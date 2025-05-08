@@ -12,6 +12,7 @@ public class RogShop : ModuleRules
         PublicIncludePaths.AddRange(new string[] {
             Path.Combine(ModuleDirectory, "Chracters"),
             Path.Combine(ModuleDirectory, "Controller"),
+            Path.Combine(ModuleDirectory, "Widget"),
         });
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
