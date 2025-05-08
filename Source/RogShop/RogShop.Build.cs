@@ -11,6 +11,8 @@ public class RogShop : ModuleRules
 
         PublicIncludePaths.AddRange(new string[] {
             Path.Combine(ModuleDirectory, "Chracters"),
+            Path.Combine(ModuleDirectory, "Controller"),
+            Path.Combine(ModuleDirectory, "Widget"),
             Path.Combine(ModuleDirectory, "Widget", "DunShop"),
         });
 
