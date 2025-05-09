@@ -19,13 +19,15 @@ public:
 	UFUNCTION(CallInEditor, Category="Tile")
 	FVector GetTileSize();
 	
+	virtual void Interact() {}
+	
 protected:
 	virtual void BeginPlay() override;
-
+	
 public:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USceneComponent> SceneComp;
-	
+
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UStaticMeshComponent> Plane;
 };

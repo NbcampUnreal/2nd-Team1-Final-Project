@@ -9,7 +9,7 @@
 
 class ARSTycoonBaseAIController;
 class UBlackBoardComponent;
-enum class EBaseTycoonAIState;
+enum class EBaseTycoonAIState : uint8;
 
 UCLASS()
 class ROGSHOP_API ARSTycoonBaseAICharacter : public ACharacter
@@ -26,7 +26,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	// Å¸°Ù À§Ä¡·Î ÀÌµ¿
+	// íƒ€ê²Ÿ ìœ„ì¹˜ë¡œ ì´ë™
 	UFUNCTION(BlueprintCallable, Category = "AI Movement")
 	void MoveToTarget();
 
@@ -34,17 +34,17 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	// ÇöÀç AI »óÅÂ (Walking, Working, Waiting µî)
+	// í˜„ì¬ AI ìƒíƒœ (Walking, Working, Waiting ë“±)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI State")
 	EBaseTycoonAIState CurrentAIState;
 
-	// ¸ñÇ¥ ¾×ÅÍ(Å×ÀÌºí, ¼Õ´Ô, ¿ä¸®´ë) µî
+	// ëª©í‘œ ì•¡í„°(í…Œì´ë¸”, ì†ë‹˜, ìš”ë¦¬ëŒ€) ë“±
 	TObjectPtr<AActor> CurrentTarget;
 
 private:
-	// AI ÄÁÆ®·Ñ·¯ ÂüÁ¶
+	// AI ì»¨íŠ¸ë¡¤ëŸ¬ ì°¸ì¡°
 	TObjectPtr<ARSTycoonBaseAIController> AIController;
-	// ºí·¢º¸µå ÄÄÆ÷³ÍÆ® ÂüÁ¶
+	// ë¸”ë™ë³´ë“œ ì»´í¬ë„ŒíŠ¸ ì°¸ì¡°
 	TObjectPtr<UBlackBoardComponent> BlackBoardComp;
 
 };

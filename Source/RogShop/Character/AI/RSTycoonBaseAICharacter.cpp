@@ -40,15 +40,15 @@ void ARSTycoonBaseAICharacter::MoveToTarget()
 		return;
 	}
 
-	// TODO : AIController¸¦ ¸¸µé¾î ÁÖ½Ã¸é ÇÕÄ¡°í ³ª¼­ ÀÌ°Å ÁÖ¼® Ç®¾î¾ßµÊ.
+	// TODO : AIControllerë¥¼ ë§Œë“¤ì–´ ì£¼ì‹œë©´ í•©ì¹˜ê³  ë‚˜ì„œ ì´ê±° ì£¼ì„ í’€ì–´ì•¼ë¨.
 
-	// Å¸°Ù ¾×ÅÍ¸¦ ÇâÇØ ÀÌµ¿
+	// íƒ€ê²Ÿ ì•¡í„°ë¥¼ í–¥í•´ ì´ë™
 	//AIController->MoveToActor(
-	//	CurrentTarget,    // ¸ñÇ¥ ¾×ÅÍ
-	//	50.0f,          // µµÂø ÆÇÁ¤ ¹İ°æ
-	//	true,           // Ãæµ¹ ¿µ¿ªÀÌ °ãÄ¡¸é µµÂøÀ¸·Î °£ÁÖ
-	//	true,           // °æ·Î Å½»ö »ç¿ë
-	//	false           // ¸ñÀûÁö¸¦ ³×ºñ°ÔÀÌ¼Ç ¸Ş½Ã¿¡ Åõ¿µ(Projection)ÇÏÁö ¾ÊÀ½
+	//	CurrentTarget,    // ëª©í‘œ ì•¡í„°
+	//	50.0f,          // ë„ì°© íŒì • ë°˜ê²½
+	//	true,           // ì¶©ëŒ ì˜ì—­ì´ ê²¹ì¹˜ë©´ ë„ì°©ìœ¼ë¡œ ê°„ì£¼
+	//	true,           // ê²½ë¡œ íƒìƒ‰ ì‚¬ìš©
+	//	false           // ëª©ì ì§€ë¥¼ ë„¤ë¹„ê²Œì´ì…˜ ë©”ì‹œì— íˆ¬ì˜(Projection)í•˜ì§€ ì•ŠìŒ
 	//);
 
 	UE_LOG(LogTemp, Display, TEXT("%s moving to target: %s"),
