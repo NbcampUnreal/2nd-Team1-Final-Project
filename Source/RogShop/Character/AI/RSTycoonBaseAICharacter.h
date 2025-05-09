@@ -9,7 +9,7 @@
 
 class ARSTycoonBaseAIController;
 class UBlackBoardComponent;
-enum class EBaseTycoonAIState;
+enum class EBaseTycoonAIState : uint8;
 
 UCLASS()
 class ROGSHOP_API ARSTycoonBaseAICharacter : public ACharacter
