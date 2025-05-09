@@ -17,9 +17,17 @@ class ROGSHOP_API UDunItemWidget : public UUserWidget
 public:
     virtual void NativeConstruct() override;
 
+    void SetItemName(FText ItemName);
+    void SetItemDescription(FText ItemDescription);
+    void SetItemPrice(int32 ItemPrice);
+    void SetItemIcon(UTexture2D* ItemIcon);
+
 protected:
     UPROPERTY(meta = (BindWidget))
     class UImage* ItemImage;
+
+    UPROPERTY(meta = (BindWidget))
+    class UTextBlock* ItemNameText;
 
     UPROPERTY(meta = (BindWidget))
     class UTextBlock* ItemDesText;
