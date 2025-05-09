@@ -2,6 +2,7 @@
 
 using System.IO;
 using UnrealBuildTool;
+using UnrealBuildTool.Rules;
 
 public class RogShop : ModuleRules
 {
@@ -10,13 +11,14 @@ public class RogShop : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
         PublicIncludePaths.AddRange(new string[] {
-            Path.Combine(ModuleDirectory, "Chracters"),
+            Path.Combine(ModuleDirectory, "Character"),
+            Path.Combine(ModuleDirectory, "Character", "AI"),
             Path.Combine(ModuleDirectory, "Controller"),
             Path.Combine(ModuleDirectory, "Widget"),
             Path.Combine(ModuleDirectory, "Widget", "DunShop"),
         });
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
