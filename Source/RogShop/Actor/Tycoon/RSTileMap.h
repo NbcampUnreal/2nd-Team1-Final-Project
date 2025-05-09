@@ -22,12 +22,13 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	UFUNCTION(CallInEditor, Category="TileMap")
-	void CreateTiles();
-
+	// UFUNCTION(CallInEditor, Category="TileMap")
+	void CreateTilesWithChildActorComponent();
+	void CreateTilesWithSpawnActor();
+	
 public:
-	UPROPERTY(EditAnywhere, Category="Tile")
-	TSubclassOf<ARSBaseTile> TileType;
+	UPROPERTY(EditAnywhere, Category="TileMap")
+	TSubclassOf<ARSBaseTile> DefaultTileType;
 
 	UPROPERTY(EditAnywhere, Category="TileMap")
 	int32 Width;
@@ -35,10 +36,10 @@ public:
 	UPROPERTY(EditAnywhere, Category="TileMap")
 	int32 Height;
 
+protected:
+	TArray<TWeakObjectPtr<ARSBaseTile>> Tiles;
+	
 private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USceneComponent> TileParent;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Tile")
-	TSubclassOf<ARSBaseTile> DefaultTileType;
 };
