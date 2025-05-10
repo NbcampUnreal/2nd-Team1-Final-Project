@@ -7,6 +7,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ARSDunPlayerCharacter::ARSDunPlayerCharacter()
@@ -32,6 +33,9 @@ ARSDunPlayerCharacter::ARSDunPlayerCharacter()
 
     // 캐릭터가 컨트롤러 Yaw를 따르지 않도록 설정
     bUseControllerRotationYaw = false;
+
+    // 변수 기본값 설정
+    DodgeMontage = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -138,10 +142,31 @@ void ARSDunPlayerCharacter::Look(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
 {
-    // 애니메이션이 아직 준비되지 않았으므로 디버깅용 출력
-    if (GEngine)
+    // 낙하 중 구르기가 되지 않도록한다.
+    if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
     {
-        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Dodge Activated"));
+        if (MovementComponent->IsFalling())
+        {
+            return;
+        }
+    }
+
+    FVector LastInput = GetLastMovementInputVector();
+
+    if (!LastInput.IsNearlyZero())
+    {
+        FRotator DesiredRotation = LastInput.Rotation();
+        SetActorRotation(DesiredRotation);
+    }
+
+    // 몽타주를 재생중이지 않은 경우 구르기 실행
+    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+    if (AnimInstance && DodgeMontage)
+    {
+        if (!AnimInstance->IsAnyMontagePlaying())
+        {
+            PlayAnimMontage(DodgeMontage);
+        }
     }
 }
 

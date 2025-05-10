@@ -16,6 +16,7 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "Controller"),
             Path.Combine(ModuleDirectory, "Widget"),
             Path.Combine(ModuleDirectory, "Widget", "DunShop"),
+            Path.Combine(ModuleDirectory, "AnimInstances"),
         });
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule" });
