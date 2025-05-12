@@ -26,8 +26,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shop")
     UDataTable* ItemDataTable;
 
-    void SetMouseMode(bool bEnable);
-    void PopulateShopItems();
+    void HandleItemPurchase(FName PurchasedID);
 
     // Èñ±Íµµ ·£´ý ÃßÃâ ÇÔ¼ö
     ERarity GetRandomRarity();
@@ -44,4 +43,7 @@ protected:
 
     UFUNCTION()
     void OnExitClicked();
+
+    void SetMouseMode(bool bEnable);
+    void PopulateShopItems();
 };
