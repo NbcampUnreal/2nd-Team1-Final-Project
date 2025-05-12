@@ -3,3 +3,8 @@
 
 #include "RSDunBaseCharacter.h"
 
+ARSDunBaseCharacter::ARSDunBaseCharacter()
+{
+	MaxHP = 100.f;
+	HP = MaxHP;
+}

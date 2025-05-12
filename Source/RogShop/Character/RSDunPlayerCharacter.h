@@ -31,6 +31,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	void OnDeath();
+
 protected:
 	UFUNCTION()
 	void Move(const FInputActionValue& value);
@@ -56,8 +60,11 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UCameraComponent> CameraComp;
 
-// 구르기 관련
+// 애니메이션 몽타주 관련
 private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dodge", meta = (AllowPrivateAccess = true))
-	TObjectPtr<UAnimMontage> DodgeMontage;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UAnimMontage> DodgeMontage; // 구르기
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UAnimMontage> DeathMontage; // 사망
 };
