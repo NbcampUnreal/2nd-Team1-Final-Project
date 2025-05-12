@@ -105,7 +105,8 @@ void UDunItemWidget::BuyItem()
                 case ERarity::Legendary: PotionValue = 4.0f; break;
             }
 
-            Character->AddHP(PotionValue);  // 캐릭터 클래스에 이 함수 구현 필요
+            // Character->AddHP(PotionValue);  // 캐릭터 클래스에 이 함수 구현 필요
+
             break;
         }
         case EItemList::Sword:
