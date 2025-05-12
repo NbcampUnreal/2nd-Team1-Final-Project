@@ -15,7 +15,9 @@ public:
 	ARSTableTile();
 
 	virtual void Tick(float DeltaTime) override;
-
+	
+	virtual void Interact() override;
+	
 	FVector GetFoodLocation() const;
 	const TArray<TObjectPtr<USceneComponent>>& GetSittingLocations() { return SittingLocations; }
 
