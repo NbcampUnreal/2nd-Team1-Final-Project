@@ -3,6 +3,7 @@
 
 #include "DunShopWidget.h"
 #include "DunItemWidget.h"
+#include "RSGameInstance.h"
 
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
@@ -30,6 +31,17 @@ void UDunShopWidget::OnExitClicked()
     SetMouseMode(false);
 
     RemoveFromParent();
+}
+
+void UDunShopWidget::HandleItemPurchase(FName PurchasedID)
+{
+    URSGameInstance* GI = Cast<URSGameInstance>(GetGameInstance());
+
+    if (GI)
+    {
+        GI->PurchasedItemIDs.Add(PurchasedID);  // 아이템 구매 후 아이디 추가
+        UE_LOG(LogTemp, Warning, TEXT("Item Purchased: %s"), *PurchasedID.ToString());
+    }
 }
 
 void UDunShopWidget::SetMouseMode(bool bEnable)
@@ -60,6 +72,8 @@ void UDunShopWidget::SetMouseMode(bool bEnable)
 
 void UDunShopWidget::PopulateShopItems()
 {
+    TSet<FName> AlreadySpawnedIDs;
+
     const int32 ItemCount = 5;
 
     for (int32 i = 0; i < ItemCount; ++i)
@@ -68,22 +82,51 @@ void UDunShopWidget::PopulateShopItems()
 
         if (RandomItem)
         {
-            UE_LOG(LogTemp, Warning, TEXT("Selected Item: %s (%s)"),
+            /*UE_LOG(LogTemp, Warning, TEXT("Selected Item: %s (%s)"),
                 *RandomItem->ItemName.ToString(),
-                *UEnum::GetValueAsString(RandomItem->Rarity));
+                *UEnum::GetValueAsString(RandomItem->Rarity));*/
+
+            // 중복 랜덤 생성 방지
+            if (!RandomItem || AlreadySpawnedIDs.Contains(RandomItem->ItemID))
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Item Already Exist"));
+                continue;
+            }
+            // 이미 샀던 아이템 생성 방지
+            else
+            {
+                URSGameInstance* GI = Cast<URSGameInstance>(GetGameInstance());
+
+                if (GI)
+                {
+                    if (GI->PurchasedItemIDs.Contains(RandomItem->ItemID))
+                    {
+                        UE_LOG(LogTemp, Warning, TEXT("Item Already Buy"));
+                        continue;
+                    }
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("GameInstance is not valid!"));
+                }
+            }
+
+            AlreadySpawnedIDs.Add(RandomItem->ItemID);
 
             if (ItemWidgetClass && ItemHorizontalBox)
             {
-                // 위젯 생성
                 UDunItemWidget* NewItemWidget = CreateWidget<UDunItemWidget>(this, ItemWidgetClass);
 
                 if (NewItemWidget)
                 {
-                    // 아이템 정보를 설정
                     NewItemWidget->SetItemName(RandomItem->ItemName);
                     NewItemWidget->SetItemDescription(RandomItem->Description);
                     NewItemWidget->SetItemPrice(RandomItem->Price);
                     NewItemWidget->SetItemIcon(RandomItem->Icon);
+                    NewItemWidget->SetItemType(RandomItem->ItemList);
+                    NewItemWidget->SetItemRarity(RandomItem->Rarity);
+                    NewItemWidget->SetItemID(RandomItem->ItemID);
+                    NewItemWidget->SetParentShop(this);
 
                     // 위젯을 수평 박스에 추가
                     UHorizontalBoxSlot* BoxSlot = Cast<UHorizontalBoxSlot>(ItemHorizontalBox->AddChild(NewItemWidget));
@@ -128,7 +171,7 @@ FShopItemStruct* UDunShopWidget::GetRandomItemFromDataTable(UDataTable* DataTabl
     TArray<FShopItemStruct*> FilteredItems;
     for (FShopItemStruct* Item : AllItems)
     {
-        if (Item && Item->Rarity == SelectedRarity) // Rarity는 Struct에 추가돼 있어야 함
+        if (Item && Item->Rarity == SelectedRarity)
         {
             FilteredItems.Add(Item);
         }
@@ -141,5 +184,5 @@ FShopItemStruct* UDunShopWidget::GetRandomItemFromDataTable(UDataTable* DataTabl
         return FilteredItems[RandomIndex];
     }
 
-    return nullptr; // 선택된 등급에 해당하는 아이템이 없을 경우
+    return nullptr;
 }
