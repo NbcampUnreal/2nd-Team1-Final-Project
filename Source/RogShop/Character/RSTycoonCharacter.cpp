@@ -50,14 +50,14 @@ void ARSTycoonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 void ARSTycoonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	InteractSphere->OnComponentBeginOverlap.AddDynamic(this, &ARSTycoonCharacter::OnBeginOverlapInteract);
 }
 
 void ARSTycoonCharacter::OnMove(const FInputActionValue& Value)
 {
 	FVector Input = Value.Get<FVector>();
+	
 	GetMovementComponent()->AddInputVector(Input);
+	
 }
 
 void ARSTycoonCharacter::OnInteract(const FInputActionValue& Value)
@@ -65,18 +65,24 @@ void ARSTycoonCharacter::OnInteract(const FInputActionValue& Value)
 	TArray<AActor*> OverlapTileActors;
 	InteractSphere->GetOverlappingActors(OverlapTileActors, ARSBaseTile::StaticClass());
 
-	if(OverlapTileActors.Num() > 0)
+	if (OverlapTileActors.Num() > 0)
 	{
-		ARSBaseTile* Tile = Cast<ARSBaseTile>(OverlapTileActors[0]);
+		AActor* MinActor = nullptr;
+		int32 Min = INT32_MAX;
+		FVector PlayerLocation = GetActorLocation();
+
+		//제일 가까운 Tile 검출
+		for (AActor* Tile : OverlapTileActors)
+		{
+			double DistanceSqrt = FVector::DistSquared2D(PlayerLocation, Tile->GetActorLocation());
+			if (DistanceSqrt < Min)
+			{
+				Min = DistanceSqrt;
+				MinActor = Tile;
+			}
+		}
+		
+		ARSBaseTile* Tile = Cast<ARSBaseTile>(MinActor);
 		Tile->Interact();
-
-		RS_LOG("상호작용 됨")
 	}
-}
-
-void ARSTycoonCharacter::OnBeginOverlapInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                                UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-                                                const FHitResult& SweepResult)
-{
-	RS_LOG("상호작용 가능 범위 안에 들어옴")
 }

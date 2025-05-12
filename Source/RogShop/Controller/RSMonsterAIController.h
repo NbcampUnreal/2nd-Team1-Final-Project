@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "../Character/ARSDunMonsterCharacter.h"
+#include "NavigationSystem.h"
+#include "Navigation/PathFollowingComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "RSMonsterAIController.generated.h"
 
 /**
@@ -13,8 +17,15 @@ UCLASS()
 class ROGSHOP_API ARSMonsterAIController : public AAIController
 {
 	GENERATED_BODY()
-protected:
-
-public:
+protected://Value	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RVO")//RVO radius
+	float avoidanceRadius;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RVO")//RVO priority
+	float avoidanceWeight;
+public://Function
 	ARSMonsterAIController();
+
+	UFUNCTION(BlueprintCallable)
+	void SetRVOAvoidanceEnabled(bool bEnable);
 };

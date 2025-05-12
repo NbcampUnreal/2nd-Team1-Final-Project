@@ -8,13 +8,22 @@
 
 ARSBaseTile::ARSBaseTile()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	
+	PrimaryActorTick.bCanEverTick = false;
 
 	SceneComp = CreateDefaultSubobject<USceneComponent>("SceneComp");
 	RootComponent = SceneComp;
-	
+
 	Plane = CreateDefaultSubobject<UStaticMeshComponent>("Plane");
 	Plane->SetupAttachment(RootComponent);
+
+	//기본 메시 설정
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMeshAsset(TEXT("/Engine/BasicShapes/Cube.Cube"));
+	if (CubeMeshAsset.Succeeded())
+	{
+		Plane->SetStaticMesh(CubeMeshAsset.Object);
+		Plane->SetRelativeScale3D(FVector(5, 5, 0.1));
+	}
 }
 
 FVector ARSBaseTile::GetTileSize()
