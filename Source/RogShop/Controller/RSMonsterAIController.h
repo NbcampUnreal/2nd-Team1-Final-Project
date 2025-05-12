@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "../Character/ARSDunMonsterCharacter.h"
 #include "RSMonsterAIController.generated.h"
 
 /**
