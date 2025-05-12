@@ -20,6 +20,8 @@ public:
 public:
 	void AddMapping();
 
+	void RemoveAllMapping();
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
 	TObjectPtr<UInputMappingContext> IMC;
