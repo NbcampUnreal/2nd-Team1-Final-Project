@@ -13,6 +13,9 @@ UCLASS()
 class ROGSHOP_API ARSDunBaseCharacter : public ACharacter
 {
 	GENERATED_BODY()
+
+public:
+	ARSDunBaseCharacter();
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

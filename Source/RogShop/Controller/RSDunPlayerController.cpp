@@ -26,3 +26,15 @@ void ARSDunPlayerController::AddMapping()
         }
     }
 }
+
+void ARSDunPlayerController::RemoveAllMapping()
+{
+    // 모든 매핑 제거
+    if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
+    {
+        if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+        {
+            Subsystem->ClearAllMappings();
+        }
+    }
+}

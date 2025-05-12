@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 ARSDunPlayerCharacter::ARSDunPlayerCharacter()
@@ -101,6 +102,47 @@ void ARSDunPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
                 EnhancedInput->BindAction(PlayerController->SecondWeaponSlotAction, ETriggerEvent::Triggered, this, &ARSDunPlayerCharacter::SecondWeaponSlot);
             }
         }
+    }
+}
+
+float ARSDunPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+    const float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+    float NewHP = FMath::Clamp(HP - Damage, 0.0f, MaxHP);
+
+    HP = NewHP;
+
+    if (HP <= 0)
+    {
+        OnDeath();
+    }
+
+    return Damage;
+}
+
+void ARSDunPlayerCharacter::OnDeath()
+{
+    // 레벨 오브젝트를 제외한 모든 오브젝트와 충돌하지 않도록 콜리전 설정 변경
+    GetCapsuleComponent()->SetCollisionProfileName(TEXT("DeadCharacter"));
+    GetMesh()->SetCollisionProfileName(TEXT("DeadCharacter"));
+
+    // 사망 애니메이션 재생
+    if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+    {
+        AnimInstance->Montage_Play(DeathMontage);
+    }
+
+    // 더이상 입력받지 못하도록 플레이어 컨트롤러의 입력 매핑 제거
+    if (ARSDunPlayerController* PlayerController = Cast<ARSDunPlayerController>(GetController()))
+    {
+        PlayerController->RemoveAllMapping();
+    }
+
+    // 더이상 움직일 수 없도록 설정
+    if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+    {
+        MovementComponent->SetMovementMode(EMovementMode::MOVE_None);
     }
 }
 
