@@ -102,7 +102,9 @@ void ARSTileMap::CreateTilesWithSpawnActor()
 		for (int32 j = 0; j < Width; j++)
 		{
 			ARSBaseTile* TileActor = GetWorld()->SpawnActor<ARSBaseTile>(DefaultTileType);
+#if WITH_EDITOR
 			TileActor->SetActorLabel(FString::Printf(TEXT("Tile %d x %d"), i, j));
+#endif
 
 			FVector Location = StartLocation;
 			Location.X += TileSize.X * j;
