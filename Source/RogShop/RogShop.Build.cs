@@ -18,6 +18,9 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "AnimInstances"),
             Path.Combine(ModuleDirectory, "CheatManager"),
             Path.Combine(ModuleDirectory, "GameInstance"),
+            Path.Combine(ModuleDirectory, "Actor", "Dungeon", "Weapon"),
+            Path.Combine(ModuleDirectory, "AnimNotifyState"),
+            Path.Combine(ModuleDirectory, "ActorComponent"),
         });
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule", "NavigationSystem" });
