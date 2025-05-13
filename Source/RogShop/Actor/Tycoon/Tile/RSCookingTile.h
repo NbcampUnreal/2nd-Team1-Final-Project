@@ -6,6 +6,17 @@
 #include "RSBaseTile.h"
 #include "RSCookingTile.generated.h"
 
+class ARSBaseFood;
+class ARSTycoonCustomerCharacter;
+
+UENUM()
+enum class ECookingState
+{
+	None,
+	Cooking,
+	Finish,
+};
+
 UCLASS()
 class ROGSHOP_API ARSCookingTile : public ARSBaseTile
 {
@@ -14,12 +25,23 @@ class ROGSHOP_API ARSCookingTile : public ARSBaseTile
 public:
 	ARSCookingTile();
 
-	virtual void Tick(float DeltaTime) override;
-
 	virtual void Interact() override;
-	
-protected:
-	virtual void BeginPlay() override;
 
-public:
+private:
+	void OrderToCook();
+	void Cook(const FString& FoodName);
+	void TakeFood();
+
+private:
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<USceneComponent> FoodLocation; //음식이 나오는 위치
+	
+	ECookingState State;
+
+	UPROPERTY()
+	TWeakObjectPtr<ARSBaseFood> CookedFood;
+	
+	//임시
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ARSBaseFood> FoodType;
 };
