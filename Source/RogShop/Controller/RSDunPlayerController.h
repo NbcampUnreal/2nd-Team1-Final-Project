@@ -15,6 +15,8 @@ class ROGSHOP_API ARSDunPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
+	ARSDunPlayerController();
+
 	virtual void BeginPlay() override;
 
 public:
