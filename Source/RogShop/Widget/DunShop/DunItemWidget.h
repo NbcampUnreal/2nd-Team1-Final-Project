@@ -17,17 +17,11 @@ class ROGSHOP_API UDunItemWidget : public UUserWidget
 public:
     virtual void NativeConstruct() override;
 
-    void SetItemName(FText ItemName);
-    void SetItemDescription(FText ItemDescription);
-    void SetItemPrice(int32 ItemPrice);
-    void SetItemIcon(UTexture2D* ItemIcon);
-    void SetItemType(EItemList InItemList);
-    void SetItemRarity(ERarity InItemRarity);
-    void SetItemID(FName InItemID);
+    void SetItemData(const FShopItemStruct& InItemData);
 
     void SetParentShop(UDunShopWidget* InShop);
 
-    void BuyItem();
+    bool BuyItem();
 
 protected:
     UPROPERTY(meta = (BindWidget))
@@ -46,16 +40,10 @@ protected:
     class UButton* BuyBtn;
 
     UPROPERTY()
-    EItemList ItemListType;
-
-    UPROPERTY()
-    ERarity ItemRarity;
-
-    UPROPERTY()
-    FName ItemID;
-
-    UPROPERTY()
     UDunShopWidget* ParentShop;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+    FShopItemStruct ItemData;
 
     UFUNCTION()
     void OnBuyClicked();

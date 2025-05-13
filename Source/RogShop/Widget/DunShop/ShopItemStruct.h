@@ -16,8 +16,11 @@ enum class ERarity : uint8
 UENUM(BlueprintType)
 enum class EItemList : uint8
 {
+    None,
     Potion,
     Sword,
+    BattleAxe,
+    Hammer
 };
 
 USTRUCT(BlueprintType)
@@ -45,8 +48,8 @@ public:
     UTexture2D* Icon = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-    ERarity Rarity;
+    ERarity Rarity = ERarity::Common;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-    EItemList ItemList = EItemList::Potion;
+    EItemList ItemList = EItemList::None;
 };
