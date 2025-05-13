@@ -82,14 +82,9 @@ void UDunShopWidget::PopulateShopItems()
 
         if (RandomItem)
         {
-            /*UE_LOG(LogTemp, Warning, TEXT("Selected Item: %s (%s)"),
-                *RandomItem->ItemName.ToString(),
-                *UEnum::GetValueAsString(RandomItem->Rarity));*/
-
             // 중복 랜덤 생성 방지
             if (!RandomItem || AlreadySpawnedIDs.Contains(RandomItem->ItemID))
             {
-                UE_LOG(LogTemp, Warning, TEXT("Item Already Exist"));
                 continue;
             }
             // 이미 샀던 아이템 생성 방지
@@ -101,7 +96,6 @@ void UDunShopWidget::PopulateShopItems()
                 {
                     if (GI->PurchasedItemIDs.Contains(RandomItem->ItemID))
                     {
-                        UE_LOG(LogTemp, Warning, TEXT("Item Already Buy"));
                         continue;
                     }
                 }
@@ -119,13 +113,7 @@ void UDunShopWidget::PopulateShopItems()
 
                 if (NewItemWidget)
                 {
-                    NewItemWidget->SetItemName(RandomItem->ItemName);
-                    NewItemWidget->SetItemDescription(RandomItem->Description);
-                    NewItemWidget->SetItemPrice(RandomItem->Price);
-                    NewItemWidget->SetItemIcon(RandomItem->Icon);
-                    NewItemWidget->SetItemType(RandomItem->ItemList);
-                    NewItemWidget->SetItemRarity(RandomItem->Rarity);
-                    NewItemWidget->SetItemID(RandomItem->ItemID);
+                    NewItemWidget->SetItemData(*RandomItem);
                     NewItemWidget->SetParentShop(this);
 
                     // 위젯을 수평 박스에 추가
@@ -138,6 +126,10 @@ void UDunShopWidget::PopulateShopItems()
                 }
             }
 
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("ItemDataTable is Null"));
         }
     }
 }

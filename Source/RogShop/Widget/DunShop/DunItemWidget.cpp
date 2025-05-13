@@ -19,66 +19,29 @@ void UDunItemWidget::NativeConstruct()
     }
 }
 
-void UDunItemWidget::OnBuyClicked()
+void UDunItemWidget::SetItemData(const FShopItemStruct& InItemData)
 {
-    if (ItemPriceText)
-    {
-        ItemPriceText->SetText(FText::FromString("Sold Out"));
-    }
+    ItemData = InItemData;
 
-    if (BuyBtn)
-    {
-        BuyBtn->SetIsEnabled(false);
-    }
-
-    BuyItem();
-}
-
-void UDunItemWidget::SetItemName(FText ItemName)
-{
     if (ItemNameText)
     {
-        ItemNameText->SetText(ItemName);
+        ItemNameText->SetText(InItemData.ItemName);
     }
-}
 
-void UDunItemWidget::SetItemDescription(FText ItemDescription)
-{
     if (ItemDesText)
     {
-        ItemDesText->SetText(ItemDescription);
+        ItemDesText->SetText(InItemData.Description);
     }
-}
 
-void UDunItemWidget::SetItemPrice(int32 ItemPrice)
-{
     if (ItemPriceText)
     {
-        ItemPriceText->SetText(FText::AsNumber(ItemPrice));
+        ItemPriceText->SetText(FText::AsNumber(InItemData.Price));
     }
-}
 
-void UDunItemWidget::SetItemIcon(UTexture2D* ItemIcon)
-{
-    if (ItemImage && ItemIcon)
+    if (ItemImage && InItemData.Icon)
     {
-        ItemImage->SetBrushFromTexture(ItemIcon);
+        ItemImage->SetBrushFromTexture(InItemData.Icon);
     }
-}
-
-void UDunItemWidget::SetItemType(EItemList InItemList)
-{
-    ItemListType = InItemList;
-}
-
-void UDunItemWidget::SetItemRarity(ERarity InItemRarity)
-{
-    ItemRarity = InItemRarity;
-}
-
-void UDunItemWidget::SetItemID(FName InItemID)
-{
-    ItemID = InItemID;
 }
 
 void UDunItemWidget::SetParentShop(UDunShopWidget* InShop)
@@ -86,18 +49,61 @@ void UDunItemWidget::SetParentShop(UDunShopWidget* InShop)
     ParentShop = InShop;
 }
 
-void UDunItemWidget::BuyItem()
+void UDunItemWidget::OnBuyClicked()
+{
+    if (BuyItem())
+    {
+        // Character->SetPrice(ItemData.Price); // 플레이어 골드 수정 관련 함수 또는 public 변수 필요
+
+        if (ItemPriceText)
+        {
+            ItemPriceText->SetText(FText::FromString("Sold Out"));
+        }
+
+        if (BuyBtn)
+        {
+            BuyBtn->SetIsEnabled(false);
+        }
+
+        if (ParentShop)
+        {
+            ParentShop->HandleItemPurchase(ItemData.ItemID);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("ParentShop is nullptr"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("No Buy Item"));
+    }
+}
+
+bool UDunItemWidget::BuyItem()
 {
     ARSDunBaseCharacter* Character = Cast<ARSDunBaseCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
-    if (!Character) return;
+    if (!Character)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("BuyItem - Character is nullptr"));
+        return false;
+    }
 
-    switch (ItemListType)
+    /*if (Character->GetPrice() - ItemData.Price < 0) // 플레이어 골드 가져오기 관련 함수 또는 public 변수 필요
+    {
+        UE_LOG(LogTemp, Warning, TEXT("BuyItem - More Gold Need"));
+        return false;
+    }*/
+
+    bool bIsBuy = true;
+
+    switch (ItemData.ItemList)
     {
         case EItemList::Potion:
         {
             float PotionValue = 0.0f;
 
-            switch (ItemRarity)
+            switch (ItemData.Rarity)
             {
                 case ERarity::Common: PotionValue = 1.0f; break;
                 case ERarity::Rare: PotionValue = 2.0f; break;
@@ -105,27 +111,31 @@ void UDunItemWidget::BuyItem()
                 case ERarity::Legendary: PotionValue = 4.0f; break;
             }
 
-            // Character->AddHP(PotionValue);  // 캐릭터 클래스에 이 함수 구현 필요
+            // Character->AddHP(PotionValue);  // 플레이어 HP 수정 관련 함수 또는 public 변수 필요
 
             break;
         }
         case EItemList::Sword:
         {
-            // ...
+            // 무기 1 ...
+            break;
+        }
+        case EItemList::BattleAxe:
+        {
+            // 무기 2 ...
+            break;
+        }
+        case EItemList::Hammer:
+        {
+            // 무기 3 ...
             break;
         }
         default:
-            UE_LOG(LogTemp, Warning, TEXT("Not Define Item."));
+            UE_LOG(LogTemp, Warning, TEXT("Not Define Item"));
+            bIsBuy = false;
             break;
     }
 
-    if (ParentShop)
-    {
-        ParentShop->HandleItemPurchase(ItemID);
-    }
-    else 
-    {
-        UE_LOG(LogTemp, Warning, TEXT("ParentShop is nullptr"));
-    }
+    return bIsBuy;
 }
 
