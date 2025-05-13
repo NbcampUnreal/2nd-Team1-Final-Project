@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "ShopItemStruct.h"
 #include "DunItemWidget.generated.h"
 
-/**
- * 
- */
+class UDunShopWidget;
+
 UCLASS()
 class ROGSHOP_API UDunItemWidget : public UUserWidget
 {
@@ -17,10 +17,11 @@ class ROGSHOP_API UDunItemWidget : public UUserWidget
 public:
     virtual void NativeConstruct() override;
 
-    void SetItemName(FText ItemName);
-    void SetItemDescription(FText ItemDescription);
-    void SetItemPrice(int32 ItemPrice);
-    void SetItemIcon(UTexture2D* ItemIcon);
+    void SetItemData(const FShopItemStruct& InItemData);
+
+    void SetParentShop(UDunShopWidget* InShop);
+
+    bool BuyItem();
 
 protected:
     UPROPERTY(meta = (BindWidget))
@@ -37,6 +38,12 @@ protected:
 
     UPROPERTY(meta = (BindWidget))
     class UButton* BuyBtn;
+
+    UPROPERTY()
+    UDunShopWidget* ParentShop;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+    FShopItemStruct ItemData;
 
     UFUNCTION()
     void OnBuyClicked();

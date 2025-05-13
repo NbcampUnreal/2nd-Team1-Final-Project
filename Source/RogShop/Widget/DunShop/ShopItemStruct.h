@@ -13,6 +13,16 @@ enum class ERarity : uint8
     Legendary
 };
 
+UENUM(BlueprintType)
+enum class EItemList : uint8
+{
+    None,
+    Potion,
+    Sword,
+    BattleAxe,
+    Hammer
+};
+
 USTRUCT(BlueprintType)
 struct ROGSHOP_API FShopItemStruct : public FTableRowBase
 {
@@ -22,21 +32,24 @@ public:
 
     // 내부 로직 처리용
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-    FName ItemID;
+    FName ItemID = NAME_None;
 
     // 보여주는 텍스트
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-    FText ItemName;
+    FText ItemName = FText::FromString(TEXT(""));
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-    FText Description;
+    FText Description = FText::FromString(TEXT(""));
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-    int32 Price;
+    int32 Price = 0;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-    UTexture2D* Icon;
+    UTexture2D* Icon = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-    ERarity Rarity;
+    ERarity Rarity = ERarity::Common;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+    EItemList ItemList = EItemList::None;
 };
