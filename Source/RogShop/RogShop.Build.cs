@@ -16,6 +16,7 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "Controller"),
             Path.Combine(ModuleDirectory, "Widget", "DunShop"),
             Path.Combine(ModuleDirectory, "AnimInstances"),
+            Path.Combine(ModuleDirectory, "CheatManager"),
             Path.Combine(ModuleDirectory, "GameInstance"),
         });
 

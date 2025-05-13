@@ -14,8 +14,8 @@ void ARSMonsterAIController::SetRVOAvoidanceEnabled(bool bEnable)//path find bot
 	APawn* ctrlPawn = GetPawn();//Figure out Who is possessed Pawn
 	if (ctrlPawn)
 	{
-		AARSDunMonsterCharacter* ctrlChr;
-		ctrlChr = Cast<AARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
+		ARSDunMonsterCharacter* ctrlChr;
+		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
 		if (ctrlChr)
 		{
 			UCharacterMovementComponent* movementComponent = ctrlChr->GetCharacterMovement();
