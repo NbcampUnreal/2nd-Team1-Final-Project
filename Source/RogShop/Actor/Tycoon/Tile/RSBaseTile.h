@@ -15,15 +15,16 @@ public:
 	ARSBaseTile();
 
 	virtual void Tick(float DeltaTime) override;
-	
-	virtual void Interact() {}
-	
+
+	virtual void Interact() { }
+
 	UFUNCTION(CallInEditor, Category="Tile")
 	FVector GetTileSize();
-	
+	FString GetTileName() const { return TileName; }
+
 protected:
 	virtual void BeginPlay() override;
-	
+
 public:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USceneComponent> SceneComp;
