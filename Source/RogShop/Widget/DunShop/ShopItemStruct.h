@@ -18,6 +18,10 @@ enum class EItemList : uint8
 {
     None,
     Potion,
+    MaxHpRelic,
+    WalkSpeedRelic,
+    AttackRelic,
+    AttackSpeedRelic,
     Sword,
     BattleAxe,
     Hammer

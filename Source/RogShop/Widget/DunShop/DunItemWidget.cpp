@@ -53,7 +53,7 @@ void UDunItemWidget::OnBuyClicked()
 {
     if (BuyItem())
     {
-        // Character->SetPrice(ItemData.Price); // 플레이어 골드 수정 관련 함수 또는 public 변수 필요
+        // Character->SetLifeEssence(ItemData.Price); // 플레이어 골드 수정 관련 함수 또는 public 변수 필요
 
         if (ItemPriceText)
         {
@@ -89,29 +89,85 @@ bool UDunItemWidget::BuyItem()
         return false;
     }
 
-    /*if (Character->GetPrice() - ItemData.Price < 0) // 플레이어 골드 가져오기 관련 함수 또는 public 변수 필요
+    /*if (Character->GetLifeEssence() - ItemData.Price < 0) // 플레이어 재화 가져오기 관련 함수 또는 public 변수 필요
     {
-        UE_LOG(LogTemp, Warning, TEXT("BuyItem - More Gold Need"));
+        UE_LOG(LogTemp, Warning, TEXT("BuyItem - More LifeEssence Need"));
         return false;
     }*/
 
     bool bIsBuy = true;
 
+    float FinalValue = 0.0f;
+
     switch (ItemData.ItemList)
     {
         case EItemList::Potion:
         {
-            float PotionValue = 0.0f;
-
             switch (ItemData.Rarity)
             {
-                case ERarity::Common: PotionValue = 1.0f; break;
-                case ERarity::Rare: PotionValue = 2.0f; break;
-                case ERarity::Epic: PotionValue = 3.0f; break;
-                case ERarity::Legendary: PotionValue = 4.0f; break;
+                case ERarity::Common: FinalValue = 1.0f; break;
+                case ERarity::Rare: FinalValue = 2.0f; break;
+                case ERarity::Epic: FinalValue = 3.0f; break;
+                case ERarity::Legendary: FinalValue = 4.0f; break;
             }
 
-            // Character->AddHP(PotionValue);  // 플레이어 HP 수정 관련 함수 또는 public 변수 필요
+            // Character->AddHP(FinalValue);  // 플레이어 HP 수정 관련 함수 또는 public 변수 필요
+
+            break;
+        }
+        case EItemList::MaxHpRelic:
+        {
+            switch (ItemData.Rarity)
+            {
+                case ERarity::Common: FinalValue = 1.0f; break;
+                case ERarity::Rare: FinalValue = 2.0f; break;
+                case ERarity::Epic: FinalValue = 3.0f; break;
+                case ERarity::Legendary: FinalValue = 4.0f; break;
+            }
+
+            // Character->SetMaxHP(FinalValue);
+
+            break;
+        }
+        case EItemList::WalkSpeedRelic:
+        {
+            switch (ItemData.Rarity)
+            {
+                case ERarity::Common: FinalValue = 1.0f; break;
+                case ERarity::Rare: FinalValue = 2.0f; break;
+                case ERarity::Epic: FinalValue = 3.0f; break;
+                case ERarity::Legendary: FinalValue = 4.0f; break;
+            }
+
+            // Character->AddWalkSpeed(FinalValue);
+
+            break;
+        }
+        case EItemList::AttackRelic:
+        {
+            switch (ItemData.Rarity)
+            {
+                case ERarity::Common: FinalValue = 5.0f; break;
+                case ERarity::Rare: FinalValue = 10.0f; break;
+                case ERarity::Epic: FinalValue = 15.0f; break;
+                case ERarity::Legendary: FinalValue = 25.0f; break;
+            }
+
+            // Character->AddAtk(FinalValue);
+
+            break;
+        }
+        case EItemList::AttackSpeedRelic:
+        {
+            switch (ItemData.Rarity)
+            {
+                case ERarity::Common: FinalValue = 5.0f; break;
+                case ERarity::Rare: FinalValue = 10.0f; break;
+                case ERarity::Epic: FinalValue = 15.0f; break;
+                case ERarity::Legendary: FinalValue = 25.0f; break;
+            }
+
+            // Character->AddAtkSpeed(FinalValue);
 
             break;
         }
