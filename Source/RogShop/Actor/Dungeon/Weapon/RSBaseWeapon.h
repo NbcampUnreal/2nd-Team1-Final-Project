@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "RSInteractableInterface.h"
+#include "RSInteractable.h"
 #include "RSBaseWeapon.generated.h"
 
 UCLASS()
-class ROGSHOP_API ARSBaseWeapon : public AActor, public IRSInteractableInterface
+class ROGSHOP_API ARSBaseWeapon : public AActor, public IRSInteractable
 {
 	GENERATED_BODY()
 	

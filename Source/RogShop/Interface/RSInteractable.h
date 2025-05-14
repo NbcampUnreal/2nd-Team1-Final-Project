@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "RSInteractableInterface.generated.h"
+#include "RSInteractable.generated.h"
 
 class ARSDunPlayerCharacter;
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class URSInteractableInterface : public UInterface
+class URSInteractable : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -18,7 +18,7 @@ class URSInteractableInterface : public UInterface
 /**
  * 
  */
-class ROGSHOP_API IRSInteractableInterface
+class ROGSHOP_API IRSInteractable
 {
 	GENERATED_BODY()
 

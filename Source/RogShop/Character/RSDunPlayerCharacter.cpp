@@ -10,7 +10,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "RSPlayerWeaponComponent.h"
-#include "RSInteractableInterface.h"
+#include "RSInteractable.h"
 #include "DrawDebugHelpers.h"
 
 // Sets default values
@@ -232,7 +232,7 @@ void ARSDunPlayerCharacter::Interaction(const FInputActionValue& value)
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Interaction Activated"));
     }
 
-    IRSInteractableInterface* Interactable = Cast<IRSInteractableInterface>(InteractActor);
+    IRSInteractable* Interactable = Cast<IRSInteractable>(InteractActor);
     if (Interactable)
     {
         Interactable->Interact(this);
@@ -296,9 +296,9 @@ void ARSDunPlayerCharacter::InteractTrace()
     if (bHit)
     {
         AActor* HitActor = Hit.GetActor();
-        if (HitActor && HitActor->GetClass()->ImplementsInterface(URSInteractableInterface::StaticClass()))
+        if (HitActor && HitActor->GetClass()->ImplementsInterface(URSInteractable::StaticClass()))
         {
-            IRSInteractableInterface* Interactable = Cast<IRSInteractableInterface>(HitActor);
+            IRSInteractable* Interactable = Cast<IRSInteractable>(HitActor);
             if (Interactable)
             {
                 InteractActor = HitActor;
