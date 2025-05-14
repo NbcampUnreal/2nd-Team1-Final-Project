@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h" // 데이터 테이블용
-#include "ShopItemStruct.generated.h"
+#include "ShopItemData.generated.h"
 
 UENUM(BlueprintType)
 enum class ERarity : uint8
@@ -18,13 +18,17 @@ enum class EItemList : uint8
 {
     None,
     Potion,
+    MaxHpRelic,
+    WalkSpeedRelic,
+    AttackRelic,
+    AttackSpeedRelic,
     Sword,
     BattleAxe,
     Hammer
 };
 
 USTRUCT(BlueprintType)
-struct ROGSHOP_API FShopItemStruct : public FTableRowBase
+struct ROGSHOP_API FShopItemData : public FTableRowBase
 {
     GENERATED_BODY()
 
