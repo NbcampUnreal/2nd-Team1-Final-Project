@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "ShopItemStruct.h"
+#include "ShopItemData.h"
 #include "DunItemWidget.generated.h"
 
 class UDunShopWidget;
@@ -17,7 +17,7 @@ class ROGSHOP_API UDunItemWidget : public UUserWidget
 public:
     virtual void NativeConstruct() override;
 
-    void SetItemData(const FShopItemStruct& InItemData);
+    void SetItemData(const FShopItemData& InItemData);
 
     void SetParentShop(UDunShopWidget* InShop);
 
@@ -43,7 +43,7 @@ protected:
     UDunShopWidget* ParentShop;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-    FShopItemStruct ItemData;
+    FShopItemData ItemData;
 
     UFUNCTION()
     void OnBuyClicked();

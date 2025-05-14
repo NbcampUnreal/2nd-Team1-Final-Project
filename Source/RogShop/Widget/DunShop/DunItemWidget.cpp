@@ -19,7 +19,7 @@ void UDunItemWidget::NativeConstruct()
     }
 }
 
-void UDunItemWidget::SetItemData(const FShopItemStruct& InItemData)
+void UDunItemWidget::SetItemData(const FShopItemData& InItemData)
 {
     ItemData = InItemData;
 

@@ -52,7 +52,7 @@ void UDunShopWidget::PopulateShopItems()
 
     for (int32 i = 0; i < ItemCount; ++i)
     {
-        FShopItemStruct* RandomItem = GetRandomItemFromDataTable(ItemDataTable);
+        FShopItemData* RandomItem = GetRandomItemFromDataTable(ItemDataTable);
 
         if (RandomItem)
         {
@@ -125,7 +125,7 @@ ERarity UDunShopWidget::GetRandomRarity()
         return ERarity::Legendary;
 }
 
-FShopItemStruct* UDunShopWidget::GetRandomItemFromDataTable(UDataTable* DataTable)
+FShopItemData* UDunShopWidget::GetRandomItemFromDataTable(UDataTable* DataTable)
 {
     if (!DataTable) return nullptr;
 
@@ -133,12 +133,12 @@ FShopItemStruct* UDunShopWidget::GetRandomItemFromDataTable(UDataTable* DataTabl
     ERarity SelectedRarity = GetRandomRarity();
 
     // 2. 전체 데이터 테이블 가져오기
-    TArray<FShopItemStruct*> AllItems;
+    TArray<FShopItemData*> AllItems;
     DataTable->GetAllRows(TEXT("Context"), AllItems);
 
     // 3. 뽑은 등급과 일치하는 아이템들 필터링
-    TArray<FShopItemStruct*> FilteredItems;
-    for (FShopItemStruct* Item : AllItems)
+    TArray<FShopItemData*> FilteredItems;
+    for (FShopItemData* Item : AllItems)
     {
         if (Item && Item->Rarity == SelectedRarity)
         {

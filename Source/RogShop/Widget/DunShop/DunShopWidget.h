@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "ShopItemStruct.h"
+#include "ShopItemData.h"
 #include "DunShopWidget.generated.h"
 
 class UHorizontalBox;
@@ -34,7 +34,7 @@ public:
     ERarity GetRandomRarity();
 
     // 데이터 테이블에서 확률 기반 아이템 랜덤 추출 함수
-    FShopItemStruct* GetRandomItemFromDataTable(UDataTable* DataTable);
+    FShopItemData* GetRandomItemFromDataTable(UDataTable* DataTable);
 
 protected:
     UPROPERTY(meta = (BindWidget))
