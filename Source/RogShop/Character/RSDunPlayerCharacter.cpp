@@ -10,6 +10,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "RSPlayerWeaponComponent.h"
+#include "RSInteractableInterface.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 ARSDunPlayerCharacter::ARSDunPlayerCharacter()
@@ -36,11 +38,16 @@ ARSDunPlayerCharacter::ARSDunPlayerCharacter()
     // 캐릭터가 컨트롤러 Yaw를 따르지 않도록 설정
     bUseControllerRotationYaw = false;
 
-    // 변수 기본값 설정
+    // 구르기 및 사망 시 재생하는 애니메이션 몽타주
     DodgeMontage = nullptr;
     DeathMontage = nullptr;
 
+    // 무기 컴포넌트
     WeaponComp = CreateDefaultSubobject<URSPlayerWeaponComponent>(TEXT("RSPlayerWeapon"));
+
+    // 상호작용
+    InteractActor = nullptr;
+    InteractDistance = 200.f;
 }
 
 // Called when the game starts or when spawned
@@ -55,6 +62,7 @@ void ARSDunPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+    InteractTrace();
 }
 
 // Called to bind functionality to input
@@ -223,6 +231,12 @@ void ARSDunPlayerCharacter::Interaction(const FInputActionValue& value)
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Interaction Activated"));
     }
+
+    IRSInteractableInterface* Interactable = Cast<IRSInteractableInterface>(InteractActor);
+    if (Interactable)
+    {
+        Interactable->Interact(this);
+    }
 }
 
 void ARSDunPlayerCharacter::NormalAttack(const FInputActionValue& value)
@@ -265,4 +279,44 @@ void ARSDunPlayerCharacter::SecondWeaponSlot(const FInputActionValue& value)
 URSPlayerWeaponComponent* ARSDunPlayerCharacter::GetRSPlayerWeaponComponent()
 {
     return WeaponComp;
+}
+
+void ARSDunPlayerCharacter::InteractTrace()
+{
+    FVector Start = GetActorLocation();
+    FVector ForwardVector = GetActorForwardVector();
+    FVector End = Start + (ForwardVector * InteractDistance);
+
+    FHitResult Hit;
+    FCollisionQueryParams Params;
+    Params.AddIgnoredActor(this);
+
+    bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_GameTraceChannel1, Params);
+    
+    if (bHit)
+    {
+        AActor* HitActor = Hit.GetActor();
+        if (HitActor && HitActor->GetClass()->ImplementsInterface(URSInteractableInterface::StaticClass()))
+        {
+            IRSInteractableInterface* Interactable = Cast<IRSInteractableInterface>(HitActor);
+            if (Interactable)
+            {
+                InteractActor = HitActor;
+
+                DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1.0f, 0, 2.0f);
+            }
+            else
+            {
+                DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 2.0f);
+            }
+        }
+        else
+        {
+            DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 2.0f);
+        }
+    }
+    else
+    {
+        DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 2.0f);
+    }
 }
