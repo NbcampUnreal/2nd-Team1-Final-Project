@@ -44,32 +44,6 @@ void UDunShopWidget::HandleItemPurchase(FName PurchasedID)
     }
 }
 
-void UDunShopWidget::SetMouseMode(bool bEnable)
-{
-    UWorld* World = GetWorld();
-
-    if (World)
-    {
-        APlayerController* PlayerController = World->GetFirstPlayerController();
-
-        if (PlayerController)
-        {
-            if (bEnable)
-            {
-                FInputModeUIOnly InputMode;
-                PlayerController->SetInputMode(InputMode);
-                PlayerController->bShowMouseCursor = true;
-            }
-            else
-            {
-                FInputModeGameOnly InputMode;
-                PlayerController->SetInputMode(InputMode);
-                PlayerController->bShowMouseCursor = false;
-            }
-        }
-    }
-}
-
 void UDunShopWidget::PopulateShopItems()
 {
     TSet<FName> AlreadySpawnedIDs;
@@ -117,12 +91,15 @@ void UDunShopWidget::PopulateShopItems()
                     NewItemWidget->SetParentShop(this);
 
                     // 위젯을 수평 박스에 추가
-                    UHorizontalBoxSlot* BoxSlot = Cast<UHorizontalBoxSlot>(ItemHorizontalBox->AddChild(NewItemWidget));
+                    ItemHorizontalBox->AddChild(NewItemWidget);
+
+                    // 위젯이 전부 동일한 크기로 설정
+                    /*UHorizontalBoxSlot* BoxSlot = Cast<UHorizontalBoxSlot>(ItemHorizontalBox->AddChild(NewItemWidget));
 
                     if (BoxSlot)
                     {
                         BoxSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
-                    }
+                    }*/
                 }
             }
 
@@ -177,4 +154,30 @@ FShopItemStruct* UDunShopWidget::GetRandomItemFromDataTable(UDataTable* DataTabl
     }
 
     return nullptr;
+}
+
+void UDunShopWidget::SetMouseMode(bool bEnable)
+{
+    UWorld* World = GetWorld();
+
+    if (World)
+    {
+        APlayerController* PlayerController = World->GetFirstPlayerController();
+
+        if (PlayerController)
+        {
+            if (bEnable)
+            {
+                FInputModeUIOnly InputMode;
+                PlayerController->SetInputMode(InputMode);
+                PlayerController->bShowMouseCursor = true;
+            }
+            else
+            {
+                FInputModeGameOnly InputMode;
+                PlayerController->SetInputMode(InputMode);
+                PlayerController->bShowMouseCursor = false;
+            }
+        }
+    }
 }
