@@ -21,6 +21,7 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "Actor", "Dungeon", "Weapon"),
             Path.Combine(ModuleDirectory, "AnimNotifyState"),
             Path.Combine(ModuleDirectory, "ActorComponent"),
+            Path.Combine(ModuleDirectory, "Interface"),
         });
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule", "NavigationSystem" });

@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "RSInteractable.h"
 #include "RSBaseWeapon.generated.h"
 
 UCLASS()
-class ROGSHOP_API ARSBaseWeapon : public AActor
+class ROGSHOP_API ARSBaseWeapon : public AActor, public IRSInteractable
 {
 	GENERATED_BODY()
 	
@@ -18,6 +19,10 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+// 상호작용
+public:
+	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
 
 // 스켈레탈 메시
 private:
