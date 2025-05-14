@@ -8,6 +8,7 @@
 
 class USpringArmComponent;
 class UCameraComponent;
+class URSPlayerWeaponComponent;
 
 struct FInputActionValue;
 
@@ -67,4 +68,12 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> DeathMontage; // 사망
+
+// 무기 관련
+public:
+	URSPlayerWeaponComponent* GetRSPlayerWeaponComponent();
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = true))
+	TObjectPtr<URSPlayerWeaponComponent> WeaponComp;
 };

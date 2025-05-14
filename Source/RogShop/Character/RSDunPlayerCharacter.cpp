@@ -9,6 +9,7 @@
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/CapsuleComponent.h"
+#include "RSPlayerWeaponComponent.h"
 
 // Sets default values
 ARSDunPlayerCharacter::ARSDunPlayerCharacter()
@@ -37,6 +38,9 @@ ARSDunPlayerCharacter::ARSDunPlayerCharacter()
 
     // 변수 기본값 설정
     DodgeMontage = nullptr;
+    DeathMontage = nullptr;
+
+    WeaponComp = CreateDefaultSubobject<URSPlayerWeaponComponent>(TEXT("RSPlayerWeapon"));
 }
 
 // Called when the game starts or when spawned
@@ -223,10 +227,9 @@ void ARSDunPlayerCharacter::Interaction(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::NormalAttack(const FInputActionValue& value)
 {
-    // 애니메이션이 아직 준비되지 않았으므로 디버깅용 출력
-    if (GEngine)
+    if (WeaponComp)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("NormalAttack Activated"));
+        WeaponComp->HandleNormalAttackInput();
     }
 }
 
@@ -257,4 +260,9 @@ void ARSDunPlayerCharacter::SecondWeaponSlot(const FInputActionValue& value)
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("SecondWeaponSlot Activated"));
     }
+}
+
+URSPlayerWeaponComponent* ARSDunPlayerCharacter::GetRSPlayerWeaponComponent()
+{
+    return WeaponComp;
 }
