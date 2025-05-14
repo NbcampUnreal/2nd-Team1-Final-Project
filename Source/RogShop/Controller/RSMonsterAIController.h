@@ -8,7 +8,6 @@
 #include "NavigationSystem.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "NavigationInvokerComponent.h"
 #include "RSMonsterAIController.generated.h"
 
 /**
@@ -24,19 +23,9 @@ protected://Value
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RVO")//RVO priority
 	float avoidanceWeight;
-
-/*	UPROPERTY(BlueprintReadWrite, Category = Navigation, meta = (AllowPrivateAccess = "true"))
-	UNavigationInvokerComponent* NavInvoker;
-
-	float NavGenerationRadius;
-	float NavRemovalRadius;*/
 public://Function
 	ARSMonsterAIController();
 
 	UFUNCTION(BlueprintCallable)
 	void SetRVOAvoidanceEnabled(bool bEnable);
-
-//	FORCEINLINE class UNavigationInvokerComponent* GetNavInvoker() const { return NavInvoker; }
-
-//	virtual void OnPossess(APawn* InPawn) override;
 };
