@@ -19,66 +19,29 @@ void UDunItemWidget::NativeConstruct()
     }
 }
 
-void UDunItemWidget::OnBuyClicked()
+void UDunItemWidget::SetItemData(const FShopItemData& InItemData)
 {
-    if (ItemPriceText)
-    {
-        ItemPriceText->SetText(FText::FromString("Sold Out"));
-    }
+    ItemData = InItemData;
 
-    if (BuyBtn)
-    {
-        BuyBtn->SetIsEnabled(false);
-    }
-
-    BuyItem();
-}
-
-void UDunItemWidget::SetItemName(FText ItemName)
-{
     if (ItemNameText)
     {
-        ItemNameText->SetText(ItemName);
+        ItemNameText->SetText(InItemData.ItemName);
     }
-}
 
-void UDunItemWidget::SetItemDescription(FText ItemDescription)
-{
     if (ItemDesText)
     {
-        ItemDesText->SetText(ItemDescription);
+        ItemDesText->SetText(InItemData.Description);
     }
-}
 
-void UDunItemWidget::SetItemPrice(int32 ItemPrice)
-{
     if (ItemPriceText)
     {
-        ItemPriceText->SetText(FText::AsNumber(ItemPrice));
+        ItemPriceText->SetText(FText::AsNumber(InItemData.Price));
     }
-}
 
-void UDunItemWidget::SetItemIcon(UTexture2D* ItemIcon)
-{
-    if (ItemImage && ItemIcon)
+    if (ItemImage && InItemData.Icon)
     {
-        ItemImage->SetBrushFromTexture(ItemIcon);
+        ItemImage->SetBrushFromTexture(InItemData.Icon);
     }
-}
-
-void UDunItemWidget::SetItemType(EItemList InItemList)
-{
-    ItemListType = InItemList;
-}
-
-void UDunItemWidget::SetItemRarity(ERarity InItemRarity)
-{
-    ItemRarity = InItemRarity;
-}
-
-void UDunItemWidget::SetItemID(FName InItemID)
-{
-    ItemID = InItemID;
 }
 
 void UDunItemWidget::SetParentShop(UDunShopWidget* InShop)
@@ -86,46 +49,149 @@ void UDunItemWidget::SetParentShop(UDunShopWidget* InShop)
     ParentShop = InShop;
 }
 
-void UDunItemWidget::BuyItem()
+void UDunItemWidget::OnBuyClicked()
+{
+    if (BuyItem())
+    {
+        // Character->SetLifeEssence(ItemData.Price); // 플레이어 골드 수정 관련 함수 또는 public 변수 필요
+
+        if (ItemPriceText)
+        {
+            ItemPriceText->SetText(FText::FromString("Sold Out"));
+        }
+
+        if (BuyBtn)
+        {
+            BuyBtn->SetIsEnabled(false);
+        }
+
+        if (ParentShop)
+        {
+            ParentShop->HandleItemPurchase(ItemData.ItemID);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("ParentShop is nullptr"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("No Buy Item"));
+    }
+}
+
+bool UDunItemWidget::BuyItem()
 {
     ARSDunBaseCharacter* Character = Cast<ARSDunBaseCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
-    if (!Character) return;
+    if (!Character)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("BuyItem - Character is nullptr"));
+        return false;
+    }
 
-    switch (ItemListType)
+    /*if (Character->GetLifeEssence() - ItemData.Price < 0) // 플레이어 재화 가져오기 관련 함수 또는 public 변수 필요
+    {
+        UE_LOG(LogTemp, Warning, TEXT("BuyItem - More LifeEssence Need"));
+        return false;
+    }*/
+
+    bool bIsBuy = true;
+
+    float FinalValue = 0.0f;
+
+    switch (ItemData.ItemList)
     {
         case EItemList::Potion:
         {
-            float PotionValue = 0.0f;
-
-            switch (ItemRarity)
+            switch (ItemData.Rarity)
             {
-                case ERarity::Common: PotionValue = 1.0f; break;
-                case ERarity::Rare: PotionValue = 2.0f; break;
-                case ERarity::Epic: PotionValue = 3.0f; break;
-                case ERarity::Legendary: PotionValue = 4.0f; break;
+                case ERarity::Common: FinalValue = 1.0f; break;
+                case ERarity::Rare: FinalValue = 2.0f; break;
+                case ERarity::Epic: FinalValue = 3.0f; break;
+                case ERarity::Legendary: FinalValue = 4.0f; break;
             }
 
-            // Character->AddHP(PotionValue);  // 캐릭터 클래스에 이 함수 구현 필요
+            // Character->AddHP(FinalValue);  // 플레이어 HP 수정 관련 함수 또는 public 변수 필요
+
+            break;
+        }
+        case EItemList::MaxHpRelic:
+        {
+            switch (ItemData.Rarity)
+            {
+                case ERarity::Common: FinalValue = 1.0f; break;
+                case ERarity::Rare: FinalValue = 2.0f; break;
+                case ERarity::Epic: FinalValue = 3.0f; break;
+                case ERarity::Legendary: FinalValue = 4.0f; break;
+            }
+
+            // Character->SetMaxHP(FinalValue);
+
+            break;
+        }
+        case EItemList::WalkSpeedRelic:
+        {
+            switch (ItemData.Rarity)
+            {
+                case ERarity::Common: FinalValue = 1.0f; break;
+                case ERarity::Rare: FinalValue = 2.0f; break;
+                case ERarity::Epic: FinalValue = 3.0f; break;
+                case ERarity::Legendary: FinalValue = 4.0f; break;
+            }
+
+            // Character->AddWalkSpeed(FinalValue);
+
+            break;
+        }
+        case EItemList::AttackRelic:
+        {
+            switch (ItemData.Rarity)
+            {
+                case ERarity::Common: FinalValue = 5.0f; break;
+                case ERarity::Rare: FinalValue = 10.0f; break;
+                case ERarity::Epic: FinalValue = 15.0f; break;
+                case ERarity::Legendary: FinalValue = 25.0f; break;
+            }
+
+            // Character->AddAtk(FinalValue);
+
+            break;
+        }
+        case EItemList::AttackSpeedRelic:
+        {
+            switch (ItemData.Rarity)
+            {
+                case ERarity::Common: FinalValue = 5.0f; break;
+                case ERarity::Rare: FinalValue = 10.0f; break;
+                case ERarity::Epic: FinalValue = 15.0f; break;
+                case ERarity::Legendary: FinalValue = 25.0f; break;
+            }
+
+            // Character->AddAtkSpeed(FinalValue);
 
             break;
         }
         case EItemList::Sword:
         {
-            // ...
+            // 무기 1 ...
+            break;
+        }
+        case EItemList::BattleAxe:
+        {
+            // 무기 2 ...
+            break;
+        }
+        case EItemList::Hammer:
+        {
+            // 무기 3 ...
             break;
         }
         default:
-            UE_LOG(LogTemp, Warning, TEXT("Not Define Item."));
+            UE_LOG(LogTemp, Warning, TEXT("Not Define Item"));
+            bIsBuy = false;
             break;
     }
 
-    if (ParentShop)
-    {
-        ParentShop->HandleItemPurchase(ItemID);
-    }
-    else 
-    {
-        UE_LOG(LogTemp, Warning, TEXT("ParentShop is nullptr"));
-    }
+    return bIsBuy;
 }
 
