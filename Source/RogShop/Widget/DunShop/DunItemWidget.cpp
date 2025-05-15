@@ -1,7 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "DunItemWidget.h"
-#include "RSDunBaseCharacter.h"
+#include "RSDunPlayerCharacter.h"
+#include "RSPlayerWeaponComponent.h"
 #include "Kismet/GameplayStatics.h"
+
+#include "RSBaseWeapon.h"
 
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
@@ -82,8 +85,10 @@ void UDunItemWidget::OnBuyClicked()
 
 bool UDunItemWidget::BuyItem()
 {
-    ARSDunBaseCharacter* Character = Cast<ARSDunBaseCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
-    if (!Character)
+    APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    ARSDunPlayerCharacter* PlayerChar = Cast<ARSDunPlayerCharacter>(PC->GetCharacter());
+
+    if (!PlayerChar)
     {
         UE_LOG(LogTemp, Warning, TEXT("BuyItem - Character is nullptr"));
         return false;
@@ -171,19 +176,26 @@ bool UDunItemWidget::BuyItem()
 
             break;
         }
-        case EItemList::Sword:
+        case EItemList::Weapon:
         {
-            // 무기 1 ...
-            break;
-        }
-        case EItemList::BattleAxe:
-        {
-            // 무기 2 ...
-            break;
-        }
-        case EItemList::Hammer:
-        {
-            // 무기 3 ...
+            FActorSpawnParameters SpawnParams;
+            SpawnParams.Owner = PlayerChar;
+            SpawnParams.Instigator = PlayerChar;
+
+            // 월드에 무기 액터 생성을 해야만 데이터를 넘길 수 있음
+            ARSBaseWeapon* SpawnedWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(
+                ItemData.WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+
+            if (SpawnedWeapon)
+            {
+                URSPlayerWeaponComponent* WeaponComp = PlayerChar->GetRSPlayerWeaponComponent();
+
+                if (WeaponComp)
+                {
+                    WeaponComp->EquipWeaponToSlot(SpawnedWeapon);
+                }
+            }
+
             break;
         }
         default:
