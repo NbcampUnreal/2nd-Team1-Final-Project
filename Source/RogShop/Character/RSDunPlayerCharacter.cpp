@@ -264,6 +264,8 @@ void ARSDunPlayerCharacter::FirstWeaponSlot(const FInputActionValue& value)
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("FirstWeaponSlot Activated"));
     }
+
+    WeaponComp->EquipWeaponToCharacter(EWeaponSlot::FirstWeaponSlot);
 }
 
 void ARSDunPlayerCharacter::SecondWeaponSlot(const FInputActionValue& value)
@@ -274,6 +276,8 @@ void ARSDunPlayerCharacter::SecondWeaponSlot(const FInputActionValue& value)
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("SecondWeaponSlot Activated"));
     }
+
+    WeaponComp->EquipWeaponToCharacter(EWeaponSlot::SecondWeaponSlot);
 }
 
 URSPlayerWeaponComponent* ARSDunPlayerCharacter::GetRSPlayerWeaponComponent()
@@ -308,15 +312,18 @@ void ARSDunPlayerCharacter::InteractTrace()
             else
             {
                 DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 2.0f);
+                InteractActor = nullptr;
             }
         }
         else
         {
             DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 2.0f);
+            InteractActor = nullptr;
         }
     }
     else
     {
         DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 2.0f);
+        InteractActor = nullptr;
     }
 }
