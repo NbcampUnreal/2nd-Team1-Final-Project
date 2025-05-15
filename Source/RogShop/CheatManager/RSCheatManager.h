@@ -16,6 +16,12 @@ class ROGSHOP_API URSCheatManager : public UCheatManager
 	
 public:
 	UFUNCTION(exec)
-	void TestMonsterWalk();
+	void TestAnubisAttack();
+
+	UFUNCTION(exec)
+	void TestAnubisHItReact();
+
+	UFUNCTION(exec)
+	void TestAnubisDeath();
 
 };

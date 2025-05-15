@@ -7,6 +7,7 @@
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
+class UMeleeAttackBoxComponent;
 
 UCLASS()
 class ROGSHOP_API ARSDunMonsterCharacter : public ARSDunBaseCharacter
@@ -18,8 +19,12 @@ public:
 
 	// 애니메이션 실행 함수
 	virtual void PlayBaseAttackAnim();
-	void PlayHitReactAnim();
-	void PlayDeathAnim();
+	virtual void PlayHitReactAnim();
+	virtual void PlayDeathAnim();
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UMeleeAttackBoxComponent> MeleeAttackBoxComponent;
 
 protected:
 	// 애니메이션 몽타주
