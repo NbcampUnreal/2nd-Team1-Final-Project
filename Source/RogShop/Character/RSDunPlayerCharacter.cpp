@@ -312,15 +312,18 @@ void ARSDunPlayerCharacter::InteractTrace()
             else
             {
                 DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 2.0f);
+                InteractActor = nullptr;
             }
         }
         else
         {
             DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 2.0f);
+            InteractActor = nullptr;
         }
     }
     else
     {
         DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 2.0f);
+        InteractActor = nullptr;
     }
 }
