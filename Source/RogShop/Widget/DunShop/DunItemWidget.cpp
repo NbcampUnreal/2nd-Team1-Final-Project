@@ -1,7 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "DunItemWidget.h"
-#include "RSDunBaseCharacter.h"
+#include "RSDunPlayerCharacter.h"
+#include "RSPlayerWeaponComponent.h"
 #include "Kismet/GameplayStatics.h"
+
+#include "RSBaseWeapon.h"
 
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
@@ -19,7 +22,7 @@ void UDunItemWidget::NativeConstruct()
     }
 }
 
-void UDunItemWidget::SetItemData(const FShopItemStruct& InItemData)
+void UDunItemWidget::SetItemData(const FShopItemData& InItemData)
 {
     ItemData = InItemData;
 
@@ -53,7 +56,7 @@ void UDunItemWidget::OnBuyClicked()
 {
     if (BuyItem())
     {
-        // Character->SetPrice(ItemData.Price); // 플레이어 골드 수정 관련 함수 또는 public 변수 필요
+        // Character->SetLifeEssence(ItemData.Price); // 플레이어 골드 수정 관련 함수 또는 public 변수 필요
 
         if (ItemPriceText)
         {
@@ -82,52 +85,117 @@ void UDunItemWidget::OnBuyClicked()
 
 bool UDunItemWidget::BuyItem()
 {
-    ARSDunBaseCharacter* Character = Cast<ARSDunBaseCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
-    if (!Character)
+    APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    ARSDunPlayerCharacter* PlayerChar = Cast<ARSDunPlayerCharacter>(PC->GetCharacter());
+
+    if (!PlayerChar)
     {
         UE_LOG(LogTemp, Warning, TEXT("BuyItem - Character is nullptr"));
         return false;
     }
 
-    /*if (Character->GetPrice() - ItemData.Price < 0) // 플레이어 골드 가져오기 관련 함수 또는 public 변수 필요
+    /*if (Character->GetLifeEssence() - ItemData.Price < 0) // 플레이어 재화 가져오기 관련 함수 또는 public 변수 필요
     {
-        UE_LOG(LogTemp, Warning, TEXT("BuyItem - More Gold Need"));
+        UE_LOG(LogTemp, Warning, TEXT("BuyItem - More LifeEssence Need"));
         return false;
     }*/
 
     bool bIsBuy = true;
 
+    float FinalValue = 0.0f;
+
     switch (ItemData.ItemList)
     {
         case EItemList::Potion:
         {
-            float PotionValue = 0.0f;
-
             switch (ItemData.Rarity)
             {
-                case ERarity::Common: PotionValue = 1.0f; break;
-                case ERarity::Rare: PotionValue = 2.0f; break;
-                case ERarity::Epic: PotionValue = 3.0f; break;
-                case ERarity::Legendary: PotionValue = 4.0f; break;
+                case ERarity::Common: FinalValue = 1.0f; break;
+                case ERarity::Rare: FinalValue = 2.0f; break;
+                case ERarity::Epic: FinalValue = 3.0f; break;
+                case ERarity::Legendary: FinalValue = 4.0f; break;
             }
 
-            // Character->AddHP(PotionValue);  // 플레이어 HP 수정 관련 함수 또는 public 변수 필요
+            // Character->AddHP(FinalValue);  // 플레이어 HP 수정 관련 함수 또는 public 변수 필요
 
             break;
         }
-        case EItemList::Sword:
+        case EItemList::MaxHpRelic:
         {
-            // 무기 1 ...
+            switch (ItemData.Rarity)
+            {
+                case ERarity::Common: FinalValue = 1.0f; break;
+                case ERarity::Rare: FinalValue = 2.0f; break;
+                case ERarity::Epic: FinalValue = 3.0f; break;
+                case ERarity::Legendary: FinalValue = 4.0f; break;
+            }
+
+            // Character->SetMaxHP(FinalValue);
+
             break;
         }
-        case EItemList::BattleAxe:
+        case EItemList::WalkSpeedRelic:
         {
-            // 무기 2 ...
+            switch (ItemData.Rarity)
+            {
+                case ERarity::Common: FinalValue = 1.0f; break;
+                case ERarity::Rare: FinalValue = 2.0f; break;
+                case ERarity::Epic: FinalValue = 3.0f; break;
+                case ERarity::Legendary: FinalValue = 4.0f; break;
+            }
+
+            // Character->AddWalkSpeed(FinalValue);
+
             break;
         }
-        case EItemList::Hammer:
+        case EItemList::AttackRelic:
         {
-            // 무기 3 ...
+            switch (ItemData.Rarity)
+            {
+                case ERarity::Common: FinalValue = 5.0f; break;
+                case ERarity::Rare: FinalValue = 10.0f; break;
+                case ERarity::Epic: FinalValue = 15.0f; break;
+                case ERarity::Legendary: FinalValue = 25.0f; break;
+            }
+
+            // Character->AddAtk(FinalValue);
+
+            break;
+        }
+        case EItemList::AttackSpeedRelic:
+        {
+            switch (ItemData.Rarity)
+            {
+                case ERarity::Common: FinalValue = 5.0f; break;
+                case ERarity::Rare: FinalValue = 10.0f; break;
+                case ERarity::Epic: FinalValue = 15.0f; break;
+                case ERarity::Legendary: FinalValue = 25.0f; break;
+            }
+
+            // Character->AddAtkSpeed(FinalValue);
+
+            break;
+        }
+        case EItemList::Weapon:
+        {
+            FActorSpawnParameters SpawnParams;
+            SpawnParams.Owner = PlayerChar;
+            SpawnParams.Instigator = PlayerChar;
+
+            // 월드에 무기 액터 생성을 해야만 데이터를 넘길 수 있음
+            ARSBaseWeapon* SpawnedWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(
+                ItemData.WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+
+            if (SpawnedWeapon)
+            {
+                URSPlayerWeaponComponent* WeaponComp = PlayerChar->GetRSPlayerWeaponComponent();
+
+                if (WeaponComp)
+                {
+                    WeaponComp->EquipWeaponToSlot(SpawnedWeapon);
+                }
+            }
+
             break;
         }
         default:
