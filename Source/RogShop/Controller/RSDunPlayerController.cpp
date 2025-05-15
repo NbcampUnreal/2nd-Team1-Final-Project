@@ -1,8 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "RSDunPlayerController.h"
 #include "EnhancedInputSubsystems.h"
+#include "RSCheatManager.h"
+
+ARSDunPlayerController::ARSDunPlayerController()
+{
+    CheatClass = URSCheatManager::StaticClass();
+}
 
 void ARSDunPlayerController::BeginPlay()
 {

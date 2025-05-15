@@ -6,6 +6,8 @@
 #include "RSBaseTile.h"
 #include "RSTableTile.generated.h"
 
+class ARSTycoonCustomerCharacter;
+
 UCLASS()
 class ROGSHOP_API ARSTableTile : public ARSBaseTile
 {
@@ -14,18 +16,23 @@ class ROGSHOP_API ARSTableTile : public ARSBaseTile
 public:
 	ARSTableTile();
 
-	virtual void Tick(float DeltaTime) override;
+	virtual void Interact() override;
+	bool Sit(const TArray<ARSTycoonCustomerCharacter*>& Customers);
 
 	FVector GetFoodLocation() const;
 	const TArray<TObjectPtr<USceneComponent>>& GetSittingLocations() { return SittingLocations; }
 
-protected:
-	virtual void BeginPlay() override;
+private:
+	void Order();
+	void Serving();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadonly)
 	TObjectPtr<USceneComponent> FoodLocation; //음식이 위치할 곳
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TArray<TObjectPtr<USceneComponent>> SittingLocations;	//손님이 앉는 위치들
+	TArray<TObjectPtr<USceneComponent>> SittingLocations; //손님이 앉는 위치들
+
+	UPROPERTY()
+	TArray<TObjectPtr<ARSTycoonCustomerCharacter>> SittingCustomers;
 };

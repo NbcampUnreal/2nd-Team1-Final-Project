@@ -12,14 +12,22 @@ public class RogShop : ModuleRules
 
         PublicIncludePaths.AddRange(new string[] {
             Path.Combine(ModuleDirectory, "Character"),
-            Path.Combine(ModuleDirectory, "Character", "AI"),
+            Path.Combine(ModuleDirectory, "Character", "Monster"),
             Path.Combine(ModuleDirectory, "Controller"),
-            Path.Combine(ModuleDirectory, "Widget"),
             Path.Combine(ModuleDirectory, "Widget", "DunShop"),
+            Path.Combine(ModuleDirectory, "Widget", "Mainmenu"),
             Path.Combine(ModuleDirectory, "AnimInstances"),
+            Path.Combine(ModuleDirectory, "AnimNotifyState"),
+            Path.Combine(ModuleDirectory, "ActorComponent"),
+            Path.Combine(ModuleDirectory, "CheatManager"),
+            Path.Combine(ModuleDirectory, "GameModeBase"),
+            Path.Combine(ModuleDirectory, "GameInstance"),
+            Path.Combine(ModuleDirectory, "Actor", "Dungeon", "Weapon"),
+            Path.Combine(ModuleDirectory, "AnimNotifyState"),
+            Path.Combine(ModuleDirectory, "Interface"),
         });
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule", "NavigationSystem" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

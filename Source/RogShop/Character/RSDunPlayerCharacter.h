@@ -8,6 +8,7 @@
 
 class USpringArmComponent;
 class UCameraComponent;
+class URSPlayerWeaponComponent;
 
 struct FInputActionValue;
 
@@ -67,4 +68,20 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> DeathMontage; // 사망
+
+// 무기 관련
+public:
+	URSPlayerWeaponComponent* GetRSPlayerWeaponComponent();
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = true))
+	TObjectPtr<URSPlayerWeaponComponent> WeaponComp;
+
+// 상호작용 관련
+private:
+	void InteractTrace();
+
+private:
+	AActor* InteractActor;	// 라인트레이스를 통해 찾은 상호작용 가능한 액터
+	float InteractDistance;	// 라인트레이스를 할 거리
 };

@@ -16,18 +16,22 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void Interact() { }
+
 	UFUNCTION(CallInEditor, Category="Tile")
 	FVector GetTileSize();
-	
-	virtual void Interact() {}
-	
+	FString GetTileName() const { return TileName; }
+
 protected:
 	virtual void BeginPlay() override;
-	
+
 public:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USceneComponent> SceneComp;
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UStaticMeshComponent> Plane;
+
+	// FText TileName = FText::FromString(TEXT("Default"));
+	FString TileName = "Default";
 };
