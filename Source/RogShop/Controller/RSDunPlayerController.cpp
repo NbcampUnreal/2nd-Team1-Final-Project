@@ -7,6 +7,7 @@
 ARSDunPlayerController::ARSDunPlayerController()
 {
     CheatClass = URSCheatManager::StaticClass();
+
 }
 
 void ARSDunPlayerController::BeginPlay()
@@ -14,6 +15,10 @@ void ARSDunPlayerController::BeginPlay()
     Super::BeginPlay();
 
     AddMapping();
+
+    //CheatClass = LoadClass<URSCheatManager>(nullptr, TEXT("/Game/Blueprints/CheatManager/BP_RSCheatManager.BP_RSCheatManager_C"));
+    //EnableCheats();
+
 }
 
 void ARSDunPlayerController::AddMapping()
