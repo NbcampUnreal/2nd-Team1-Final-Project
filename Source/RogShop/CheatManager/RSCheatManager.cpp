@@ -26,3 +26,8 @@ void URSCheatManager::TestMonsterWalk()
         Monster->PlayWalkAnim();
     }*/
 }
+
+void URSCheatManager::OpenTycoonLevel()
+{
+    UGameplayStatics::OpenLevel(GetWorld(), "TycoonTestMap");
+}

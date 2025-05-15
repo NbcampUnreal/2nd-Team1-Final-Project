@@ -17,10 +17,12 @@ public:
 	ARSTableTile();
 
 	virtual void Interact() override;
-	bool Sit(const TArray<ARSTycoonCustomerCharacter*>& Customers);
+	void Sit(const TArray<ARSTycoonCustomerCharacter*>& Customers);
 
-	FVector GetFoodLocation() const;
+	bool Use() const { return SittingCustomers.Num() > 0; }
+	FVector GetFoodPosition() const;
 	const TArray<TObjectPtr<USceneComponent>>& GetSittingLocations() { return SittingLocations; }
+	int32 GetMaxPlace() const { return SittingLocations.Num(); }
 
 private:
 	void Order();
@@ -34,5 +36,5 @@ protected:
 	TArray<TObjectPtr<USceneComponent>> SittingLocations; //손님이 앉는 위치들
 
 	UPROPERTY()
-	TArray<TObjectPtr<ARSTycoonCustomerCharacter>> SittingCustomers;
+	TArray<TObjectPtr<ARSTycoonCustomerCharacter>> SittingCustomers;	//앉아있는 손님들
 };

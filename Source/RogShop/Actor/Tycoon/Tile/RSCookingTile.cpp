@@ -3,8 +3,11 @@
 
 #include "RSCookingTile.h"
 
+#include "RSTycoonInventoryComponent.h"
 #include "RogShop/UtilDefine.h"
 #include "RogShop/Actor/Tycoon/Food/RSBaseFood.h"
+#include "RogShop/DataTable/CookFoodData.h"
+#include "RogShop/GameInstanceSubsystem/RSDataSubsystem.h"
 #include "RogShop/GameModeBase/RSTycoonGameModeBase.h"
 #include "Tycoon/RSTycoonPlayerCharacter.h"
 
@@ -44,22 +47,38 @@ void ARSCookingTile::OrderToCook()
 	auto& Orders = GameMode->GetOrders();
 	if (Orders.Num() == 0)
 	{
+		RS_LOG_C("오더가 없습니다", FColor::Red)
 		return;
 	}
 
 	//임시로 제일 가까이 있는거부터 제작하게
-	Cook(Orders[0]);
+	FName FoodName = Orders[0];
+
+	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->RemoveOrder(FoodName);
+	Cook(FoodName);
 }
 
-void ARSCookingTile::Cook(const FString& FoodName)
+void ARSCookingTile::Cook(const FName& FoodKey)
 {
 	State = ECookingState::Cooking;
 
+	FCookFoodData* Data = GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Food
+	                                       ->FindRow<FCookFoodData>(FoodKey, TEXT("Get FoodData"));
+
+	//사용한 재료 제거
+	for (auto& Need : Data->NeedIngredients)
+	{
+		GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->Inventory->Remove(Need.Key, Need.Value);
+	}
+
+
+	
 	//임시, 바로 제작됨
-	//임시, 음식의 형태를 임의로 한가지로 고정함. 데이터 테이블에서 종류에 따라 생성되는 모델링을 바꿀 예정
 	State = ECookingState::Finish;
 
-	ARSBaseFood* Food = GetWorld()->SpawnActor<ARSBaseFood>(FoodType);
+	// FCookFoodData const* Data = GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Food->
+	//                                                FindRow<FCookFoodData>(FoodKey, TEXT("Find Cook Data"));
+	ARSBaseFood* Food = GetWorld()->SpawnActor<ARSBaseFood>(Data->ActorType);
 	Food->SetActorLocation(FoodLocation->GetComponentLocation());
 
 	CookedFood = Food;
@@ -74,6 +93,8 @@ void ARSCookingTile::TakeFood()
 	{
 		Player->Pickup(Food);
 		CookedFood = nullptr;
+
+		State = ECookingState::None;
 	}
 	else
 	{

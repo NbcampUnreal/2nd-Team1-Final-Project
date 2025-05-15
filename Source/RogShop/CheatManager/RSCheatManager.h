@@ -18,4 +18,6 @@ public:
 	UFUNCTION(exec)
 	void TestMonsterWalk();
 
+	UFUNCTION(exec)
+	void OpenTycoonLevel();
 };

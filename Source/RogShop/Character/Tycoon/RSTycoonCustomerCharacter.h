@@ -36,7 +36,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	FString WantFoodName;
+	FName WantFoodKey;
 	
 	// 현재 AI 상태
 	UPROPERTY(VisibleAnywhere)
