@@ -9,6 +9,14 @@
 
 class ARSBaseWeapon;
 
+UENUM(BlueprintType)
+enum class EWeaponSlot : uint8
+{
+	FirstWeaponSlot,
+	SecondWeaponSlot,
+	NONE
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ROGSHOP_API URSPlayerWeaponComponent : public UActorComponent
 {
@@ -33,18 +41,26 @@ public:
 
 	void ResetCombo();
 
-	void SetWeaponActor(ARSBaseWeapon* WeaponActor);
+	UFUNCTION(BlueprintCallable)
+	void EquipWeaponToSlot(ARSBaseWeapon* WeaponActor);
+
+	void EquipWeaponToCharacter(EWeaponSlot TargetWeaponSlot);
 
 private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess = true))
-	TObjectPtr<ARSBaseWeapon> WeaponActor; // 무기 액터
+	// 무기
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
+	TArray<TObjectPtr<ARSBaseWeapon>> WeaponActors; // 무기 액터
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
-	bool bIsAttack;
+	EWeaponSlot WeaponSlot;
+
+	// 애니메이션을 위한 상태
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
+	bool bIsAttack;	// 공격 중인 상태
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
-	bool bComboInputBuffered;
+	bool bComboInputBuffered;	// 공격 중일 때 들어온 입력 버퍼
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
-	int32 ComboIndex;
+	int32 ComboIndex;	// 콤보 공격을 위한 인덱스 값
 };
