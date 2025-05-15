@@ -145,7 +145,6 @@ TArray<AActor*> ARSDunMonsterCharacter::GetPatrolPoint()
 {
 	return patrolPoints;
 }
-}
 
 void ARSDunMonsterCharacter::OnDeath()
 {

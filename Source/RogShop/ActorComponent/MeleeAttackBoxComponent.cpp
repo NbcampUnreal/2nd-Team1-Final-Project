@@ -54,7 +54,7 @@ void UMeleeAttackBoxComponent::OnAttackOverlap(
 		UCharacterMovementComponent* MoveComp = HitCharacter->GetCharacterMovement();
 	
 		FVector KnockbackDir = (OtherActor->GetActorLocation() - GetOwner()->GetActorLocation()).GetSafeNormal();
-		FVector KnockbackForce = KnockbackDir * 10000.f;
+		FVector KnockbackForce = KnockbackDir * 5000.f;
 
 		MoveComp->AddImpulse(KnockbackForce, true);
 		UE_LOG(LogTemp, Warning, TEXT("KnockBack Success!!"));
