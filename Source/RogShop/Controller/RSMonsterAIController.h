@@ -8,9 +8,7 @@
 #include "NavigationSystem.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Components/SphereComponent.h"
 #include "Components/PrimitiveComponent.h"
-#include "Engine/TargetPoint.h"
 #include "RSMonsterAIController.generated.h"
 
 /**
@@ -27,9 +25,6 @@ protected://Value
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RVO")//RVO priority
 	float avoidanceWeight;
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Patrol")
-	TArray<AActor*> patrolPoints;
-
 	int32 currentPatrolIdx;
 public://Function
 	ARSMonsterAIController();
@@ -44,9 +39,6 @@ public://Function
 	//Patrol
 	UFUNCTION(BlueprintCallable)
 	void MoveToCurrentPatrolPoint();
-
-//	UFUNCTION(BlueprintCallable)
-//	void FindNearPatrolPoint();
 
 	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
 };

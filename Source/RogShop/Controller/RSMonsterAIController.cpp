@@ -7,6 +7,7 @@ ARSMonsterAIController::ARSMonsterAIController()
 {
 	avoidanceRadius = 0.0f;
 	avoidanceWeight = 0.0f;
+	currentPatrolIdx = 0;
 }
 
 void ARSMonsterAIController::SetRVOAvoidanceEnabled(bool bEnable)//path find bottleneck resolving function
@@ -39,7 +40,7 @@ void ARSMonsterAIController::AIAttack()
 		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
 		if (ctrlChr)
 		{
-			
+			ctrlChr->PlayBaseAttackAnim();
 		}
 	}
 }
@@ -47,14 +48,15 @@ void ARSMonsterAIController::AIAttack()
 void ARSMonsterAIController::MoveToCurrentPatrolPoint()
 {
 	APawn* ctrlPawn = GetPawn();
+	
 	if (ctrlPawn)
 	{
-		ARSDunMonsterCharacter* monster = Cast<ARSDunMonsterCharacter>(GetPawn());
+		ARSDunMonsterCharacter* monster = Cast<ARSDunMonsterCharacter>(ctrlPawn);
 		if (!monster)
 		{
 			return;
 		}
-
+		TArray<AActor*> patrolPoints = monster->GetPatrolPoint();
 		// 순찰 포인트가 하나도 없다면 이동할 필요 없음
 		if (patrolPoints.Num() == 0)
 		{
@@ -74,28 +76,6 @@ void ARSMonsterAIController::MoveToCurrentPatrolPoint()
 		currentPatrolIdx = (currentPatrolIdx + 1) % patrolPoints.Num();
 	}
 }
-/*
-void ARSMonsterAIController::FindNearPatrolPoint()
-{
-	APawn* ctrlPawn = GetPawn();
-	if (ctrlPawn)
-	{//regist detect area to pawn
-		USphereComponent* detectSphere = NewObject<USphereComponent>(ctrlPawn);
-		if (!detectSphere) return;
-
-		detectSphere->RegisterComponent();
-		detectSphere->AttachToComponent(ctrlPawn->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-		detectSphere->SetSphereRadius(500.f);
-		detectSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		detectSphere->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-		detectSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		detectSphere->SetCollisionResponseToChannel(ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
-		detectSphere->SetGenerateOverlapEvents(true);
-
-		//Overlap event bind
-		detectSphere->OnComponentBeginOverlap.AddDynamic(this, &ARSDunMonsterCharacter:: );
-	}
-}*/
 
 void ARSMonsterAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {

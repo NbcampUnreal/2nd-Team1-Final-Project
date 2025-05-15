@@ -6,6 +6,9 @@
 #include "RSDunBaseCharacter.h"
 #include "NavigationInvokerComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/SphereComponent.h"
+#include "Engine/TargetPoint.h"
+#include "Engine/OverlapResult.h"
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
@@ -19,7 +22,7 @@ class ROGSHOP_API ARSDunMonsterCharacter : public ARSDunBaseCharacter
 public:
 	ARSDunMonsterCharacter();
 
-//	virtual void BeginPlay()override;
+	virtual void BeginPlay()override;
 
 	// 애니메이션 실행 함수
 	virtual void PlayBaseAttackAnim();
@@ -36,6 +39,13 @@ public:
 	//NavLink jump function
 	UFUNCTION(BlueprintCallable)
 	void JumpTo(FVector destination);
+
+	//Patrol
+	UFUNCTION(BlueprintCallable)
+	void FindNearPatrolPoint();
+
+	UFUNCTION()
+	TArray<AActor*> GetPatrolPoint();
 protected:
 	// 애니메이션 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -60,6 +70,16 @@ protected:
 	//NavLink
 	UPROPERTY(BlueprintReadWrite, Category = Navigation)
 	float jumpForce;
+
+	//Patrol
+	UPROPERTY(EditInstanceOnly,BlueprintReadWrite, Category = "Patrol")
+	TArray<AActor*> patrolPoints;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Patrol")
+	USphereComponent* detectSphere;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Patrol")
+	float maxDetectPatrolRoute;
 private:
 	TObjectPtr<ARSMonsterAIController> AIController;  // TODO : 혹시나 캐싱해서 쓸 일 생길까봐 미리 만들어둠.
 
