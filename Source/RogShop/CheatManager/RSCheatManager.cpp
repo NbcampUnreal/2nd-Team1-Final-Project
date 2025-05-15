@@ -78,9 +78,6 @@ void URSCheatManager::SpawnMonster(FString MonsterName)
     UWorld* World = GetWorld();
     if (!World) return;
 
-    /*FVector SpawnLocation = GetOuterAPlayerController()->GetPawn()->GetActorLocation() + FVector(500, 0, 0);
-    FRotator SpawnRotation = FRotator::ZeroRotator;*/
-
     FVector PlayerLocation = GetOuterAPlayerController()->GetPawn()->GetActorLocation();
     FVector Forward = GetOuterAPlayerController()->GetPawn()->GetActorForwardVector(); // 플레이어가 바라보는 방향
 

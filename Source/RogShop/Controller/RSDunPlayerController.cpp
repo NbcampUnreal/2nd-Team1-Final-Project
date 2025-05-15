@@ -16,9 +16,6 @@ void ARSDunPlayerController::BeginPlay()
 
     AddMapping();
 
-    //CheatClass = LoadClass<URSCheatManager>(nullptr, TEXT("/Game/Blueprints/CheatManager/BP_RSCheatManager.BP_RSCheatManager_C"));
-    //EnableCheats();
-
 }
 
 void ARSDunPlayerController::AddMapping()
