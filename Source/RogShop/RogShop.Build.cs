@@ -1,14 +1,33 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+using System.IO;
 using UnrealBuildTool;
+using UnrealBuildTool.Rules;
 
 public class RogShop : ModuleRules
 {
 	public RogShop(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+
+        PublicIncludePaths.AddRange(new string[] {
+            Path.Combine(ModuleDirectory, "Character"),
+            Path.Combine(ModuleDirectory, "Character", "Monster"),
+            Path.Combine(ModuleDirectory, "Controller"),
+            Path.Combine(ModuleDirectory, "Widget", "DunShop"),
+            Path.Combine(ModuleDirectory, "Widget", "Mainmenu"),
+            Path.Combine(ModuleDirectory, "AnimInstances"),
+            Path.Combine(ModuleDirectory, "AnimNotifyState"),
+            Path.Combine(ModuleDirectory, "ActorComponent"),
+            Path.Combine(ModuleDirectory, "CheatManager"),
+            Path.Combine(ModuleDirectory, "GameModeBase"),
+            Path.Combine(ModuleDirectory, "GameInstance"),
+            Path.Combine(ModuleDirectory, "Actor", "Dungeon", "Weapon"),
+            Path.Combine(ModuleDirectory, "AnimNotifyState"),
+            Path.Combine(ModuleDirectory, "Interface"),
+        });
+
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule", "NavigationSystem" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

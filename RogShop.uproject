@@ -7,7 +7,12 @@
 		{
 			"Name": "RogShop",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine",
+				"UMG",
+				"AIModule"
+			]
 		}
 	],
 	"Plugins": [
