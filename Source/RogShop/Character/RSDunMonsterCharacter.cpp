@@ -2,9 +2,13 @@
 
 
 #include "RSDunMonsterCharacter.h"
+#include "MeleeAttackBoxComponent.h"
 
 ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 {
+	MeleeAttackBoxComponent = CreateDefaultSubobject<UMeleeAttackBoxComponent>(TEXT("MeleeAttackBoxComponent"));
+	MeleeAttackBoxComponent->SetupAttachment(RootComponent);
+
 	navGenerationRadius = 500.0f;
 	navRemovalRadius = 750.0f;
 	jumpForce = 0.0f;
@@ -22,19 +26,16 @@ void ARSDunMonsterCharacter::BeginPlay()
 
 void ARSDunMonsterCharacter::PlayBaseAttackAnim()
 {
-	PlayAnimMontage(BaseAttackMontage);
 	UE_LOG(LogTemp, Warning, TEXT("Attack Complete!!"));
 }
 
 void ARSDunMonsterCharacter::PlayHitReactAnim()
 {
-	PlayAnimMontage(HitReactMontage);
 	UE_LOG(LogTemp, Warning, TEXT("HitReact Complete!!"));
 }
 
 void ARSDunMonsterCharacter::PlayDeathAnim()
 {
-	PlayAnimMontage(DeathMontage);
 	UE_LOG(LogTemp, Warning, TEXT("Death Complete!!"));
 }
 
