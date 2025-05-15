@@ -2,7 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h" // 데이터 테이블용
+
 #include "ShopItemData.generated.h"
+
+class ARSBaseWeapon;
 
 UENUM(BlueprintType)
 enum class ERarity : uint8
@@ -22,9 +25,7 @@ enum class EItemList : uint8
     WalkSpeedRelic,
     AttackRelic,
     AttackSpeedRelic,
-    Sword,
-    BattleAxe,
-    Hammer
+    Weapon,
 };
 
 USTRUCT(BlueprintType)
@@ -56,4 +57,7 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
     EItemList ItemList = EItemList::None;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+    TSubclassOf<ARSBaseWeapon> WeaponClass;
 };

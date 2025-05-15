@@ -24,4 +24,6 @@ public:
 	UFUNCTION(exec)
 	void TestAnubisDeath();
 
+	UFUNCTION(Exec)
+	void SpawnDunShopNPC();
 };

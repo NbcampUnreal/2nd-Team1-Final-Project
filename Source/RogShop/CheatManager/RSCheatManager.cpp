@@ -70,3 +70,23 @@ void URSCheatManager::TestAnubisDeath()
         Monster->PlayDeathAnim();
     }
 }
+
+void URSCheatManager::SpawnDunShopNPC()
+{
+    UWorld* World = GetWorld();
+    if (!World) return;
+
+    APlayerController* PC = GetOuterAPlayerController();
+    if (!PC) return;
+
+    FVector SpawnLocation = PC->GetPawn()->GetActorLocation() + PC->GetPawn()->GetActorForwardVector() * 200.f;
+    FActorSpawnParameters Params;
+    Params.Owner = PC;
+
+    TSubclassOf<AActor> NPCClass = LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Actor/DungeonNpc/BP_RSDunShopNpcActor.BP_RSDunShopNpcActor_C"));
+
+    if (NPCClass)
+    {
+        World->SpawnActor<AActor>(NPCClass, SpawnLocation, FRotator::ZeroRotator, Params);
+    }
+}
