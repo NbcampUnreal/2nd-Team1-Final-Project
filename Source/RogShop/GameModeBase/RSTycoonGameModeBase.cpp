@@ -43,7 +43,7 @@ void ARSTycoonGameModeBase::AddOrder(const FName& OrderFoodName)
 
 void ARSTycoonGameModeBase::RemoveOrder(const FName& OrderFoodName)
 {
-	OrderedFoodKeys.Remove(OrderFoodName);
+	OrderedFoodKeys.RemoveSingle(OrderFoodName);
 }
 
 void ARSTycoonGameModeBase::BeginPlay()
