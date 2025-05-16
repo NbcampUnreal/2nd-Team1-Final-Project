@@ -63,4 +63,17 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
 	int32 ComboIndex;	// 콤보 공격을 위한 인덱스 값
+
+// 충돌 로직 관리
+public:
+	void StartAttackOverlap();
+	void EndAttackOverlap();
+
+protected:
+	UFUNCTION()
+	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+private:
+	UPROPERTY()
+	TSet<AActor*> DamagedActors;	// 데미지 입은 액터 저장
 };
