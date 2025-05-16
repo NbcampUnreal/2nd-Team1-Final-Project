@@ -120,7 +120,7 @@ void URSCheatManager::SpawnDunShopNPC()
 
 void URSCheatManager::OpenTycoonLevel()
 {
-    UGameplayStatics::OpenLevel(GetWorld(), "TycoonTestMap");
+    UGameplayStatics::OpenLevel(GetWorld(), TEXT("TycoonTestMap"));
 }
 
 void URSCheatManager::TestAnubisDeath()

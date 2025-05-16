@@ -18,6 +18,9 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	
 public:
+	UPROPERTY()
 	TObjectPtr<UDataTable> Food;
+	
+	UPROPERTY()
 	TObjectPtr<UDataTable> Ingredient;
 };
