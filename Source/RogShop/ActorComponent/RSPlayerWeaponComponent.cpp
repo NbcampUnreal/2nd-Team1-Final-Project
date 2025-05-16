@@ -2,9 +2,11 @@
 
 
 #include "RSPlayerWeaponComponent.h"
+#include "RogShop/UtilDefine.h"
 #include "RSBaseWeapon.h"
 #include "GameFramework/Character.h"
-#include "RogShop/UtilDefine.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/BoxComponent.h"
 
 // Sets default values for this component's properties
 URSPlayerWeaponComponent::URSPlayerWeaponComponent()
@@ -187,24 +189,82 @@ void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSl
 	uint8 Index = static_cast<uint8>(WeaponSlot);
 	if (WeaponActors.IsValidIndex(Index))
 	{
-		AActor* CurEquipWeapon = WeaponActors[Index];
+		ARSBaseWeapon* CurEquipWeapon = WeaponActors[Index];
 		if (CurEquipWeapon)
 		{
 			CurEquipWeapon->SetActorHiddenInGame(true);
 			CurEquipWeapon->SetActorEnableCollision(false);
+
+			// 오버랩 이벤트 바인딩 해제
+			WeaponActors[Index]->GetBoxComp()->OnComponentBeginOverlap.RemoveDynamic(this, &URSPlayerWeaponComponent::OnBeginOverlap);
 		}
 	}
 
 	uint8 TargetIndex = static_cast<uint8>(TargetWeaponSlot);
 	if (WeaponActors.IsValidIndex(TargetIndex))
 	{
-		AActor* TargetEquipWeapon = WeaponActors[TargetIndex];
+		ARSBaseWeapon* TargetEquipWeapon = WeaponActors[TargetIndex];
 		if (TargetEquipWeapon)
 		{
 			TargetEquipWeapon->SetActorHiddenInGame(false);
 			TargetEquipWeapon->SetActorEnableCollision(true);
+
+			// 오버랩 이벤트 바인딩
+			UBoxComponent* CurWeaponBoxComp = TargetEquipWeapon->GetBoxComp();
+			if (CurWeaponBoxComp)
+			{
+				CurWeaponBoxComp->OnComponentBeginOverlap.AddDynamic(this, &URSPlayerWeaponComponent::OnBeginOverlap);
+			}
 		}
 	}
 	// 현재 슬롯을 변경한다.
 	WeaponSlot = TargetWeaponSlot;
+}
+
+void URSPlayerWeaponComponent::StartAttackOverlap()
+{
+	// 콜리전을 켠다.
+	uint8 Index = static_cast<uint8>(WeaponSlot);
+	if (WeaponActors.IsValidIndex(Index))
+	{
+		WeaponActors[Index]->StartOverlap();
+	}
+}
+
+void URSPlayerWeaponComponent::EndAttackOverlap()
+{
+	// 콜리전을 끈다.
+	uint8 Index = static_cast<uint8>(WeaponSlot);
+	if (WeaponActors.IsValidIndex(Index))
+	{
+		WeaponActors[Index]->EndOverlap();
+	}
+
+	// 해당 무기로 피해를 입은 액터들의 목록을 초기화한다.
+	DamagedActors.Empty();
+}
+
+void URSPlayerWeaponComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	// 오버랩 된 액터에게 데미지를 가한다.
+	ACharacter* OwnerCharacter = GetOwner<ACharacter>();
+
+	AController* OwnerController = nullptr;
+	if (OwnerCharacter)
+	{
+		OwnerController = OwnerCharacter->GetInstigatorController();
+	}
+
+	if (OtherActor && OtherActor != OwnerCharacter && !DamagedActors.Contains(OtherActor))
+	{
+		uint8 Index = static_cast<uint8>(WeaponSlot);
+		float WeaponDamage = 0.f;
+		if (WeaponActors.IsValidIndex(Index))
+		{
+			WeaponDamage = WeaponActors[Index]->GetWeaponDamage();
+		}
+
+		UGameplayStatics::ApplyDamage(OtherActor, WeaponDamage, OwnerController, WeaponActors[Index], UDamageType::StaticClass());
+		DamagedActors.Add(OtherActor);
+	}
 }

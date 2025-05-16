@@ -7,6 +7,8 @@
 #include "RSInteractable.h"
 #include "RSBaseWeapon.generated.h"
 
+class UBoxComponent;
+
 UCLASS()
 class ROGSHOP_API ARSBaseWeapon : public AActor, public IRSInteractable
 {
@@ -24,12 +26,17 @@ protected:
 public:
 	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
 
-// 스켈레탈 메시
+// 컴포넌트
+public:
+	UBoxComponent* GetBoxComp() const;
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
 	TObjectPtr<USceneComponent> SceneComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
 	TObjectPtr<USkeletalMeshComponent> MeshComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UBoxComponent> BoxComp;	// 데미지 로직을 위한 콜리전 용도의 컴포넌트
 
 // 애니메이션
 public:
@@ -44,4 +51,15 @@ private:
 	TArray<TObjectPtr<UAnimMontage>> NormalAttacks; // 무기의 기본 공격 몽타주
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = true))
 	TArray<TObjectPtr<UAnimMontage>> StrongAttacks; // 무기의 강 공격 몽타주
+
+// 충돌
+public:
+	void StartOverlap();
+	void EndOverlap();
+
+	float GetWeaponDamage() const;
+
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = true))
+	float WeaponDamage;	// 오버랩 시 가할 무기 데미지
 };

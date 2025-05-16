@@ -101,7 +101,7 @@ void ARSDunMonsterCharacter::FindNearPatrolPoint()
 		overlapResults,
 		GetActorLocation(),
 		FQuat::Identity,
-		ECollisionChannel::ECC_GameTraceChannel2,
+		ECollisionChannel::ECC_GameTraceChannel6,
 		FCollisionShape::MakeSphere(maxDetectPatrolRoute),
 		collisionQueryParms
 	);
