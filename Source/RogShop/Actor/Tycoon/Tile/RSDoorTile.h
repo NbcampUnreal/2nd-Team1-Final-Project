@@ -6,6 +6,8 @@
 #include "RSBaseTile.h"
 #include "RSDoorTile.generated.h"
 
+class ARSTableTile;
+struct FCookFoodData;
 class ARSTycoonCustomerCharacter;
 
 UCLASS()
@@ -16,8 +18,8 @@ class ROGSHOP_API ARSDoorTile : public ARSBaseTile
 public:
 	ARSDoorTile();
 
-	void SpawnCustomer();
-	
+	void SpawnCustomer(const FName& FoodData, ARSTableTile* Target);
+
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USceneComponent> CustomerSpawnPoint;
