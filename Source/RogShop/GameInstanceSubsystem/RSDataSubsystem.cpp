@@ -4,6 +4,7 @@
 #include "RSDataSubsystem.h"
 
 #include "RogShop/RSDataSubsystemSettings.h"
+#include "RogShop/UtilDefine.h"
 
 void URSDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -12,7 +13,7 @@ void URSDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	const URSDataSubsystemSettings* DataSettings = GetDefault<URSDataSubsystemSettings>();
 	Food = DataSettings->FoodDataTable.LoadSynchronous();
 	Ingredient = DataSettings->IngredientDataTable.LoadSynchronous();
-    
+
 	check(Food)
 	check(Ingredient)
 }
