@@ -7,6 +7,7 @@
 ARSDunPlayerController::ARSDunPlayerController()
 {
     CheatClass = URSCheatManager::StaticClass();
+
 }
 
 void ARSDunPlayerController::BeginPlay()
@@ -14,6 +15,7 @@ void ARSDunPlayerController::BeginPlay()
     Super::BeginPlay();
 
     AddMapping();
+
 }
 
 void ARSDunPlayerController::AddMapping()

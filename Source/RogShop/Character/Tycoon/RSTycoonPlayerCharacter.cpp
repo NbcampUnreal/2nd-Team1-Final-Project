@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "RSTycoonPlayerController.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "RogShop/UtilDefine.h"
 #include "RogShop/Actor/Tycoon/Tile/RSBaseTile.h"
@@ -20,6 +21,15 @@ ARSTycoonPlayerCharacter::ARSTycoonPlayerCharacter()
 
 	PickupLocation = CreateDefaultSubobject<USceneComponent>("FoodLocation");
 	PickupLocation->SetupAttachment(RootComponent);
+
+	// 컨트롤러 회전 사용 비활성화
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+
+	// Character Movement Component 설정
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 }
 
 void ARSTycoonPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -59,17 +69,19 @@ void ARSTycoonPlayerCharacter::Pickup(AActor* Actor)
 	Actor->SetActorLocation(PickupLocation->GetComponentLocation());
 }
 
-void ARSTycoonPlayerCharacter::Drop(FVector DropPosition)
+bool ARSTycoonPlayerCharacter::Drop(FVector DropPosition)
 {
 	if (PickupActor == nullptr)
 	{
-		RS_LOG_C("들고있는 음식이 없습니다", FColor::Red)
-		return;
+		RS_LOG_C("들고있는 Actor가 없습니다", FColor::Red)
+		return false;
 	}
 	
 	PickupActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	PickupActor->SetActorLocation(DropPosition);
 	PickupActor = nullptr;
+
+	return true;
 }
 
 void ARSTycoonPlayerCharacter::OnMove(const FInputActionValue& Value)
@@ -88,7 +100,7 @@ void ARSTycoonPlayerCharacter::OnInteract(const FInputActionValue& Value)
 	{
 		return;
 	}
-
+	
 	AActor* MinActor = nullptr;
 	int32 Min = INT32_MAX;
 	const FVector PlayerLocation = GetActorLocation();

@@ -29,7 +29,7 @@ public:
 
 private:
 	void OrderToCook();
-	void Cook(const FString& FoodName);
+	void Cook(const FName& FoodKey);
 	void TakeFood();
 
 private:
@@ -40,8 +40,4 @@ private:
 
 	UPROPERTY()
 	TWeakObjectPtr<ARSBaseFood> CookedFood;
-	
-	//임시
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<ARSBaseFood> FoodType;
 };

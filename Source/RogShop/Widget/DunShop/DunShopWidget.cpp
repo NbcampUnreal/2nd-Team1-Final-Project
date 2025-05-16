@@ -5,6 +5,9 @@
 #include "DunItemWidget.h"
 #include "RSGameInstance.h"
 
+#include "RSDunPlayerCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/HorizontalBox.h"
@@ -29,6 +32,15 @@ void UDunShopWidget::NativeConstruct()
 void UDunShopWidget::OnExitClicked()
 {
     SetMouseMode(false);
+
+    // 걷는 캐릭터 정지 필요시
+    //if (APlayerController* PC = GetOwningPlayer())
+    //{
+    //    if (ARSDunPlayerCharacter* Player = Cast<ARSDunPlayerCharacter>(PC->GetPawn()))
+    //    {
+    //        Player->GetCharacterMovement()->MaxWalkSpeed = 600.f;
+    //    }
+    //}
 
     RemoveFromParent();
 }

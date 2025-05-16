@@ -33,3 +33,12 @@
 	{	\
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT(FormatString), ##__VA_ARGS__)); \
 	}
+
+
+//Format, Color 버전
+#define RS_LOG_F_C(FormatString, Color, ...) \
+	UE_LOG(LogTemp, Warning, TEXT(FormatString), ##__VA_ARGS__) \
+	if (GEngine) \
+	{	\
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, Color, FString::Printf(TEXT(FormatString), ##__VA_ARGS__)); \
+	}
