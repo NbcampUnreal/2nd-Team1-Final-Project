@@ -6,6 +6,9 @@
 
 ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 {
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	AIControllerClass = ARSDunMonsterCharacter::StaticClass();
+
 	MeleeAttackBoxComponent = CreateDefaultSubobject<UMeleeAttackBoxComponent>(TEXT("MeleeAttackBoxComponent"));
 	MeleeAttackBoxComponent->SetupAttachment(RootComponent);
 
@@ -19,6 +22,7 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 
 	//Patrol
 	maxDetectPatrolRoute = 2000.f;
+
 }
 
 void ARSDunMonsterCharacter::BeginPlay()
