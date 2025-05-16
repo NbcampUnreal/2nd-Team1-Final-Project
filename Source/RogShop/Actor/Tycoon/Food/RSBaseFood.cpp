@@ -13,7 +13,4 @@ ARSBaseFood::ARSBaseFood()
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	Mesh->SetupAttachment(RootComponent);
-	
-	TakeLocation = CreateDefaultSubobject<USceneComponent>("TakeLocation");
-	TakeLocation->SetupAttachment(RootComponent);
 }

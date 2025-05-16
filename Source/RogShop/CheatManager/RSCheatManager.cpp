@@ -117,3 +117,8 @@ void URSCheatManager::SpawnDunShopNPC()
         World->SpawnActor<AActor>(NPCClass, SpawnLocation, FRotator::ZeroRotator, Params);
     }
 }
+
+void URSCheatManager::OpenTycoonLevel()
+{
+    UGameplayStatics::OpenLevel(GetWorld(), "TycoonTestMap");
+}

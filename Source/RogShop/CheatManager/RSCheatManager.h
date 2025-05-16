@@ -18,7 +18,7 @@ public:
 	URSCheatManager();
 	
 public:
-	// ´øÀü ¸ó½ºÅÍ ¾Ö´Ï¸ŞÀÌ¼Ç Å×½ºÆ®¿ë ÇÔ¼ö
+	// ë˜ì „ ëª¬ìŠ¤í„° ì• ë‹ˆë©”ì´ì…˜ í…ŒìŠ¤íŠ¸ìš© í•¨ìˆ˜
 	UFUNCTION(exec)
 	void TestDunMonsterAttack();
 
@@ -27,15 +27,22 @@ public:
 
 	UFUNCTION(exec)
 	void TestDunMonsterDeath();
-
-	// ¾î¶² ´øÀü ¸ó½ºÅÍµçÁö ½ºÆùÇÒ ¼ö ÀÖ´Â ÇÔ¼ö
+  
 	UFUNCTION(exec)
+	void OpenTycoonLevel();
+	
+	UFUNCTION(exec)
+	void TestAnubisDeath();
+  
+	// ì–´ë–¤ ë˜ì „ ëª¬ìŠ¤í„°ë“ ì§€ ìŠ¤í°í•  ìˆ˜ ìˆëŠ” í•¨ìˆ˜
+	UFUNCTION(Exec)
 	void SpawnMonster(FString MonsterName);
 
+	UFUNCTION(Exec)
+	void SpawnDunShopNPC();
+  
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SpawnMonster")
 	TMap<FString, TSubclassOf<AActor>> MonsterMap;
 
-	UFUNCTION(Exec)
-	void SpawnDunShopNPC();
 };
