@@ -10,31 +10,21 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	MeleeAttackBoxComponent->SetupAttachment(RootComponent);
 
 	//Navigation, NavLink
-	navGenerationRadius = 500.0f;
-	navRemovalRadius = 750.0f;
-	jumpForce = 0.0f;
+	navGenerationRadius = 1000.0f;
+	navRemovalRadius = 1500.0f;
+	jumpForce = 100.0f;
 
 	navInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("NavInvoker"));	
 	navInvoker->SetGenerationRadii(navGenerationRadius, navRemovalRadius);
 
 	//Patrol
 	maxDetectPatrolRoute = 2000.f;
-	detectSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DetectPatrolRoute"));
-	detectSphere->SetupAttachment(RootComponent);
-	detectSphere->SetSphereRadius(maxDetectPatrolRoute);
-	detectSphere->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-	detectSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	detectSphere->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-	detectSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	detectSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	detectSphere->SetGenerateOverlapEvents(true);
 }
 
 void ARSDunMonsterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	FindNearPatrolPoint();
-	
+	GetWorld()->GetTimerManager().SetTimer(detectDelayTimer, this, &ARSDunMonsterCharacter::FindNearPatrolPoint, 0.5f, false);	
 }
 
 void ARSDunMonsterCharacter::PlayBaseAttackAnim()
@@ -104,19 +94,7 @@ void ARSDunMonsterCharacter::JumpTo(FVector destination)
 }
 
 void ARSDunMonsterCharacter::FindNearPatrolPoint()
-{	
-/*	TArray<AActor*> overlappingActors;
-	detectSphere->GetOverlappingActors(overlappingActors, ATargetPoint::StaticClass());
-	
-	for (AActor* act : overlappingActors)
-	{
-		ATargetPoint* target = Cast<ATargetPoint>(act);
-		if (target)
-		{
-			patrolPoints.Add(target);
-			UE_LOG(LogTemp, Error, TEXT("iswork?"));
-		}
-	}*/
+{
 	TArray<FOverlapResult> overlapResults;
 	FCollisionQueryParams collisionQueryParms(NAME_None, false, this);
 	bool bResult = GetWorld()->OverlapMultiByChannel(
@@ -124,11 +102,12 @@ void ARSDunMonsterCharacter::FindNearPatrolPoint()
 		GetActorLocation(),
 		FQuat::Identity,
 		ECollisionChannel::ECC_GameTraceChannel2,
-		FCollisionShape::MakeSphere(300.f),
+		FCollisionShape::MakeSphere(maxDetectPatrolRoute),
 		collisionQueryParms
 	);
+//	DrawDebugSphere(GetWorld(), GetActorLocation(), maxDetectPatrolRoute, 16, FColor::Red, false, 60.f);
 
-	if (bResult)
+	if (!overlapResults.IsEmpty())
 	{
 		for (auto const& overlapResult : overlapResults)
 		{

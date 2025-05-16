@@ -9,6 +9,7 @@
 #include "Components/SphereComponent.h"
 #include "Engine/TargetPoint.h"
 #include "Engine/OverlapResult.h"
+#include "TimerManager.h"
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
@@ -83,11 +84,10 @@ protected:
 	UPROPERTY(EditInstanceOnly,BlueprintReadWrite, Category = "Patrol")
 	TArray<AActor*> patrolPoints;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Patrol")
-	USphereComponent* detectSphere;
-
 	UPROPERTY(BlueprintReadWrite, Category = "Patrol")
 	float maxDetectPatrolRoute;
+
+	FTimerHandle detectDelayTimer;
 private:
 	TObjectPtr<ARSMonsterAIController> AIController;  // TODO : 혹시나 캐싱해서 쓸 일 생길까봐 미리 만들어둠.
 
