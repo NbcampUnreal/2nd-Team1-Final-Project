@@ -76,14 +76,14 @@ void URSTycoonInventoryComponent::LoadItemData()
 
 bool URSTycoonInventoryComponent::CheckValidItem(const FName& ItemKey)
 {
-	if (GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Food->
-	                FindRow<FCookFoodData>(ItemKey, TEXT("Contains FoodData")))
+	URSDataSubsystem* Data = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>();
+
+	if (FCookFoodData* Row = Data->Food->FindRow<FCookFoodData>(ItemKey, TEXT("Contains FoodData")))
 	{
 		return true;
 	}
 
-	if (GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Ingredient->
-	                FindRow<FIngredientData>(ItemKey, TEXT("Contains IngredientData")))
+	if (FIngredientData* Row = Data->Ingredient->FindRow<FIngredientData>(ItemKey, TEXT("Contains IngredientData")))
 	{
 		return true;
 	}

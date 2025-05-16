@@ -18,7 +18,7 @@ ARSTycoonGameModeBase::ARSTycoonGameModeBase()
 	//어차피 1개라 성능을 많이 안 잡아 먹을거 같아서 true
 	PrimaryActorTick.bCanEverTick = true;
 
-	Inventory = CreateDefaultSubobject<URSTycoonInventoryComponent>("Inventory");
+	Inventory = CreateDefaultSubobject<URSTycoonInventoryComponent>(TEXT("Inventory"));
 }
 
 void ARSTycoonGameModeBase::StartGame()
@@ -53,7 +53,7 @@ void ARSTycoonGameModeBase::BeginPlay()
 	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
 	
 	//임시
-	Inventory->Add("TempGre", 4);
+	Inventory->Add(FName(TEXT("TempGre")), 4);
 
 	GetWorldTimerManager().SetTimerForNextTick([&]()
 	{
