@@ -13,20 +13,36 @@ UCLASS()
 class ROGSHOP_API URSCheatManager : public UCheatManager
 {
 	GENERATED_BODY()
+
+public:
+	URSCheatManager();
 	
 public:
+	// 던전 몬스터 애니메이션 테스트용 함수
 	UFUNCTION(exec)
-	void TestAnubisAttack();
+	void TestDunMonsterAttack();
 
 	UFUNCTION(exec)
-	void TestAnubisHItReact();
+	void TestDunMonsterHItReact();
 
+	UFUNCTION(exec)
+	void TestDunMonsterDeath();
+  
 	UFUNCTION(exec)
 	void OpenTycoonLevel();
 	
 	UFUNCTION(exec)
 	void TestAnubisDeath();
+  
+	// 어떤 던전 몬스터든지 스폰할 수 있는 함수
+	UFUNCTION(Exec)
+	void SpawnMonster(FString MonsterName);
 
 	UFUNCTION(Exec)
 	void SpawnDunShopNPC();
+  
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SpawnMonster")
+	TMap<FString, TSubclassOf<AActor>> MonsterMap;
+
 };

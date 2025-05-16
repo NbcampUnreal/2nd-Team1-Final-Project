@@ -29,6 +29,9 @@ public:
 	virtual void PlayHitReactAnim();
 	virtual void PlayDeathAnim();
 
+	UFUNCTION(BlueprintCallable, Category = "Enemy")
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UMeleeAttackBoxComponent> MeleeAttackBoxComponent;
@@ -46,16 +49,21 @@ public:
 
 	UFUNCTION()
 	TArray<AActor*> GetPatrolPoint();
+
+protected:
+	UFUNCTION(BlueprintCallable, Category = "Enemy|Status")
+	void OnDeath();
+
 protected:
 	// 局聪皋捞记 根鸥林
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UAnimMontage* BaseAttackMontage;
+	TObjectPtr<UAnimMontage> BaseAttackMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UAnimMontage* HitReactMontage;
+	TObjectPtr<UAnimMontage> HitReactMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UAnimMontage* DeathMontage;
+	TObjectPtr<UAnimMontage> DeathMontage;
 
 	//NavInvoker
 	UPROPERTY(BlueprintReadWrite, Category = Navigation, meta = (AllowPrivateAccess = "true"))//Navigation Invoker Setting
