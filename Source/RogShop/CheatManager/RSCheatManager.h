@@ -30,9 +30,6 @@ public:
   
 	UFUNCTION(exec)
 	void OpenTycoonLevel();
-	
-	UFUNCTION(exec)
-	void TestAnubisDeath();
   
 	// 어떤 던전 몬스터든지 스폰할 수 있는 함수
 	UFUNCTION(Exec)
@@ -41,8 +38,13 @@ public:
 	UFUNCTION(Exec)
 	void SpawnDunShopNPC();
   
+	UFUNCTION(exec)
+	void SpawnWeaponPad();
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SpawnMonster")
 	TMap<FString, TSubclassOf<AActor>> MonsterMap;
 
+	UPROPERTY(EditAnywhere, Category = "Spawn")
+	TSubclassOf<AActor> WeaponSpawnPadBPClass;
 };
