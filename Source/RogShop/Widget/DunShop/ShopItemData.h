@@ -2,10 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h" // 데이터 테이블용
-
+#include "RSBaseWeapon.h"
 #include "ShopItemData.generated.h"
-
-class ARSBaseWeapon;
 
 UENUM(BlueprintType)
 enum class ERarity : uint8
