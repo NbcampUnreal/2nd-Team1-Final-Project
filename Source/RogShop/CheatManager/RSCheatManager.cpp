@@ -79,7 +79,7 @@ void URSCheatManager::SpawnMonster(FString MonsterName)
     if (!World) return;
 
     FVector PlayerLocation = GetOuterAPlayerController()->GetPawn()->GetActorLocation();
-    FVector Forward = GetOuterAPlayerController()->GetPawn()->GetActorForwardVector(); // ÇÃ·¹ÀÌ¾î°¡ ¹Ù¶óº¸´Â ¹æÇâ
+    FVector Forward = GetOuterAPlayerController()->GetPawn()->GetActorForwardVector(); // ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½Ù¶óº¸´ï¿½ ï¿½ï¿½ï¿½ï¿½
 
     FVector SpawnLocation = PlayerLocation + Forward * 500.0f;
     FVector DirectionToPlayer = (PlayerLocation - SpawnLocation).GetSafeNormal();
@@ -121,4 +121,8 @@ void URSCheatManager::SpawnDunShopNPC()
 void URSCheatManager::OpenTycoonLevel()
 {
     UGameplayStatics::OpenLevel(GetWorld(), "TycoonTestMap");
+}
+
+void URSCheatManager::TestAnubisDeath()
+{
 }
