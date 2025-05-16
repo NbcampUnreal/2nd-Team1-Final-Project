@@ -14,16 +14,6 @@ void URSDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	Food = DataSettings->FoodDataTable.LoadSynchronous();
 	Ingredient = DataSettings->IngredientDataTable.LoadSynchronous();
 
-	if (Food != nullptr)
-	{
-		RS_LOG("Food not Load")
-	}
-	
-	if (Ingredient != nullptr)
-	{
-		RS_LOG("Ingredient not Load")
-	}
-	
 	check(Food)
 	check(Ingredient)
 }
