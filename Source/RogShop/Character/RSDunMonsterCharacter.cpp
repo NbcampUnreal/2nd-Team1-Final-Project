@@ -51,7 +51,8 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 	/*if (bIsDead) return 0.0f;*/ // TODO : 만약 선국님이 bIsDead 변수 만들어 주면 넣을 로직
 
 	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	HP -= damage;
+	
+	DecreaseHP(damage);
 
 	// 데미지 받으면 로그에 추가! (임시)
 	UE_LOG(LogTemp, Warning, TEXT("[%s] took %.1f damage from [%s]"),
@@ -60,7 +61,7 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 		DamageCauser ? *DamageCauser->GetName() : TEXT("Unknown"));
 
 	
-	if (HP <= 0)
+	if (GetHP() <= 0)
 	{
 		OnDeath();
 	}
