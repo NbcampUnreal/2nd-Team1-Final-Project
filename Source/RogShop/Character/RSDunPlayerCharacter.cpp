@@ -12,6 +12,8 @@
 #include "RSPlayerWeaponComponent.h"
 #include "RSInteractable.h"
 #include "DrawDebugHelpers.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISense_Sight.h"
 
 // Sets default values
 ARSDunPlayerCharacter::ARSDunPlayerCharacter()
@@ -48,6 +50,11 @@ ARSDunPlayerCharacter::ARSDunPlayerCharacter()
     // 상호작용
     InteractActor = nullptr;
     InteractDistance = 200.f;
+
+    // AI퍼셉션 자극 소스
+    AIPerceptionStimuliSourceComp = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("AIPerceptionStimuliSource"));
+    AIPerceptionStimuliSourceComp->bAutoRegister = true;
+    AIPerceptionStimuliSourceComp->RegisterForSense(UAISense_Sight::StaticClass());
 }
 
 // Called when the game starts or when spawned
