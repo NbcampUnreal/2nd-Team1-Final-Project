@@ -128,11 +128,9 @@ float ARSDunPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& 
 {
     const float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-    float NewHP = FMath::Clamp(HP - Damage, 0.0f, MaxHP);
+    DecreaseHP(Damage);
 
-    HP = NewHP;
-
-    if (HP <= 0)
+    if (GetHP() <= 0)
     {
         OnDeath();
     }
@@ -142,6 +140,8 @@ float ARSDunPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& 
 
 void ARSDunPlayerCharacter::OnDeath()
 {
+    Super::OnDeath();
+
     // 레벨 오브젝트를 제외한 모든 오브젝트와 충돌하지 않도록 콜리전 설정 변경
     GetCapsuleComponent()->SetCollisionProfileName(TEXT("DeadCharacter"));
     GetMesh()->SetCollisionProfileName(TEXT("DeadCharacter"));
