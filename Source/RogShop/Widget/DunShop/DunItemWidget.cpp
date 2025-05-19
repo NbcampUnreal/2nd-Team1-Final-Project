@@ -106,17 +106,17 @@ bool UDunItemWidget::BuyItem()
 
     switch (ItemData.ItemList)
     {
-        case EItemList::Potion:
+        case EItemList::Potion: // 체력 즉시 회복
         {
             switch (ItemData.Rarity)
             {
-                case ERarity::Common: FinalValue = 1.0f; break;
-                case ERarity::Rare: FinalValue = 2.0f; break;
-                case ERarity::Epic: FinalValue = 3.0f; break;
-                case ERarity::Legendary: FinalValue = 4.0f; break;
+                case ERarity::Common: FinalValue = 10.0f; break;
+                case ERarity::Rare: FinalValue = 20.0f; break;
+                case ERarity::Epic: FinalValue = 30.0f; break;
+                case ERarity::Legendary: FinalValue = 40.0f; break;
             }
 
-            // Character->AddHP(FinalValue);  // 플레이어 HP 수정 관련 함수 또는 public 변수 필요
+            PlayerChar->IncreaseHP(FinalValue);
 
             break;
         }
@@ -134,7 +134,7 @@ bool UDunItemWidget::BuyItem()
 
             break;
         }
-        case EItemList::WalkSpeedRelic:
+        case EItemList::WalkSpeedRelic: // 임시
         {
             switch (ItemData.Rarity)
             {
@@ -148,7 +148,7 @@ bool UDunItemWidget::BuyItem()
 
             break;
         }
-        case EItemList::AttackRelic:
+        case EItemList::AttackRelic: // 임시
         {
             switch (ItemData.Rarity)
             {
@@ -162,7 +162,7 @@ bool UDunItemWidget::BuyItem()
 
             break;
         }
-        case EItemList::AttackSpeedRelic:
+        case EItemList::AttackSpeedRelic: // 임시
         {
             switch (ItemData.Rarity)
             {
