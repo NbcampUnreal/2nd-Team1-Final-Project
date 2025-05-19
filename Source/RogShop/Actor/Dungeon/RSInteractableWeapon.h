@@ -5,19 +5,19 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "RSInteractable.h"
-#include "InteractableWeapon.generated.h"
+#include "RSInteractableWeapon.generated.h"
 
 class ARSDungeonItemBase;
 class UBoxComponent;
 
 UCLASS()
-class ROGSHOP_API AInteractableWeapon : public AActor, public IRSInteractable
+class ROGSHOP_API ARSInteractableWeapon : public AActor, public IRSInteractable
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AInteractableWeapon();
+	ARSInteractableWeapon();
 
 protected:
 	// Called when the game starts or when spawned

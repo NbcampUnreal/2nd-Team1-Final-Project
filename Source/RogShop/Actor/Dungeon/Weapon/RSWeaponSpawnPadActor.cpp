@@ -75,8 +75,8 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
     {
         FVector SpawnLoc = StartLocation + FVector(0, i * ActualSpacing, 0);
 
-        AInteractableWeapon* InteractableWeapon = GetWorld()->SpawnActor<AInteractableWeapon>(
-            AInteractableWeapon::StaticClass(),
+        ARSInteractableWeapon* InteractableWeapon = GetWorld()->SpawnActor<ARSInteractableWeapon>(
+            ARSInteractableWeapon::StaticClass(),
             SpawnLoc,
             FRotator::ZeroRotator
         );
