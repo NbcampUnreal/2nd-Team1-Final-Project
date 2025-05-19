@@ -30,15 +30,14 @@ public:
 	virtual void PlayHitReactAnim();
 	virtual void PlayDeathAnim();
 
+	//Navigation Invoker function
+	FORCEINLINE class UNavigationInvokerComponent* GetNavInvoker() const { return navInvoker; };
+
 	UFUNCTION(BlueprintCallable, Category = "Enemy")
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UMeleeAttackBoxComponent> MeleeAttackBoxComponent;
-
-	//Navigation Invoker function
-	FORCEINLINE class UNavigationInvokerComponent* GetNavInvoker() const { return navInvoker; };
+	UFUNCTION(BlueprintCallable, Category = "Trace")
+	virtual void PerformAttackTrace() PURE_VIRTUAL(ARSDunMonsterCharacter::PerformAttackTrace, );
 
 	//NavLink jump function
 	UFUNCTION(BlueprintCallable)
@@ -51,9 +50,16 @@ public:
 	UFUNCTION()
 	TArray<AActor*> GetPatrolPoint();
 
+	bool HasAttackTraced() const;
+	void SetAttackTraced(bool bNewValue);
+
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Status")
 	void OnDeath();
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UMeleeAttackBoxComponent> MeleeAttackBoxComponent;
 
 protected:
 	// 애니메이션 몽타주
@@ -88,6 +94,9 @@ protected:
 	float maxDetectPatrolRoute;
 
 	FTimerHandle detectDelayTimer;
+
+	bool bHasAttackTraced;  // 트레이스(몬스터한테 공격 판정이)가 되었는지 판단하는 변수
+
 private:
 	TObjectPtr<ARSMonsterAIController> AIController;  // TODO : 혹시나 캐싱해서 쓸 일 생길까봐 미리 만들어둠.
 

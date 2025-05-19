@@ -21,4 +21,14 @@ public:
 	void PlayHitReactAnim() override;
 	void PlayDeathAnim() override;
 
+	void PerformAttackTrace() override;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace")
+	FVector TraceBoxHalfSize;
+
+	// 트레이스 길이 (앞으로 얼마만큼 쏠지)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace")
+	float TraceLength;
+
 };

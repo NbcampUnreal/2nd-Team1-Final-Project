@@ -18,12 +18,12 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "Widget", "Mainmenu"),
             Path.Combine(ModuleDirectory, "AnimInstances"),
             Path.Combine(ModuleDirectory, "AnimNotifyState"),
+            Path.Combine(ModuleDirectory, "AnimNotify"),
             Path.Combine(ModuleDirectory, "ActorComponent"),
             Path.Combine(ModuleDirectory, "CheatManager"),
             Path.Combine(ModuleDirectory, "GameModeBase"),
             Path.Combine(ModuleDirectory, "GameInstance"),
             Path.Combine(ModuleDirectory, "Actor", "Dungeon", "Weapon"),
-            Path.Combine(ModuleDirectory, "AnimNotifyState"),
             Path.Combine(ModuleDirectory, "Interface"),
         });
 
