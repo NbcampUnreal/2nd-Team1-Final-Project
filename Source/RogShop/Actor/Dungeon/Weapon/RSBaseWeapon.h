@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "RSDungeonItemBase.h"
 #include "RSInteractable.h"
 #include "RSBaseWeapon.generated.h"
 
 class UBoxComponent;
 
 UCLASS()
-class ROGSHOP_API ARSBaseWeapon : public AActor, public IRSInteractable
+class ROGSHOP_API ARSBaseWeapon : public ARSDungeonItemBase
 {
 	GENERATED_BODY()
 	
@@ -21,10 +21,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-// 상호작용
-public:
-	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
 
 // 컴포넌트
 public:

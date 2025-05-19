@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "RSWeaponSpawnPadActor.h"
-#include "ShopItemData.h"
+#include "DungeonItemData.h"
+#include "InteractableWeapon.h"
 
 // Sets default values
 ARSWeaponSpawnPadActor::ARSWeaponSpawnPadActor()
@@ -25,21 +26,21 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
     if (!WeaponDataTable) return;
 
     // 데이터 테이블에서 모든 Row 가져오기
-    TArray<FShopItemData*> AllWeapons;
+    TArray<FDungeonItemData*> AllWeapons;
     WeaponDataTable->GetAllRows(TEXT("WeaponSpawn"), AllWeapons);
 
-    TArray<FShopItemData*> FilteredWeapons;
+    TArray<FDungeonItemData*> FilteredWeapons;
 
-    for (FShopItemData* Item : AllWeapons)
+    for (FDungeonItemData* Item : AllWeapons)
     {
-        if (Item && Item->Rarity == ERarity::Common && Item->ItemList == EItemList::Weapon)
+        if (Item && Item->ItemRarity == EItemRarity::Common && Item->ItemType == EItemType::Weapon)
         {
             FilteredWeapons.Add(Item);
         }
     }
 
     // 선택된 무기 저장용 배열
-    TArray<FShopItemData*> SelectedWeapons;
+    TArray<FDungeonItemData*> SelectedWeapons;
 
     // 중복 방지를 위해 랜덤 선택 후 제거
     while (SelectedWeapons.Num() < NumberOfWeapons && FilteredWeapons.Num() > 0)
@@ -73,11 +74,19 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
     for (int32 i = 0; i < SelectedWeapons.Num(); ++i)
     {
         FVector SpawnLoc = StartLocation + FVector(0, i * ActualSpacing, 0);
-        GetWorld()->SpawnActor<AActor>(
-            SelectedWeapons[i]->WeaponClass,
+
+        AInteractableWeapon* InteractableWeapon = GetWorld()->SpawnActor<AInteractableWeapon>(
+            AInteractableWeapon::StaticClass(),
             SpawnLoc,
             FRotator::ZeroRotator
         );
+
+        UStaticMesh* ItemStaticMesh = SelectedWeapons[i]->ItemStaticMesh;
+        TSubclassOf<ARSDungeonItemBase> ItemClass = SelectedWeapons[i]->ItemClass;
+        if (ItemStaticMesh && ItemClass)
+        {
+            InteractableWeapon->InitInteractableWeapon(ItemStaticMesh, ItemClass);
+        }
 
         // UE_LOG(LogTemp, Warning, TEXT("SelectedWeapon ID: %s"), *SelectedWeapons[i]->ItemID.ToString());
     }
