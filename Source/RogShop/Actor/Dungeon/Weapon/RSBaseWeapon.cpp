@@ -32,16 +32,6 @@ void ARSBaseWeapon::BeginPlay()
 	
 }
 
-void ARSBaseWeapon::Interact(ARSDunPlayerCharacter* Interactor)
-{
-	// 플레이어의 무기 슬롯에 남은 칸으로 삽입되거나 현재 무기와 교체된다.
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Interaction ARSBaseWeapon"));
-	}
-}
-
 UBoxComponent* ARSBaseWeapon::GetBoxComp() const
 {
 	return BoxComp;
