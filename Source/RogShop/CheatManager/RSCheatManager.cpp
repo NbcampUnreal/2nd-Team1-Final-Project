@@ -152,8 +152,6 @@ void URSCheatManager::SpawnWeaponPad()
     FRotator SpawnRotation = FRotator::ZeroRotator;
 
     GetWorld()->SpawnActor<AActor>(WeaponSpawnPadBPClass, SpawnLocation, SpawnRotation);
-
-    UE_LOG(LogTemp, Warning, TEXT("Suc !"));
 }
 
 void URSCheatManager::OpenTycoonLevel()
