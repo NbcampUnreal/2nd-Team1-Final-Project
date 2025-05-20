@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "RSTycoonGameModeBase.generated.h"
 
+class ARSTycoonCustomerCharacter;
 struct FCookFoodData;
 class URSTycoonInventoryComponent;
 
@@ -16,10 +17,11 @@ class ROGSHOP_API ARSTycoonGameModeBase : public AGameModeBase
 
 public:
 	ARSTycoonGameModeBase();
-	
+
 	void StartGame();
 	void AddOrder(const FName& OrderFoodName);
 	void RemoveOrder(const FName& OrderFoodName);
+	void RemoveCustomer(ARSTycoonCustomerCharacter* Customer);
 
 	const TArray<FName>& GetOrders() const { return OrderedFoodKeys; }
 
@@ -30,19 +32,24 @@ private:
 	void CreateCustomer();
 	bool CanOrder(FName& OutOrderFood);
 
+	int32 GetCurrentCustomerCount() const { return Customers.Num(); }
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<URSTycoonInventoryComponent> Inventory;	//인벤토리
-	
+	TObjectPtr<URSTycoonInventoryComponent> Inventory; //인벤토리
+
 private:
 	UPROPERTY(VisibleAnywhere)
-	TArray<FName> OrderedFoodKeys;		//오더 들어온 음식의 Key들
+	//오더 들어온 음식의 Key들
+	TArray<FName> OrderedFoodKeys; 
+
+	UPROPERTY()
+	//가게 안에 있는 손님들
+	TArray<TWeakObjectPtr<ARSTycoonCustomerCharacter>> Customers; 
 
 	UPROPERTY(VisibleAnywhere)
-	int32 NowCustomerCount; 			//지금 가게에 있는 손님
+	//최대 입장 가능한 손님, TableTile의 영향을 받음
+	int32 MaxCustomerCount; 
 
-	UPROPERTY(VisibleAnywhere)
-	int32 MaxCustomerCount;				//최대 입장 가능한 손님, TableTile의 영향을 받음
-	
-	FTimerHandle CustomerTimerHandle;	//손님 등장 타이머
-}; 
+	FTimerHandle CustomerTimerHandle; //손님 등장 타이머
+};

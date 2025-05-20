@@ -37,6 +37,10 @@ void ARSCookingTile::Interact()
 		//음식 가져감
 		TakeFood();
 	}
+	else if (State == ECookingState::Cooking)
+	{
+		RS_LOG_F_C("요리중 입니다 : %s", FColor::Orange, *CookingFoodKey.ToString())
+	}
 }
 
 void ARSCookingTile::OrderToCook()
@@ -61,26 +65,33 @@ void ARSCookingTile::OrderToCook()
 void ARSCookingTile::Cook(const FName& FoodKey)
 {
 	State = ECookingState::Cooking;
-
+	CookingFoodKey = FoodKey;
+	
 	FCookFoodData* Data = GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Food
 	                                       ->FindRow<FCookFoodData>(FoodKey, TEXT("Get FoodData"));
 
 	//사용한 재료 제거
 	for (auto& Need : Data->NeedIngredients)
 	{
-		GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->Inventory->Remove(Need.Key, Need.Value);
+		GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->Inventory->RemoveItem(Need.Key, Need.Value);
 	}
 
+	//5초 후 완성
+	FTimerHandle Timer;
+	GetWorldTimerManager().SetTimer(Timer, this, &ARSCookingTile::FinishCook, 5.f, false);
+}
 
-	
-	//임시, 바로 제작됨
+void ARSCookingTile::FinishCook()
+{
 	State = ECookingState::Finish;
 
-	// FCookFoodData const* Data = GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Food->
-	//                                                FindRow<FCookFoodData>(FoodKey, TEXT("Find Cook Data"));
+	FCookFoodData const* Data = GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Food->
+	                                               FindRow<FCookFoodData>(CookingFoodKey, TEXT("Find Cook Data"));
+	
 	ARSBaseFood* Food = GetWorld()->SpawnActor<ARSBaseFood>(Data->ActorType);
 	Food->SetActorLocation(FoodLocation->GetComponentLocation());
 
+	CookingFoodKey = "";
 	CookedFood = Food;
 }
 

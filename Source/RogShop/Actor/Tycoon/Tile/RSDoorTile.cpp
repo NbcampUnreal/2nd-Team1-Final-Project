@@ -16,16 +16,16 @@ ARSDoorTile::ARSDoorTile()
 	CustomerSpawnPoint->SetupAttachment(RootComponent);
 }
 
-void ARSDoorTile::SpawnCustomer(const FName& FoodKey, ARSTableTile* Target)
+ARSTycoonCustomerCharacter* ARSDoorTile::SpawnCustomer(const FName& FoodKey, ARSTableTile* Target)
 {
 	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	ARSTycoonCustomerCharacter* Customer = GetWorld()->SpawnActor<ARSTycoonCustomerCharacter>(CustomerType, SpawnParameters);
-	Customer->SetActorLocation(CustomerSpawnPoint->GetComponentLocation());
-
+	ARSTycoonCustomerCharacter* Customer = GetWorld()->SpawnActor<ARSTycoonCustomerCharacter>(
+		CustomerType, CustomerSpawnPoint->GetComponentTransform(), SpawnParameters);
 	Customer->WantFoodKey = FoodKey;
 
-	//임시
-	Target->Sit({Customer});
+	Customer->MoveToTarget(Target->GetSitTransform().GetLocation(), Target);
+
+	return Customer;
 }
