@@ -25,8 +25,10 @@ class ROGSHOP_API ARSCookingTile : public ARSBaseTile
 public:
 	ARSCookingTile();
 
+	TILE_KEY()
+	
 	virtual void Interact() override;
-
+	
 private:
 	void OrderToCook();
 	void Cook(const FName& FoodKey);

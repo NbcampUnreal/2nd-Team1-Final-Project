@@ -6,12 +6,7 @@
 
 ARSIceBoxTile::ARSIceBoxTile()
 {
-	TileName = TEXT("아이스 박스");
-}
-
-void ARSIceBoxTile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	TileDisplayName = TEXT("아이스 박스");
 }
 
 void ARSIceBoxTile::Interact()
@@ -19,10 +14,4 @@ void ARSIceBoxTile::Interact()
 	Super::Interact();
 
 	//걍 재료 상자칸 + 될거같음
-}
-
-void ARSIceBoxTile::BeginPlay()
-{
-	Super::BeginPlay();
-	
 }

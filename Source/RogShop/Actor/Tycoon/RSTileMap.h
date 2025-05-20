@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "RSTileMap.generated.h"
 
+struct FTileRow;
 class ARSBaseTile;
 
 UCLASS()
@@ -22,9 +23,10 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	// UFUNCTION(CallInEditor, Category="TileMap")
-	void CreateTilesWithChildActorComponent();
-	void CreateTilesWithSpawnActor();
+	void CreateTiles();
+
+	void LoadTiles();
+	void SaveTiles();
 	
 public:
 	UPROPERTY(EditAnywhere, Category="TileMap")
@@ -36,10 +38,15 @@ public:
 	UPROPERTY(EditAnywhere, Category="TileMap")
 	int32 Height;
 
-protected:
-	TArray<TWeakObjectPtr<ARSBaseTile>> Tiles;
-	
 private:
+	static const FString TileMapSaveSlot;
+	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USceneComponent> TileParent;
+	
+	UPROPERTY()
+	TArray<TWeakObjectPtr<ARSBaseTile>> TileActors;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<FTileRow> TileName2DMap;
 };

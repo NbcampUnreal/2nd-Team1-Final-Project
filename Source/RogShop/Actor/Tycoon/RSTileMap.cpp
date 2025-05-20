@@ -4,8 +4,13 @@
 #include "RSTileMap.h"
 
 #include "MovieSceneSequenceID.h"
+#include "Kismet/GameplayStatics.h"
 #include "RogShop/UtilDefine.h"
+#include "RogShop/SaveGame/RSTycoonSaveGame.h"
 #include "Tile/RSBaseTile.h"
+#include "Tile/RSTableTile.h"
+
+const FString ARSTileMap::TileMapSaveSlot = TEXT("TileMapSaveSlot");
 
 ARSTileMap::ARSTileMap()
 {
@@ -24,66 +29,23 @@ void ARSTileMap::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CreateTilesWithSpawnActor(); // 임시
+	LoadTiles();
+	TileName2DMap[0].Tiles[0] = ARSTableTile::GetTileKey();
+	SaveTiles();
+	
+	// CreateTiles();
 }
 
-void ARSTileMap::CreateTilesWithChildActorComponent()
-{
-	RS_LOG_F("%d x %d Tile 생성", Width, Height)
-
-	check(DefaultTileType)
-
-	if (TileParent->GetNumChildrenComponents() > 0)
-	{
-		auto& ChildCompArray = TileParent->GetAttachChildren();
-		int Num = ChildCompArray.Num();
-
-		for (int32 i = 0; i < Num; i++)
-		{
-			auto& Child = ChildCompArray[0];
-			if (Child && !Child->IsBeingDestroyed())
-			{
-				Child->DestroyComponent();
-			}
-		}
-	}
-
-	FVector TileSize = DefaultTileType.GetDefaultObject()->GetTileSize();
-
-	for (int32 i = 0; i < Height; i++)
-	{
-		for (int32 j = 0; j < Width; j++)
-		{
-			FName TileName = FName(FString::Printf(TEXT("Tile %d x %d"), i, j));
-
-			//새로운 UChildActorComponent를 생성
-			UChildActorComponent* NewChildActorComp = NewObject<UChildActorComponent>(this, TileName);
-			NewChildActorComp->SetChildActorClass(DefaultTileType);
-
-			//부모를 설정 후 컴포넌트를 등록
-			NewChildActorComp->SetupAttachment(TileParent);
-			NewChildActorComp->CreationMethod = EComponentCreationMethod::Instance;
-			NewChildActorComp->RegisterComponent();
-
-			FVector Location = FVector::ZeroVector;
-			Location.Y += TileSize.Y * j;
-			Location.X += TileSize.X * i;
-
-			NewChildActorComp->SetRelativeLocation(Location);
-		}
-	}
-}
-
-void ARSTileMap::CreateTilesWithSpawnActor()
+void ARSTileMap::CreateTiles()
 {
 	RS_LOG_F("%d x %d Tile 생성", Width, Height)
 
 	check(DefaultTileType)
 
 	//임시, 타일 전체 삭제
-	if (Tiles.Num() > 0)
+	if (TileActors.Num() > 0)
 	{
-		for (auto& Tile : Tiles)
+		for (auto& Tile : TileActors)
 		{
 			if (Tile.Get())
 			{
@@ -91,9 +53,11 @@ void ARSTileMap::CreateTilesWithSpawnActor()
 			}
 		}
 
-		Tiles.Empty();
+		TileActors.Empty();
 	}
 
+	
+	
 	FVector TileSize = DefaultTileType.GetDefaultObject()->GetTileSize();
 	FVector StartLocation = GetActorLocation();
 	
@@ -111,9 +75,44 @@ void ARSTileMap::CreateTilesWithSpawnActor()
 			Location.Y += TileSize.Y * i;
 			
 			TileActor->SetActorLocation(Location);
-			Tiles.Add(TileActor);
+			TileActors.Add(TileActor);
 		}
 	}
 
 	
+}
+
+void ARSTileMap::LoadTiles()
+{
+	URSTycoonSaveGame* LoadedGame = Cast<URSTycoonSaveGame>(
+		UGameplayStatics::LoadGameFromSlot(TileMapSaveSlot, 0));
+	
+	if (LoadedGame)
+	{
+		RS_LOG_C("타일 로드 성공", FColor::Yellow)
+		TileName2DMap = LoadedGame->Tile2DMap;
+	}
+	else
+	{
+		for (int i = 0; i < Height; i++)
+		{
+			TileName2DMap.Add(FTileRow());
+			for (int j = 0; j < Width; j++)
+			{
+				TileName2DMap[i].Tiles.Add(ARSBaseTile::GetTileKey());
+			}
+		}
+	}
+}
+
+void ARSTileMap::SaveTiles()
+{	
+	// SaveGame 오브젝트 생성
+	URSTycoonSaveGame* SaveGameInstance = Cast<URSTycoonSaveGame>(
+		UGameplayStatics::CreateSaveGameObject(URSTycoonSaveGame::StaticClass()));
+	
+	SaveGameInstance->Tile2DMap = TileName2DMap;
+
+	// 저장
+	UGameplayStatics::SaveGameToSlot(SaveGameInstance, TileMapSaveSlot, 0);
 }

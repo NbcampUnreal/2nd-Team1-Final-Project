@@ -11,7 +11,7 @@
 
 ARSTableTile::ARSTableTile()
 {
-	TileName = TEXT("테이블");
+	TileDisplayName = TEXT("테이블");
 
 	FoodLocation = CreateDefaultSubobject<USceneComponent>("FoodLocation");
 	FoodLocation->SetupAttachment(RootComponent);

@@ -17,7 +17,9 @@ class ROGSHOP_API ARSDoorTile : public ARSBaseTile
 
 public:
 	ARSDoorTile();
-
+	
+	TILE_KEY()
+	
 	ARSTycoonCustomerCharacter* SpawnCustomer(const FName& FoodData, ARSTableTile* Target);
 
 	FVector GetSpawnPoint() const { return CustomerSpawnPoint->GetComponentLocation(); }

@@ -6,6 +6,10 @@
 #include "GameFramework/Actor.h"
 #include "RSBaseTile.generated.h"
 
+#define TILE_KEY() \
+	static FName GetTileKey() { return StaticClass()->GetFName(); }
+
+
 UCLASS()
 class ROGSHOP_API ARSBaseTile : public AActor
 {
@@ -13,15 +17,16 @@ class ROGSHOP_API ARSBaseTile : public AActor
 
 public:
 	ARSBaseTile();
-
+	
+	TILE_KEY()
+	
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Interact() { }
 
-	UFUNCTION(CallInEditor, Category="Tile")
 	FVector GetTileSize();
-	FString GetTileName() const { return TileName; }
-
+	FString GetTileDisplayName() const { return TileDisplayName; }
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -32,6 +37,6 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UStaticMeshComponent> Plane;
 
-	// FText TileName = FText::FromString(TEXT("Default"));
-	FString TileName = "Default";
+protected:
+	FString TileDisplayName = TEXT("기본");
 };
