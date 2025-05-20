@@ -5,7 +5,9 @@
 #include "RSDunMonsterCharacter.h"
 #include "RSDunAnubisCharacter.h"
 #include "RSDunBossSpiderQueenCharacter.h"
+#include "RSDunPlayerController.h"
 
+#include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 
 URSCheatManager::URSCheatManager()
@@ -118,11 +120,57 @@ void URSCheatManager::SpawnDunShopNPC()
     }
 }
 
+void URSCheatManager::SpawnWeaponPad()
+{
+    if (!GetWorld() || !WeaponSpawnPadBPClass)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("GetWorld or WeaponSpawnPadBPClass Is Null !"));
+        return;
+    }
+
+    APlayerController* PC = GetOuterAPlayerController();
+    if (!PC)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("APlayerController Is Null !"));
+        return;
+    }
+
+    APawn* PlayerPawn = PC->GetPawn();
+    if (!PlayerPawn)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("APawn Is Null !"));
+        return;
+    }
+
+    FVector PlayerLocation = PlayerPawn->GetActorLocation();
+    FRotator PlayerRotation = PlayerPawn->GetActorRotation();
+
+    // 플레이어 앞 방향 벡터 (정면 방향)
+    FVector ForwardVector = PlayerRotation.Vector();
+
+    // 플레이어 앞 200 유닛 지점에 스폰
+    FVector SpawnLocation = PlayerLocation + ForwardVector * 200.f;
+
+    FRotator SpawnRotation = FRotator::ZeroRotator;
+
+    GetWorld()->SpawnActor<AActor>(WeaponSpawnPadBPClass, SpawnLocation, SpawnRotation);
+}
+
+void URSCheatManager::ShowRSDunMainWidget()
+{
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetOuterAPlayerController());
+
+    if (PC && PC->RSDunMainWidget)
+    {
+        PC->RSDunMainWidget->AddToViewport();
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("PC or RSDunMainWidget Is Null !"));
+    }
+}
+
 void URSCheatManager::OpenTycoonLevel()
 {
     UGameplayStatics::OpenLevel(GetWorld(), TEXT("TycoonTestMap"));
-}
-
-void URSCheatManager::TestAnubisDeath()
-{
 }

@@ -4,7 +4,7 @@
 #include "RSPlayerWeaponComponent.h"
 #include "RogShop/UtilDefine.h"
 #include "RSBaseWeapon.h"
-#include "GameFramework/Character.h"
+#include "RSDunPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/BoxComponent.h"
 
@@ -50,7 +50,7 @@ void URSPlayerWeaponComponent::HandleNormalAttackInput()
 		uint8 Index = static_cast<uint8>(WeaponSlot);
         if (WeaponActors.IsValidIndex(Index) && WeaponActors[Index] != nullptr)
         {
-            ACharacter* CurCharacter = GetOwner<ACharacter>();
+			ARSDunPlayerCharacter* CurCharacter = GetOwner<ARSDunPlayerCharacter>();
             if (!CurCharacter)
             {
                 return;
@@ -67,7 +67,9 @@ void URSPlayerWeaponComponent::HandleNormalAttackInput()
             
             if (CurAttackMontage && AnimInstance)
             {
-                AnimInstance->Montage_Play(CurAttackMontage);
+				float AttackSpeed = CurCharacter->GetAttackSpeed();
+
+                AnimInstance->Montage_Play(CurAttackMontage, AttackSpeed);
                 bIsAttack = true;
                 ++ComboIndex;
             }
@@ -82,7 +84,7 @@ bool URSPlayerWeaponComponent::ContinueComboAttack()
 		uint8 Index = static_cast<uint8>(WeaponSlot);
 		if (WeaponActors.IsValidIndex(Index) && WeaponActors[Index] != nullptr)
 		{
-			ACharacter* CurCharacter = GetOwner<ACharacter>();
+			ARSDunPlayerCharacter* CurCharacter = GetOwner<ARSDunPlayerCharacter>();
 			if (!CurCharacter)
 			{
 				return false;
@@ -105,7 +107,10 @@ bool URSPlayerWeaponComponent::ContinueComboAttack()
 
 			if (CurAttackMontage && AnimInstance)
 			{
-				AnimInstance->Montage_Play(CurAttackMontage);
+				float AttackSpeed = CurCharacter->GetAttackSpeed();
+
+				AnimInstance->Montage_Play(CurAttackMontage, AttackSpeed);
+
 				bComboInputBuffered = false;
 				ComboIndex += 1;
 
@@ -247,7 +252,7 @@ void URSPlayerWeaponComponent::EndAttackOverlap()
 void URSPlayerWeaponComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	// 오버랩 된 액터에게 데미지를 가한다.
-	ACharacter* OwnerCharacter = GetOwner<ACharacter>();
+	ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
 
 	AController* OwnerController = nullptr;
 	if (OwnerCharacter)
@@ -258,13 +263,15 @@ void URSPlayerWeaponComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedCom
 	if (OtherActor && OtherActor != OwnerCharacter && !DamagedActors.Contains(OtherActor))
 	{
 		uint8 Index = static_cast<uint8>(WeaponSlot);
-		float WeaponDamage = 0.f;
-		if (WeaponActors.IsValidIndex(Index))
+		float TotalDamage = 0.f;
+		if (WeaponActors.IsValidIndex(Index) && OwnerCharacter)
 		{
-			WeaponDamage = WeaponActors[Index]->GetWeaponDamage();
+			float WeaponDamage = WeaponActors[Index]->GetWeaponDamage();
+			float AttackPower = OwnerCharacter->GetAttackPower();
+			TotalDamage = WeaponDamage + AttackPower;
 		}
 
-		UGameplayStatics::ApplyDamage(OtherActor, WeaponDamage, OwnerController, WeaponActors[Index], UDamageType::StaticClass());
+		UGameplayStatics::ApplyDamage(OtherActor, TotalDamage, OwnerController, WeaponActors[Index], UDamageType::StaticClass());
 		DamagedActors.Add(OtherActor);
 	}
 }

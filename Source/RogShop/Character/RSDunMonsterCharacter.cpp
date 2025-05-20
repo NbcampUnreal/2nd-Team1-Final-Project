@@ -51,11 +51,9 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 	// TODO : 만약 선국님이 bIsDead 변수 만들어 주면 넣을 로직
 	/*if (bIsDead) return 0.0f;*/ 
 
-	const float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
-	const float NewHP = FMath::Clamp(HP - damage, 0.0f, MaxHP);
-
-	HP = NewHP;
+	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	
+	DecreaseHP(damage);
 
 	// 데미지 받으면 로그에 추가! (임시)
 	UE_LOG(LogTemp, Warning, TEXT("[%s] took %.1f damage from [%s]"),
@@ -64,7 +62,7 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 		DamageCauser ? *DamageCauser->GetName() : TEXT("Unknown"));
 
 	
-	if (HP <= 0)
+	if (GetHP() <= 0)
 	{
 		OnDeath();
 	}
@@ -131,16 +129,6 @@ void ARSDunMonsterCharacter::FindNearPatrolPoint()
 TArray<AActor*> ARSDunMonsterCharacter::GetPatrolPoint()
 {
 	return patrolPoints;
-}
-
-bool ARSDunMonsterCharacter::HasAttackTraced() const
-{
-	return bHasAttackTraced;
-}
-
-void ARSDunMonsterCharacter::SetAttackTraced(bool bNewValue)
-{
-	bHasAttackTraced = bNewValue;
 }
 
 void ARSDunMonsterCharacter::OnDeath()

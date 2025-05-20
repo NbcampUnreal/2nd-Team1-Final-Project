@@ -9,6 +9,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class URSPlayerWeaponComponent;
+class UAIPerceptionStimuliSourceComponent;
 
 struct FInputActionValue;
 
@@ -74,7 +75,7 @@ public:
 	URSPlayerWeaponComponent* GetRSPlayerWeaponComponent();
 
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
 	TObjectPtr<URSPlayerWeaponComponent> WeaponComp;
 
 // 상호작용 관련
@@ -84,4 +85,26 @@ private:
 private:
 	AActor* InteractActor;	// 라인트레이스를 통해 찾은 상호작용 가능한 액터
 	float InteractDistance;	// 라인트레이스를 할 거리
+
+// AI퍼셉션 자극 소스
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UAIPerceptionStimuliSourceComponent> AIPerceptionStimuliSourceComp;
+
+// 스탯 관련
+public:
+	float GetAttackPower() const;
+	void IncreaseAttackPower(float Amount);
+	void DecreaseAttackPower(float Amount);
+
+	float GetAttackSpeed() const;
+	void IncreaseAttackSpeed(float Amount);
+	void DecreaseAttackSpeed(float Amount);
+
+private:
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
+	float AttackPower;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
+	float AttackSpeed;
 };

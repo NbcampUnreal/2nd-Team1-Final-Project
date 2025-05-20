@@ -12,6 +12,8 @@
 #include "RSPlayerWeaponComponent.h"
 #include "RSInteractable.h"
 #include "DrawDebugHelpers.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISense_Sight.h"
 
 // Sets default values
 ARSDunPlayerCharacter::ARSDunPlayerCharacter()
@@ -48,6 +50,15 @@ ARSDunPlayerCharacter::ARSDunPlayerCharacter()
     // 상호작용
     InteractActor = nullptr;
     InteractDistance = 200.f;
+
+    // AI퍼셉션 자극 소스
+    AIPerceptionStimuliSourceComp = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("AIPerceptionStimuliSource"));
+    AIPerceptionStimuliSourceComp->bAutoRegister = true;
+    AIPerceptionStimuliSourceComp->RegisterForSense(UAISense_Sight::StaticClass());
+
+    // 스탯
+    AttackPower = 0.f;
+    AttackSpeed = 1.f;
 }
 
 // Called when the game starts or when spawned
@@ -121,18 +132,16 @@ float ARSDunPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& 
 {
     const float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-    float NewHP = FMath::Clamp(HP - Damage, 0.0f, MaxHP);
-
-    HP = NewHP;
+    DecreaseHP(Damage);
 
     UE_LOG(LogTemp, Warning, TEXT("[%s] took %.1f damage from [%s], Current Hp is %f"),
         *GetName(),
         Damage,
         DamageCauser ? *DamageCauser->GetName() : TEXT("Unknown"),
-        HP
+        GetHP()
     );
 
-    if (HP <= 0)
+    if (GetHP() <= 0)
     {
         OnDeath();
     }
@@ -142,6 +151,8 @@ float ARSDunPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& 
 
 void ARSDunPlayerCharacter::OnDeath()
 {
+    Super::OnDeath();
+
     // 레벨 오브젝트를 제외한 모든 오브젝트와 충돌하지 않도록 콜리전 설정 변경
     GetCapsuleComponent()->SetCollisionProfileName(TEXT("DeadCharacter"));
     GetMesh()->SetCollisionProfileName(TEXT("DeadCharacter"));
@@ -162,6 +173,11 @@ void ARSDunPlayerCharacter::OnDeath()
     if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
     {
         MovementComponent->SetMovementMode(EMovementMode::MOVE_None);
+    }
+
+    if (AIPerceptionStimuliSourceComp)
+    {
+        AIPerceptionStimuliSourceComp->UnregisterFromPerceptionSystem();
     }
 }
 
@@ -333,4 +349,39 @@ void ARSDunPlayerCharacter::InteractTrace()
         DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 2.0f);
         InteractActor = nullptr;
     }
+}
+
+float ARSDunPlayerCharacter::GetAttackPower() const
+{
+    return AttackPower;
+}
+
+void ARSDunPlayerCharacter::IncreaseAttackPower(float Amount)
+{
+    float NewAttackPower = AttackPower + Amount;
+    AttackPower = Amount;
+}
+
+void ARSDunPlayerCharacter::DecreaseAttackPower(float Amount)
+{
+    float NewAttackPower = AttackPower - Amount;
+    AttackPower = NewAttackPower;
+}
+
+float ARSDunPlayerCharacter::GetAttackSpeed() const
+{
+    return AttackSpeed;
+}
+
+void ARSDunPlayerCharacter::IncreaseAttackSpeed(float Amount)
+{
+    float NewAttackSpeed = AttackSpeed + Amount;
+    AttackSpeed = NewAttackSpeed;
+}
+
+void ARSDunPlayerCharacter::DecreaseAttackSpeed(float Amount)
+{
+    // 애니메이션의 재생 속도가 음수값이 된다면 애니메이션이 역재생 되므로, 예외처리
+    float NewAttackSpeed = FMath::Max(AttackSpeed - Amount, 0.0f);
+    AttackSpeed = NewAttackSpeed;
 }
