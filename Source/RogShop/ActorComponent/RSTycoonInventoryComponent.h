@@ -15,8 +15,12 @@ class ROGSHOP_API URSTycoonInventoryComponent : public UActorComponent
 public:
 	URSTycoonInventoryComponent();
 
-	void Add(const FName& ItemKey, int32 Amount = 1);
-	void Remove(const FName& ItemKey, int32 Amount = 1);
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void AddItem(FName ItemKey, int32 Amount = 1);
+	
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void RemoveItem(FName ItemKey, int32 Amount = 1);
+
 	void SaveItemData();
 
 	int32 GetAmount(const FName& ItemKey);

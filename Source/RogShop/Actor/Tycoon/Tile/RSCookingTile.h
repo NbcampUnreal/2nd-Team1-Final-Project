@@ -30,14 +30,16 @@ public:
 private:
 	void OrderToCook();
 	void Cook(const FName& FoodKey);
+	void FinishCook();
 	void TakeFood();
 
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USceneComponent> FoodLocation; //음식이 나오는 위치
-	
-	ECookingState State;
 
 	UPROPERTY()
-	TWeakObjectPtr<ARSBaseFood> CookedFood;
+	TWeakObjectPtr<ARSBaseFood> CookedFood; //완성되어 배치되있는 음식 
+
+	ECookingState State;
+	FName CookingFoodKey; //요리하고 있는 음식 키
 };

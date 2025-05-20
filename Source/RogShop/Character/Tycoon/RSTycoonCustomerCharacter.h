@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "RSTycoonCustomerCharacter.generated.h"
 
+class USphereComponent;
 class ARSTycoonBaseAIController;
 class UBlackBoardComponent;
 
@@ -19,6 +20,9 @@ enum class ETycoonCustomerState : uint8
 	Eat = 3             UMETA(DisplayName = "Eat"),
 };
 
+class ARSTycoonCustomerCharacter;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnLeave, ARSTycoonCustomerCharacter*);
 
 UCLASS()
 class ROGSHOP_API ARSTycoonCustomerCharacter : public ACharacter
@@ -28,24 +32,32 @@ class ROGSHOP_API ARSTycoonCustomerCharacter : public ACharacter
 public:
 	ARSTycoonCustomerCharacter();
 
-	UFUNCTION(BlueprintCallable, Category = "AI Movement")
-	void MoveToTarget();
+	UFUNCTION(BlueprintCallable)
+	void MoveToTarget(FVector Location, AActor* Target);
 
-
+	void Sit(const FTransform& SitTransform);
+	void WaitFood();
+	void Eat();
+	
 protected:
 	virtual void BeginPlay() override;
 
+private:
+	UFUNCTION()
+	void OnInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
 public:
 	FName WantFoodKey;
 	
-	// 현재 AI 상태
 	UPROPERTY(VisibleAnywhere)
 	ETycoonCustomerState State;
 
+	FOnLeave OnLeave;
+	
 private:
-	// 목표 위치
-	FVector TargetLocation;
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<USphereComponent> InteractSphere;
 
-	// 블랙보드 컴포넌트 참조
-	TObjectPtr<UBlackBoardComponent> BlackBoardComp;
+	UPROPERTY()
+	TWeakObjectPtr<AActor> MoveTarget;
 };
