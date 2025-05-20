@@ -17,8 +17,6 @@ void UDunShopWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    UE_LOG(LogTemp, Warning, TEXT("DunShopWidget Open !"));
-
     SetMouseMode(true);
 
     if (ExitBtn)
@@ -52,7 +50,6 @@ void UDunShopWidget::HandleItemPurchase(FName PurchasedID)
     if (GI)
     {
         GI->PurchasedItemIDs.Add(PurchasedID);  // 아이템 구매 후 아이디 추가
-        UE_LOG(LogTemp, Warning, TEXT("Item Purchased: %s"), *PurchasedID.ToString());
     }
 }
 

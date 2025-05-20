@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "RSDunMainWidget.h"
 #include "RSDunPlayerController.generated.h"
 
 class UInputMappingContext;
@@ -24,6 +25,8 @@ public:
 
 	void RemoveAllMapping();
 
+	void ShowRSDunMainWidget();
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
 	TObjectPtr<UInputMappingContext> IMC;
@@ -43,4 +46,12 @@ public:
 	TObjectPtr<UInputAction> FirstWeaponSlotAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
 	TObjectPtr<UInputAction> SecondWeaponSlotAction;
+
+	UPROPERTY()
+	URSDunMainWidget* RSDunMainWidget;
+
+protected:
+	// 블루프린트에서 지정할 수 있도록 TSubclassOf로 선언
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<UUserWidget> RSDunMainWidgetClass;
 };

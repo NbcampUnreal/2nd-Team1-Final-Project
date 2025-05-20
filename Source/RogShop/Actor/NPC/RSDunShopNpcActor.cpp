@@ -36,8 +36,6 @@ void ARSDunShopNpcActor::Interact(ARSDunPlayerCharacter* Interactor)
 	if (!StoreWidget) return;
 
 	StoreWidget->AddToViewport();
-
-	UE_LOG(LogTemp, Warning, TEXT("Widget opened from NPC"));
 }
 
 
