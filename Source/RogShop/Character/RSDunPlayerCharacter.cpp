@@ -163,6 +163,11 @@ void ARSDunPlayerCharacter::OnDeath()
     {
         MovementComponent->SetMovementMode(EMovementMode::MOVE_None);
     }
+
+    if (AIPerceptionStimuliSourceComp)
+    {
+        AIPerceptionStimuliSourceComp->UnregisterFromPerceptionSystem();
+    }
 }
 
 void ARSDunPlayerCharacter::Move(const FInputActionValue& value)
