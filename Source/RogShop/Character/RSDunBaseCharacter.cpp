@@ -5,12 +5,12 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 ARSDunBaseCharacter::ARSDunBaseCharacter()
-{
-	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
-
+{	
 	MoveSpeed = 600.f;
 	MaxHP = 100.f;
 	HP = MaxHP;
+
+	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
 
 	bIsDead = false;
 }
