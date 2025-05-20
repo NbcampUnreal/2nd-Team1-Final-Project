@@ -50,7 +50,4 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Spawn")
 	TSubclassOf<AActor> WeaponSpawnPadBPClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TSubclassOf<UUserWidget> RSDunMainWidgetClass;
 };

@@ -17,6 +17,15 @@ class ROGSHOP_API URSDunMainWidget : public UUserWidget
 public:
     virtual void NativeConstruct() override;
 
+    UFUNCTION(BlueprintCallable)
+    void UpdateWeaponImage(UTexture2D* NewWeaponImage);
+
+    UFUNCTION(BlueprintCallable)
+    void UpdateHP();
+
+    UFUNCTION(BlueprintCallable)
+    void UpdateMaxHP();
+
 protected:
     UPROPERTY(meta = (BindWidget))
     class UTextBlock* LifeEssenceText;

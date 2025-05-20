@@ -5,6 +5,7 @@
 #include "RSDunMonsterCharacter.h"
 #include "RSDunAnubisCharacter.h"
 #include "RSDunBossSpiderQueenCharacter.h"
+#include "RSDunPlayerController.h"
 
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
@@ -157,19 +158,15 @@ void URSCheatManager::SpawnWeaponPad()
 
 void URSCheatManager::ShowRSDunMainWidget()
 {
-    if (RSDunMainWidgetClass == nullptr)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("RSDunMainWidgetClass not set!"));
-        return;
-    }
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetOuterAPlayerController());
 
-    if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+    if (PC && PC->RSDunMainWidget)
     {
-        UUserWidget* Widget = CreateWidget<UUserWidget>(PC, RSDunMainWidgetClass);
-        if (Widget)
-        {
-            Widget->AddToViewport();
-        }
+        PC->RSDunMainWidget->AddToViewport();
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("PC or RSDunMainWidget Is Null !"));
     }
 }
 
