@@ -17,24 +17,29 @@ public:
 	ARSTableTile();
 
 	virtual void Interact() override;
-	void Sit(const TArray<ARSTycoonCustomerCharacter*>& Customers);
+	void Sit(ARSTycoonCustomerCharacter* Customer);
 
-	bool Use() const { return SittingCustomers.Num() > 0; }
-	FVector GetFoodPosition() const;
-	const TArray<TObjectPtr<USceneComponent>>& GetSittingLocations() { return SittingLocations; }
+	bool CanSit() const { return SittingCustomers.Num() < SittingLocations.Num(); }
+	FVector GetFoodLocation() const { return FoodLocation->GetComponentLocation(); }
 	int32 GetMaxPlace() const { return SittingLocations.Num(); }
+	FTransform GetSitTransform() const { return SittingLocations[SittingCustomers.Num()]->GetComponentTransform(); }
 
 private:
 	void Order();
 	void Serving();
-
+	
+	bool Use() const { return SittingCustomers.Num() > 0; }
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadonly)
 	TObjectPtr<USceneComponent> FoodLocation; //음식이 위치할 곳
 
+	UPROPERTY()
+	TObjectPtr<AActor> FoodActor; //배치된 음식
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<TObjectPtr<USceneComponent>> SittingLocations; //손님이 앉는 위치들
 
 	UPROPERTY()
-	TArray<TObjectPtr<ARSTycoonCustomerCharacter>> SittingCustomers;	//앉아있는 손님들
+	TArray<TObjectPtr<ARSTycoonCustomerCharacter>> SittingCustomers; //앉아있는 손님들
 };

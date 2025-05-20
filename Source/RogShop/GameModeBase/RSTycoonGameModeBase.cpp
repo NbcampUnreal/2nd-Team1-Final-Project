@@ -52,9 +52,7 @@ void ARSTycoonGameModeBase::BeginPlay()
 
 	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
 	
-	//임시
-	Inventory->Add(FName(TEXT("TempGre")), 4);
-
+	//임시, 게임 시작 버튼 생기면 StartGame 호출하게 만들거임
 	GetWorldTimerManager().SetTimerForNextTick([&]()
 	{
 		StartGame();
@@ -64,26 +62,10 @@ void ARSTycoonGameModeBase::BeginPlay()
 void ARSTycoonGameModeBase::CreateCustomer()
 {
 	//손님의 인원이 최대 손님의 갯수를 넘을 수 없음
-	if (NowCustomerCount >= MaxCustomerCount)
+	if (GetCurrentCustomerCount() >= MaxCustomerCount)
 	{
 		return;
 	}
-
-	//앉을 수 있는 테이블의 인원수보다 적거나 같은 손님을 고름
-	//처음엔 최대 수로 앉을 수 있는지 검사 --> 된 손님만 추려서 손님으로 등장
-
-	//임시, 테이블 중 랜덤으로 고름
-	//현재 테이블에 따라 들어갈 수 있는 손님 설정이 안되있음
-	TArray<AActor*> TableTiles;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSTableTile::StaticClass(), TableTiles);
-
-	if (TableTiles.Num() == 0)
-	{
-		return;
-	}
-
-	int32 RandomTableIndex = FMath::RandRange(0, TableTiles.Num() - 1);
-	ARSTableTile* TargetTableTile = Cast<ARSTableTile>(TableTiles[RandomTableIndex]);
 
 	//손님이 들어와서 먹을 수 있는 음식이 있는지 검사
 	FName OrderFoodKey;
@@ -92,21 +74,31 @@ void ARSTycoonGameModeBase::CreateCustomer()
 		return;
 	}
 
+	//임시, 동적 생성이 생긴 후에는 RSTileMap에서 할 예정
 
+	//손님이 앉을 테이블 결정
+	TArray<AActor*> TableTiles;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSTableTile::StaticClass(), TableTiles);
+	check(TableTiles.Num())
+
+	int32 RandomTableIndex = FMath::RandRange(0, TableTiles.Num() - 1);
+	ARSTableTile* TargetTableTile = Cast<ARSTableTile>(TableTiles[RandomTableIndex]);
+
+	//손님을 스폰할 문 결정
 	TArray<AActor*> DoorTiles;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSDoorTile::StaticClass(), DoorTiles);
-
-	if (DoorTiles.Num() == 0)
-	{
-		RS_LOG("DoorTile을 찾을 수 없습니다")
-		return;
-	}
+	check(DoorTiles.Num())
 
 	int32 RandomDoorIndex = FMath::RandRange(0, DoorTiles.Num() - 1);
 	ARSDoorTile* SpawnDoorTile = Cast<ARSDoorTile>(DoorTiles[RandomDoorIndex]);
 
-	NowCustomerCount++;
-	SpawnDoorTile->SpawnCustomer(OrderFoodKey, TargetTableTile);
+	ARSTycoonCustomerCharacter* Customer = SpawnDoorTile->SpawnCustomer(OrderFoodKey, TargetTableTile);
+	Customers.Add(Customer);
+}
+
+void ARSTycoonGameModeBase::RemoveCustomer(ARSTycoonCustomerCharacter* Customer)
+{
+	Customers.RemoveSingle(Customer);
 }
 
 //남은 재료중에 요리가 가능한지 반환
@@ -115,11 +107,11 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 {
 	URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
 
-	//1. 이미 주문 목록에 있는 음식들이 사용하는 재료를 남은 재료 목록에서 제외 시켜야함
+	//1. 이미 들어와있는 손님들이 시키는 음식들이 사용하는 재료를 남은 재료 목록에서 제외 시켜야함
 	TMap<FName, int32> Ingredients = Inventory->GetItems(); //재료 있는 것들 복사
-	for (const FName& FoodKey : OrderedFoodKeys)
+	for (auto& Customer : Customers)
 	{
-		FCookFoodData const* Data = DataSubsystem->Food->FindRow<FCookFoodData>(FoodKey, TEXT("Get FoodData"));
+		FCookFoodData const* Data = DataSubsystem->Food->FindRow<FCookFoodData>(Customer->WantFoodKey, TEXT("Get FoodData"));
 		for (auto& Need : Data->NeedIngredients)
 		{
 			//주문이 들어간 음식은 있는 식재료로 제작 가능한 음식들 이라는 뜻이기 때문에 딱히 Contains 검사를 해주지 않아도 됨
@@ -130,6 +122,7 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 	//2. 남은 재료중에 만들 수 있는거 있는지 확인
 	TArray<FCookFoodData*> FoodDatas;
 	int OrderFoodIndex = INDEX_NONE;
+	FString MakeFoodName = "";
 	DataSubsystem->Food->GetAllRows<FCookFoodData>(TEXT("Get All Food Data"), FoodDatas);
 
 	for (int i = 0; i < FoodDatas.Num(); i++)
@@ -143,6 +136,7 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 				FoodDatas[OrderFoodIndex]->Price < Data->Price)
 			{
 				OrderFoodIndex = i;
+				MakeFoodName = Data->Name;
 			}
 		}
 	}
@@ -155,12 +149,9 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 		auto RowNames = DataSubsystem->Food->GetRowNames();
 		OutOrderFood = RowNames[OrderFoodIndex];
 
-		//테스트
-		RS_LOG("Food DataTable에 등록되있는 Rows")
-		for (int i = 0; i < RowNames.Num(); i++)
-		{
-			RS_LOG_F("%d. %s - %s", i, *RowNames[i].ToString(), *FoodDatas[i]->Name) 
-		}
+		//디버그
+		FCookFoodData* DebugFood = DataSubsystem->Food->FindRow<FCookFoodData>(OutOrderFood, TEXT("Debug Find Food"));
+		RS_LOG_F_C("만들어야되는 음식 : %s, 지정된 Row 음식 : %s", FColor::Green, *MakeFoodName, *DebugFood->Name)
 	}
 
 	return bResult;

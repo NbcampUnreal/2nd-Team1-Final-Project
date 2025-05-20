@@ -15,11 +15,11 @@ URSTycoonInventoryComponent::URSTycoonInventoryComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void URSTycoonInventoryComponent::Add(const FName& ItemKey, int32 Amount)
+void URSTycoonInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 {
 	if (GetFilledSize() >= GetSize())
 	{
-		RS_LOG("인벤토리가 가득 찼습니다")
+		RS_LOG_C("인벤토리가 가득 찼습니다", FColor::Red)
 		return;
 	}
 
@@ -33,7 +33,7 @@ void URSTycoonInventoryComponent::Add(const FName& ItemKey, int32 Amount)
 	}
 }
 
-void URSTycoonInventoryComponent::Remove(const FName& ItemKey, int32 Amount)
+void URSTycoonInventoryComponent::RemoveItem(FName ItemKey, int32 Amount)
 {
 	if (CheckValidItem(ItemKey))
 	{

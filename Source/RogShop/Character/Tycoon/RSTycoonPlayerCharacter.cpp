@@ -69,19 +69,21 @@ void ARSTycoonPlayerCharacter::Pickup(AActor* Actor)
 	Actor->SetActorLocation(PickupLocation->GetComponentLocation());
 }
 
-bool ARSTycoonPlayerCharacter::Drop(FVector DropPosition)
+AActor* ARSTycoonPlayerCharacter::Drop(FVector DropPosition)
 {
 	if (PickupActor == nullptr)
 	{
 		RS_LOG_C("들고있는 Actor가 없습니다", FColor::Red)
-		return false;
+		return nullptr;
 	}
+
+	AActor* Temp = PickupActor.Get();
 	
 	PickupActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	PickupActor->SetActorLocation(DropPosition);
 	PickupActor = nullptr;
 
-	return true;
+	return Temp;
 }
 
 void ARSTycoonPlayerCharacter::OnMove(const FInputActionValue& Value)
