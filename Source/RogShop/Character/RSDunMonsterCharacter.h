@@ -50,9 +50,6 @@ public:
 	UFUNCTION()
 	TArray<AActor*> GetPatrolPoint();
 
-	bool HasAttackTraced() const;
-	void SetAttackTraced(bool bNewValue);
-
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Status")
 	void OnDeath();
@@ -106,8 +103,6 @@ protected:
 	float TraceUpOffset;        // (선택) 높이 보정
 
 	FTimerHandle detectDelayTimer;
-
-	bool bHasAttackTraced;  // 트레이스(몬스터한테 공격 판정이)가 되었는지 판단하는 변수
 
 private:
 	TObjectPtr<ARSMonsterAIController> AIController;  // TODO : 혹시나 캐싱해서 쓸 일 생길까봐 미리 만들어둠.
