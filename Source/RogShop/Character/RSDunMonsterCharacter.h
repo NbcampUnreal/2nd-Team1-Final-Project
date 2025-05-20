@@ -57,10 +57,6 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Status")
 	void OnDeath();
 
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UMeleeAttackBoxComponent> MeleeAttackBoxComponent;
-
 protected:
 	// 애니메이션 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -92,6 +88,22 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, Category = "Patrol")
 	float maxDetectPatrolRoute;
+
+	// 트레이스 관련
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
+	FVector TraceBoxHalfSize;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
+	float TraceLength;        // 트레이스 길이 (앞으로 얼마만큼 쏠지)
+
+	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	float TraceForwardOffset; // 소켓 기준 앞으로 얼마나 밀지
+
+	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	float TraceRightOffset;     // (선택) 좌우 보정
+
+	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	float TraceUpOffset;        // (선택) 높이 보정
 
 	FTimerHandle detectDelayTimer;
 

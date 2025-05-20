@@ -23,12 +23,21 @@ public:
 
 	void PerformAttackTrace() override;
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace")
-	FVector TraceBoxHalfSize;
-
-	// 트레이스 길이 (앞으로 얼마만큼 쏠지)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace")
-	float TraceLength;
+//public:
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
+//	FVector TraceBoxHalfSize;
+//
+//	// 트레이스 길이 (앞으로 얼마만큼 쏠지)
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
+//	float TraceLength;
+//
+//	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+//	float TraceForwardOffset; // 소켓 기준 앞으로 얼마나 밀지
+//
+//	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+//	float TraceRightOffset;     // (선택) 좌우 보정
+//
+//	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+//	float TraceUpOffset;        // (선택) 높이 보정
 
 };

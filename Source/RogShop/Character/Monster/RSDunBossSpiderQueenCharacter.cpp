@@ -1,18 +1,32 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "RSDunBossSpiderQueenCharacter.h"
+#include "RogShop/UtilDefine.h"
+#include "RogShop/RSMonsterAttackTraceDefine.h"
 
 ARSDunBossSpiderQueenCharacter::ARSDunBossSpiderQueenCharacter()
 {
 	TraceBoxHalfSize = FVector(20.f, 20.f, 20.f);
 	TraceLength = 150.f;
+	TraceForwardOffset = 0.f;
+	TraceRightOffset = 0.f;
+	TraceUpOffset = 0.f;
 }
 
 void ARSDunBossSpiderQueenCharacter::PlayBaseAttackAnim()
 {
-	PlayAnimMontage(BaseAttackMontage);
-	UE_LOG(LogTemp, Warning, TEXT("Boss SpiderQueen Attack Success!!"));
+	// TODO : í€„ë¦¬í‹° ì—…ë•Œ PlayBaseAttackAnim()ì´ ë¹„í—¤ì´ë¹„ì–´ íŠ¸ë¦¬ì—ì„œ ëª½íƒ€ì£¼ê°€ ì‹¤í–‰ë˜ê³  ìžˆìœ¼ë©´ í˜¸ì¶œë˜ì§€ ì•Šë„ë¡ ìµœì í™” ì½”ë“œ í•„ìš”.
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (IsValid(AnimInstance) == true && IsValid(BaseAttackMontage) == true)
+	{
+		if (AnimInstance->Montage_IsPlaying(BaseAttackMontage) == false)
+		{
+			AnimInstance->Montage_Play(BaseAttackMontage);
+			RS_LOG("ê±°ë¯¸ ì—¬ì™• ê³µê²©í•©ë‹ˆë‹¤.");
+		}
+	}
 }
 
 void ARSDunBossSpiderQueenCharacter::PlayHitReactAnim()
@@ -30,23 +44,27 @@ void ARSDunBossSpiderQueenCharacter::PlayDeathAnim()
 void ARSDunBossSpiderQueenCharacter::PerformAttackTrace()
 {
 	FHitResult HitResult;
-	FVector Start = GetMesh()->GetSocketLocation("FrontLeg3_R"); // TODO : ¿©±â´Ù ½ÇÁ¦ ¼ÒÄÏ ÀÌ¸§À¸·Î ¹Ù²ãÁà¾ß ÇÔ.
+	FVector Start = GetMesh()->GetSocketLocation("FrontLeg3_R"); // TODO : ì—¬ê¸°ë‹¤ ì‹¤ì œ ì†Œì¼“ ì´ë¦„ìœ¼ë¡œ ë°”ê¿”ì¤˜ì•¼ í•¨.
+	Start += GetActorForwardVector() * TraceForwardOffset;
+	Start += GetActorRightVector() * TraceRightOffset;
+	Start += GetActorUpVector() * TraceUpOffset;
+
 	FVector End = Start + GetActorForwardVector() * TraceLength;
 	FQuat Rotation = GetActorRotation().Quaternion();
 
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 
-	// DrawDebugBox¿¡¼­ ¾²´Â º¯¼ö
+	// DrawDebugBoxì—ì„œ ì“°ëŠ” ë³€ìˆ˜
 	FVector Center = (Start + End) * 0.5f;
 
-	// ¸ó½ºÅÍ °ø°ÝÀÌ ÇÃ·¹ÀÌ¾î¿¡°Ô Àû¿ëµÇ°Ô ÇÏ·Á´Â TraceÀÔ´Ï´Ù. ÀúÈñ °ÔÀÓÀº ÇÃ·¹ÀÌ¾î°¡ 1¸íÀÌ´Ï SweepSingleByChannelÀ» »ç¿ëÇß½À´Ï´Ù.
+	// ëª¬ìŠ¤í„° ê³µê²©ì´ í”Œë ˆì´ì–´ì—ê²Œ ì ìš©ë˜ê²Œ í•˜ë ¤ëŠ” Traceìž…ë‹ˆë‹¤. ì €í¬ ê²Œìž„ì€ í”Œë ˆì´ì–´ê°€ 1ëª…ì´ë‹ˆ SweepSingleByChannelì„ ì‚¬ìš©í–ˆìŠµë‹ˆë‹¤.
 	bool bHit = GetWorld()->SweepSingleByChannel(
 		HitResult,
 		Start,
 		End,
 		Rotation,
-		ECC_GameTraceChannel1,
+		ECC_MonsterAttackTrace,
 		FCollisionShape::MakeBox(TraceBoxHalfSize),
 		Params
 	);
@@ -57,7 +75,7 @@ void ARSDunBossSpiderQueenCharacter::PerformAttackTrace()
 		AActor* HitActor = HitResult.GetActor();
 		if (IsValid(HitActor))
 		{
-			UGameplayStatics::ApplyDamage(HitActor, 10.f, GetController(), this, nullptr);
+			UGameplayStatics::ApplyDamage(HitActor, 1.f, GetController(), this, nullptr);
 		}
 	}
 	else

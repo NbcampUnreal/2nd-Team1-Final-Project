@@ -4,13 +4,16 @@
 #include "RSAttackTraceAnimNotify.h"
 #include "RSDunMonsterCharacter.h"
 
-void URSAttackTraceAnimNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+void URSAttackTraceAnimNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
+	Super::Notify(MeshComp, Animation, EventReference);
+
 	UE_LOG(LogTemp, Warning, TEXT("Notify Success!!"));
-	if (MeshComp && MeshComp->GetOwner())
+	AActor* Owner = MeshComp->GetOwner();
+
+	if (MeshComp && Owner)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Notify GetOwner!!"));
-		AActor* Owner = MeshComp->GetOwner();
 		ARSDunMonsterCharacter* DunMonsterCharacter = Cast<ARSDunMonsterCharacter>(Owner);
 
 		if (DunMonsterCharacter)

@@ -10,9 +10,6 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	AIControllerClass = ARSDunMonsterCharacter::StaticClass();
 
-	MeleeAttackBoxComponent = CreateDefaultSubobject<UMeleeAttackBoxComponent>(TEXT("MeleeAttackBoxComponent"));
-	MeleeAttackBoxComponent->SetupAttachment(RootComponent);
-
 	//Navigation, NavLink
 	navGenerationRadius = 1000.0f;
 	navRemovalRadius = 1500.0f;
