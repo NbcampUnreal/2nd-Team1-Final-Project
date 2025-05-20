@@ -19,6 +19,9 @@ public:
 
 // 스탯 관련
 public:
+	float GetMoveSpeed() const;
+	void ChangeMoveSpeed(float Amount);
+
 	float GetMaxHP() const;
 	void IncreaseMaxHP(float Amount);
 	void DecreaseMaxHP(float Amount);
@@ -28,11 +31,11 @@ public:
 	void DecreaseHP(float Amount);
 
 private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float WalkSpeed;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "Stat", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
+	float MoveSpeed;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
 	float MaxHP;
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, category = "Stat", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
 	float HP;
 
 // 상태 관련
@@ -40,5 +43,6 @@ public:
 	bool GetIsDead();
 	virtual void OnDeath();
 private:
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, category = "State", meta = (AllowPrivateAccess = "true"))
 	bool bIsDead;
 };
