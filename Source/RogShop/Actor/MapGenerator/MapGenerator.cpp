@@ -20,7 +20,7 @@ void AMapGenerator::BeginPlay()
     RandomStream.Initialize(Seed);
 
     GenerateMainPath(); 
-    ExpandPathToCoverMinTiles(0.6f);
+    ExpandPathToCoverMinTiles(0.5f);
     SpawnTiles();
 }
 // 유효한 위치인지 확인 (그리드 안에 있는지)
