@@ -3,10 +3,12 @@
 #include "RSDunPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "RSCheatManager.h"
+#include "Blueprint/UserWidget.h"
 
 ARSDunPlayerController::ARSDunPlayerController()
 {
     CheatClass = URSCheatManager::StaticClass();
+
 }
 
 void ARSDunPlayerController::BeginPlay()
@@ -14,6 +16,8 @@ void ARSDunPlayerController::BeginPlay()
     Super::BeginPlay();
 
     AddMapping();
+
+    ShowRSDunMainWidget();
 }
 
 void ARSDunPlayerController::AddMapping()
@@ -41,5 +45,23 @@ void ARSDunPlayerController::RemoveAllMapping()
         {
             Subsystem->ClearAllMappings();
         }
+    }
+}
+
+void ARSDunPlayerController::ShowRSDunMainWidget()
+{
+    if (RSDunMainWidgetClass)
+    {
+        RSDunMainWidget = CreateWidget<URSDunMainWidget>(this, RSDunMainWidgetClass);
+
+        if (RSDunMainWidget)
+        {
+            // 상시 출력 필요 시 주석 해제 필요
+            // RSDunMainWidget->AddToViewport();
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("RSDunMainWidgetClass Null !"));
     }
 }

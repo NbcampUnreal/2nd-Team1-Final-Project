@@ -1,7 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "DunItemWidget.h"
-#include "RSDunBaseCharacter.h"
+#include "RSDunPlayerCharacter.h"
+#include "RSPlayerWeaponComponent.h"
 #include "Kismet/GameplayStatics.h"
+
+#include "RSBaseWeapon.h"
+#include "RSDunPlayerController.h"
 
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
@@ -82,10 +86,12 @@ void UDunItemWidget::OnBuyClicked()
 
 bool UDunItemWidget::BuyItem()
 {
-    ARSDunBaseCharacter* Character = Cast<ARSDunBaseCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
-    if (!Character)
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+    ARSDunPlayerCharacter* PlayerChar = Cast<ARSDunPlayerCharacter>(PC->GetCharacter());
+
+    if (!PlayerChar)
     {
-        UE_LOG(LogTemp, Warning, TEXT("BuyItem - Character is nullptr"));
+        UE_LOG(LogTemp, Warning, TEXT("BuyItem - Character or PC is nullptr"));
         return false;
     }
 
@@ -101,17 +107,18 @@ bool UDunItemWidget::BuyItem()
 
     switch (ItemData.ItemList)
     {
-        case EItemList::Potion:
+        case EItemList::Potion: // 체력 즉시 회복
         {
             switch (ItemData.Rarity)
             {
-                case ERarity::Common: FinalValue = 1.0f; break;
-                case ERarity::Rare: FinalValue = 2.0f; break;
-                case ERarity::Epic: FinalValue = 3.0f; break;
-                case ERarity::Legendary: FinalValue = 4.0f; break;
+                case ERarity::Common: FinalValue = 10.0f; break;
+                case ERarity::Rare: FinalValue = 20.0f; break;
+                case ERarity::Epic: FinalValue = 30.0f; break;
+                case ERarity::Legendary: FinalValue = 40.0f; break;
             }
 
-            // Character->AddHP(FinalValue);  // 플레이어 HP 수정 관련 함수 또는 public 변수 필요
+            PlayerChar->IncreaseHP(FinalValue);
+            PC->RSDunMainWidget->UpdateHP();
 
             break;
         }
@@ -129,7 +136,7 @@ bool UDunItemWidget::BuyItem()
 
             break;
         }
-        case EItemList::WalkSpeedRelic:
+        case EItemList::WalkSpeedRelic: // 임시
         {
             switch (ItemData.Rarity)
             {
@@ -143,7 +150,7 @@ bool UDunItemWidget::BuyItem()
 
             break;
         }
-        case EItemList::AttackRelic:
+        case EItemList::AttackRelic: // 임시
         {
             switch (ItemData.Rarity)
             {
@@ -157,33 +164,38 @@ bool UDunItemWidget::BuyItem()
 
             break;
         }
-        case EItemList::AttackSpeedRelic:
+        case EItemList::Weapon:
         {
-            switch (ItemData.Rarity)
+            FActorSpawnParameters SpawnParams;
+            SpawnParams.Owner = PlayerChar;
+            SpawnParams.Instigator = PlayerChar;
+
+            // 월드에 무기 액터 생성을 해야만 데이터를 넘길 수 있음
+            ARSBaseWeapon* SpawnedWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(
+                ItemData.WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+
+            if (SpawnedWeapon)
             {
-                case ERarity::Common: FinalValue = 5.0f; break;
-                case ERarity::Rare: FinalValue = 10.0f; break;
-                case ERarity::Epic: FinalValue = 15.0f; break;
-                case ERarity::Legendary: FinalValue = 25.0f; break;
+                URSPlayerWeaponComponent* WeaponComp = PlayerChar->GetRSPlayerWeaponComponent();
+
+                if (WeaponComp)
+                {
+                    WeaponComp->EquipWeaponToSlot(SpawnedWeapon);
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("WeaponComp is Null"));
+                    bIsBuy = false;
+                }
+            }
+            else
+            {
+                UE_LOG(LogTemp, Warning, TEXT("SpawnedWeapon is Null"));
+                bIsBuy = false;
             }
 
-            // Character->AddAtkSpeed(FinalValue);
+            PC->RSDunMainWidget->UpdateWeaponImage(ItemData.Icon);
 
-            break;
-        }
-        case EItemList::Sword:
-        {
-            // 무기 1 ...
-            break;
-        }
-        case EItemList::BattleAxe:
-        {
-            // 무기 2 ...
-            break;
-        }
-        case EItemList::Hammer:
-        {
-            // 무기 3 ...
             break;
         }
         default:

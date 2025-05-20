@@ -16,12 +16,33 @@ class ROGSHOP_API ARSDunBaseCharacter : public ACharacter
 
 public:
 	ARSDunBaseCharacter();
-	
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float WalkSpeed;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "Stat", meta = (AllowPrivateAccess = "true"))
+
+// 스탯 관련
+public:
+	float GetMoveSpeed() const;
+	void ChangeMoveSpeed(float Amount);
+
+	float GetMaxHP() const;
+	void IncreaseMaxHP(float Amount);
+	void DecreaseMaxHP(float Amount);
+
+	float GetHP() const;
+	void IncreaseHP(float Amount);
+	void DecreaseHP(float Amount);
+
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
+	float MoveSpeed;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
 	float MaxHP;
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, category = "Stat", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
 	float HP;
+
+// 상태 관련
+public:
+	bool GetIsDead();
+	virtual void OnDeath();
+private:
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, category = "State", meta = (AllowPrivateAccess = "true"))
+	bool bIsDead;
 };

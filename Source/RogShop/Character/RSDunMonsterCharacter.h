@@ -6,6 +6,10 @@
 #include "RSDunBaseCharacter.h"
 #include "NavigationInvokerComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/SphereComponent.h"
+#include "Engine/TargetPoint.h"
+#include "Engine/OverlapResult.h"
+#include "TimerManager.h"
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
@@ -19,12 +23,15 @@ class ROGSHOP_API ARSDunMonsterCharacter : public ARSDunBaseCharacter
 public:
 	ARSDunMonsterCharacter();
 
-//	virtual void BeginPlay()override;
+	virtual void BeginPlay()override;
 
 	// 애니메이션 실행 함수
 	virtual void PlayBaseAttackAnim();
 	virtual void PlayHitReactAnim();
 	virtual void PlayDeathAnim();
+
+	UFUNCTION(BlueprintCallable, Category = "Enemy")
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -36,16 +43,28 @@ public:
 	//NavLink jump function
 	UFUNCTION(BlueprintCallable)
 	void JumpTo(FVector destination);
+
+	//Patrol
+	UFUNCTION(BlueprintCallable)
+	void FindNearPatrolPoint();
+
+	UFUNCTION()
+	TArray<AActor*> GetPatrolPoint();
+
+protected:
+	UFUNCTION(BlueprintCallable, Category = "Enemy|Status")
+	void OnDeath();
+
 protected:
 	// 애니메이션 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UAnimMontage* BaseAttackMontage;
+	TObjectPtr<UAnimMontage> BaseAttackMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UAnimMontage* HitReactMontage;
+	TObjectPtr<UAnimMontage> HitReactMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UAnimMontage* DeathMontage;
+	TObjectPtr<UAnimMontage> DeathMontage;
 
 	//NavInvoker
 	UPROPERTY(BlueprintReadWrite, Category = Navigation, meta = (AllowPrivateAccess = "true"))//Navigation Invoker Setting
@@ -60,6 +79,15 @@ protected:
 	//NavLink
 	UPROPERTY(BlueprintReadWrite, Category = Navigation)
 	float jumpForce;
+
+	//Patrol
+	UPROPERTY(EditInstanceOnly,BlueprintReadWrite, Category = "Patrol")
+	TArray<AActor*> patrolPoints;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Patrol")
+	float maxDetectPatrolRoute;
+
+	FTimerHandle detectDelayTimer;
 private:
 	TObjectPtr<ARSMonsterAIController> AIController;  // TODO : 혹시나 캐싱해서 쓸 일 생길까봐 미리 만들어둠.
 

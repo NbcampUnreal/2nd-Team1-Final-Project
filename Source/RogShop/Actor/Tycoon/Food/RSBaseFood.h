@@ -24,7 +24,4 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UStaticMeshComponent> Mesh;
-	
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<USceneComponent> TakeLocation;
 };

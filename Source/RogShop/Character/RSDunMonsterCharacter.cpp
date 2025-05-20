@@ -6,23 +6,30 @@
 
 ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 {
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	AIControllerClass = ARSDunMonsterCharacter::StaticClass();
+
 	MeleeAttackBoxComponent = CreateDefaultSubobject<UMeleeAttackBoxComponent>(TEXT("MeleeAttackBoxComponent"));
 	MeleeAttackBoxComponent->SetupAttachment(RootComponent);
 
-	navGenerationRadius = 500.0f;
-	navRemovalRadius = 750.0f;
-	jumpForce = 0.0f;
+	//Navigation, NavLink
+	navGenerationRadius = 1000.0f;
+	navRemovalRadius = 1500.0f;
+	jumpForce = 100.0f;
 
 	navInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("NavInvoker"));	
 	navInvoker->SetGenerationRadii(navGenerationRadius, navRemovalRadius);
+
+	//Patrol
+	maxDetectPatrolRoute = 2000.f;
+
 }
-/*
+
 void ARSDunMonsterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	navInvoker->SetGenerationRadii(navGenerationRadius, navRemovalRadius);
-}*/
+	GetWorld()->GetTimerManager().SetTimer(detectDelayTimer, this, &ARSDunMonsterCharacter::FindNearPatrolPoint, 0.5f, false);	
+}
 
 void ARSDunMonsterCharacter::PlayBaseAttackAnim()
 {
@@ -37,6 +44,38 @@ void ARSDunMonsterCharacter::PlayHitReactAnim()
 void ARSDunMonsterCharacter::PlayDeathAnim()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Death Complete!!"));
+}
+
+float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	/*if (bIsDead) return 0.0f;*/ // TODO : 만약 선국님이 bIsDead 변수 만들어 주면 넣을 로직
+
+	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	
+	DecreaseHP(damage);
+
+	// 데미지 받으면 로그에 추가! (임시)
+	UE_LOG(LogTemp, Warning, TEXT("[%s] took %.1f damage from [%s]"),
+		*GetName(),
+		damage,
+		DamageCauser ? *DamageCauser->GetName() : TEXT("Unknown"));
+
+	
+	if (GetHP() <= 0)
+	{
+		OnDeath();
+	}
+
+	// TODO : 만약 영빈님이 블랙보드에 IsHit 같은 변수 있다고 하면 넣을 로직
+	/*if (AAIController* AIController = Cast<AAIController>(GetController()))
+	{
+		if (UBlackboardComponent* BBComponent = AIController->GetBlackboardComponent())
+		{
+			BBComponent->SetValueAsBool(TEXT("IsHit"), true);
+		}
+	}*/
+
+	return damage;
 }
 
 void ARSDunMonsterCharacter::JumpTo(FVector destination)
@@ -57,4 +96,41 @@ void ARSDunMonsterCharacter::JumpTo(FVector destination)
 	{
 		LaunchCharacter(launchVelocity, true, true);
 	}
+}
+
+void ARSDunMonsterCharacter::FindNearPatrolPoint()
+{
+	TArray<FOverlapResult> overlapResults;
+	FCollisionQueryParams collisionQueryParms(NAME_None, false, this);
+	bool bResult = GetWorld()->OverlapMultiByChannel(
+		overlapResults,
+		GetActorLocation(),
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel6,
+		FCollisionShape::MakeSphere(maxDetectPatrolRoute),
+		collisionQueryParms
+	);
+//	DrawDebugSphere(GetWorld(), GetActorLocation(), maxDetectPatrolRoute, 16, FColor::Red, false, 60.f);
+
+	if (!overlapResults.IsEmpty())
+	{
+		for (auto const& overlapResult : overlapResults)
+		{
+			ATargetPoint* target = Cast<ATargetPoint>(overlapResult.GetActor());
+			if (IsValid(target))
+			{
+				patrolPoints.Add(target);
+			}
+		}
+	}
+}
+
+TArray<AActor*> ARSDunMonsterCharacter::GetPatrolPoint()
+{
+	return patrolPoints;
+}
+
+void ARSDunMonsterCharacter::OnDeath()
+{
+	PlayDeathAnim();
 }

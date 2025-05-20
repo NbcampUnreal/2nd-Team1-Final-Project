@@ -20,7 +20,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void Pickup(AActor* Actor);
-	void Drop(FVector DropPosition);
+	bool Drop(FVector DropPosition);
 	
 private:
 	void OnMove(const FInputActionValue& Value);

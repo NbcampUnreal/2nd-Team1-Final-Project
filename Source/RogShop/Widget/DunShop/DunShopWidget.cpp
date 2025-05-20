@@ -5,6 +5,9 @@
 #include "DunItemWidget.h"
 #include "RSGameInstance.h"
 
+#include "RSDunPlayerCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/HorizontalBox.h"
@@ -13,8 +16,6 @@
 void UDunShopWidget::NativeConstruct()
 {
     Super::NativeConstruct();
-
-    UE_LOG(LogTemp, Warning, TEXT("DunShopWidget Open !"));
 
     SetMouseMode(true);
 
@@ -30,6 +31,15 @@ void UDunShopWidget::OnExitClicked()
 {
     SetMouseMode(false);
 
+    // 걷는 캐릭터 정지 필요시
+    //if (APlayerController* PC = GetOwningPlayer())
+    //{
+    //    if (ARSDunPlayerCharacter* Player = Cast<ARSDunPlayerCharacter>(PC->GetPawn()))
+    //    {
+    //        Player->GetCharacterMovement()->MaxWalkSpeed = 600.f;
+    //    }
+    //}
+
     RemoveFromParent();
 }
 
@@ -40,7 +50,6 @@ void UDunShopWidget::HandleItemPurchase(FName PurchasedID)
     if (GI)
     {
         GI->PurchasedItemIDs.Add(PurchasedID);  // 아이템 구매 후 아이디 추가
-        UE_LOG(LogTemp, Warning, TEXT("Item Purchased: %s"), *PurchasedID.ToString());
     }
 }
 
