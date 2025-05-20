@@ -6,11 +6,9 @@
 
 ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 {
+	// 몬스터 스폰 테스트할 때 AIController가 스폰안되는 문제가 있어서 설정
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	AIControllerClass = ARSDunMonsterCharacter::StaticClass();
-
-	MeleeAttackBoxComponent = CreateDefaultSubobject<UMeleeAttackBoxComponent>(TEXT("MeleeAttackBoxComponent"));
-	MeleeAttackBoxComponent->SetupAttachment(RootComponent);
 
 	//Navigation, NavLink
 	navGenerationRadius = 1000.0f;
@@ -22,6 +20,8 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 
 	//Patrol
 	maxDetectPatrolRoute = 2000.f;
+
+	bHasAttackTraced = false;
 
 }
 
@@ -48,7 +48,8 @@ void ARSDunMonsterCharacter::PlayDeathAnim()
 
 float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	/*if (bIsDead) return 0.0f;*/ // TODO : 만약 선국님이 bIsDead 변수 만들어 주면 넣을 로직
+	// TODO : 만약 선국님이 bIsDead 변수 만들어 주면 넣을 로직
+	/*if (bIsDead) return 0.0f;*/ 
 
 	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	

@@ -30,15 +30,14 @@ public:
 	virtual void PlayHitReactAnim();
 	virtual void PlayDeathAnim();
 
+	//Navigation Invoker function
+	FORCEINLINE class UNavigationInvokerComponent* GetNavInvoker() const { return navInvoker; };
+
 	UFUNCTION(BlueprintCallable, Category = "Enemy")
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UMeleeAttackBoxComponent> MeleeAttackBoxComponent;
-
-	//Navigation Invoker function
-	FORCEINLINE class UNavigationInvokerComponent* GetNavInvoker() const { return navInvoker; };
+	UFUNCTION(BlueprintCallable, Category = "Trace")
+	virtual void PerformAttackTrace() PURE_VIRTUAL(ARSDunMonsterCharacter::PerformAttackTrace, );
 
 	//NavLink jump function
 	UFUNCTION(BlueprintCallable)
@@ -50,6 +49,9 @@ public:
 
 	UFUNCTION()
 	TArray<AActor*> GetPatrolPoint();
+
+	bool HasAttackTraced() const;
+	void SetAttackTraced(bool bNewValue);
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Status")
@@ -87,7 +89,26 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Patrol")
 	float maxDetectPatrolRoute;
 
+	// 트레이스 관련
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
+	FVector TraceBoxHalfSize;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
+	float TraceLength;        // 트레이스 길이 (앞으로 얼마만큼 쏠지)
+
+	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	float TraceForwardOffset; // 소켓 기준 앞으로 얼마나 밀지
+
+	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	float TraceRightOffset;     // (선택) 좌우 보정
+
+	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	float TraceUpOffset;        // (선택) 높이 보정
+
 	FTimerHandle detectDelayTimer;
+
+	bool bHasAttackTraced;  // 트레이스(몬스터한테 공격 판정이)가 되었는지 판단하는 변수
+
 private:
 	TObjectPtr<ARSMonsterAIController> AIController;  // TODO : 혹시나 캐싱해서 쓸 일 생길까봐 미리 만들어둠.
 
