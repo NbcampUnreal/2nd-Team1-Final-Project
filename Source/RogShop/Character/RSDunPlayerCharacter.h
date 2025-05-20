@@ -90,4 +90,21 @@ private:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAIPerceptionStimuliSourceComponent> AIPerceptionStimuliSourceComp;
+
+// ½ºÅÈ °ü·Ã
+public:
+	float GetAttackPower() const;
+	void IncreaseAttackPower(float Amount);
+	void DecreaseAttackPower(float Amount);
+
+	float GetAttackSpeed() const;
+	void IncreaseAttackSpeed(float Amount);
+	void DecreaseAttackSpeed(float Amount);
+
+private:
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
+	float AttackPower;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
+	float AttackSpeed;
 };
