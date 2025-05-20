@@ -22,7 +22,6 @@ enum class EItemList : uint8
     MaxHpRelic,
     WalkSpeedRelic,
     AttackRelic,
-    AttackSpeedRelic,
     Weapon,
 };
 

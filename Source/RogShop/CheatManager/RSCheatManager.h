@@ -41,6 +41,9 @@ public:
 	UFUNCTION(exec)
 	void SpawnWeaponPad();
 
+	UFUNCTION(exec)
+	void ShowRSDunMainWidget();
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SpawnMonster")
 	TMap<FString, TSubclassOf<AActor>> MonsterMap;

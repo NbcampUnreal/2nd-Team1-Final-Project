@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "RSBaseWeapon.h"
+#include "RSDunPlayerController.h"
 
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
@@ -85,12 +86,12 @@ void UDunItemWidget::OnBuyClicked()
 
 bool UDunItemWidget::BuyItem()
 {
-    APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
     ARSDunPlayerCharacter* PlayerChar = Cast<ARSDunPlayerCharacter>(PC->GetCharacter());
 
     if (!PlayerChar)
     {
-        UE_LOG(LogTemp, Warning, TEXT("BuyItem - Character is nullptr"));
+        UE_LOG(LogTemp, Warning, TEXT("BuyItem - Character or PC is nullptr"));
         return false;
     }
 
@@ -117,6 +118,7 @@ bool UDunItemWidget::BuyItem()
             }
 
             PlayerChar->IncreaseHP(FinalValue);
+            PC->RSDunMainWidget->UpdateHP();
 
             break;
         }
@@ -162,20 +164,6 @@ bool UDunItemWidget::BuyItem()
 
             break;
         }
-        case EItemList::AttackSpeedRelic: // юс╫ц
-        {
-            switch (ItemData.Rarity)
-            {
-                case ERarity::Common: FinalValue = 5.0f; break;
-                case ERarity::Rare: FinalValue = 10.0f; break;
-                case ERarity::Epic: FinalValue = 15.0f; break;
-                case ERarity::Legendary: FinalValue = 25.0f; break;
-            }
-
-            // Character->AddAtkSpeed(FinalValue);
-
-            break;
-        }
         case EItemList::Weapon:
         {
             FActorSpawnParameters SpawnParams;
@@ -194,7 +182,19 @@ bool UDunItemWidget::BuyItem()
                 {
                     WeaponComp->EquipWeaponToSlot(SpawnedWeapon);
                 }
+                else
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("WeaponComp is Null"));
+                    bIsBuy = false;
+                }
             }
+            else
+            {
+                UE_LOG(LogTemp, Warning, TEXT("SpawnedWeapon is Null"));
+                bIsBuy = false;
+            }
+
+            PC->RSDunMainWidget->UpdateWeaponImage(ItemData.Icon);
 
             break;
         }

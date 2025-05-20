@@ -5,7 +5,9 @@
 #include "RSDunMonsterCharacter.h"
 #include "RSDunAnubisCharacter.h"
 #include "RSDunBossSpiderQueenCharacter.h"
+#include "RSDunPlayerController.h"
 
+#include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 
 URSCheatManager::URSCheatManager()
@@ -152,6 +154,20 @@ void URSCheatManager::SpawnWeaponPad()
     FRotator SpawnRotation = FRotator::ZeroRotator;
 
     GetWorld()->SpawnActor<AActor>(WeaponSpawnPadBPClass, SpawnLocation, SpawnRotation);
+}
+
+void URSCheatManager::ShowRSDunMainWidget()
+{
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetOuterAPlayerController());
+
+    if (PC && PC->RSDunMainWidget)
+    {
+        PC->RSDunMainWidget->AddToViewport();
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("PC or RSDunMainWidget Is Null !"));
+    }
 }
 
 void URSCheatManager::OpenTycoonLevel()
