@@ -20,10 +20,6 @@ ARSTableTile::ARSTableTile()
 void ARSTableTile::Interact()
 {
 	Super::Interact();
-
-	//손님이 앉아있고 주문을 신청하면 주문 받기
-	//음식을 들고 있다면 요리를 완성한 음식을 FoodLocation에 배치
-	// ㄴ 배치 후 조금이따가 돈 벌리면서 손님이 사라짐
 	
 	if (!Use())
 	{
@@ -49,31 +45,27 @@ void ARSTableTile::Interact()
 	}
 }
 
-void ARSTableTile::Sit(const TArray<ARSTycoonCustomerCharacter*>& Customers)
+void ARSTableTile::Sit(ARSTycoonCustomerCharacter* Customer)
 {
-	if (Customers.Num() > GetMaxPlace())
+	if (SittingCustomers.Num() >= GetMaxPlace())
 	{
 		RS_LOG_C("손님이 좌석수보다 많습니다", FColor::Red)
 		return;
 	}
 
 	RS_LOG("손님이 앉음")
-	SittingCustomers = Customers;
-	
-	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
-	for (int32 i = 0; i < Customers.Num(); i++)
+
+	int32 CustomerIndex = SittingCustomers.Num();
+	SittingCustomers.Add(Customer);
+
+	Customer->Sit(SittingLocations[CustomerIndex]->GetComponentTransform());
+	Customer->OnLeave.AddLambda([&](ARSTycoonCustomerCharacter* LeaveCustomer)
 	{
-		Customers[i]->SetActorLocation(SittingLocations[i]->GetComponentLocation());
-		Customers[i]->State = ETycoonCustomerState::OrderWaiting;
+		SittingCustomers.RemoveSingle(LeaveCustomer);
 
-		//오더 자체는 시스템적으로 들어가있음, 손님한테 가서 상호작용을 해서 음식을 기다리는 상태로 만들어야하는거임 
-		GameMode->AddOrder(Customers[i]->WantFoodKey);
-	}
-}
-
-FVector ARSTableTile::GetFoodPosition() const
-{
-	return FoodLocation->GetComponentLocation();
+		FoodActor->Destroy();
+		FoodActor = nullptr;
+	});
 }
 
 void ARSTableTile::Order()
@@ -82,7 +74,7 @@ void ARSTableTile::Order()
 
 	for (auto& Customer : SittingCustomers)
 	{
-		Customer->State = ETycoonCustomerState::FoodWaiting;
+		Customer->WaitFood();
 	}
 }
 
@@ -91,13 +83,22 @@ void ARSTableTile::Serving()
 	ARSTycoonPlayerCharacter* Player = Cast<ARSTycoonPlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	check(Player)
 
-	bool bComplete = Player->Drop(FoodLocation->GetComponentLocation());
-	if (bComplete)
+	AActor* Food = Player->Drop(FoodLocation->GetComponentLocation());
+	if (Food)
 	{
 		RS_LOG("음식을 전달했습니다")
+
+		//임시, 지금 기획이 좀 바뀌면서 이상함.
+		//수정해야함
+		FoodActor = Food;
+		
 		for (auto& Customer : SittingCustomers)
 		{
-			Customer->State = ETycoonCustomerState::Eat;
+			Customer->Eat();
 		}
+	}
+	else
+	{
+		RS_LOG_C("음식을 전달하지 못했습니다", FColor::Red)
 	}
 }

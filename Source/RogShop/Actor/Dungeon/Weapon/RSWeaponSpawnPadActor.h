@@ -19,9 +19,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* PadMesh;
-
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	UDataTable* WeaponDataTable;
 
@@ -33,4 +30,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+// ÄÄÆ÷³ÍÆ®
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
+	UStaticMeshComponent* PadMesh;
 };
