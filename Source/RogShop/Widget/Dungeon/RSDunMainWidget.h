@@ -21,6 +21,9 @@ public:
     void UpdateWeaponImage(UTexture2D* NewWeaponImage);
 
     UFUNCTION(BlueprintCallable)
+    void UpdateWeaponSlot(bool bIsFirst, UTexture2D* NewWeaponImage);
+
+    UFUNCTION(BlueprintCallable)
     void UpdateHP();
 
     UFUNCTION(BlueprintCallable)

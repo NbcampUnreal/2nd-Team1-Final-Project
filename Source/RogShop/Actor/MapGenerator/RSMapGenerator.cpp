@@ -1,36 +1,40 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MapGenerator.h"
+#include "RSMapGenerator.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Engine/LevelStreamingDynamic.h"
+#include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "Containers/Queue.h"
 
 // Sets default values
-AMapGenerator::AMapGenerator()
+ARSMapGenerator::ARSMapGenerator()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 }
 
 // Called when the game starts or when spawned
-void AMapGenerator::BeginPlay()
+void ARSMapGenerator::BeginPlay()
 {
 	Super::BeginPlay();
 	
     RandomStream.Initialize(Seed);
 
     GenerateMainPath(); 
-    ExpandPathToCoverMinTiles(0.6f);
+    ChooseShopTile();
+    ExpandPathToCoverMinTiles(0.5f);
     SpawnTiles();
 }
 // 유효한 위치인지 확인 (그리드 안에 있는지)
-bool AMapGenerator::IsValidPos(FVector2D Pos) const
+bool ARSMapGenerator::IsValidPos(FVector2D Pos) const
 {
     return Pos.X >= 0 && Pos.X < GridSize && Pos.Y >= 0 && Pos.Y < GridSize;
 }
 
 //현재 위치에서 이동할 수 있는 다음 위치 선택
-FVector2D AMapGenerator::GetNextDirection(FVector2D Current, TArray<FVector2D>& Visited)
+FVector2D ARSMapGenerator::GetNextDirection(FVector2D Current, TArray<FVector2D>& Visited)
 {
     TArray<FVector2D> Candidates;
 
@@ -56,7 +60,7 @@ FVector2D AMapGenerator::GetNextDirection(FVector2D Current, TArray<FVector2D>& 
 }
 
 //시작점에서부터 메인 경로 생성
-void AMapGenerator::GenerateMainPath()
+void ARSMapGenerator::GenerateMainPath()
 {
     FVector2D Current = FVector2D(0, 0);
     TArray<FVector2D> Path;
@@ -89,7 +93,7 @@ void AMapGenerator::GenerateMainPath()
 }
 
 //보스방 위치 찾기 (BFS로 가장 먼 타일 탐색)
-void AMapGenerator::FindBossRoom()
+void ARSMapGenerator::FindBossRoom()
 {
     TQueue<FVector2D> Queue;
     TMap<FVector2D, int32> Distance;
@@ -137,7 +141,7 @@ void AMapGenerator::FindBossRoom()
 }
 
 //전체 타일 수가 최소 비율 이상이 되도록 경로 확장
-void AMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
+void ARSMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
 {
     const int32 MinTiles = FMath::CeilToInt(GridSize * GridSize * MinRatio);
     TArray<FVector2D> AllUsed;
@@ -216,7 +220,7 @@ void AMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
 }
 
 //타일 스폰 (연결 방향에 따라 회전 설정)
-void AMapGenerator::SpawnTiles()
+void ARSMapGenerator::SpawnTiles()
 {
     for (int32 X = 0; X < GridSize; ++X)
     {
@@ -231,83 +235,144 @@ void AMapGenerator::SpawnTiles()
             FRotator Rot = FRotator::ZeroRotator;
             int ConnBits = (int)Data.Connections;
             int DirCount = FMath::CountBits(ConnBits); // 연결된 방향 수
-            TSubclassOf<AActor> SelectedTile = nullptr;
+
+            FString TileName = FString::Printf(TEXT("Tile_%d_%d"), X, Y); //유니크한 일므
+            TSoftObjectPtr<UWorld> SelectedLevel = nullptr;
 
             // 보스방일 경우 보스 타일 사용
-            if (BossRoomTile && Pos == BossRoomPos)
+            if (BossRoomTileLevel.IsValid() && Pos == BossRoomPos)
             {
-                GetWorld()->SpawnActor<AActor>(BossRoomTile, WorldLoc, FRotator::ZeroRotator);
-                continue;
+                SelectedLevel = BossRoomTileLevel;
             }
-
-            // 방향 수에 따라 타일 분기
-            switch (DirCount)
-            {
-            case 1: // 막다른길
-                SelectedTile = DeadEndTile;
-                if (ConnBits & (int)EDir::Up)
-                    Rot = FRotator(0, 0, 0);     // 입구 위
-                else if (ConnBits & (int)EDir::Down)
-                    Rot = FRotator(0, 180, 0);   // 입구 아래
-                else if (ConnBits & (int)EDir::Left)
-                    Rot = FRotator(0, 270, 0);   // 입구 왼
-                else if (ConnBits & (int)EDir::Right)
-                    Rot = FRotator(0, 90, 0);    // 입구 오
-                break;
-
-            case 2: // 직선 또는 ㄴ자형
-                if (ConnBits == ((int)(EDir::Up | EDir::Down)))
+            else {
+                // 방향 수에 따라 타일 분기
+                switch (DirCount)
                 {
-                    SelectedTile = LineTile;
-                    Rot = FRotator(0, 0, 0); // ㅣ
+                case 1: // 막다른길
+                    SelectedLevel = DeadEndTileLevel;
+                    if (ConnBits & (int)EDir::Up)
+                        Rot = FRotator(0, 0, 0);     // 입구 위
+                    else if (ConnBits & (int)EDir::Down)
+                        Rot = FRotator(0, 180, 0);   // 입구 아래
+                    else if (ConnBits & (int)EDir::Left)
+                        Rot = FRotator(0, 270, 0);   // 입구 왼
+                    else if (ConnBits & (int)EDir::Right)
+                        Rot = FRotator(0, 90, 0);    // 입구 오
+                    break;
+
+                case 2: // 직선 또는 ㄴ자형
+                    if (ConnBits == ((int)(EDir::Up | EDir::Down)))
+                    {
+                        SelectedLevel = LineTileLevel;
+                        Rot = FRotator(0, 0, 0); // ㅣ
+                    }
+                    else if (ConnBits == ((int)(EDir::Left | EDir::Right)))
+                    {
+                        SelectedLevel = LineTileLevel;
+                        Rot = FRotator(0, 90, 0); // ─
+                    }
+                    else
+                    {
+                        SelectedLevel = CornerTileLevel;
+
+                        if (ConnBits == ((int)(EDir::Down | EDir::Right)))
+                            Rot = FRotator(0, 0, 0);
+                        else if (ConnBits == ((int)(EDir::Down | EDir::Left)))
+                            Rot = FRotator(0, 90, 0);
+                        else if (ConnBits == ((int)(EDir::Up | EDir::Left)))
+                            Rot = FRotator(0, 180, 0);
+                        else if (ConnBits == ((int)(EDir::Up | EDir::Right)))
+                            Rot = FRotator(0, 270, 0);
+                    }
+                    break;
+
+                case 3: // T형 타일
+                    SelectedLevel = TTileLevel;
+
+                    if ((ConnBits & (int)EDir::Up) == 0)
+                        Rot = FRotator(0, 180, 0); // ┴
+                    else if ((ConnBits & (int)EDir::Down) == 0)
+                        Rot = FRotator(0, 0, 0);   // ┬
+                    else if ((ConnBits & (int)EDir::Left) == 0)
+                        Rot = FRotator(0, 270, 0); // ┤
+                    else if ((ConnBits & (int)EDir::Right) == 0)
+                        Rot = FRotator(0, 90, 0);  // ├
+                    break;
+
+                case 4: // 십자 타일
+                    SelectedLevel = CrossTileLevel;
+                    Rot = FRotator(0, 0, 0);
+                    break;
+
+                default:
+                    break;
                 }
-                else if (ConnBits == ((int)(EDir::Left | EDir::Right)))
-                {
-                    SelectedTile = LineTile;
-                    Rot = FRotator(0, 90, 0); // ─
-                }
-                else
-                {
-                    SelectedTile = CornerTile;
-
-                    if (ConnBits == ((int)(EDir::Down | EDir::Right)))
-                        Rot = FRotator(0, 0, 0);
-                    else if (ConnBits == ((int)(EDir::Down | EDir::Left)))
-                        Rot = FRotator(0, 90, 0);
-                    else if (ConnBits == ((int)(EDir::Up | EDir::Left)))
-                        Rot = FRotator(0, 180, 0);
-                    else if (ConnBits == ((int)(EDir::Up | EDir::Right)))
-                        Rot = FRotator(0, 270, 0);
-                }
-                break;
-
-            case 3: // T형 타일
-                SelectedTile = TTile;
-
-                if ((ConnBits & (int)EDir::Up) == 0)
-                    Rot = FRotator(0, 180, 0); // ┴
-                else if ((ConnBits & (int)EDir::Down) == 0)
-                    Rot = FRotator(0, 0, 0);   // ┬
-                else if ((ConnBits & (int)EDir::Left) == 0)
-                    Rot = FRotator(0, 270, 0); // ┤
-                else if ((ConnBits & (int)EDir::Right) == 0)
-                    Rot = FRotator(0, 90, 0);  // ├
-                break;
-
-            case 4: // 십자 타일
-                SelectedTile = CrossTile;
-                Rot = FRotator(0, 0, 0);
-                break;
-
-            default:
-                break;
             }
 
             // 스폰 실행
-            if (SelectedTile)
+            if (SelectedLevel.IsValid())
             {
-                GetWorld()->SpawnActor<AActor>(SelectedTile, WorldLoc, Rot);
+                StreamTile(SelectedLevel, WorldLoc, Rot, TileName);
+
+                //상점NPC생성
+                if (ShopNPC && Pos == ShopTilePos)
+                {
+                    FTransform NPCLocation(Rot, WorldLoc + FVector(0, 0, 30));
+                    GetWorld()->SpawnActor<AActor>(ShopNPC, NPCLocation);
+                }
             }
         }
+    }
+}
+
+
+void ARSMapGenerator::StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector & Location, const FRotator & Rotation, const FString & UniqueName)
+{
+    if (!LevelToStream.IsValid()) return;
+
+    //위치와 회전을 담을 객체
+    FTransform LevelTransform;
+    LevelTransform.SetLocation(Location);
+    LevelTransform.SetRotation(Rotation.Quaternion());
+
+    bool bLoadSuccess = false;
+
+    //동적으로 레벨 생성
+    ULevelStreamingDynamic* StreamingLevel = ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(
+        GetWorld(),
+        LevelToStream, 
+        LevelTransform, 
+        bLoadSuccess,
+        UniqueName);
+
+    if (!bLoadSuccess || !StreamingLevel)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("레벨 로드 실패: %s"), *LevelToStream.ToString());
+    }
+    else
+    {
+        UE_LOG(LogTemp, Log, TEXT("레벨 로드 성공: %s"), *LevelToStream.ToString());
+    }
+}
+
+void ARSMapGenerator::ChooseShopTile() 
+{
+
+    TArray<FVector2D> Candidates;
+
+    //보스방을 제외한 타일에서 후보 선출
+    for (const auto& Pair : TileMap)
+    {
+        const FVector2D& Pos = Pair.Key;
+        if (Pos != BossRoomPos)
+        {
+            Candidates.Add(Pos);
+        }
+    }
+
+    // 후보에서 하나 선택
+    if (Candidates.Num() > 0)
+    {
+        ShopTilePos = Candidates[RandomStream.RandRange(0, Candidates.Num() - 1)];
     }
 }
