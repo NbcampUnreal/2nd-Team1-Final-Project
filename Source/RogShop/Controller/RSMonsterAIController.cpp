@@ -76,7 +76,7 @@ void ARSMonsterAIController::MoveToCurrentPatrolPoint()
 		currentPatrolIdx = (currentPatrolIdx + 1) % patrolPoints.Num();
 	}
 }
-
+/*
 void ARSMonsterAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
 	Super::OnMoveCompleted(RequestID, Result);
@@ -85,4 +85,4 @@ void ARSMonsterAIController::OnMoveCompleted(FAIRequestID RequestID, const FPath
 	{
 		MoveToCurrentPatrolPoint();
 	}
-}
+}*/
