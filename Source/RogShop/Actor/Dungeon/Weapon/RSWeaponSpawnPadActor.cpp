@@ -28,26 +28,34 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
     // 데이터 테이블에서 모든 Row 가져오기
     TArray<FDungeonItemData*> AllWeapons;
     WeaponDataTable->GetAllRows(TEXT("WeaponSpawn"), AllWeapons);
+    
+    // 데이터 테이블에서 모든 Row에 대한 Row Name을 가져오기
+    TArray<FName> AllRowNames = WeaponDataTable->GetRowNames();
 
     TArray<FDungeonItemData*> FilteredWeapons;
-
-    for (FDungeonItemData* Item : AllWeapons)
+    TArray<FName> FilteredRowNames;
+    
+    for (int i = 0; i < AllWeapons.Num(); ++i)
     {
-        if (Item && Item->ItemRarity == EItemRarity::Common && Item->ItemType == EItemType::Weapon)
+        if (AllWeapons[i] && AllWeapons[i]->ItemRarity == EItemRarity::Common && AllWeapons[i]->ItemType == EItemType::Weapon)
         {
-            FilteredWeapons.Add(Item);
+            FilteredWeapons.Add(AllWeapons[i]);
+            FilteredRowNames.Add(AllRowNames[i]);
         }
     }
 
     // 선택된 무기 저장용 배열
     TArray<FDungeonItemData*> SelectedWeapons;
+    TArray<FName> SelectedRowNames;
 
     // 중복 방지를 위해 랜덤 선택 후 제거
     while (SelectedWeapons.Num() < NumberOfWeapons && FilteredWeapons.Num() > 0)
     {
         int32 Index = FMath::RandRange(0, FilteredWeapons.Num() - 1);
         SelectedWeapons.Add(FilteredWeapons[Index]);
+        SelectedRowNames.Add(FilteredRowNames[Index]);
         FilteredWeapons.RemoveAt(Index); // 이 줄이 "중복 제거" 핵심!
+        FilteredRowNames.RemoveAt(Index); // 이 줄이 "중복 제거" 핵심!
     }
 
     FVector Origin;
@@ -81,11 +89,12 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
             FRotator::ZeroRotator
         );
 
+        FName CurDataTableKey = SelectedRowNames[i];
         UStaticMesh* ItemStaticMesh = SelectedWeapons[i]->ItemStaticMesh;
         TSubclassOf<ARSDungeonItemBase> ItemClass = SelectedWeapons[i]->ItemClass;
-        if (ItemStaticMesh && ItemClass)
+        if (InteractableWeapon && ItemStaticMesh && ItemClass)
         {
-            InteractableWeapon->InitInteractableWeapon(ItemStaticMesh, ItemClass);
+            InteractableWeapon->InitInteractableWeapon(CurDataTableKey, ItemStaticMesh, ItemClass);
         }
 
         // UE_LOG(LogTemp, Warning, TEXT("SelectedWeapon ID: %s"), *SelectedWeapons[i]->ItemID.ToString());

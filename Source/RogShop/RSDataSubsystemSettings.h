@@ -20,4 +20,7 @@ public:
 	
 	UPROPERTY(Config, EditAnywhere)
 	TSoftObjectPtr<UDataTable> IngredientDataTable;
+
+	UPROPERTY(Config, EditAnywhere)
+	TSoftObjectPtr<UDataTable> WeaponDataTable;
 };

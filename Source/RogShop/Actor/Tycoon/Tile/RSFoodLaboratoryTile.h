@@ -14,11 +14,8 @@ class ROGSHOP_API ARSFoodLaboratoryTile : public ARSBaseTile
 public:
 	ARSFoodLaboratoryTile();
 
-	virtual void Tick(float DeltaTime) override;
-
+	GENERATED_TILE()
+	
 	virtual void Interact() override;
 	
-protected:
-	virtual void BeginPlay() override;
-
 };

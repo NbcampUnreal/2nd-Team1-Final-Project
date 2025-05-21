@@ -7,6 +7,9 @@
 #include "RSDunPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/BoxComponent.h"
+#include "RogShop/GameInstanceSubsystem/RSDataSubsystem.h"
+#include "DungeonItemData.h"
+#include "RSInteractableWeapon.h"
 
 // Sets default values for this component's properties
 URSPlayerWeaponComponent::URSPlayerWeaponComponent()
@@ -15,7 +18,8 @@ URSPlayerWeaponComponent::URSPlayerWeaponComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	WeaponActors.SetNum(2);
+	WeaponSlotSize = 2;
+	WeaponActors.SetNum(WeaponSlotSize);
 	WeaponSlot = EWeaponSlot::NONE;
 }
 
@@ -96,17 +100,22 @@ bool URSPlayerWeaponComponent::ContinueComboAttack()
 				return false;
 			}
 
+			// 콤보 공격이 배열의 크기를 넘어서지 않게 해준다.
 			const TArray<UAnimMontage*>& CurNormalAttacks = WeaponActors[Index]->GetNormalAttacks();
 			if (CurNormalAttacks.Num() <= ComboIndex)
 			{
 				ComboIndex %= CurNormalAttacks.Num();
 			}
 
+			// 현재 재생해야하는 몽타주를 찾는다.
 			UAnimMontage* CurAttackMontage = CurNormalAttacks[ComboIndex];
 			UAnimInstance* AnimInstance = SkeletalMeshComp->GetAnimInstance();
 
 			if (CurAttackMontage && AnimInstance)
 			{
+				// 몽타주를 재생시켜준다.
+				// 입력된 버퍼 값을 초기화하고, 다음 공격을 위해 콤보 인덱스를 증가시킨다.
+
 				float AttackSpeed = CurCharacter->GetAttackSpeed();
 
 				AnimInstance->Montage_Play(CurAttackMontage, AttackSpeed);
@@ -127,6 +136,8 @@ bool URSPlayerWeaponComponent::ContinueComboAttack()
 
 void URSPlayerWeaponComponent::ResetCombo()
 {
+	// 공격 애니메이션이 재생된 후 더이상 입력이 없을 때 호출된다.
+	// 공격에 대해 모두 기본값으로 설정
 	ComboIndex = 0;
 	bComboInputBuffered = false;
 	bIsAttack = false;
@@ -135,9 +146,9 @@ void URSPlayerWeaponComponent::ResetCombo()
 void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 {
 	// 슬롯의 크기가 잘못 설정된 경우
-	if (WeaponActors.Num() != 2)
+	if (WeaponActors.Num() != WeaponSlotSize)
 	{
-		WeaponActors.SetNum(2);
+		WeaponActors.SetNum(WeaponSlotSize);
 	}
 
 	// 슬롯에 포함할 액터를 숨김처리 및 충돌을 끈다.
@@ -169,25 +180,48 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 
 		RS_LOG("1 Slot Add Weapon")
 	}
-	
-	// 만약, 비어있는 무기 슬롯이 없는 경우 들고 있는 무기와 교체한다.
-	// TODO
-	// 기존 무기는 땅 바닥에 버려지도록 구현해야한다.
-	uint8 Index = static_cast<uint8>(WeaponSlot);
-	if (WeaponActors.Num() > Index)
+	else
 	{
-		WeaponActors[Index] = NewWeaponActor;
-		EquipWeaponToCharacter(WeaponSlot);
+		// 만약, 비어있는 무기 슬롯이 없는 경우 들고 있는 무기와 교체한다.
+		// TODO : 기존 무기는 땅 바닥에 버려지도록 구현해야한다.
+		// 기존에 장착하던 무기를 버리는 로직
+		uint8 Index = static_cast<uint8>(WeaponSlot);
+
+		ARSInteractableWeapon* InteractableWeapon = GetWorld()->SpawnActor<ARSInteractableWeapon>(ARSInteractableWeapon::StaticClass(), CurCharacter->GetActorTransform());
+
+		FName WeaponKey = WeaponActors[Index]->GetDataTableKey();
+
+		FDungeonItemData* Data = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Weapon->FindRow<FDungeonItemData>(WeaponKey, TEXT("Get WeaponData"));
+
+		if (Data)
+		{
+			UStaticMesh* ItemStaticMesh = Data->ItemStaticMesh;
+			TSubclassOf<ARSDungeonItemBase> ItemClass = Data->ItemClass;
+
+			if (InteractableWeapon && ItemStaticMesh && ItemClass)
+			{
+				InteractableWeapon->InitInteractableWeapon(WeaponKey, ItemStaticMesh, ItemClass);
+			}
+
+			// 기존에 장착하던 무기 제거
+			WeaponActors[Index]->Destroy();
+			WeaponActors[Index] = NewWeaponActor;
+
+			// 새로운 무기를 장착
+			EquipWeaponToCharacter(WeaponSlot);
+		}
 	}
 }
 
 void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSlot)
 {
 	// 잘못된 값이 들어왔는지 확인
-	if (EWeaponSlot::NONE == TargetWeaponSlot || WeaponSlot == TargetWeaponSlot)
+	if (EWeaponSlot::NONE == TargetWeaponSlot)
 	{
 		return;
 	}
+	
+	// TODO : WeaponSlot == TargetWeaponSlot로 값이 들어온 경우 새로 착용할 무기의 숨김 처리를 끄고, 충돌을 켜기만 한다.
 
 	// 현재 착용 중인 무기가 있는 경우 숨김 처리 및 충돌을 끈다.
 	// 새로 착용할 무기의 숨김 처리를 끄고, 충돌을 켠다.

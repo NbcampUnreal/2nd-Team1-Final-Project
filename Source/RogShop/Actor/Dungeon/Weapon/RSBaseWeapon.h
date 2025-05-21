@@ -56,6 +56,15 @@ public:
 	float GetWeaponDamage() const;
 
 private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Status", meta = (AllowPrivateAccess = true))
 	float WeaponDamage;	// 오버랩 시 가할 무기 데미지
+
+// 데이터 테이블의 RowName을 ID값으로 사용한다.
+public:
+	FName GetDataTableKey() const;
+	void SetDataTableKey(FName NewDataTableKey);
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info", meta = (AllowPrivateAccess = true))
+	FName DataTableKey;
 };

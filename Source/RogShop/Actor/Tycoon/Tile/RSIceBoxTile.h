@@ -13,11 +13,8 @@ class ROGSHOP_API ARSIceBoxTile : public ARSBaseTile
 
 public:
 	ARSIceBoxTile();
-
-	virtual void Tick(float DeltaTime) override;
-
-	virtual void Interact() override;
 	
-protected:
-	virtual void BeginPlay() override;
+	GENERATED_TILE()
+	
+	virtual void Interact() override;
 };

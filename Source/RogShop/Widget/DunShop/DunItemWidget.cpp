@@ -57,7 +57,7 @@ void UDunItemWidget::OnBuyClicked()
 {
     if (BuyItem())
     {
-        // Character->SetLifeEssence(ItemData.Price); // 플레이어 골드 수정 관련 함수 또는 public 변수 필요
+        // Character->DecreaseLifeEssence(ItemData.Price); // 플레이어 골드 수정 관련 함수 또는 public 변수 필요
 
         if (ItemPriceText)
         {
@@ -122,45 +122,25 @@ bool UDunItemWidget::BuyItem()
 
             break;
         }
-        case EItemList::MaxHpRelic:
+        case EItemList::Relic:
         {
-            switch (ItemData.Rarity)
+            URSBaseRelicEffect* Effect = nullptr;
+
+            if (ItemData.EffectClass)
             {
-                case ERarity::Common: FinalValue = 1.0f; break;
-                case ERarity::Rare: FinalValue = 2.0f; break;
-                case ERarity::Epic: FinalValue = 3.0f; break;
-                case ERarity::Legendary: FinalValue = 4.0f; break;
+                Effect = NewObject<URSBaseRelicEffect>(this, ItemData.EffectClass);
             }
 
-            // Character->SetMaxHP(FinalValue);
-
-            break;
-        }
-        case EItemList::WalkSpeedRelic: // 임시
-        {
-            switch (ItemData.Rarity)
+            if (Effect)
             {
-                case ERarity::Common: FinalValue = 1.0f; break;
-                case ERarity::Rare: FinalValue = 2.0f; break;
-                case ERarity::Epic: FinalValue = 3.0f; break;
-                case ERarity::Legendary: FinalValue = 4.0f; break;
+                // ApplyEffect 함수가 URSBaseRelicEffect 자식 클래스에서 구현되어야 함
+                Effect->ApplyEffect(PlayerChar, PC, ItemData);
             }
-
-            // Character->AddWalkSpeed(FinalValue);
-
-            break;
-        }
-        case EItemList::AttackRelic: // 임시
-        {
-            switch (ItemData.Rarity)
+            else
             {
-                case ERarity::Common: FinalValue = 5.0f; break;
-                case ERarity::Rare: FinalValue = 10.0f; break;
-                case ERarity::Epic: FinalValue = 15.0f; break;
-                case ERarity::Legendary: FinalValue = 25.0f; break;
+                UE_LOG(LogTemp, Warning, TEXT("BuyItem - EffectClass is null"));
+                bIsBuy = false;
             }
-
-            // Character->AddAtk(FinalValue);
 
             break;
         }

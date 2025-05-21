@@ -31,7 +31,7 @@ public:
 // 레벨 이동
 private:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Level", meta = (AllowPrivateAccess = true))
-	TWeakObjectPtr<UWorld> TargetLevel;
+	TSoftObjectPtr<UWorld> TargetLevelAsset;
 
 // 컴포넌트
 private:
