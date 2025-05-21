@@ -28,7 +28,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 // 해당 엑터의 메시 세팅 및 상호작용에 필요한 변수 세팅
-	void InitInteractableWeapon(UStaticMesh* NewMesh, const TSubclassOf<ARSDungeonItemBase> NewWeaponClass);
+	void InitInteractableWeapon(FName NewDataTableKey, UStaticMesh* NewMesh, const TSubclassOf<ARSDungeonItemBase> NewWeaponClass);
 
 // 상호작용
 public:
@@ -44,4 +44,8 @@ private:
 	TObjectPtr<USceneComponent> SceneComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UStaticMeshComponent> MeshComp;
+
+// 데이터 테이블의 RowName을 ID값으로 사용한다.
+private:
+	FName DataTableKey;
 };

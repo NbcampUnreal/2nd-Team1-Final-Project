@@ -68,3 +68,13 @@ float ARSBaseWeapon::GetWeaponDamage() const
 {
 	return WeaponDamage;
 }
+
+FName ARSBaseWeapon::GetDataTableKey() const
+{
+	return DataTableKey;
+}
+
+void ARSBaseWeapon::SetDataTableKey(FName NewDataTableKey)
+{
+	DataTableKey = NewDataTableKey;
+}
