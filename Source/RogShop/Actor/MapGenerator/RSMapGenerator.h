@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Engine/LevelStreamingDynamic.h"
 #include "Kismet/GameplayStatics.h"
-#include "MapGenerator.generated.h"
+#include "RSMapGenerator.generated.h"
 
 UENUM()
 enum class EDir : uint8 //방향표시 열거형(Bitmask형태)
@@ -33,13 +33,13 @@ struct FTileData
 
 
 UCLASS()
-class ROGSHOP_API AMapGenerator : public AActor
+class ROGSHOP_API ARSMapGenerator : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AMapGenerator();
+	ARSMapGenerator();
 
 protected:
 	// Called when the game starts or when spawned

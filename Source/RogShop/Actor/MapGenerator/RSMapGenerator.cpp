@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MapGenerator.h"
+#include "RSMapGenerator.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine/LevelStreamingDynamic.h"
 #include "Kismet/GameplayStatics.h"
@@ -9,14 +9,14 @@
 #include "Containers/Queue.h"
 
 // Sets default values
-AMapGenerator::AMapGenerator()
+ARSMapGenerator::ARSMapGenerator()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 }
 
 // Called when the game starts or when spawned
-void AMapGenerator::BeginPlay()
+void ARSMapGenerator::BeginPlay()
 {
 	Super::BeginPlay();
 	
@@ -28,13 +28,13 @@ void AMapGenerator::BeginPlay()
     SpawnTiles();
 }
 // 유효한 위치인지 확인 (그리드 안에 있는지)
-bool AMapGenerator::IsValidPos(FVector2D Pos) const
+bool ARSMapGenerator::IsValidPos(FVector2D Pos) const
 {
     return Pos.X >= 0 && Pos.X < GridSize && Pos.Y >= 0 && Pos.Y < GridSize;
 }
 
 //현재 위치에서 이동할 수 있는 다음 위치 선택
-FVector2D AMapGenerator::GetNextDirection(FVector2D Current, TArray<FVector2D>& Visited)
+FVector2D ARSMapGenerator::GetNextDirection(FVector2D Current, TArray<FVector2D>& Visited)
 {
     TArray<FVector2D> Candidates;
 
@@ -60,7 +60,7 @@ FVector2D AMapGenerator::GetNextDirection(FVector2D Current, TArray<FVector2D>& 
 }
 
 //시작점에서부터 메인 경로 생성
-void AMapGenerator::GenerateMainPath()
+void ARSMapGenerator::GenerateMainPath()
 {
     FVector2D Current = FVector2D(0, 0);
     TArray<FVector2D> Path;
@@ -93,7 +93,7 @@ void AMapGenerator::GenerateMainPath()
 }
 
 //보스방 위치 찾기 (BFS로 가장 먼 타일 탐색)
-void AMapGenerator::FindBossRoom()
+void ARSMapGenerator::FindBossRoom()
 {
     TQueue<FVector2D> Queue;
     TMap<FVector2D, int32> Distance;
@@ -141,7 +141,7 @@ void AMapGenerator::FindBossRoom()
 }
 
 //전체 타일 수가 최소 비율 이상이 되도록 경로 확장
-void AMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
+void ARSMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
 {
     const int32 MinTiles = FMath::CeilToInt(GridSize * GridSize * MinRatio);
     TArray<FVector2D> AllUsed;
@@ -220,7 +220,7 @@ void AMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
 }
 
 //타일 스폰 (연결 방향에 따라 회전 설정)
-void AMapGenerator::SpawnTiles()
+void ARSMapGenerator::SpawnTiles()
 {
     for (int32 X = 0; X < GridSize; ++X)
     {
@@ -326,7 +326,7 @@ void AMapGenerator::SpawnTiles()
 }
 
 
-void AMapGenerator::StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector & Location, const FRotator & Rotation, const FString & UniqueName)
+void ARSMapGenerator::StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector & Location, const FRotator & Rotation, const FString & UniqueName)
 {
     if (!LevelToStream.IsValid()) return;
 
@@ -355,7 +355,7 @@ void AMapGenerator::StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVect
     }
 }
 
-void AMapGenerator::ChooseShopTile() 
+void ARSMapGenerator::ChooseShopTile() 
 {
 
     TArray<FVector2D> Candidates;
