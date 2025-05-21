@@ -21,8 +21,6 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	//Patrol
 	maxDetectPatrolRoute = 2000.f;
 
-	bHasAttackTraced = false;
-
 }
 
 void ARSDunMonsterCharacter::BeginPlay()
