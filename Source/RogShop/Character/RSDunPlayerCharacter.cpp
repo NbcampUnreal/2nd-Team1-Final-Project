@@ -134,6 +134,13 @@ float ARSDunPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& 
 
     DecreaseHP(Damage);
 
+    UE_LOG(LogTemp, Warning, TEXT("[%s] took %.1f damage from [%s], Current Hp is %f"),
+        *GetName(),
+        Damage,
+        DamageCauser ? *DamageCauser->GetName() : TEXT("Unknown"),
+        GetHP()
+    );
+
     if (GetHP() <= 0)
     {
         OnDeath();
