@@ -23,4 +23,7 @@ public:
 	
 	UPROPERTY()
 	TObjectPtr<UDataTable> Ingredient;
+
+	UPROPERTY()
+	TObjectPtr<UDataTable> Weapon;
 };

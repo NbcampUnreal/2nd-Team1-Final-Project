@@ -54,6 +54,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
 	EWeaponSlot WeaponSlot;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
+	int32 WeaponSlotSize;	// 최대 슬롯 수
+
 	// 애니메이션을 위한 상태
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
 	bool bIsAttack;	// 공격 중인 상태
