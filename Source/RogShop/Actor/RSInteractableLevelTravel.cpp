@@ -34,11 +34,29 @@ void ARSInteractableLevelTravel::Tick(float DeltaTime)
 
 void ARSInteractableLevelTravel::Interact(ARSDunPlayerCharacter* Interactor)
 {
-	if (TargetLevel.Get())
+	// TODO : 레벨을 이동하기 전에 세이브 처리가 필요하다.
+
+	if (TargetLevelAsset.IsValid())
 	{
-		// TODO : 레벨을 이동하기 전에 세이브 처리가 필요하다.
-		FString AssetName = TargetLevel->GetName();
-		FName LevelName = FName(*AssetName);
+		// 로드된 경우
+
+		FStringAssetReference AssetRef = TargetLevelAsset.ToSoftObjectPath();
+		FString LevelPath = AssetRef.ToString();
+		FName LevelName = FName(*FPackageName::GetShortName(LevelPath));
 		UGameplayStatics::OpenLevel(GetWorld(), LevelName);
+	}
+	else if (TargetLevelAsset.IsNull() == false)
+	{
+		// 아직 로드되지 않았을 경우
+		
+		// 패키지 경로 예시: /Game/Maps/MyLevel
+		FString LevelPackagePath = TargetLevelAsset.ToSoftObjectPath().GetLongPackageName();
+
+		if (!LevelPackagePath.IsEmpty())
+		{
+			// 레벨 이름만 추출
+			FName LevelName = FName(*FPackageName::GetShortName(LevelPackagePath));
+			UGameplayStatics::OpenLevel(GetWorld(), LevelName);
+		}
 	}
 }
