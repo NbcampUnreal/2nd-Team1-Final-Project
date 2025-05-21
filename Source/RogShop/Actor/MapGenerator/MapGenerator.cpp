@@ -2,6 +2,9 @@
 
 
 #include "MapGenerator.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Engine/LevelStreamingDynamic.h"
+#include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "Containers/Queue.h"
 
@@ -231,83 +234,115 @@ void AMapGenerator::SpawnTiles()
             FRotator Rot = FRotator::ZeroRotator;
             int ConnBits = (int)Data.Connections;
             int DirCount = FMath::CountBits(ConnBits); // 연결된 방향 수
-            TSubclassOf<AActor> SelectedTile = nullptr;
+
+            FString TileName = FString::Printf(TEXT("Tile_%d_%d"), X, Y); //유니크한 일므
+            TSoftObjectPtr<UWorld> SelectedLevel = nullptr;
 
             // 보스방일 경우 보스 타일 사용
-            if (BossRoomTile && Pos == BossRoomPos)
+            if (BossRoomTileLevel.IsValid() && Pos == BossRoomPos)
             {
-                GetWorld()->SpawnActor<AActor>(BossRoomTile, WorldLoc, FRotator::ZeroRotator);
-                continue;
+                SelectedLevel = BossRoomTileLevel;
             }
-
-            // 방향 수에 따라 타일 분기
-            switch (DirCount)
-            {
-            case 1: // 막다른길
-                SelectedTile = DeadEndTile;
-                if (ConnBits & (int)EDir::Up)
-                    Rot = FRotator(0, 0, 0);     // 입구 위
-                else if (ConnBits & (int)EDir::Down)
-                    Rot = FRotator(0, 180, 0);   // 입구 아래
-                else if (ConnBits & (int)EDir::Left)
-                    Rot = FRotator(0, 270, 0);   // 입구 왼
-                else if (ConnBits & (int)EDir::Right)
-                    Rot = FRotator(0, 90, 0);    // 입구 오
-                break;
-
-            case 2: // 직선 또는 ㄴ자형
-                if (ConnBits == ((int)(EDir::Up | EDir::Down)))
+            else {
+                // 방향 수에 따라 타일 분기
+                switch (DirCount)
                 {
-                    SelectedTile = LineTile;
-                    Rot = FRotator(0, 0, 0); // ㅣ
+                case 1: // 막다른길
+                    SelectedLevel = DeadEndTileLevel;
+                    if (ConnBits & (int)EDir::Up)
+                        Rot = FRotator(0, 0, 0);     // 입구 위
+                    else if (ConnBits & (int)EDir::Down)
+                        Rot = FRotator(0, 180, 0);   // 입구 아래
+                    else if (ConnBits & (int)EDir::Left)
+                        Rot = FRotator(0, 270, 0);   // 입구 왼
+                    else if (ConnBits & (int)EDir::Right)
+                        Rot = FRotator(0, 90, 0);    // 입구 오
+                    break;
+
+                case 2: // 직선 또는 ㄴ자형
+                    if (ConnBits == ((int)(EDir::Up | EDir::Down)))
+                    {
+                        SelectedLevel = LineTileLevel;
+                        Rot = FRotator(0, 0, 0); // ㅣ
+                    }
+                    else if (ConnBits == ((int)(EDir::Left | EDir::Right)))
+                    {
+                        SelectedLevel = LineTileLevel;
+                        Rot = FRotator(0, 90, 0); // ─
+                    }
+                    else
+                    {
+                        SelectedLevel = CornerTileLevel;
+
+                        if (ConnBits == ((int)(EDir::Down | EDir::Right)))
+                            Rot = FRotator(0, 0, 0);
+                        else if (ConnBits == ((int)(EDir::Down | EDir::Left)))
+                            Rot = FRotator(0, 90, 0);
+                        else if (ConnBits == ((int)(EDir::Up | EDir::Left)))
+                            Rot = FRotator(0, 180, 0);
+                        else if (ConnBits == ((int)(EDir::Up | EDir::Right)))
+                            Rot = FRotator(0, 270, 0);
+                    }
+                    break;
+
+                case 3: // T형 타일
+                    SelectedLevel = TTileLevel;
+
+                    if ((ConnBits & (int)EDir::Up) == 0)
+                        Rot = FRotator(0, 180, 0); // ┴
+                    else if ((ConnBits & (int)EDir::Down) == 0)
+                        Rot = FRotator(0, 0, 0);   // ┬
+                    else if ((ConnBits & (int)EDir::Left) == 0)
+                        Rot = FRotator(0, 270, 0); // ┤
+                    else if ((ConnBits & (int)EDir::Right) == 0)
+                        Rot = FRotator(0, 90, 0);  // ├
+                    break;
+
+                case 4: // 십자 타일
+                    SelectedLevel = CrossTileLevel;
+                    Rot = FRotator(0, 0, 0);
+                    break;
+
+                default:
+                    break;
                 }
-                else if (ConnBits == ((int)(EDir::Left | EDir::Right)))
-                {
-                    SelectedTile = LineTile;
-                    Rot = FRotator(0, 90, 0); // ─
-                }
-                else
-                {
-                    SelectedTile = CornerTile;
-
-                    if (ConnBits == ((int)(EDir::Down | EDir::Right)))
-                        Rot = FRotator(0, 0, 0);
-                    else if (ConnBits == ((int)(EDir::Down | EDir::Left)))
-                        Rot = FRotator(0, 90, 0);
-                    else if (ConnBits == ((int)(EDir::Up | EDir::Left)))
-                        Rot = FRotator(0, 180, 0);
-                    else if (ConnBits == ((int)(EDir::Up | EDir::Right)))
-                        Rot = FRotator(0, 270, 0);
-                }
-                break;
-
-            case 3: // T형 타일
-                SelectedTile = TTile;
-
-                if ((ConnBits & (int)EDir::Up) == 0)
-                    Rot = FRotator(0, 180, 0); // ┴
-                else if ((ConnBits & (int)EDir::Down) == 0)
-                    Rot = FRotator(0, 0, 0);   // ┬
-                else if ((ConnBits & (int)EDir::Left) == 0)
-                    Rot = FRotator(0, 270, 0); // ┤
-                else if ((ConnBits & (int)EDir::Right) == 0)
-                    Rot = FRotator(0, 90, 0);  // ├
-                break;
-
-            case 4: // 십자 타일
-                SelectedTile = CrossTile;
-                Rot = FRotator(0, 0, 0);
-                break;
-
-            default:
-                break;
             }
 
             // 스폰 실행
-            if (SelectedTile)
+            if (SelectedLevel.IsValid())
             {
-                GetWorld()->SpawnActor<AActor>(SelectedTile, WorldLoc, Rot);
+                StreamTile(SelectedLevel, WorldLoc, Rot, TileName);
             }
         }
+    }
+}
+
+
+void AMapGenerator::StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector & Location, const FRotator & Rotation, const FString & UniqueName)
+{
+    if (!LevelToStream.IsValid()) return;
+
+    //위치와 회전을 담을 객체
+    FTransform LevelTransform;
+    LevelTransform.SetLocation(Location);
+    LevelTransform.SetRotation(Rotation.Quaternion());
+
+    bool bLoadSuccess = false;
+
+    //동적으로 레벨 생성
+    ULevelStreamingDynamic* StreamingLevel = ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(
+        GetWorld(),
+        LevelToStream, 
+        LevelTransform, 
+        bLoadSuccess,
+        UniqueName);
+
+    if (!bLoadSuccess || !StreamingLevel)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("레벨 로드 실패: %s"), *LevelToStream.ToString());
+    }
+    else
+    {
+        UE_LOG(LogTemp, Log, TEXT("레벨 로드 성공: %s"), *LevelToStream.ToString());
     }
 }
