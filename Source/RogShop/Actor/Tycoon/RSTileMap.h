@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "RSTileMap.generated.h"
 
+struct FTileRow;
 class ARSBaseTile;
 
 UCLASS()
@@ -21,25 +22,41 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-private:
-	// UFUNCTION(CallInEditor, Category="TileMap")
-	void CreateTilesWithChildActorComponent();
-	void CreateTilesWithSpawnActor();
+private:	
+	void LoadTiles();
+	void SetDefaultSettings();
+	void CreateTiles();
+	UClass* GetTileClass(const FName& TileKey);
 	
-public:
+	UFUNCTION(CallInEditor)
+	void SaveTiles();
+
+	UFUNCTION(CallInEditor)
+	void DeleteTileData();
+
+private:
+	static const FString TileMapSaveSlot;
+	
 	UPROPERTY(EditAnywhere, Category="TileMap")
 	TSubclassOf<ARSBaseTile> DefaultTileType;
 
 	UPROPERTY(EditAnywhere, Category="TileMap")
-	int32 Width;
+	int32 DefaultWidth = 3;
 
 	UPROPERTY(EditAnywhere, Category="TileMap")
-	int32 Height;
+	int32 DefaultHeight = 3;
 
-protected:
-	TArray<TWeakObjectPtr<ARSBaseTile>> Tiles;
+	UPROPERTY(EditDefaultsOnly, Category="TileMap")
+	TArray<TSubclassOf<ARSBaseTile>> TileTypes;	
 	
-private:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="TileMap")
 	TObjectPtr<USceneComponent> TileParent;
+	
+	UPROPERTY()
+	TArray<TWeakObjectPtr<ARSBaseTile>> TileActors;
+
+	UPROPERTY(EditAnywhere, Category="TileMap")
+	TArray<FTileRow> TileName2DMap;
+	
+	int32 Width, Height;
 };

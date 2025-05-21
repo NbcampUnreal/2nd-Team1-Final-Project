@@ -37,7 +37,7 @@ void ARSInteractableWeapon::Tick(float DeltaTime)
 
 }
 
-void ARSInteractableWeapon::InitInteractableWeapon(UStaticMesh* NewMesh, const TSubclassOf<ARSDungeonItemBase> NewWeaponClass)
+void ARSInteractableWeapon::InitInteractableWeapon(FName NewDataTableKey, UStaticMesh* NewMesh, const TSubclassOf<ARSDungeonItemBase> NewWeaponClass)
 {
 	if (!NewMesh)
 	{
@@ -47,6 +47,8 @@ void ARSInteractableWeapon::InitInteractableWeapon(UStaticMesh* NewMesh, const T
 	{
 		RS_LOG_C("Invalid Blueprint Class Used", FColor::Red);
 	}
+
+	DataTableKey = NewDataTableKey;
 
 	MeshComp->SetStaticMesh(NewMesh);
 	WeaponClass = NewWeaponClass;
@@ -70,6 +72,7 @@ void ARSInteractableWeapon::Interact(ARSDunPlayerCharacter* Interactor)
 	URSPlayerWeaponComponent* RSPlayerWeaponComponent = Interactor->GetRSPlayerWeaponComponent();
 	if (SpawnWeapon && RSPlayerWeaponComponent)
 	{
+		SpawnWeapon->SetDataTableKey(DataTableKey);
 		RSPlayerWeaponComponent->EquipWeaponToSlot(SpawnWeapon);
 
 		Destroy();

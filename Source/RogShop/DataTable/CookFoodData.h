@@ -56,5 +56,5 @@ public:
 	FString Description;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<ARSBaseFood> ActorType;
+	TObjectPtr<UStaticMesh> ActorType;
 };

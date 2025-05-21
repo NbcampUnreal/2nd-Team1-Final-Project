@@ -11,10 +11,9 @@
 #include "RogShop/GameModeBase/RSTycoonGameModeBase.h"
 #include "Tycoon/RSTycoonPlayerCharacter.h"
 
-
 ARSCookingTile::ARSCookingTile()
 {
-	TileName = TEXT("화구");
+	TileDisplayName = TEXT("화구");
 
 	FoodLocation = CreateDefaultSubobject<USceneComponent>(TEXT("FoodLocation"));
 	FoodLocation->SetupAttachment(RootComponent);

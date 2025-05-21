@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "MapGenerator.generated.h"
+#include "Engine/LevelStreamingDynamic.h"
+#include "Kismet/GameplayStatics.h"
+#include "RSMapGenerator.generated.h"
 
 UENUM()
 enum class EDir : uint8 //방향표시 열거형(Bitmask형태)
@@ -24,20 +26,20 @@ struct FTileData
 {
 	GENERATED_BODY()
 
-	FVector2D GridPos;                // 그리드 상의 좌표 (예: (0,0) ~ (2,2))
-	EDir Connections = EDir::None;  // 이 타일이 연결된 방향 정보 (예: 위+아래 → ㅣ)
+	FVector2D GridPos;                // 그리드 상의 좌표
+	EDir Connections = EDir::None;  // 이 타일이 연결된 방향 정보 (ex) 위+아래 → ㅣ)
 	bool bIsMainPath = false;         // 메인 경로(시작점~보스방)에 포함되는 타일인지 여부
 };
 
 
 UCLASS()
-class ROGSHOP_API AMapGenerator : public AActor
+class ROGSHOP_API ARSMapGenerator : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AMapGenerator();
+	ARSMapGenerator();
 
 protected:
 	// Called when the game starts or when spawned
@@ -47,11 +49,14 @@ protected:
 	void GenerateMainPath();   // 시작점부터 보스방까지 연결된 주 경로 생성
 	void ExpandPathToCoverMinTiles(float MinRatio);  // 타일이 전체의 일정 비율 이상 되도록 확장
 	void FindBossRoom();                             // 가장 먼 방을 보스방으로 설정
+	void StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector& Location, const FRotator& Rotation, const FString& UniqueName);
+	void ChooseShopTile();
 	
 	bool IsValidPos(FVector2D Pos) const;                // 좌표가 그리드 안에 있는지 확인
 	FVector2D GetNextDirection(FVector2D Current, TArray<FVector2D>& Visited); // 다음 경로 선택
 
 public:
+	FVector2D ShopTilePos = FVector2D::ZeroVector;
 	// 타일 간 간격
 	UPROPERTY(EditAnywhere, Category="Room Status")
 	float TileSize = 4000.0f;
@@ -62,28 +67,32 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Room Status")
 	int32 GridSize = 3;
 
+	// 상점NPC
+	UPROPERTY(EditAnywhere, Category = "NPC")
+	TSubclassOf<AActor> ShopNPC;
+
 	// ㅣ모양 타일
 	UPROPERTY(EditAnywhere, Category = "Room Spawning")
-	TSubclassOf<AActor> LineTile;
+	TSoftObjectPtr<UWorld> LineTileLevel;
 
 	// ㄴ 모양 타일
 	UPROPERTY(EditAnywhere, Category = "Room Spawning")
-	TSubclassOf<AActor> CornerTile;
+	TSoftObjectPtr<UWorld> CornerTileLevel;
 
 	// + 모양 타일
 	UPROPERTY(EditAnywhere, Category = "Room Spawning")
-	TSubclassOf<AActor> CrossTile;
+	TSoftObjectPtr<UWorld> CrossTileLevel;
 
 	// T 모양 타일
 	UPROPERTY(EditAnywhere, Category = "Room Spawning")
-	TSubclassOf<AActor> TTile;
+	TSoftObjectPtr<UWorld> TTileLevel;
 
 	// 막다른길 모양 타일
 	UPROPERTY(EditAnywhere, Category = "Room Spawning")
-	TSubclassOf<AActor> DeadEndTile;
+	TSoftObjectPtr<UWorld> DeadEndTileLevel;
 
 	UPROPERTY(EditAnywhere, Category = "Room Spawning")
-	TSubclassOf<AActor> BossRoomTile; // 보스방 전용 타일
+	TSoftObjectPtr<UWorld> BossRoomTileLevel; // 보스방 전용 타일
 
 private:
 	// 그리드 상에 생성된 타일 정보를 저장하는 Map

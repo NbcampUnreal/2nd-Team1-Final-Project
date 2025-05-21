@@ -12,9 +12,9 @@ class ARSBaseWeapon;
 UENUM(BlueprintType)
 enum class EWeaponSlot : uint8
 {
+	NONE,
 	FirstWeaponSlot,
 	SecondWeaponSlot,
-	NONE
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -52,7 +52,10 @@ private:
 	TArray<TObjectPtr<ARSBaseWeapon>> WeaponActors; // 무기 액터
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
-	EWeaponSlot WeaponSlot;
+	EWeaponSlot WeaponSlot;	// 1-based, 현재 장착중인 무기 슬롯을 의미한다.
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
+	int32 WeaponSlotSize;	// 최대 슬롯 수
 
 	// 애니메이션을 위한 상태
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
