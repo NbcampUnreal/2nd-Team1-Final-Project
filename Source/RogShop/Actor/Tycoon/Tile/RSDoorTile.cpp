@@ -10,7 +10,7 @@
 
 ARSDoorTile::ARSDoorTile()
 {
-	TileName = TEXT("문");
+	TileDisplayName = TEXT("문");
 
 	CustomerSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("CustomerSpawnPoint"));
 	CustomerSpawnPoint->SetupAttachment(RootComponent);

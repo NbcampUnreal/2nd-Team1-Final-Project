@@ -119,7 +119,7 @@ void ARSTycoonPlayerCharacter::OnInteract(const FInputActionValue& Value)
 	}
 
 	ARSBaseTile* Tile = Cast<ARSBaseTile>(MinActor);
-	RS_LOG_F("상호작용 하는 Tile 이름 : %s", *Tile->GetTileName())
+	RS_LOG_F("상호작용 하는 Tile 이름 : %s", *Tile->GetTileDisplayName())
 
 	Tile->Interact();
 }

@@ -8,7 +8,6 @@
 
 ARSBaseTile::ARSBaseTile()
 {
-	
 	PrimaryActorTick.bCanEverTick = false;
 
 	SceneComp = CreateDefaultSubobject<USceneComponent>("SceneComp");
