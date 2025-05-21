@@ -28,6 +28,7 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "Actor", "Dungeon"),
             Path.Combine(ModuleDirectory, "Interface"),
             Path.Combine(ModuleDirectory, "DataTable"),
+            Path.Combine(ModuleDirectory, "Object", "Relic"),
         });
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule", "NavigationSystem", "DeveloperSettings" });

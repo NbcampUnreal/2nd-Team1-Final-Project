@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h" // 데이터 테이블용
 #include "RSBaseWeapon.h"
+#include "RSBaseRelicEffect.h"
 #include "ShopItemData.generated.h"
 
 UENUM(BlueprintType)
@@ -19,10 +20,16 @@ enum class EItemList : uint8
 {
     None,
     Potion,
+    Relic,
+    Weapon,
+};
+
+UENUM(BlueprintType)
+enum class ERelicType : uint8
+{
+    None,
     MaxHpRelic,
     WalkSpeedRelic,
-    AttackRelic,
-    Weapon,
 };
 
 USTRUCT(BlueprintType)
@@ -56,5 +63,11 @@ public:
     EItemList ItemList = EItemList::None;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+    ERelicType RelicType = ERelicType::None;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
     TSubclassOf<ARSBaseWeapon> WeaponClass;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+    TSubclassOf<URSBaseRelicEffect> EffectClass;
 };
