@@ -18,8 +18,6 @@ void URSDunMainWidget::NativeConstruct()
 
 void URSDunMainWidget::UpdateWeaponImage(UTexture2D* NewWeaponImage)
 {
-    if (!NewWeaponImage) return;
-
     if (WeaponSlot1->Brush.GetResourceObject() == nullptr)
     {
         WeaponSlot1->SetBrushFromTexture(NewWeaponImage);
@@ -31,6 +29,18 @@ void URSDunMainWidget::UpdateWeaponImage(UTexture2D* NewWeaponImage)
     else
     {
         UE_LOG(LogTemp, Warning, TEXT("Both weapon slots are full!"));
+    }
+}
+
+void URSDunMainWidget::UpdateWeaponSlot(bool bIsFirst, UTexture2D* NewWeaponImage)
+{
+    if (bIsFirst)
+    {
+        WeaponSlot1->SetBrushFromTexture(NewWeaponImage);
+    }
+    else // 2번째 무기 슬롯
+    {
+        WeaponSlot2->SetBrushFromTexture(NewWeaponImage);
     }
 }
 
