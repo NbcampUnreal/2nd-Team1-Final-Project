@@ -16,6 +16,7 @@ URSCheatManager::URSCheatManager()
     MonsterMap.Add("bossspiderqueen", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBossSpiderQueenCharacter.BP_RSDunBossSpiderQueenCharacter_C")));
     MonsterMap.Add("boar", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBoarCharacter.BP_RSDunBoarCharacter_C")));
     MonsterMap.Add("skeleton", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunSkeletonCharacter.BP_RSDunSkeletonCharacter_C")));
+    MonsterMap.Add("bossflower", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBossFlowerCharacter.BP_RSDunBossFlowerCharacter_C")));
    
 }
 
