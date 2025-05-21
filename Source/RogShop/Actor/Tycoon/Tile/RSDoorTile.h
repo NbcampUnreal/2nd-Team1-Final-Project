@@ -18,7 +18,7 @@ class ROGSHOP_API ARSDoorTile : public ARSBaseTile
 public:
 	ARSDoorTile();
 	
-	TILE_KEY()
+	GENERATED_TILE()
 	
 	ARSTycoonCustomerCharacter* SpawnCustomer(const FName& FoodData, ARSTableTile* Target);
 

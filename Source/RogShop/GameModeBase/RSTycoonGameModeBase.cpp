@@ -118,13 +118,13 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 			Ingredients[Need.Key] -= Need.Value;
 		}
 	}
-
+	
 	//2. 남은 재료중에 만들 수 있는거 있는지 확인
 	TArray<FCookFoodData*> FoodDatas;
 	int OrderFoodIndex = INDEX_NONE;
 	FString MakeFoodName = "";
 	DataSubsystem->Food->GetAllRows<FCookFoodData>(TEXT("Get All Food Data"), FoodDatas);
-
+	
 	for (int i = 0; i < FoodDatas.Num(); i++)
 	{
 		FCookFoodData* Data = FoodDatas[i];

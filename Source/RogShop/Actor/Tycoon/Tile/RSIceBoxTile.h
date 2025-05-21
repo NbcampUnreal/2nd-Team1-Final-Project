@@ -14,7 +14,7 @@ class ROGSHOP_API ARSIceBoxTile : public ARSBaseTile
 public:
 	ARSIceBoxTile();
 	
-	TILE_KEY()
+	GENERATED_TILE()
 	
 	virtual void Interact() override;
 };

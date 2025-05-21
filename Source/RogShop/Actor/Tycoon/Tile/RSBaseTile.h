@@ -6,8 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "RSBaseTile.generated.h"
 
-#define TILE_KEY() \
-	static FName GetTileKey() { return StaticClass()->GetFName(); }
+#define GENERATED_TILE() \
+	static FName GetStaticTileKey() { return StaticClass()->GetFName(); } \
+	virtual FName GetTileKey() const override { return GetStaticTileKey(); }
 
 
 UCLASS()
@@ -17,8 +18,10 @@ class ROGSHOP_API ARSBaseTile : public AActor
 
 public:
 	ARSBaseTile();
-	
-	TILE_KEY()
+
+	//GENERATED_TILE을 쓰기 위한 함수들
+	static FName GetStaticTileKey() { return StaticClass()->GetFName(); }
+	virtual FName GetTileKey() const { return GetStaticTileKey(); }
 	
 	virtual void Tick(float DeltaTime) override;
 

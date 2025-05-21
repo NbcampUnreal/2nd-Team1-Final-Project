@@ -22,31 +22,41 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-private:
-	void CreateTiles();
-
+private:	
 	void LoadTiles();
-	void SaveTiles();
+	void SetDefaultSettings();
+	void CreateTiles();
+	UClass* GetTileClass(const FName& TileKey);
 	
-public:
-	UPROPERTY(EditAnywhere, Category="TileMap")
-	TSubclassOf<ARSBaseTile> DefaultTileType;
+	UFUNCTION(CallInEditor)
+	void SaveTiles();
 
-	UPROPERTY(EditAnywhere, Category="TileMap")
-	int32 Width;
-
-	UPROPERTY(EditAnywhere, Category="TileMap")
-	int32 Height;
+	UFUNCTION(CallInEditor)
+	void DeleteTileData();
 
 private:
 	static const FString TileMapSaveSlot;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="TileMap")
+	TSubclassOf<ARSBaseTile> DefaultTileType;
+
+	UPROPERTY(EditAnywhere, Category="TileMap")
+	int32 DefaultWidth = 3;
+
+	UPROPERTY(EditAnywhere, Category="TileMap")
+	int32 DefaultHeight = 3;
+
+	UPROPERTY(EditDefaultsOnly, Category="TileMap")
+	TArray<TSubclassOf<ARSBaseTile>> TileTypes;	
+	
+	UPROPERTY(EditAnywhere, Category="TileMap")
 	TObjectPtr<USceneComponent> TileParent;
 	
 	UPROPERTY()
 	TArray<TWeakObjectPtr<ARSBaseTile>> TileActors;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, Category="TileMap")
 	TArray<FTileRow> TileName2DMap;
+	
+	int32 Width, Height;
 };

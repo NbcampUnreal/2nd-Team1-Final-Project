@@ -14,7 +14,7 @@ class ROGSHOP_API ARSFoodLaboratoryTile : public ARSBaseTile
 public:
 	ARSFoodLaboratoryTile();
 
-	TILE_KEY()
+	GENERATED_TILE()
 	
 	virtual void Interact() override;
 	

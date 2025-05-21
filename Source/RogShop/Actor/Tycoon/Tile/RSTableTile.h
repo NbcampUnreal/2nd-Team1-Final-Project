@@ -16,7 +16,7 @@ class ROGSHOP_API ARSTableTile : public ARSBaseTile
 public:
 	ARSTableTile();
 
-	TILE_KEY()
+	GENERATED_TILE()
 	
 	virtual void Interact() override;
 	void Sit(ARSTycoonCustomerCharacter* Customer);

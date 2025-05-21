@@ -25,7 +25,7 @@ class ROGSHOP_API ARSCookingTile : public ARSBaseTile
 public:
 	ARSCookingTile();
 
-	TILE_KEY()
+	GENERATED_TILE()
 	
 	virtual void Interact() override;
 	
