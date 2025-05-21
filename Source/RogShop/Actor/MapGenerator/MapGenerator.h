@@ -50,11 +50,13 @@ protected:
 	void ExpandPathToCoverMinTiles(float MinRatio);  // 타일이 전체의 일정 비율 이상 되도록 확장
 	void FindBossRoom();                             // 가장 먼 방을 보스방으로 설정
 	void StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector& Location, const FRotator& Rotation, const FString& UniqueName);
+	void ChooseShopTile();
 	
 	bool IsValidPos(FVector2D Pos) const;                // 좌표가 그리드 안에 있는지 확인
 	FVector2D GetNextDirection(FVector2D Current, TArray<FVector2D>& Visited); // 다음 경로 선택
 
 public:
+	FVector2D ShopTilePos = FVector2D::ZeroVector;
 	// 타일 간 간격
 	UPROPERTY(EditAnywhere, Category="Room Status")
 	float TileSize = 4000.0f;
@@ -64,6 +66,10 @@ public:
 	// 그리드 크기
 	UPROPERTY(EditAnywhere, Category = "Room Status")
 	int32 GridSize = 3;
+
+	// 상점NPC
+	UPROPERTY(EditAnywhere, Category = "NPC")
+	TSubclassOf<AActor> ShopNPC;
 
 	// ㅣ모양 타일
 	UPROPERTY(EditAnywhere, Category = "Room Spawning")

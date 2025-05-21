@@ -23,6 +23,7 @@ void AMapGenerator::BeginPlay()
     RandomStream.Initialize(Seed);
 
     GenerateMainPath(); 
+    ChooseShopTile();
     ExpandPathToCoverMinTiles(0.5f);
     SpawnTiles();
 }
@@ -312,6 +313,13 @@ void AMapGenerator::SpawnTiles()
             if (SelectedLevel.IsValid())
             {
                 StreamTile(SelectedLevel, WorldLoc, Rot, TileName);
+
+                //상점NPC생성
+                if (ShopNPC && Pos == ShopTilePos)
+                {
+                    FTransform NPCLocation(Rot, WorldLoc + FVector(0, 0, 30));
+                    GetWorld()->SpawnActor<AActor>(ShopNPC, NPCLocation);
+                }
             }
         }
     }
@@ -344,5 +352,27 @@ void AMapGenerator::StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVect
     else
     {
         UE_LOG(LogTemp, Log, TEXT("레벨 로드 성공: %s"), *LevelToStream.ToString());
+    }
+}
+
+void AMapGenerator::ChooseShopTile() 
+{
+
+    TArray<FVector2D> Candidates;
+
+    //보스방을 제외한 타일에서 후보 선출
+    for (const auto& Pair : TileMap)
+    {
+        const FVector2D& Pos = Pair.Key;
+        if (Pos != BossRoomPos)
+        {
+            Candidates.Add(Pos);
+        }
+    }
+
+    // 후보에서 하나 선택
+    if (Candidates.Num() > 0)
+    {
+        ShopTilePos = Candidates[RandomStream.RandRange(0, Candidates.Num() - 1)];
     }
 }
