@@ -63,6 +63,18 @@ void UDunShopWidget::PopulateShopItems()
     {
         FShopItemData* RandomItem = GetRandomItemFromDataTable(ItemDataTable);
 
+        FName FoundRowName = NAME_None;
+
+        // 무기를 위해서 해당 구조체를 이용하여 데이터 테이블에서 그 구조체에 해당하는 행 이름을 가져옴
+        for (const TPair<FName, uint8*>& Row : ItemDataTable->GetRowMap())
+        {
+            if (Row.Value == (uint8*)RandomItem)
+            {
+                FoundRowName = Row.Key;
+                break;
+            }
+        }
+
         if (RandomItem)
         {
             // 중복 랜덤 생성 방지
@@ -98,6 +110,7 @@ void UDunShopWidget::PopulateShopItems()
                 {
                     NewItemWidget->SetItemData(*RandomItem);
                     NewItemWidget->SetParentShop(this);
+                    NewItemWidget->SetItemRowName(FoundRowName);
 
                     // 위젯을 수평 박스에 추가
                     ItemHorizontalBox->AddChild(NewItemWidget);
