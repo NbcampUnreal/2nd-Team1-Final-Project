@@ -8,6 +8,8 @@
 
 class USphereComponent;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnInteractTarget, AActor*)
+
 UCLASS()
 class ROGSHOP_API ARSTycoonNPC : public ACharacter
 {
@@ -19,6 +21,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void MoveToTarget(FVector Location, AActor* Target);
 
+	bool IsMoving() const { return MoveTarget != nullptr; }
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void InteractTarget(AActor* TargetActor) {}
@@ -27,10 +31,13 @@ private:
 	UFUNCTION()
 	void OnInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
+public:
+	FOnInteractTarget OnInteractTarget;
+	
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USphereComponent> InteractSphere;
 
 	UPROPERTY()
-	TWeakObjectPtr<AActor> MoveTarget;
+	TObjectPtr<AActor> MoveTarget;
 };

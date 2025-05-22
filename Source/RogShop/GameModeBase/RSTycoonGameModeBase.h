@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TycoonDatas.h"
 #include "GameFramework/GameModeBase.h"
 #include "RSTycoonGameModeBase.generated.h"
 
 class ARSTycoonCustomerCharacter;
-struct FCookFoodData;
 class URSTycoonInventoryComponent;
 
 UCLASS()
@@ -19,11 +19,12 @@ public:
 	ARSTycoonGameModeBase();
 
 	void StartGame();
-	void AddOrder(const FName& OrderFoodName);
-	void RemoveOrder(const FName& OrderFoodName);
+	void AddOrder(FFoodOrder Order);
+	void RemoveOrder(FFoodOrder Order);
 	void RemoveCustomer(ARSTycoonCustomerCharacter* Customer);
 
-	const TArray<FName>& GetOrders() const { return OrderedFoodKeys; }
+	const TArray<FFoodOrder>& GetOrders() const { return FoodOrders; }
+	const TArray<TWeakObjectPtr<ARSTycoonCustomerCharacter>>& GetCustomers() const { return Customers; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -39,17 +40,18 @@ public:
 	TObjectPtr<URSTycoonInventoryComponent> Inventory; //인벤토리
 
 private:
-	UPROPERTY(VisibleAnywhere)
 	//오더 들어온 음식의 Key들
-	TArray<FName> OrderedFoodKeys; 
+	UPROPERTY(VisibleAnywhere)
+	TArray<FFoodOrder> FoodOrders; 
 
-	UPROPERTY()
 	//가게 안에 있는 손님들
+	UPROPERTY()
 	TArray<TWeakObjectPtr<ARSTycoonCustomerCharacter>> Customers; 
 
-	UPROPERTY(VisibleAnywhere)
 	//최대 입장 가능한 손님, TableTile의 영향을 받음
+	UPROPERTY(VisibleAnywhere)
 	int32 MaxCustomerCount; 
 
 	FTimerHandle CustomerTimerHandle; //손님 등장 타이머
+	int32 Money;
 };

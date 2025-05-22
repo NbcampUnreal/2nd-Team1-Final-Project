@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "RSBaseTile.h"
+#include "TycoonDatas.h"
 #include "RSCookingTile.generated.h"
 
 class ARSBaseFood;
@@ -27,16 +28,16 @@ public:
 
 	GENERATED_TILE()
 
-	virtual void Interact() override;
+	virtual void Interact(ACharacter* InteractCharacter) override;
 
 	FTransform GetChefTransform() const { return ChefLocation->GetComponentTransform(); }
 	ECookingState GetState() const { return State; }
 
 private:
 	void OrderToCook();
-	void Cook(const FName& FoodKey);
+	void Cook(FFoodOrder Order);
 	void FinishCook();
-	void TakeFood();
+	void TakeFood(ACharacter* InteractCharacter);
 
 private:
 	UPROPERTY(EditDefaultsOnly)
@@ -46,8 +47,8 @@ private:
 	TObjectPtr<USceneComponent> ChefLocation; //요리사가 서있는 위치
 
 	UPROPERTY()
-	TWeakObjectPtr<ARSBaseFood> CookedFood; //완성되어 배치되있는 음식 
+	TObjectPtr<ARSBaseFood> CookedFood; //완성되어 배치되있는 음식 
 
 	ECookingState State;
-	FName CookingFoodKey; //요리하고 있는 음식 키
+	FFoodOrder CookingFoodOrder;
 };

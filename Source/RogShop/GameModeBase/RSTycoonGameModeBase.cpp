@@ -36,14 +36,14 @@ void ARSTycoonGameModeBase::StartGame()
 	GetWorldTimerManager().SetTimer(CustomerTimerHandle, this, &ARSTycoonGameModeBase::CreateCustomer, 5.f, true);
 }
 
-void ARSTycoonGameModeBase::AddOrder(const FName& OrderFoodName)
+void ARSTycoonGameModeBase::AddOrder(FFoodOrder Order)
 {
-	OrderedFoodKeys.Add(OrderFoodName);
+	FoodOrders.Add(Order);
 }
 
-void ARSTycoonGameModeBase::RemoveOrder(const FName& OrderFoodName)
+void ARSTycoonGameModeBase::RemoveOrder(FFoodOrder Order)
 {
-	OrderedFoodKeys.RemoveSingle(OrderFoodName);
+	FoodOrders.RemoveSingle(Order);
 }
 
 void ARSTycoonGameModeBase::BeginPlay()

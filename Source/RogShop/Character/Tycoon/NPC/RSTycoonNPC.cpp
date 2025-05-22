@@ -64,7 +64,6 @@ void ARSTycoonNPC::BeginPlay()
 	InteractSphere->OnComponentBeginOverlap.AddDynamic(this, &ARSTycoonNPC::OnInteract);
 }
 
-
 void ARSTycoonNPC::OnInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                               UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                               const FHitResult& SweepResult)
@@ -81,5 +80,6 @@ void ARSTycoonNPC::OnInteract(UPrimitiveComponent* OverlappedComponent, AActor* 
 	Cast<AAIController>(GetController())->StopMovement();
 
 	InteractTarget(OtherActor);
+	OnInteractTarget.Broadcast(OtherActor);
 }
 

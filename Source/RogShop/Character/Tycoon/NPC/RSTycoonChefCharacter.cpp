@@ -88,12 +88,12 @@ void ARSTycoonChefCharacter::BeginPlay()
 void ARSTycoonChefCharacter::InteractTarget(AActor* TargetActor)
 {
 	Super::InteractTarget(TargetActor);
-
+	
 	if (ARSCookingTile* CookingTile = Cast<ARSCookingTile>(TargetActor))
 	{
 		RS_LOG("요리사가 화구에 배치 되었습니다.")
 		PlacedCookingTile = CookingTile;
-		
+
 		FTransform ChefTransform = PlacedCookingTile->GetChefTransform();
 		SetActorLocation(ChefTransform.GetLocation());
 		SetActorRotation(ChefTransform.GetRotation());
@@ -106,14 +106,14 @@ void ARSTycoonChefCharacter::TryCook()
 	{
 		return;
 	}
-	
+
 	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
 	check(GameMode)
 
 	if (GameMode->GetOrders().Num() > 0)
 	{
 		bCooking = true;
-		PlacedCookingTile->Interact();
+		PlacedCookingTile->Interact(this);
 	}
 }
 

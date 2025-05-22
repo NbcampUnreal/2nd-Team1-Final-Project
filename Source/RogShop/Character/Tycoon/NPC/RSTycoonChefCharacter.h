@@ -24,6 +24,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	
 	virtual void InteractTarget(AActor* TargetActor) override;
 
 private:
