@@ -123,7 +123,7 @@ bool UDunItemWidget::BuyItem()
             }
 
             PlayerChar->IncreaseHP(FinalValue);
-            PC->RSDunMainWidget->UpdateHP();
+            PC->GetRSDunMainWidget()->UpdateHP();
 
             break;
         }
@@ -166,7 +166,7 @@ bool UDunItemWidget::BuyItem()
                 SpawnedWeapon->SetDataTableKey(CurrentRowName);
                 WeaponComp->EquipWeaponToSlot(SpawnedWeapon);
 
-                PC->RSDunMainWidget->UpdateWeaponImage(ItemData.Icon);
+                PC->GetRSDunMainWidget()->UpdateWeaponImage(ItemData.Icon);
             }
             else
             {

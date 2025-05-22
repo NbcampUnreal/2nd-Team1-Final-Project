@@ -7,9 +7,10 @@
 #include "RSDunPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/BoxComponent.h"
-#include "RogShop/GameInstanceSubsystem/RSDataSubsystem.h"
+#include "RSDataSubsystem.h"
 #include "DungeonItemData.h"
 #include "RSInteractableWeapon.h"
+#include "RSDunPlayerController.h"
 
 // Sets default values for this component's properties
 URSPlayerWeaponComponent::URSPlayerWeaponComponent()
@@ -212,11 +213,21 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 		// 기존에 장착하던 무기 제거
 		WeaponActors[Index]->Destroy();
 		WeaponActors[Index] = NewWeaponActor;
-		WeaponSlot = EWeaponSlot::NONE;
 
 		// 새로운 무기를 장착
-		EquipWeaponToCharacter(WeaponSlot);
+		EWeaponSlot TempWeaponSlot = WeaponSlot;
+		WeaponSlot = EWeaponSlot::NONE;
+		EquipWeaponToCharacter(TempWeaponSlot);
 	}
+
+	FName NewWeaponKey = NewWeaponActor->GetDataTableKey();
+
+	ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
+
+	if (PC)
+	{
+		PC->OnWeaponSlotChange.Broadcast(static_cast<uint8>(WeaponSlot) - 1, NewWeaponKey);
+	}	
 }
 
 void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSlot)
