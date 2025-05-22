@@ -9,6 +9,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class URSPlayerWeaponComponent;
+class URSDungeonInventoryComponent;
 class UAIPerceptionStimuliSourceComponent;
 
 struct FInputActionValue;
@@ -77,6 +78,14 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
 	TObjectPtr<URSPlayerWeaponComponent> WeaponComp;
+
+// 인벤토리 관련
+public:
+	URSDungeonInventoryComponent* GetRSDungeonInventoryComponent();
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = true))
+	TObjectPtr<URSDungeonInventoryComponent> InventoryComp;
 
 // 상호작용 관련
 private:
