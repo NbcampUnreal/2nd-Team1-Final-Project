@@ -21,6 +21,13 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	//Patrol
 	maxDetectPatrolRoute = 2000.f;
 
+	// 몬스터 공격 트레이스 관련 변수 초기화
+	TraceBoxHalfSize = FVector(60.f, 60.f, 80.f);
+	TraceLength = 0.f;
+	TraceForwardOffset = 0.f;
+	TraceRightOffset = 0.f;
+	TraceUpOffset = 0.f;
+
 }
 
 void ARSDunMonsterCharacter::BeginPlay()
