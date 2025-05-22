@@ -26,8 +26,7 @@ void URSBaseInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 {
 	if (GetFilledSize() >= GetSlotMaxSize() && !ItemMap.Contains(ItemKey))
 	{
-		RS_LOG_C("인벤토리가 가득 찼습니다", FColor::Red)
-		
+		RS_LOG_C("Inventory is full", FColor::Red)
 		return;
 	}
 
@@ -37,7 +36,7 @@ void URSBaseInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 	}
 	else
 	{
-		RS_LOG_C("아이템 추가를 실패했습니다", FColor::Red);
+		RS_LOG_C("Failed to add item", FColor::Red);
 	}
 }
 
@@ -61,7 +60,7 @@ void URSBaseInventoryComponent::RemoveItem(FName ItemKey, int32 Amount)
 	}
 	else
 	{
-		RS_LOG_C("아이템 삭제를 실패했습니다", FColor::Red);
+		RS_LOG_C("Failed to remove item", FColor::Red);
 	}
 }
 
