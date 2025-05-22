@@ -19,7 +19,7 @@ void ARSDunBossSpiderQueenCharacter::PlayBaseAttackAnim()
 		if (AnimInstance->Montage_IsPlaying(BaseAttackMontage) == false)
 		{
 			AnimInstance->Montage_Play(BaseAttackMontage);
-			RS_LOG("거미 여왕 공격합니다.");
+			RS_LOG("보스 거미 여왕이 공격합니다.");
 		}
 	}
 }
