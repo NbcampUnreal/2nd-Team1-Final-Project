@@ -21,4 +21,5 @@ public:
 	void PlayHitReactAnim() override;
 	void PlayDeathAnim() override;
 
+	void PerformAttackTrace() override;
 };
