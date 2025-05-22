@@ -43,18 +43,20 @@ void URSBaseInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 
 void URSBaseInventoryComponent::RemoveItem(FName ItemKey, int32 Amount)
 {
+	// 키가 유효한지 확인
 	if (CheckValidItem(ItemKey))
 	{
-		if (!ItemMap.Contains(ItemKey))
+		// 인벤토리에 들어있는 경우
+		if (ItemMap.Contains(ItemKey))
 		{
-			ItemMap.Add(ItemKey, 0);
-		}
+			// 아이템 개수만큼 제거
+			ItemMap[ItemKey] -= Amount;
 
-		ItemMap[ItemKey] -= Amount;
-
-		if (ItemMap[ItemKey] < 0)
-		{
-			ItemMap.Remove(ItemKey);
+			// 개수가 0 이하인 경우 맵에서 데이터 제거
+			if (ItemMap[ItemKey] <= 0)
+			{
+				ItemMap.Remove(ItemKey);
+			}
 		}
 	}
 	else
@@ -81,11 +83,6 @@ void URSBaseInventoryComponent::LoadItemData()
 bool URSBaseInventoryComponent::CheckValidItem(const FName& ItemKey)
 {
 	URSDataSubsystem* Data = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>();
-
-	if (FCookFoodData* Row = Data->Food->FindRow<FCookFoodData>(ItemKey, TEXT("Contains FoodData")))
-	{
-		return true;
-	}
 
 	if (FIngredientData* Row = Data->Ingredient->FindRow<FIngredientData>(ItemKey, TEXT("Contains IngredientData")))
 	{
