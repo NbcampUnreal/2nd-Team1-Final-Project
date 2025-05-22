@@ -53,6 +53,11 @@ void UDunItemWidget::SetParentShop(UDunShopWidget* InShop)
     ParentShop = InShop;
 }
 
+void UDunItemWidget::SetItemRowName(FName RowName)
+{
+    CurrentRowName = RowName;
+}
+
 void UDunItemWidget::OnBuyClicked()
 {
     if (BuyItem())
@@ -154,27 +159,20 @@ bool UDunItemWidget::BuyItem()
             ARSBaseWeapon* SpawnedWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(
                 ItemData.WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 
-            if (SpawnedWeapon)
-            {
-                URSPlayerWeaponComponent* WeaponComp = PlayerChar->GetRSPlayerWeaponComponent();
+            URSPlayerWeaponComponent* WeaponComp = PlayerChar->GetRSPlayerWeaponComponent();
 
-                if (WeaponComp)
-                {
-                    WeaponComp->EquipWeaponToSlot(SpawnedWeapon);
-                }
-                else
-                {
-                    UE_LOG(LogTemp, Warning, TEXT("WeaponComp is Null"));
-                    bIsBuy = false;
-                }
+            if (SpawnedWeapon && WeaponComp)
+            {
+                SpawnedWeapon->SetDataTableKey(CurrentRowName);
+                WeaponComp->EquipWeaponToSlot(SpawnedWeapon);
+
+                PC->RSDunMainWidget->UpdateWeaponImage(ItemData.Icon);
             }
             else
             {
-                UE_LOG(LogTemp, Warning, TEXT("SpawnedWeapon is Null"));
+                UE_LOG(LogTemp, Warning, TEXT("SpawnedWeapon or WeaponComp is Null"));
                 bIsBuy = false;
             }
-
-            PC->RSDunMainWidget->UpdateWeaponImage(ItemData.Icon);
 
             break;
         }
