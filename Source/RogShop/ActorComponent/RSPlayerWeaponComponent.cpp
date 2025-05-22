@@ -266,7 +266,7 @@ void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSl
 			WeaponActors[CurrentIndex]->GetBoxComp()->OnComponentBeginOverlap.RemoveDynamic(this, &URSPlayerWeaponComponent::OnBeginOverlap);
 
 			// 무기의 애님 레이어를 해제한다.
-			TSubclassOf<UAnimInstance> TargetAnimInstance = CurEquipWeapon->GetWeaponAnimInstnace();
+			TSubclassOf<UAnimInstance> CurAnimInstance = CurEquipWeapon->GetWeaponAnimInstnace();
 
 			ACharacter* CurCharacter = GetOwner<ACharacter>();
 			if (CurCharacter)
@@ -274,7 +274,7 @@ void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSl
 				USkeletalMeshComponent* SkeletalMeshComp = CurCharacter->GetMesh();
 				if (SkeletalMeshComp)
 				{
-					SkeletalMeshComp->LinkAnimClassLayers(TargetAnimInstance);
+					SkeletalMeshComp->UnlinkAnimClassLayers(CurAnimInstance);
 				}
 			}
 		}
