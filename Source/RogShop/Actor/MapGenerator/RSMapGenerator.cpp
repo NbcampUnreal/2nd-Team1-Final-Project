@@ -25,6 +25,7 @@ void ARSMapGenerator::BeginPlay()
     GenerateMainPath(); 
     ChooseShopTile();
     ExpandPathToCoverMinTiles(0.5f);
+    FindBossRoom(); // 경로 중 가장 먼 타일을 보스방으로 설정
     SpawnTiles();
 }
 // 유효한 위치인지 확인 (그리드 안에 있는지)
@@ -88,8 +89,6 @@ void ARSMapGenerator::GenerateMainPath()
         Current = Next;
         Path.Add(Current);
     }
-
-    FindBossRoom(); // 경로 중 가장 먼 타일을 보스방으로 설정
 }
 
 //보스방 위치 찾기 (BFS로 가장 먼 타일 탐색)
@@ -145,78 +144,100 @@ void ARSMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
 {
     const int32 MinTiles = FMath::CeilToInt(GridSize * GridSize * MinRatio);
     TArray<FVector2D> AllUsed;
-    TileMap.GenerateKeyArray(AllUsed); // 현재까지 생성된 타일들의 위치 목록을 배열로 가져옴
+    TileMap.GenerateKeyArray(AllUsed);
 
-    // 전체 타일 개수가 최소 개수 이상이 될 때까지 반복
-    while (TileMap.Num() < MinTiles)
+    int32 DeadEndCount = 0;
+    const int32 MaxDeadEnds = 5;
+    int32 Attempts = 0;
+    const int32 MaxAttempts = 5000;
+
+    while (TileMap.Num() < MinTiles && Attempts++ < MaxAttempts)
     {
-        FVector2D Base = AllUsed[RandomStream.RandRange(0, AllUsed.Num() - 1)]; // 현재 사용된 타일 중 하나를 랜덤으로 선택
-
-        TArray<FVector2D> Candidates;
-
-        // 네 방향을 랜덤 섞기
-        TArray<FVector2D> Directions = 
+        // 말단 타일 중 하나 선택
+        TArray<FVector2D> TipCandidates;
+        for (const FVector2D& Pos : AllUsed)
         {
-            FVector2D(0, 1), FVector2D(0, -1),
-            FVector2D(-1, 0), FVector2D(1, 0)
-        };
-
-        Directions.Sort([&](const FVector2D& A, const FVector2D& B) 
-        {
-            return RandomStream.FRand() < 0.5f;
-        }); //Directions 배열 무작위 정렬
-
-        // Directions 중 아직 생성되지 않은 위치만 후보로 추가
-        for (const FVector2D& Dir : Directions)
-        {
-            FVector2D Next = Base + Dir;
-
-            if (IsValidPos(Next) && !TileMap.Contains(Next))
+            if (GetConnectedNeighborCount(Pos) == 1)
             {
-                Candidates.Add(Next);
+                TipCandidates.Add(Pos);
             }
         }
 
-        // 후보가 없으면 패스하고 다시 반복
-        if (Candidates.Num() == 0) continue;
+        if (TipCandidates.Num() == 0) break;
 
-        // 후보 중 하나 선택
-        FVector2D Next = Candidates[0];
+        FVector2D Base = TipCandidates[RandomStream.RandRange(0, TipCandidates.Num() - 1)];
 
-        // 막다른 길로 만들지 여부(50%확률)
-        const bool bDeadEnd = RandomStream.FRand() < 0.5f;
+        TArray<FVector2D> Directions = {
+            FVector2D(0, 1), FVector2D(0, -1),
+            FVector2D(1, 0), FVector2D(-1, 0)
+        };
 
-        // 방향 계산 (Base → Next 방향)
-        EDir From, To;
-        if (Next.X > Base.X)
+        Directions.Sort([&](const FVector2D&, const FVector2D&) {
+            return RandomStream.FRand() < 0.5f;
+        });
+
+        for (const FVector2D& Dir : Directions)
         {
-            From = EDir::Right; To = EDir::Left; 
-        }
-        else if (Next.X < Base.X) 
-        { 
-            From = EDir::Left; To = EDir::Right; 
-        }
-        else if (Next.Y > Base.Y)
-        { 
-            From = EDir::Up; To = EDir::Down;
-        }
-        else
-        { 
-            From = EDir::Down; To = EDir::Up; 
-        }
-        // 기존 타일(Base)에 연결 정보 추가
-        TileMap.FindOrAdd(Base).Connections |= From;
+            FVector2D Next = Base + Dir;
+            if (!IsValidPos(Next) || TileMap.Contains(Next)) continue;
 
-        // Next에 연결 정보 추가 (막다른길일 경우 제외)
-        if (!bDeadEnd)
-        {
+            EDir From, To;
+            if (Dir == FVector2D(1, 0)) { From = EDir::Right; To = EDir::Left; }
+            else if (Dir == FVector2D(-1, 0)) { From = EDir::Left; To = EDir::Right; }
+            else if (Dir == FVector2D(0, 1)) { From = EDir::Up; To = EDir::Down; }
+            else { From = EDir::Down; To = EDir::Up; }
+
+            TileMap.FindOrAdd(Base).Connections |= From;
             TileMap.FindOrAdd(Next).Connections |= To;
+
+            for (const FVector2D& Dir2 : { FVector2D(0,1), FVector2D(0,-1), FVector2D(1,0), FVector2D(-1,0) })
+            {
+                FVector2D Neighbor = Next + Dir2;
+
+                if (!IsValidPos(Neighbor) || !TileMap.Contains(Neighbor))
+                    continue;
+
+                // 방향 계산
+                EDir From2, To2;
+                if (Dir2 == FVector2D(1, 0)) { From2 = EDir::Right; To2 = EDir::Left; }
+                else if (Dir2 == FVector2D(-1, 0)) { From2 = EDir::Left; To2 = EDir::Right; }
+                else if (Dir2 == FVector2D(0, 1)) { From2 = EDir::Up; To2 = EDir::Down; }
+                else { From2 = EDir::Down; To2 = EDir::Up; }
+
+                TileMap[Next].Connections |= From2;
+                TileMap[Neighbor].Connections |= To2;
+            }
+
+            // 주변에 더 확장할 곳 없으면 막다른 길로 지정
+            if (GetAvailableNeighborCount(Next) == 0 && DeadEndCount < MaxDeadEnds)
+            {
+                TileMap[Next].Connections &= ~To;
+                ++DeadEndCount;
+            }
+
+            AllUsed.Add(Next);
+            break;
         }
-
-        // 새 타일을 사용된 위치로 추가
-        AllUsed.Add(Next);
-
     }
+}
+int32 ARSMapGenerator::GetConnectedNeighborCount(FVector2D Pos)
+{
+    int32 Count = 0;
+    for (FVector2D Offset : { FVector2D(0, 1), FVector2D(0, -1), FVector2D(1, 0), FVector2D(-1, 0) })
+    {
+        if (TileMap.Contains(Pos + Offset)) Count++;
+    }
+    return Count;
+}
+int32 ARSMapGenerator::GetAvailableNeighborCount(FVector2D Pos)
+{
+    int32 Count = 0;
+    for (FVector2D Offset : { FVector2D(0, 1), FVector2D(0, -1), FVector2D(1, 0), FVector2D(-1, 0) })
+    {
+        FVector2D Check = Pos + Offset;
+        if (IsValidPos(Check) && !TileMap.Contains(Check)) Count++;
+    }
+    return Count;
 }
 
 //타일 스폰 (연결 방향에 따라 회전 설정)
@@ -236,13 +257,17 @@ void ARSMapGenerator::SpawnTiles()
             int ConnBits = (int)Data.Connections;
             int DirCount = FMath::CountBits(ConnBits); // 연결된 방향 수
 
-            FString TileName = FString::Printf(TEXT("Tile_%d_%d"), X, Y); //유니크한 일므
+            FString TileName = FString::Printf(TEXT("Tile_%d_%d"), X, Y); //유니크한 이름
             TSoftObjectPtr<UWorld> SelectedLevel = nullptr;
 
             // 보스방일 경우 보스 타일 사용
             if (BossRoomTileLevel.IsValid() && Pos == BossRoomPos)
             {
                 SelectedLevel = BossRoomTileLevel;
+                if (!SelectedLevel.IsValid())
+                {
+                    SelectedLevel.LoadSynchronous(); //강제 로드
+                }
             }
             else {
                 // 방향 수에 따라 타일 분기
@@ -250,37 +275,53 @@ void ARSMapGenerator::SpawnTiles()
                 {
                 case 1: // 막다른길
                     SelectedLevel = DeadEndTileLevel;
+                    if (!SelectedLevel.IsValid())
+                    {
+                        SelectedLevel.LoadSynchronous(); //강제 로드
+                    }
                     if (ConnBits & (int)EDir::Up)
-                        Rot = FRotator(0, 0, 0);     // 입구 위
+                        Rot = FRotator(0, 270, 0);     // 입구 아래
                     else if (ConnBits & (int)EDir::Down)
-                        Rot = FRotator(0, 180, 0);   // 입구 아래
+                        Rot = FRotator(0, 90, 0);   // 입구 오른
                     else if (ConnBits & (int)EDir::Left)
-                        Rot = FRotator(0, 270, 0);   // 입구 왼
+                        Rot = FRotator(0, 0, 0);   // 입구 왼
                     else if (ConnBits & (int)EDir::Right)
-                        Rot = FRotator(0, 90, 0);    // 입구 오
+                        Rot = FRotator(0, 180, 0);    // 입구 위
                     break;
 
                 case 2: // 직선 또는 ㄴ자형
                     if (ConnBits == ((int)(EDir::Up | EDir::Down)))
                     {
                         SelectedLevel = LineTileLevel;
-                        Rot = FRotator(0, 0, 0); // ㅣ
+                        if (!SelectedLevel.IsValid())
+                        {
+                            SelectedLevel.LoadSynchronous(); //강제 로드
+                        }
+                        Rot = FRotator(0, 90, 0); // ㅣ
                     }
                     else if (ConnBits == ((int)(EDir::Left | EDir::Right)))
                     {
                         SelectedLevel = LineTileLevel;
-                        Rot = FRotator(0, 90, 0); // ─
+                        if (!SelectedLevel.IsValid())
+                        {
+                            SelectedLevel.LoadSynchronous(); //강제 로드
+                        }
+                        Rot = FRotator(0, 0, 0); // ─
                     }
                     else
                     {
                         SelectedLevel = CornerTileLevel;
+                        if (!SelectedLevel.IsValid())
+                        {
+                            SelectedLevel.LoadSynchronous(); //강제 로드
+                        }
 
                         if (ConnBits == ((int)(EDir::Down | EDir::Right)))
-                            Rot = FRotator(0, 0, 0);
+                            Rot = FRotator(0, 180, 0);
                         else if (ConnBits == ((int)(EDir::Down | EDir::Left)))
                             Rot = FRotator(0, 90, 0);
                         else if (ConnBits == ((int)(EDir::Up | EDir::Left)))
-                            Rot = FRotator(0, 180, 0);
+                            Rot = FRotator(0, 0, 0);
                         else if (ConnBits == ((int)(EDir::Up | EDir::Right)))
                             Rot = FRotator(0, 270, 0);
                     }
@@ -288,19 +329,27 @@ void ARSMapGenerator::SpawnTiles()
 
                 case 3: // T형 타일
                     SelectedLevel = TTileLevel;
+                    if (!SelectedLevel.IsValid())
+                    {
+                        SelectedLevel.LoadSynchronous(); //강제 로드
+                    }
 
                     if ((ConnBits & (int)EDir::Up) == 0)
-                        Rot = FRotator(0, 180, 0); // ┴
+                        Rot = FRotator(0, 90, 0); // ┴
                     else if ((ConnBits & (int)EDir::Down) == 0)
-                        Rot = FRotator(0, 0, 0);   // ┬
+                        Rot = FRotator(0, 270, 0);   // ┬
                     else if ((ConnBits & (int)EDir::Left) == 0)
-                        Rot = FRotator(0, 270, 0); // ┤
+                        Rot = FRotator(0, 180, 0); // ┤
                     else if ((ConnBits & (int)EDir::Right) == 0)
-                        Rot = FRotator(0, 90, 0);  // ├
+                        Rot = FRotator(0, 0, 0);  // ├
                     break;
 
                 case 4: // 십자 타일
                     SelectedLevel = CrossTileLevel;
+                    if (!SelectedLevel.IsValid())
+                    {
+                        SelectedLevel.LoadSynchronous(); //강제 로드
+                    }
                     Rot = FRotator(0, 0, 0);
                     break;
 
@@ -310,10 +359,11 @@ void ARSMapGenerator::SpawnTiles()
             }
 
             // 스폰 실행
+            UE_LOG(LogTemp, Log, TEXT("Create map"));
             if (SelectedLevel.IsValid())
             {
+                UE_LOG(LogTemp, Log, TEXT("MapCreate"));
                 StreamTile(SelectedLevel, WorldLoc, Rot, TileName);
-
                 //상점NPC생성
                 if (ShopNPC && Pos == ShopTilePos)
                 {
@@ -334,6 +384,7 @@ void ARSMapGenerator::StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVe
     FTransform LevelTransform;
     LevelTransform.SetLocation(Location);
     LevelTransform.SetRotation(Rotation.Quaternion());
+
 
     bool bLoadSuccess = false;
 

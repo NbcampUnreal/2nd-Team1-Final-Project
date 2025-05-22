@@ -21,6 +21,8 @@ public:
 
     void SetParentShop(UDunShopWidget* InShop);
 
+    void SetItemRowName(FName RowName);
+
     bool BuyItem();
 
 protected:
@@ -44,6 +46,9 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
     FShopItemData ItemData;
+
+    UPROPERTY()
+    FName CurrentRowName;
 
     UFUNCTION()
     void OnBuyClicked();
