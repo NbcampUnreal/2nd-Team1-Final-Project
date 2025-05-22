@@ -5,7 +5,7 @@
 
 #include "RogShop/UtilDefine.h"
 #include "RogShop/GameModeBase/RSTycoonGameModeBase.h"
-#include "Tycoon/RSTycoonCustomerCharacter.h"
+#include "Tycoon/NPC/RSTycoonCustomerCharacter.h"
 #include "Tycoon/RSTycoonPlayerCharacter.h"
 
 

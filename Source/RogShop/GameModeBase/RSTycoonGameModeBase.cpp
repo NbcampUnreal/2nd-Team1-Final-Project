@@ -10,7 +10,7 @@
 #include "RogShop/Actor/Tycoon/Tile/RSTableTile.h"
 #include "RogShop/DataTable/CookFoodData.h"
 #include "RogShop/GameInstanceSubsystem/RSDataSubsystem.h"
-#include "Tycoon/RSTycoonCustomerCharacter.h"
+#include "Tycoon/NPC/RSTycoonCustomerCharacter.h"
 
 
 ARSTycoonGameModeBase::ARSTycoonGameModeBase()

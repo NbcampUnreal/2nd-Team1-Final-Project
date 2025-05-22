@@ -17,6 +17,9 @@ ARSCookingTile::ARSCookingTile()
 
 	FoodLocation = CreateDefaultSubobject<USceneComponent>(TEXT("FoodLocation"));
 	FoodLocation->SetupAttachment(RootComponent);
+
+	ChefLocation = CreateDefaultSubobject<USceneComponent>(TEXT("ChefLocation"));
+	ChefLocation->SetupAttachment(RootComponent);
 }
 
 void ARSCookingTile::Interact()

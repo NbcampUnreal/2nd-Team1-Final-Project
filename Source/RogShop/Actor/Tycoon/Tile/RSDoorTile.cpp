@@ -5,7 +5,7 @@
 
 #include "RSTableTile.h"
 #include "Kismet/GameplayStatics.h"
-#include "Tycoon/RSTycoonCustomerCharacter.h"
+#include "Tycoon/NPC/RSTycoonCustomerCharacter.h"
 
 
 ARSDoorTile::ARSDoorTile()

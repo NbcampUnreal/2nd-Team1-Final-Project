@@ -26,9 +26,12 @@ public:
 	ARSCookingTile();
 
 	GENERATED_TILE()
-	
+
 	virtual void Interact() override;
-	
+
+	FTransform GetChefTransform() const { return ChefLocation->GetComponentTransform(); }
+	ECookingState GetState() const { return State; }
+
 private:
 	void OrderToCook();
 	void Cook(const FName& FoodKey);
@@ -38,6 +41,9 @@ private:
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USceneComponent> FoodLocation; //음식이 나오는 위치
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<USceneComponent> ChefLocation; //요리사가 서있는 위치
 
 	UPROPERTY()
 	TWeakObjectPtr<ARSBaseFood> CookedFood; //완성되어 배치되있는 음식 
