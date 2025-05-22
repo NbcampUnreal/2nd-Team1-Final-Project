@@ -10,6 +10,8 @@
 class UInputMappingContext;
 class UInputAction;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotChange, uint8, SlotIndex, UTexture2D*, NewIcon);
+
 UCLASS()
 class ROGSHOP_API ARSDunPlayerController : public APlayerController
 {
@@ -20,12 +22,14 @@ public:
 
 	virtual void BeginPlay() override;
 
-public:
 	void AddMapping();
 
 	void RemoveAllMapping();
 
 	void ShowRSDunMainWidget();
+
+	UPROPERTY(BlueprintAssignable)
+	FOnWeaponSlotChange OnWeaponSlotChange;
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")

@@ -16,31 +16,26 @@ void URSDunMainWidget::NativeConstruct()
     UpdateMaxHP();
 }
 
-void URSDunMainWidget::UpdateWeaponImage(UTexture2D* NewWeaponImage)
+void URSDunMainWidget::UpdateWeaponSlot(uint8 index, UTexture2D* NewWeaponImage)
 {
     if (WeaponSlot1->Brush.GetResourceObject() == nullptr)
     {
         WeaponSlot1->SetBrushFromTexture(NewWeaponImage);
     }
-    else if(WeaponSlot2->Brush.GetResourceObject() == nullptr)
+    else if (WeaponSlot2->Brush.GetResourceObject() == nullptr)
     {
         WeaponSlot2->SetBrushFromTexture(NewWeaponImage);
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("Both weapon slots are full!"));
-    }
-}
-
-void URSDunMainWidget::UpdateWeaponSlot(bool bIsFirst, UTexture2D* NewWeaponImage)
-{
-    if (bIsFirst)
-    {
-        WeaponSlot1->SetBrushFromTexture(NewWeaponImage);
-    }
-    else // 2번째 무기 슬롯
-    {
-        WeaponSlot2->SetBrushFromTexture(NewWeaponImage);
+        if (index == 1)
+        {
+            WeaponSlot1->SetBrushFromTexture(NewWeaponImage);
+        }
+        else // 2 또는 0, 현재 아무것도 착용 안한 0의 상태일때 2번째 무기가 바뀜
+        {
+            WeaponSlot2->SetBrushFromTexture(NewWeaponImage);
+        }
     }
 }
 

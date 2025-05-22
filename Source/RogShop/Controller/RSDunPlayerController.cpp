@@ -16,8 +16,13 @@ void ARSDunPlayerController::BeginPlay()
     Super::BeginPlay();
 
     AddMapping();
-
+    
     ShowRSDunMainWidget();
+
+    if (RSDunMainWidget)
+    {
+        OnWeaponSlotChange.AddDynamic(RSDunMainWidget, &URSDunMainWidget::UpdateWeaponSlot);
+    }
 }
 
 void ARSDunPlayerController::AddMapping()

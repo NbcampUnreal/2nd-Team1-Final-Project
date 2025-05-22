@@ -10,6 +10,7 @@
 #include "RogShop/GameInstanceSubsystem/RSDataSubsystem.h"
 #include "DungeonItemData.h"
 #include "RSInteractableWeapon.h"
+#include "RSDunPlayerController.h"
 
 // Sets default values for this component's properties
 URSPlayerWeaponComponent::URSPlayerWeaponComponent()
@@ -164,6 +165,22 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 			NewWeaponActor->AttachToComponent(SkeletalMeshComp, AttachmentRules, FName("Weapon_Hand_r"));
 		}
+	}
+
+	// 무기 이미지 장착한 무기로 변경
+	FName NewWeaponKey = NewWeaponActor->GetDataTableKey();
+
+	FDungeonItemData* NewWeaponData = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Weapon->FindRow<FDungeonItemData>(NewWeaponKey, TEXT("Get NewWeaponData"));
+
+	if (NewWeaponData)
+	{
+		ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+
+		PC->OnWeaponSlotChange.Broadcast(static_cast<uint8>(WeaponSlot), NewWeaponData->ItemIcon);
+	}
+	else
+	{
+		RS_LOG("NewWeaponData Error")
 	}
 
 	// 현재 비어있는 무기 슬롯이 있을 경우 비어있는 슬롯에 우선적으로 채운다.
