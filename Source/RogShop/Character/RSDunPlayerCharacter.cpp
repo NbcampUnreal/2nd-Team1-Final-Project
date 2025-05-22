@@ -8,12 +8,15 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "RSPlayerWeaponComponent.h"
+#include "RSDungeonInventoryComponent.h"
 #include "RSInteractable.h"
 #include "DrawDebugHelpers.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
+#include "Engine/OverlapResult.h"
 
 // Sets default values
 ARSDunPlayerCharacter::ARSDunPlayerCharacter()
@@ -47,9 +50,12 @@ ARSDunPlayerCharacter::ARSDunPlayerCharacter()
     // 무기 컴포넌트
     WeaponComp = CreateDefaultSubobject<URSPlayerWeaponComponent>(TEXT("RSPlayerWeapon"));
 
+    // 인벤토리 컴포넌트
+    InventoryComp = CreateDefaultSubobject<URSDungeonInventoryComponent>(TEXT("RSPlayerInventory"));
+
     // 상호작용
     InteractActor = nullptr;
-    InteractDistance = 200.f;
+    InteractRadius = 200.f;
 
     // AI퍼셉션 자극 소스
     AIPerceptionStimuliSourceComp = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("AIPerceptionStimuliSource"));
@@ -308,46 +314,103 @@ URSPlayerWeaponComponent* ARSDunPlayerCharacter::GetRSPlayerWeaponComponent()
     return WeaponComp;
 }
 
+URSDungeonInventoryComponent* ARSDunPlayerCharacter::GetRSDungeonInventoryComponent()
+{
+    return InventoryComp;
+}
+
 void ARSDunPlayerCharacter::InteractTrace()
 {
-    FVector Start = GetActorLocation();
-    FVector ForwardVector = GetActorForwardVector();
-    FVector End = Start + (ForwardVector * InteractDistance);
+    // 캐릭터를 중심으로 사용할 위치 선정
+    FVector Center = GetActorLocation();
 
-    FHitResult Hit;
+    // 무시할 액터, 자기 자신은 제외
     FCollisionQueryParams Params;
     Params.AddIgnoredActor(this);
 
-    bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_GameTraceChannel1, Params);
+    // 오버랩된 액터를 저장할 배열
+    TArray<FOverlapResult> OutOverlaps;
+
+    // 캐릭터를 중심으로 반지름 크기의 구체를 사용해 InteractTrace 채널과 오버랩된 액터들을 탐색한다.
+    bool bHit = GetWorld()->OverlapMultiByChannel(OutOverlaps, Center, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(InteractRadius), Params);
     
-    if (bHit)
+    if (!bHit)
     {
-        AActor* HitActor = Hit.GetActor();
-        if (HitActor && HitActor->GetClass()->ImplementsInterface(URSInteractable::StaticClass()))
+        InteractActor = nullptr;
+        DrawDebugSphere(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
+        return;
+    }
+
+    FVector Forward = GetActorForwardVector();
+
+    // 전방 내에 있는 액터와 가장 가까이 있는 액터를 병행해서 계산한다.
+    AActor* ClosestInFront = nullptr;
+    float ClosestInFrontDist = TNumericLimits<float>::Max();
+
+    AActor* ClosestActor = nullptr;
+    float CosestActorDistance = TNumericLimits<float>::Max();
+
+    for (const FOverlapResult& Result : OutOverlaps)
+    {
+        AActor* Target = Result.GetActor();
+        if (!Target)
         {
-            IRSInteractable* Interactable = Cast<IRSInteractable>(HitActor);
+            continue;
+        }
+
+        // 대상 액터까지의 벡터 및 거리 계산
+        FVector ToTarget = Target->GetActorLocation() - Center;
+        float Distance = ToTarget.Size();
+        FVector DirToTarget = ToTarget.GetSafeNormal();
+
+        // 전방 벡터와의 내적으로 전방과의 각도 계산
+        float Dot = FVector::DotProduct(Forward, DirToTarget);
+        float Angle = FMath::RadiansToDegrees(FMath::Acos(Dot));
+
+        // 전방 내 혀용 각도 안에 있으며, 현재까지 가장 가까운 액터일 경우
+        if (Angle <= InteractAngle && Distance < ClosestInFrontDist)
+        {
+            ClosestInFront = Target;
+            ClosestInFrontDist = Distance;
+        }
+
+        // 전방 여부와 관계없이 가장 가까운 액터일 경우
+        if (Distance < CosestActorDistance)
+        {
+            ClosestActor = Target;
+            CosestActorDistance = Distance;
+        }
+    }
+
+    // 전방 또는 전체 액터 중 유효한 액터가 있는 경우
+    if (ClosestInFront || ClosestActor)
+    {
+        // 전방을 우선으로 사용한다.
+        AActor* TargetActor = (ClosestInFront != nullptr) ? ClosestInFront : ClosestActor;
+
+        // 대상 액터가 상호작용 인터페이스를 구현했는지 확인하고 구현했다면 저장한다.
+        if (TargetActor && TargetActor->GetClass()->ImplementsInterface(URSInteractable::StaticClass()))
+        {
+            IRSInteractable* Interactable = Cast<IRSInteractable>(TargetActor);
             if (Interactable)
             {
-                InteractActor = HitActor;
+                InteractActor = TargetActor;
 
-                DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1.0f, 0, 2.0f);
+                DrawDebugSphere(GetWorld(), Center, InteractRadius, 32, FColor::Green, false, 0.f, 0, 1.0f);
             }
             else
             {
-                DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 2.0f);
-                InteractActor = nullptr;
+                DrawDebugSphere(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
             }
         }
         else
         {
-            DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 2.0f);
-            InteractActor = nullptr;
+            DrawDebugSphere(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
         }
     }
     else
     {
-        DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 2.0f);
-        InteractActor = nullptr;
+        DrawDebugSphere(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
     }
 }
 

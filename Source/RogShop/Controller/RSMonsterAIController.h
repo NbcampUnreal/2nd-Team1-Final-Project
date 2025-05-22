@@ -41,5 +41,5 @@ public://Function
 	UFUNCTION(BlueprintCallable)
 	void MoveToCurrentPatrolPoint();
 
-	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
+//	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
 };

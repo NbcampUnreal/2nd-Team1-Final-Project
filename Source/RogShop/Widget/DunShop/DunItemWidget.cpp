@@ -53,11 +53,16 @@ void UDunItemWidget::SetParentShop(UDunShopWidget* InShop)
     ParentShop = InShop;
 }
 
+void UDunItemWidget::SetItemRowName(FName RowName)
+{
+    CurrentRowName = RowName;
+}
+
 void UDunItemWidget::OnBuyClicked()
 {
     if (BuyItem())
     {
-        // Character->SetLifeEssence(ItemData.Price); // 플레이어 골드 수정 관련 함수 또는 public 변수 필요
+        // Character->DecreaseLifeEssence(ItemData.Price); // 플레이어 골드 수정 관련 함수 또는 public 변수 필요
 
         if (ItemPriceText)
         {
@@ -118,49 +123,29 @@ bool UDunItemWidget::BuyItem()
             }
 
             PlayerChar->IncreaseHP(FinalValue);
-            PC->RSDunMainWidget->UpdateHP();
+            PC->GetRSDunMainWidget()->UpdateHP();
 
             break;
         }
-        case EItemList::MaxHpRelic:
+        case EItemList::Relic:
         {
-            switch (ItemData.Rarity)
+            URSBaseRelicEffect* Effect = nullptr;
+
+            if (ItemData.EffectClass)
             {
-                case ERarity::Common: FinalValue = 1.0f; break;
-                case ERarity::Rare: FinalValue = 2.0f; break;
-                case ERarity::Epic: FinalValue = 3.0f; break;
-                case ERarity::Legendary: FinalValue = 4.0f; break;
+                Effect = NewObject<URSBaseRelicEffect>(this, ItemData.EffectClass);
             }
 
-            // Character->SetMaxHP(FinalValue);
-
-            break;
-        }
-        case EItemList::WalkSpeedRelic: // 임시
-        {
-            switch (ItemData.Rarity)
+            if (Effect)
             {
-                case ERarity::Common: FinalValue = 1.0f; break;
-                case ERarity::Rare: FinalValue = 2.0f; break;
-                case ERarity::Epic: FinalValue = 3.0f; break;
-                case ERarity::Legendary: FinalValue = 4.0f; break;
+                // ApplyEffect 함수가 URSBaseRelicEffect 자식 클래스에서 구현되어야 함
+                Effect->ApplyEffect(PlayerChar, PC, ItemData);
             }
-
-            // Character->AddWalkSpeed(FinalValue);
-
-            break;
-        }
-        case EItemList::AttackRelic: // 임시
-        {
-            switch (ItemData.Rarity)
+            else
             {
-                case ERarity::Common: FinalValue = 5.0f; break;
-                case ERarity::Rare: FinalValue = 10.0f; break;
-                case ERarity::Epic: FinalValue = 15.0f; break;
-                case ERarity::Legendary: FinalValue = 25.0f; break;
+                UE_LOG(LogTemp, Warning, TEXT("BuyItem - EffectClass is null"));
+                bIsBuy = false;
             }
-
-            // Character->AddAtk(FinalValue);
 
             break;
         }
@@ -174,27 +159,20 @@ bool UDunItemWidget::BuyItem()
             ARSBaseWeapon* SpawnedWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(
                 ItemData.WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 
-            if (SpawnedWeapon)
-            {
-                URSPlayerWeaponComponent* WeaponComp = PlayerChar->GetRSPlayerWeaponComponent();
+            URSPlayerWeaponComponent* WeaponComp = PlayerChar->GetRSPlayerWeaponComponent();
 
-                if (WeaponComp)
-                {
-                    WeaponComp->EquipWeaponToSlot(SpawnedWeapon);
-                }
-                else
-                {
-                    UE_LOG(LogTemp, Warning, TEXT("WeaponComp is Null"));
-                    bIsBuy = false;
-                }
+            if (SpawnedWeapon && WeaponComp)
+            {
+                SpawnedWeapon->SetDataTableKey(CurrentRowName);
+                WeaponComp->EquipWeaponToSlot(SpawnedWeapon);
+
+                PC->GetRSDunMainWidget()->UpdateWeaponImage(ItemData.Icon);
             }
             else
             {
-                UE_LOG(LogTemp, Warning, TEXT("SpawnedWeapon is Null"));
+                UE_LOG(LogTemp, Warning, TEXT("SpawnedWeapon or WeaponComp is Null"));
                 bIsBuy = false;
             }
-
-            PC->RSDunMainWidget->UpdateWeaponImage(ItemData.Icon);
 
             break;
         }
