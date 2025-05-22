@@ -252,9 +252,10 @@ void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSl
 		return;
 	}
 
-	// 현재 착용 중인 무기가 있는 경우 숨김 처리 및 충돌을 끈다.
-	if (WeaponActors.IsValidIndex(CurrentIndex))
+	// 기존에 착용하고 있던 무기가 유효한 경우
+	if (WeaponActors.IsValidIndex(CurrentIndex) && WeaponActors[CurrentIndex])
 	{
+		// 현재 착용 중인 무기가 있는 경우 숨김 처리 및 충돌을 끈다.
 		ARSBaseWeapon* CurEquipWeapon = WeaponActors[CurrentIndex];
 		if (CurEquipWeapon)
 		{
@@ -263,23 +264,50 @@ void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSl
 
 			// 오버랩 이벤트 바인딩 해제
 			WeaponActors[CurrentIndex]->GetBoxComp()->OnComponentBeginOverlap.RemoveDynamic(this, &URSPlayerWeaponComponent::OnBeginOverlap);
+
+			// 무기의 애님 레이어를 해제한다.
+			TSubclassOf<UAnimInstance> TargetAnimInstance = CurEquipWeapon->GetWeaponAnimInstnace();
+
+			ACharacter* CurCharacter = GetOwner<ACharacter>();
+			if (CurCharacter)
+			{
+				USkeletalMeshComponent* SkeletalMeshComp = CurCharacter->GetMesh();
+				if (SkeletalMeshComp)
+				{
+					SkeletalMeshComp->LinkAnimClassLayers(TargetAnimInstance);
+				}
+			}
 		}
 	}
 
-	// 새로 착용할 무기의 숨김 처리를 끄고, 충돌을 켠다.
-	if (WeaponActors.IsValidIndex(TargetIndex))
+	// 새로 착용할 무기가 유효한 경우
+	if (WeaponActors.IsValidIndex(TargetIndex) && WeaponActors[TargetIndex])
 	{
+		// 새로 착용할 무기의 숨김 처리를 끄고, 충돌을 켠다.
 		ARSBaseWeapon* TargetEquipWeapon = WeaponActors[TargetIndex];
 		if (TargetEquipWeapon)
 		{
 			TargetEquipWeapon->SetActorHiddenInGame(false);
 			TargetEquipWeapon->SetActorEnableCollision(true);
-
+			
 			// 오버랩 이벤트 바인딩
 			UBoxComponent* CurWeaponBoxComp = TargetEquipWeapon->GetBoxComp();
 			if (CurWeaponBoxComp)
 			{
 				CurWeaponBoxComp->OnComponentBeginOverlap.AddDynamic(this, &URSPlayerWeaponComponent::OnBeginOverlap);
+			}
+
+			// 무기의 애님 레이어를 적용한다.
+			TSubclassOf<UAnimInstance> TargetAnimInstance = TargetEquipWeapon->GetWeaponAnimInstnace();
+
+			ACharacter* CurCharacter = GetOwner<ACharacter>();
+			if (CurCharacter)
+			{
+				USkeletalMeshComponent* SkeletalMeshComp = CurCharacter->GetMesh();
+				if (SkeletalMeshComp)
+				{
+					SkeletalMeshComp->LinkAnimClassLayers(TargetAnimInstance);
+				}
 			}
 
 			// 현재 슬롯을 변경한다.
