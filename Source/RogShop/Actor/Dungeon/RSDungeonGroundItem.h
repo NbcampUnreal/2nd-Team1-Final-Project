@@ -21,6 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 
 // 해당 엑터의 메시 세팅 및 상호작용에 필요한 변수 세팅
+public:
 	void InitItemInfo(FName NewDataTableKey, UStaticMesh* NewMesh);
 
 // 상호작용

@@ -11,6 +11,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "RSPlayerWeaponComponent.h"
+#include "RSDungeonInventoryComponent.h"
 #include "RSInteractable.h"
 #include "DrawDebugHelpers.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
@@ -48,6 +49,9 @@ ARSDunPlayerCharacter::ARSDunPlayerCharacter()
 
     // 무기 컴포넌트
     WeaponComp = CreateDefaultSubobject<URSPlayerWeaponComponent>(TEXT("RSPlayerWeapon"));
+
+    // 인벤토리 컴포넌트
+    InventoryComp = CreateDefaultSubobject<URSDungeonInventoryComponent>(TEXT("RSPlayerInventory"));
 
     // 상호작용
     InteractActor = nullptr;
@@ -308,6 +312,11 @@ void ARSDunPlayerCharacter::SecondWeaponSlot(const FInputActionValue& value)
 URSPlayerWeaponComponent* ARSDunPlayerCharacter::GetRSPlayerWeaponComponent()
 {
     return WeaponComp;
+}
+
+URSDungeonInventoryComponent* ARSDunPlayerCharacter::GetRSDungeonInventoryComponent()
+{
+    return InventoryComp;
 }
 
 void ARSDunPlayerCharacter::InteractTrace()
