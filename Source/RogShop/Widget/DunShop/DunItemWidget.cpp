@@ -123,7 +123,6 @@ bool UDunItemWidget::BuyItem()
             }
 
             PlayerChar->IncreaseHP(FinalValue);
-            PC->GetRSDunMainWidget()->UpdateHP();
 
             break;
         }
