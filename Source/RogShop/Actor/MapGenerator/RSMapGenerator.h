@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Engine/LevelStreamingDynamic.h"
+#include "Engine/TargetPoint.h"
+
 #include "Kismet/GameplayStatics.h"
 #include "RSMapGenerator.generated.h"
 
@@ -49,7 +51,7 @@ protected:
 	void GenerateMainPath();   // 시작점부터 보스방까지 연결된 주 경로 생성
 	void ExpandPathToCoverMinTiles(float MinRatio);  // 타일이 전체의 일정 비율 이상 되도록 확장
 	void FindBossRoom();                             // 가장 먼 방을 보스방으로 설정
-	void StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector& Location, const FRotator& Rotation, const FString& UniqueName);
+	ULevelStreamingDynamic* StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector& Location, const FRotator& Rotation, const FString& UniqueName);
 	void ChooseShopTile();
 
 	int32 GetConnectedNeighborCount(FVector2D Pos);

@@ -18,19 +18,19 @@ public:
 
 	GENERATED_TILE()
 	
-	virtual void Interact() override;
+	virtual void Interact(ACharacter* InteractCharacter) override;
 	void Sit(ARSTycoonCustomerCharacter* Customer);
 
 	bool CanSit() const { return SittingCustomers.Num() < SittingLocations.Num(); }
+	bool Use() const { return SittingCustomers.Num() > 0; }
 	FVector GetFoodLocation() const { return FoodLocation->GetComponentLocation(); }
 	int32 GetMaxPlace() const { return SittingLocations.Num(); }
 	FTransform GetSitTransform() const { return SittingLocations[SittingCustomers.Num()]->GetComponentTransform(); }
-
+	ARSTycoonCustomerCharacter* GetMainCustomer() const {return SittingCustomers[0];}
+	
 private:
 	void Order();
-	void Serving();
-	
-	bool Use() const { return SittingCustomers.Num() > 0; }
+	void Serving(ACharacter* InteractCharacter);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadonly)

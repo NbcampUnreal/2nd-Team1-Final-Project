@@ -41,8 +41,7 @@ void ARSTycoonPlayerCharacter::SetupPlayerInputComponent(UInputComponent* Player
 
 	ARSTycoonPlayerController* PlayerController = Cast<ARSTycoonPlayerController>(GetController());
 	check(PlayerController)
-
-
+	
 	if (PlayerController->MoveAction)
 	{
 		EnhancedInput->BindAction(PlayerController->MoveAction, ETriggerEvent::Triggered, this,
@@ -58,7 +57,7 @@ void ARSTycoonPlayerCharacter::SetupPlayerInputComponent(UInputComponent* Player
 
 void ARSTycoonPlayerCharacter::Pickup(AActor* Actor)
 {
-	if (PickupActor.IsValid())
+	if (PickupActor)
 	{
 		Drop(Actor->GetActorLocation());
 	}
@@ -69,7 +68,7 @@ void ARSTycoonPlayerCharacter::Pickup(AActor* Actor)
 	Actor->SetActorLocation(PickupLocation->GetComponentLocation());
 }
 
-AActor* ARSTycoonPlayerCharacter::Drop(FVector DropPosition)
+AActor* ARSTycoonPlayerCharacter::Drop(FVector DropLocation)
 {
 	if (PickupActor == nullptr)
 	{
@@ -80,7 +79,7 @@ AActor* ARSTycoonPlayerCharacter::Drop(FVector DropPosition)
 	AActor* Temp = PickupActor.Get();
 	
 	PickupActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	PickupActor->SetActorLocation(DropPosition);
+	PickupActor->SetActorLocation(DropLocation);
 	PickupActor = nullptr;
 
 	return Temp;
@@ -121,5 +120,5 @@ void ARSTycoonPlayerCharacter::OnInteract(const FInputActionValue& Value)
 	ARSBaseTile* Tile = Cast<ARSBaseTile>(MinActor);
 	RS_LOG_F("상호작용 하는 Tile 이름 : %s", *Tile->GetTileDisplayName())
 
-	Tile->Interact();
+	Tile->Interact(this);
 }
