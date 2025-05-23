@@ -16,6 +16,11 @@ void UMainMenuWidget::NativeConstruct()
 		StartButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnStartButtonClicked);
 	}
 
+	if (LoadButton)
+	{
+		LoadButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnLoadButtonClicked);
+	}
+
 	if (OptionButton)
 	{
 		OptionButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnOptionButtonClicked);
@@ -28,6 +33,11 @@ void UMainMenuWidget::NativeConstruct()
 }
 
 void UMainMenuWidget::OnStartButtonClicked()
+{
+	//UGameplayStatics::OpenLevel(this, FName("다음레벨 이름"));
+}
+
+void UMainMenuWidget::OnLoadButtonClicked()
 {
 	//UGameplayStatics::OpenLevel(this, FName("다음레벨 이름"));
 }
