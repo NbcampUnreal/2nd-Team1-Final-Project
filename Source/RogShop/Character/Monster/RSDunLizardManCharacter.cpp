@@ -1,35 +1,39 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "RSDunBossWormCharacter.h"
+#include "RSDunLizardManCharacter.h"
 #include "RogShop/RSMonsterAttackTraceDefine.h"
 
-ARSDunBossWormCharacter::ARSDunBossWormCharacter()
+void ARSDunLizardManCharacter::PlayBaseAttackAnim()
 {
+	// TODO : 퀄리티 업때 PlayBaseAttackAnim()이 비헤이비어 트리에서 몽타주가 실행되고 있으면 호출되지 않도록 최적화 코드 필요.
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (IsValid(AnimInstance) == true && IsValid(BaseAttackMontage) == true)
+	{
+		if (AnimInstance->Montage_IsPlaying(BaseAttackMontage) == false)
+		{
+			AnimInstance->Montage_Play(BaseAttackMontage);
+		}
+	}
 }
 
-void ARSDunBossWormCharacter::PlayBaseAttackAnim()
-{
-	PlayAnimMontage(BaseAttackMontage);
-	UE_LOG(LogTemp, Warning, TEXT("BossWorm Attack Success!!"));
-}
-
-void ARSDunBossWormCharacter::PlayHitReactAnim()
+void ARSDunLizardManCharacter::PlayHitReactAnim()
 {
 	PlayAnimMontage(HitReactMontage);
-	UE_LOG(LogTemp, Warning, TEXT("BossWorm HitReact Success!!"));
+	UE_LOG(LogTemp, Warning, TEXT("Boss SpiderQueen HitReact Success!!"));
 }
 
-void ARSDunBossWormCharacter::PlayDeathAnim()
+void ARSDunLizardManCharacter::PlayDeathAnim()
 {
 	PlayAnimMontage(DeathMontage);
-	UE_LOG(LogTemp, Warning, TEXT("BossWorm Death Success!!"));
+	UE_LOG(LogTemp, Warning, TEXT("Boss SpiderQueen Death Success!!"));
 }
 
-void ARSDunBossWormCharacter::PerformAttackTrace()
+void ARSDunLizardManCharacter::PerformAttackTrace()
 {
 	FHitResult HitResult;
-	FVector Start = GetMesh()->GetSocketLocation(SocketLocation); // TODO : 사막 보스 에셋 받으면 여기다 실제 소켓 이름으로 바꿔줘야 함
+	FVector Start = GetMesh()->GetSocketLocation(SocketLocation); // 여기다 실제 소켓 이름으로 바꿔줘야 함.
 	Start += GetActorForwardVector() * TraceForwardOffset;
 	Start += GetActorRightVector() * TraceRightOffset;
 	Start += GetActorUpVector() * TraceUpOffset;
