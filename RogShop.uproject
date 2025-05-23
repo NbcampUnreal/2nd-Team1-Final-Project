@@ -23,6 +23,10 @@
 			"TargetAllowList": [
 				"Editor"
 			]
+		},
+		{
+			"Name": "SkeletalMerging",
+			"Enabled": true
 		}
 	]
 }

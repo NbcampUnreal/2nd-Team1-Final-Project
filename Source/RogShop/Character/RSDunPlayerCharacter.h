@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "RSDunBaseCharacter.h"
+#include "SkeletalMergingLibrary.h"
 #include "RSDunPlayerCharacter.generated.h"
 
 class USpringArmComponent;
@@ -61,6 +62,11 @@ protected:
 	void FirstWeaponSlot(const FInputActionValue& value);
 	UFUNCTION()
 	void SecondWeaponSlot(const FInputActionValue& value);
+
+// 스켈레탈 메시 관련
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SkeletalMesh", meta = (AllowPrivateAccess = true))
+	FSkeletalMeshMergeParams SkeletalMeshMergeParams;
 
 // 카메라 관련
 private:

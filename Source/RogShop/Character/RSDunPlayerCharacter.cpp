@@ -72,6 +72,9 @@ void ARSDunPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+    // ½ºÄÌ·¹Å» ¸Þ½Ã
+    USkeletalMesh* MergeSkeletalMesh = USkeletalMergingLibrary::MergeMeshes(SkeletalMeshMergeParams);
+    GetMesh()->SetSkeletalMeshAsset(MergeSkeletalMesh);
 }
 
 // Called every frame

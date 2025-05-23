@@ -32,7 +32,7 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "GameInstanceSubsystem"),
         });
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule", "NavigationSystem", "DeveloperSettings" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule", "NavigationSystem", "DeveloperSettings", "SkeletalMerging" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
