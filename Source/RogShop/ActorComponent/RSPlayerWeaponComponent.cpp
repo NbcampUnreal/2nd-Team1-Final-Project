@@ -172,11 +172,29 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 	{
 		WeaponActors[0] = NewWeaponActor;
 
+		// UI 갱신되도록 이벤트 디스패처 호출
+		FName NewWeaponKey = NewWeaponActor->GetDataTableKey();
+
+		ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
+		if (PC)
+		{
+			PC->OnWeaponSlotChange.Broadcast(1, NewWeaponKey);
+		}
+
 		RS_LOG("0 Slot Add Weapon")
 	}
 	else if (WeaponActors[1] == nullptr)
 	{
 		WeaponActors[1] = NewWeaponActor;
+
+		// UI 갱신되도록 이벤트 디스패처 호출
+		FName NewWeaponKey = NewWeaponActor->GetDataTableKey();
+
+		ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
+		if (PC)
+		{
+			PC->OnWeaponSlotChange.Broadcast(2, NewWeaponKey);
+		}
 
 		RS_LOG("1 Slot Add Weapon")
 	}
@@ -218,16 +236,16 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 		EWeaponSlot TempWeaponSlot = WeaponSlot;
 		WeaponSlot = EWeaponSlot::NONE;
 		EquipWeaponToCharacter(TempWeaponSlot);
+
+		// UI 갱신되도록 이벤트 디스패처 호출
+		FName NewWeaponKey = NewWeaponActor->GetDataTableKey();
+
+		ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
+		if (PC)
+		{
+			PC->OnWeaponSlotChange.Broadcast(static_cast<int8>(WeaponSlot), NewWeaponKey);
+		}
 	}
-
-	FName NewWeaponKey = NewWeaponActor->GetDataTableKey();
-
-	ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
-
-	if (PC)
-	{
-		PC->OnWeaponSlotChange.Broadcast(static_cast<int8>(WeaponSlot), NewWeaponKey);
-	}	
 }
 
 void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSlot)
