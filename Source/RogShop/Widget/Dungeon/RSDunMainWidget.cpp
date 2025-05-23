@@ -7,6 +7,8 @@
 
 #include "RSDunPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "DungeonItemData.h"
+#include "RSDataSubsystem.h"
 
 void URSDunMainWidget::NativeConstruct()
 {
@@ -16,31 +18,44 @@ void URSDunMainWidget::NativeConstruct()
     UpdateMaxHP();
 }
 
-void URSDunMainWidget::UpdateWeaponImage(UTexture2D* NewWeaponImage)
+void URSDunMainWidget::UpdateWeaponSlot(uint8 SlotIndex, FName WeaponKey)
 {
-    if (WeaponSlot1->Brush.GetResourceObject() == nullptr)
+    if (URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>())
     {
-        WeaponSlot1->SetBrushFromTexture(NewWeaponImage);
-    }
-    else if(WeaponSlot2->Brush.GetResourceObject() == nullptr)
-    {
-        WeaponSlot2->SetBrushFromTexture(NewWeaponImage);
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("Both weapon slots are full!"));
-    }
-}
+        if (DataSubsystem->Weapon)
+        {
+            const FDungeonItemData* FoundData = DataSubsystem->Weapon->FindRow<FDungeonItemData>(
+                WeaponKey,
+                TEXT("Weapon Data Lookup") // µð¹ö±ë¿ë Context
+            );
 
-void URSDunMainWidget::UpdateWeaponSlot(bool bIsFirst, UTexture2D* NewWeaponImage)
-{
-    if (bIsFirst)
-    {
-        WeaponSlot1->SetBrushFromTexture(NewWeaponImage);
-    }
-    else // 2¹øÂ° ¹«±â ½½·Ô
-    {
-        WeaponSlot2->SetBrushFromTexture(NewWeaponImage);
+            if (FoundData)
+            {
+                if (WeaponSlot1->Brush.GetResourceObject() == nullptr)
+                {
+                    WeaponSlot1->SetBrushFromTexture(FoundData->ItemIcon);
+                }
+                else if (WeaponSlot2->Brush.GetResourceObject() == nullptr)
+                {
+                    WeaponSlot2->SetBrushFromTexture(FoundData->ItemIcon);
+                }
+                else
+                {
+                    if (SlotIndex == 0 || SlotIndex == 1)
+                    {
+                        WeaponSlot1->SetBrushFromTexture(FoundData->ItemIcon);
+                    }
+                    else
+                    {
+                        WeaponSlot2->SetBrushFromTexture(FoundData->ItemIcon);
+                    }
+                }
+            }
+            else
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Not FoundData"));
+            }
+        }
     }
 }
 
