@@ -3,8 +3,6 @@
 
 #include "RSCheatManager.h"
 #include "RSDunMonsterCharacter.h"
-#include "RSDunAnubisCharacter.h"
-#include "RSDunBossSpiderQueenCharacter.h"
 #include "RSDunPlayerController.h"
 
 #include "Blueprint/UserWidget.h"
@@ -45,24 +43,6 @@ void URSCheatManager::TestDunMonsterAttack()
     if (Monster)
     {
         Monster->PlayBaseAttackAnim();
-    }
-}
-
-void URSCheatManager::TestDunMonsterHItReact()
-{
-    UWorld* World = GetWorld();
-    if (!World)
-    {
-        return;
-    }
-
-    ARSDunMonsterCharacter* Monster = Cast<ARSDunMonsterCharacter>(
-        UGameplayStatics::GetActorOfClass(World, ARSDunMonsterCharacter::StaticClass())
-    );
-
-    if (Monster)
-    {
-        Monster->PlayHitReactAnim();
     }
 }
 

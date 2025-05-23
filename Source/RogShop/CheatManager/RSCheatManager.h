@@ -23,9 +23,6 @@ public:
 	void TestDunMonsterAttack();
 
 	UFUNCTION(exec)
-	void TestDunMonsterHItReact();
-
-	UFUNCTION(exec)
 	void TestDunMonsterDeath();
   
 	UFUNCTION(exec)
