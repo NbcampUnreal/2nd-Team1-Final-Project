@@ -43,6 +43,9 @@ public:
 protected:
 	virtual void InteractTarget(AActor* TargetActor) override;
 
+private:
+	void Leave();
+	
 public:
 	FName WantFoodKey;
 

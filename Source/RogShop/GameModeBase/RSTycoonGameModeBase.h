@@ -53,5 +53,4 @@ private:
 	int32 MaxCustomerCount; 
 
 	FTimerHandle CustomerTimerHandle; //손님 등장 타이머
-	int32 Money;
 };

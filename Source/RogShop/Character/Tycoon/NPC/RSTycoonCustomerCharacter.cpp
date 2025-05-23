@@ -4,7 +4,10 @@
 #include "RSTycoonCustomerCharacter.h"
 
 #include "AIController.h"
+#include "CookFoodData.h"
+#include "RSDataSubsystem.h"
 #include "RSTycoonGameModeBase.h"
+#include "RSTycoonPlayerController.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Navigation/PathFollowingComponent.h"
@@ -23,7 +26,7 @@ void ARSTycoonCustomerCharacter::Sit(ARSTableTile* Table, const FTransform& SitT
 	State = ETycoonCustomerState::OrderWaiting;
 
 	SitTableTile = Table;
-	
+
 	SetActorLocation(SitTransform.GetLocation());
 	SetActorRotation(SitTransform.GetRotation());
 }
@@ -31,7 +34,7 @@ void ARSTycoonCustomerCharacter::Sit(ARSTableTile* Table, const FTransform& SitT
 void ARSTycoonCustomerCharacter::WaitFood()
 {
 	State = ETycoonCustomerState::FoodWaiting;
-	
+
 	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
 	GameMode->AddOrder({WantFoodKey, this});
 }
@@ -39,25 +42,15 @@ void ARSTycoonCustomerCharacter::WaitFood()
 void ARSTycoonCustomerCharacter::Eat()
 {
 	State = ETycoonCustomerState::Eat;
-	
+
 	FTimerHandle Timer;
-	GetWorldTimerManager().SetTimer(Timer, [&]()
-	{
-		//나감
-		State = ETycoonCustomerState::Move;
-		RS_LOG_C("손님이 식사를 다 했습니다", FColor::Green)
-
-		ARSDoorTile* DoorTile = Cast<ARSDoorTile>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSDoorTile::StaticClass()));
-		MoveToTarget(DoorTile->GetSpawnPoint(), DoorTile);
-
-		OnFinishEat.Broadcast(this);
-	}, 5.f, false);
+	GetWorldTimerManager().SetTimer(Timer, this, &ARSTycoonCustomerCharacter::Leave, 5.f, false);
 }
 
 void ARSTycoonCustomerCharacter::InteractTarget(AActor* TargetActor)
 {
 	Super::InteractTarget(TargetActor);
-	
+
 	//의자에 닿으면 앉음
 	if (ARSTableTile* TableTile = Cast<ARSTableTile>(TargetActor))
 	{
@@ -69,7 +62,24 @@ void ARSTycoonCustomerCharacter::InteractTarget(AActor* TargetActor)
 	{
 		ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
 		GameMode->RemoveCustomer(this);
-		
+
 		Destroy();
 	}
+}
+
+void ARSTycoonCustomerCharacter::Leave()
+{
+	State = ETycoonCustomerState::Move;
+
+	FCookFoodData* Data = GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Food->
+	                                         FindRow<FCookFoodData>(WantFoodKey, TEXT("Get Price Of Food"));
+
+	RS_LOG_F_C("손님이 식사를 다 했습니다, 골드 +%d", FColor::Yellow, Data->Price)
+
+	ARSDoorTile* DoorTile = Cast<ARSDoorTile>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSDoorTile::StaticClass()));
+	MoveToTarget(DoorTile->GetSpawnPoint(), DoorTile);
+
+	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->AddMoney(Data->Price);
+	
+	OnFinishEat.Broadcast(this);
 }

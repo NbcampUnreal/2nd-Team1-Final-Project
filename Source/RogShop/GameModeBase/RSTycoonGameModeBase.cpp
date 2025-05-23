@@ -148,10 +148,6 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 		//데이터와 Row의 대응의 순서가 보장된다면 정상작동함
 		auto RowNames = DataSubsystem->Food->GetRowNames();
 		OutOrderFood = RowNames[OrderFoodIndex];
-
-		//디버그
-		FCookFoodData* DebugFood = DataSubsystem->Food->FindRow<FCookFoodData>(OutOrderFood, TEXT("Debug Find Food"));
-		RS_LOG_F_C("만들어야되는 음식 : %s, 지정된 Row 음식 : %s", FColor::Green, *MakeFoodName, *DebugFood->Name)
 	}
 
 	return bResult;
