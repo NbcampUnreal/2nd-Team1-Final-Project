@@ -20,45 +20,167 @@
 // Sets default values
 ARSDunPlayerCharacter::ARSDunPlayerCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+    // Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+    PrimaryActorTick.bCanEverTick = true;
 
-    // ½ºÇÁ¸µ ¾Ï ÄÄÆ÷³ÍÆ® »ý¼º ¹× ÄÁÆ®·Ñ·¯ È¸Àü¿¡ µû¶ó ½ºÇÁ¸µ ¾Ïµµ È¸ÀüÇÏµµ·Ï ¼³Á¤
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> HeadMeshAsset(TEXT("/Game/Assets/StylizedCharacters/BodyA/Heads/Head_01/SKM_HeadA_01.SKM_HeadA_01"));
+    if (HeadMeshAsset.Succeeded())
+    {
+        HeadMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Head"));
+        HeadMeshComp->SetupAttachment(GetMesh());
+        HeadMeshComp->SetSkeletalMesh(HeadMeshAsset.Object);
+    }
+
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> HairMeshAsset(TEXT("/Game/Assets/StylizedCharacters/BodyA/Hairstyles/Hairstyle_01/SKM_HairstyleA_01.SKM_HairstyleA_01"));
+    if (HairMeshAsset.Succeeded())
+    {
+        HairMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Hair"));
+        HairMeshComp->SetupAttachment(GetMesh());
+        HairMeshComp->SetSkeletalMesh(HairMeshAsset.Object);
+    }
+
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> EyebrowsMeshAsset(TEXT("/Game/Assets/StylizedCharacters/BodyA/Eyebrows/Eyebrows_01/SKM_EyebrowsA_01.SKM_EyebrowsA_01"));
+    if (EyebrowsMeshAsset.Succeeded())
+    {
+        EyebrowsMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Eyebrows"));
+        EyebrowsMeshComp->SetupAttachment(GetMesh());
+        EyebrowsMeshComp->SetSkeletalMesh(EyebrowsMeshAsset.Object);
+    }
+
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> MustacheMeshAsset(TEXT("/Game/Assets/StylizedCharacters/BodyA/Mustaches/Mustache_01/SKM_MustacheA_01.SKM_MustacheA_01"));
+    if (MustacheMeshAsset.Succeeded())
+    {
+        MustacheMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mustache"));
+        MustacheMeshComp->SetupAttachment(GetMesh());
+        MustacheMeshComp->SetSkeletalMesh(MustacheMeshAsset.Object);
+    }
+
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> BeardMeshAsset(TEXT("/Game/Assets/StylizedCharacters/BodyA/Beards/Beard_01/SKM_BeardA_01.SKM_BeardA_01"));
+    if (BeardMeshAsset.Succeeded())
+    {
+        BeardMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Beard"));
+        BeardMeshComp->SetupAttachment(GetMesh());
+        BeardMeshComp->SetSkeletalMesh(BeardMeshAsset.Object);
+    }
+
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> TorsoMeshAsset(TEXT("/Game/Assets/StylizedCharacters/BodyA/Body/SKM_BodyA_torso.SKM_BodyA_torso"));
+    if (TorsoMeshAsset.Succeeded())
+    {
+        TorsoMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Torso"));
+        TorsoMeshComp->SetupAttachment(GetMesh());
+        TorsoMeshComp->SetSkeletalMesh(TorsoMeshAsset.Object);
+    }
+
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> ArmsMeshAsset(TEXT("/Game/Assets/StylizedCharacters/BodyA/Body/SKM_BodyA_arms.SKM_BodyA_arms"));
+    if (ArmsMeshAsset.Succeeded())
+    {
+        ArmsMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Arms"));
+        ArmsMeshComp->SetupAttachment(GetMesh());
+        ArmsMeshComp->SetSkeletalMesh(ArmsMeshAsset.Object);
+    }
+
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> HandsMeshAsset(TEXT("/Game/Assets/StylizedCharacters/BodyA/Body/SKM_BodyA_hands.SKM_BodyA_hands"));
+    if (HandsMeshAsset.Succeeded())
+    {
+        HandsMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Hands"));
+        HandsMeshComp->SetupAttachment(GetMesh());
+        HandsMeshComp->SetSkeletalMesh(HandsMeshAsset.Object);
+    }
+
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> FingersMeshAsset(TEXT("/Game/Assets/StylizedCharacters/BodyA/Body/SKM_BodyA_fingers.SKM_BodyA_fingers"));
+    if (FingersMeshAsset.Succeeded())
+    {
+        FingersMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Fingers"));
+        FingersMeshComp->SetupAttachment(GetMesh());
+        FingersMeshComp->SetSkeletalMesh(FingersMeshAsset.Object);
+    }
+
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> LegsMeshAsset(TEXT("/Game/Assets/StylizedCharacters/BodyA/Body/SKM_BodyA_legs_01.SKM_BodyA_legs_01"));
+    if (LegsMeshAsset.Succeeded())
+    {
+        LegsMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Legs"));
+        LegsMeshComp->SetupAttachment(GetMesh());
+        LegsMeshComp->SetSkeletalMesh(LegsMeshAsset.Object);
+    }
+
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> FeetMeshAsset(TEXT("/Game/Assets/StylizedCharacters/BodyA/Body/SKM_BodyA_feet.SKM_BodyA_feet"));
+    if (FeetMeshAsset.Succeeded())
+    {
+        FeetMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Feet"));
+        FeetMeshComp->SetupAttachment(GetMesh());
+        FeetMeshComp->SetSkeletalMesh(FeetMeshAsset.Object);
+    }
+
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> TopArmorMeshAsset(TEXT("/Game/Assets/AdventurersKit/BodyA/Armor_01/SKM_BodyA_Armor_01_Top.SKM_BodyA_Armor_01_Top"));
+    if (TopArmorMeshAsset.Succeeded())
+    {
+        TopArmorMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TopArmor"));
+        TopArmorMeshComp->SetupAttachment(GetMesh());
+        TopArmorMeshComp->SetSkeletalMesh(TopArmorMeshAsset.Object);
+    }
+
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> GlovesMeshAsset(TEXT("/Game/Assets/AdventurersKit/BodyA/Armor_01/SKM_BodyA_Armor_01_Gloves.SKM_BodyA_Armor_01_Gloves"));
+    if (GlovesMeshAsset.Succeeded())
+    {
+        GlovesMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Gloves"));
+        GlovesMeshComp->SetupAttachment(GetMesh());
+        GlovesMeshComp->SetSkeletalMesh(GlovesMeshAsset.Object);
+    }
+
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> PantsMeshAsset(TEXT("/Game/Assets/AdventurersKit/BodyA/Armor_01/SKM_BodyA_Armor_01_Pants.SKM_BodyA_Armor_01_Pants"));
+    if (PantsMeshAsset.Succeeded())
+    {
+        PantsMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Pants"));
+        PantsMeshComp->SetupAttachment(GetMesh());
+        PantsMeshComp->SetSkeletalMesh(PantsMeshAsset.Object);
+    }
+
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> BootsMeshAsset(TEXT("/Game/Assets/AdventurersKit/BodyA/Armor_01/SKM_BodyA_Armor_01_Boots.SKM_BodyA_Armor_01_Boots"));
+    if (BootsMeshAsset.Succeeded())
+    {
+        BootsMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Boots"));
+        BootsMeshComp->SetupAttachment(GetMesh());
+        BootsMeshComp->SetSkeletalMesh(BootsMeshAsset.Object);
+    }
+
+
+
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½Æ®ï¿½Ñ·ï¿½ È¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ïµï¿½ È¸ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
     SpringArmComp->SetupAttachment(RootComponent);
     SpringArmComp->bUsePawnControlRotation = true;
 
-    // Ä«¸Þ¶ó ÄÄÆ÷³ÍÆ® »ý¼º
+    // Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
     CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
     CameraComp->SetupAttachment(SpringArmComp);
 
-    // Ä³¸¯ÅÍÀÇ ÀÌµ¿ ¹æÇâÀ¸·Î È¸ÀüÇÏµµ·Ï ¼³Á¤
+    // Ä³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È¸ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     if (UCharacterMovementComponent* CharacterMovementComp = GetCharacterMovement())
     {
         CharacterMovementComp->bOrientRotationToMovement = true;
-        GetCharacterMovement()->RotationRate = FRotator(0.0f, 360.0f, 0.0f); // È¸Àü ¼Óµµ
+        GetCharacterMovement()->RotationRate = FRotator(0.0f, 360.0f, 0.0f); // È¸ï¿½ï¿½ ï¿½Óµï¿½
     }
 
-    // Ä³¸¯ÅÍ°¡ ÄÁÆ®·Ñ·¯ Yaw¸¦ µû¸£Áö ¾Êµµ·Ï ¼³Á¤
+    // Ä³ï¿½ï¿½ï¿½Í°ï¿½ ï¿½ï¿½Æ®ï¿½Ñ·ï¿½ Yawï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Êµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     bUseControllerRotationYaw = false;
 
-    // ±¸¸£±â ¹× »ç¸Á ½Ã Àç»ýÇÏ´Â ¾Ö´Ï¸ÞÀÌ¼Ç ¸ùÅ¸ÁÖ
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½Å¸ï¿½ï¿½
     DodgeMontage = nullptr;
     DeathMontage = nullptr;
 
-    // ¹«±â ÄÄÆ÷³ÍÆ®
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
     WeaponComp = CreateDefaultSubobject<URSPlayerWeaponComponent>(TEXT("RSPlayerWeapon"));
 
-    // »óÈ£ÀÛ¿ë
+    // ï¿½ï¿½È£ï¿½Û¿ï¿½
     InteractActor = nullptr;
     InteractRadius = 200.f;
 
-    // AIÆÛ¼Á¼Ç ÀÚ±Ø ¼Ò½º
+    // AIï¿½Û¼ï¿½ï¿½ï¿½ ï¿½Ú±ï¿½ ï¿½Ò½ï¿½
     AIPerceptionStimuliSourceComp = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("AIPerceptionStimuliSource"));
     AIPerceptionStimuliSourceComp->bAutoRegister = true;
     AIPerceptionStimuliSourceComp->RegisterForSense(UAISense_Sight::StaticClass());
 
-    // ½ºÅÈ
+    // ï¿½ï¿½ï¿½ï¿½
     AttackPower = 0.f;
     AttackSpeed = 1.f;
 }
@@ -155,23 +277,23 @@ void ARSDunPlayerCharacter::OnDeath()
 {
     Super::OnDeath();
 
-    // ·¹º§ ¿ÀºêÁ§Æ®¸¦ Á¦¿ÜÇÑ ¸ðµç ¿ÀºêÁ§Æ®¿Í Ãæµ¹ÇÏÁö ¾Êµµ·Ï ÄÝ¸®Àü ¼³Á¤ º¯°æ
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½æµ¹ï¿½ï¿½ï¿½ï¿½ ï¿½Êµï¿½ï¿½ï¿½ ï¿½Ý¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     GetCapsuleComponent()->SetCollisionProfileName(TEXT("DeadCharacter"));
     GetMesh()->SetCollisionProfileName(TEXT("DeadCharacter"));
 
-    // »ç¸Á ¾Ö´Ï¸ÞÀÌ¼Ç Àç»ý
+    // ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½
     if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
     {
         AnimInstance->Montage_Play(DeathMontage);
     }
 
-    // ´õÀÌ»ó ÀÔ·Â¹ÞÁö ¸øÇÏµµ·Ï ÇÃ·¹ÀÌ¾î ÄÁÆ®·Ñ·¯ÀÇ ÀÔ·Â ¸ÅÇÎ Á¦°Å
+    // ï¿½ï¿½ï¿½Ì»ï¿½ ï¿½Ô·Â¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Æ®ï¿½Ñ·ï¿½ï¿½ï¿½ ï¿½Ô·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     if (ARSDunPlayerController* PlayerController = Cast<ARSDunPlayerController>(GetController()))
     {
         PlayerController->RemoveAllMapping();
     }
 
-    // ´õÀÌ»ó ¿òÁ÷ÀÏ ¼ö ¾øµµ·Ï ¼³Á¤
+    // ï¿½ï¿½ï¿½Ì»ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
     {
         MovementComponent->SetMovementMode(EMovementMode::MOVE_None);
@@ -185,7 +307,7 @@ void ARSDunPlayerCharacter::OnDeath()
 
 void ARSDunPlayerCharacter::Move(const FInputActionValue& value)
 {
-    // Ä«¸Þ¶ó ½ÃÁ¡À» ±âÁØÇÏ¿© ÀÔ·Â¹ÞÀº ¹æÇâÀ¸·Î Ä³¸¯ÅÍ ÀÌµ¿
+    // Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½Ô·Â¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½
     if (Controller)
     {
         const FVector2D MoveInput = value.Get<FVector2D>();
@@ -207,21 +329,21 @@ void ARSDunPlayerCharacter::Move(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::Look(const FInputActionValue& value)
 {
-    // ¸¶¿ì½ºÀÇ X, Y ¿òÁ÷ÀÓÀ» 2D ÃàÀ¸·Î °¡Á®¿Í ½ºÇÁ¸µ¾Ï È¸Àü
+    // ï¿½ï¿½ï¿½ì½ºï¿½ï¿½ X, Y ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 2D ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È¸ï¿½ï¿½
     if (Controller)
     {
         FVector2D LookInput = value.Get<FVector2D>();
 
-        // ÁÂ¿ì È¸Àü
+        // ï¿½Â¿ï¿½ È¸ï¿½ï¿½
         AddControllerYawInput(LookInput.X);
-        // »óÇÏ È¸Àü
+        // ï¿½ï¿½ï¿½ï¿½ È¸ï¿½ï¿½
         AddControllerPitchInput(LookInput.Y);
     }
 }
 
 void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
 {
-    // ³«ÇÏ Áß ±¸¸£±â°¡ µÇÁö ¾Êµµ·ÏÇÑ´Ù.
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½â°¡ ï¿½ï¿½ï¿½ï¿½ ï¿½Êµï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
     if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
     {
         if (MovementComponent->IsFalling())
@@ -238,7 +360,7 @@ void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
         SetActorRotation(DesiredRotation);
     }
 
-    // ¸ùÅ¸ÁÖ¸¦ Àç»ýÁßÀÌÁö ¾ÊÀº °æ¿ì ±¸¸£±â ½ÇÇà
+    // ï¿½ï¿½Å¸ï¿½Ö¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
     if (AnimInstance && DodgeMontage)
     {
@@ -251,7 +373,7 @@ void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::Interaction(const FInputActionValue& value)
 {
-    // ¾Ö´Ï¸ÞÀÌ¼Ç°ú ±âÈ¹ÀÌ ¾ÆÁ÷ ÁØºñµÇÁö ¾Ê¾ÒÀ¸¹Ç·Î µð¹ö±ë¿ë Ãâ·Â
+    // ï¿½Ö´Ï¸ï¿½ï¿½Ì¼Ç°ï¿½ ï¿½ï¿½È¹ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Øºï¿½ï¿½ï¿½ï¿½ ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
     if (GEngine)
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Interaction Activated"));
@@ -274,7 +396,7 @@ void ARSDunPlayerCharacter::NormalAttack(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::StrongAttack(const FInputActionValue& value)
 {
-    // ¾Ö´Ï¸ÞÀÌ¼ÇÀÌ ¾ÆÁ÷ ÁØºñµÇÁö ¾Ê¾ÒÀ¸¹Ç·Î µð¹ö±ë¿ë Ãâ·Â
+    // ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Øºï¿½ï¿½ï¿½ï¿½ ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
     if (GEngine)
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("StrongAttack Activated"));
@@ -283,8 +405,8 @@ void ARSDunPlayerCharacter::StrongAttack(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::FirstWeaponSlot(const FInputActionValue& value)
 {
-    // ¾Ö´Ï¸ÞÀÌ¼ÇÀÌ ¾ÆÁ÷ ÁØºñµÇÁö ¾Ê¾ÒÀ¸¹Ç·Î µð¹ö±ë¿ë Ãâ·Â
-    // ÃßÈÄ¿¡ ÇØ´ç ¹«±â·Î ÀüÈ¯µÇ´Â ±â´É ±¸ÇöÇØ¾ßÇÑ´Ù.
+    // ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Øºï¿½ï¿½ï¿½ï¿½ ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+    // ï¿½ï¿½ï¿½Ä¿ï¿½ ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½Ñ´ï¿½.
     if (GEngine)
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("FirstWeaponSlot Activated"));
@@ -295,8 +417,8 @@ void ARSDunPlayerCharacter::FirstWeaponSlot(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::SecondWeaponSlot(const FInputActionValue& value)
 {
-    // ¾Ö´Ï¸ÞÀÌ¼ÇÀÌ ¾ÆÁ÷ ÁØºñµÇÁö ¾Ê¾ÒÀ¸¹Ç·Î µð¹ö±ë¿ë Ãâ·Â
-    // ÃßÈÄ¿¡ ÇØ´ç ¹«±â·Î ÀüÈ¯µÇ´Â ±â´É ±¸ÇöÇØ¾ßÇÑ´Ù.
+    // ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Øºï¿½ï¿½ï¿½ï¿½ ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+    // ï¿½ï¿½ï¿½Ä¿ï¿½ ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½Ñ´ï¿½.
     if (GEngine)
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("SecondWeaponSlot Activated"));
@@ -312,17 +434,17 @@ URSPlayerWeaponComponent* ARSDunPlayerCharacter::GetRSPlayerWeaponComponent()
 
 void ARSDunPlayerCharacter::InteractTrace()
 {
-    // Ä³¸¯ÅÍ¸¦ Áß½ÉÀ¸·Î »ç¿ëÇÒ À§Ä¡ ¼±Á¤
+    // Ä³ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ß½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
     FVector Center = GetActorLocation();
 
-    // ¹«½ÃÇÒ ¾×ÅÍ, ÀÚ±â ÀÚ½ÅÀº Á¦¿Ü
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½Ú±ï¿½ ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     FCollisionQueryParams Params;
     Params.AddIgnoredActor(this);
 
-    // ¿À¹ö·¦µÈ ¾×ÅÍ¸¦ ÀúÀåÇÒ ¹è¿­
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½è¿­
     TArray<FOverlapResult> OutOverlaps;
 
-    // Ä³¸¯ÅÍ¸¦ Áß½ÉÀ¸·Î ¹ÝÁö¸§ Å©±âÀÇ ±¸Ã¼¸¦ »ç¿ëÇØ InteractTrace Ã¤³Î°ú ¿À¹ö·¦µÈ ¾×ÅÍµéÀ» Å½»öÇÑ´Ù.
+    // Ä³ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ß½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ InteractTrace Ã¤ï¿½Î°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ Å½ï¿½ï¿½ï¿½Ñ´ï¿½.
     bool bHit = GetWorld()->OverlapMultiByChannel(OutOverlaps, Center, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(InteractRadius), Params);
     
     if (!bHit)
@@ -334,7 +456,7 @@ void ARSDunPlayerCharacter::InteractTrace()
 
     FVector Forward = GetActorForwardVector();
 
-    // Àü¹æ ³»¿¡ ÀÖ´Â ¾×ÅÍ¿Í °¡Àå °¡±îÀÌ ÀÖ´Â ¾×ÅÍ¸¦ º´ÇàÇØ¼­ °è»êÇÑ´Ù.
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½Í¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
     AActor* ClosestInFront = nullptr;
     float ClosestInFrontDist = TNumericLimits<float>::Max();
 
@@ -349,23 +471,23 @@ void ARSDunPlayerCharacter::InteractTrace()
             continue;
         }
 
-        // ´ë»ó ¾×ÅÍ±îÁöÀÇ º¤ÅÍ ¹× °Å¸® °è»ê
+        // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Í±ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Å¸ï¿½ ï¿½ï¿½ï¿½
         FVector ToTarget = Target->GetActorLocation() - Center;
         float Distance = ToTarget.Size();
         FVector DirToTarget = ToTarget.GetSafeNormal();
 
-        // Àü¹æ º¤ÅÍ¿ÍÀÇ ³»ÀûÀ¸·Î Àü¹æ°úÀÇ °¢µµ °è»ê
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Í¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         float Dot = FVector::DotProduct(Forward, DirToTarget);
         float Angle = FMath::RadiansToDegrees(FMath::Acos(Dot));
 
-        // Àü¹æ ³» Çô¿ë °¢µµ ¾È¿¡ ÀÖÀ¸¸ç, ÇöÀç±îÁö °¡Àå °¡±î¿î ¾×ÅÍÀÏ °æ¿ì
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½È¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         if (Angle <= InteractAngle && Distance < ClosestInFrontDist)
         {
             ClosestInFront = Target;
             ClosestInFrontDist = Distance;
         }
 
-        // Àü¹æ ¿©ºÎ¿Í °ü°è¾øÀÌ °¡Àå °¡±î¿î ¾×ÅÍÀÏ °æ¿ì
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         if (Distance < CosestActorDistance)
         {
             ClosestActor = Target;
@@ -373,13 +495,13 @@ void ARSDunPlayerCharacter::InteractTrace()
         }
     }
 
-    // Àü¹æ ¶Ç´Â ÀüÃ¼ ¾×ÅÍ Áß À¯È¿ÇÑ ¾×ÅÍ°¡ ÀÖ´Â °æ¿ì
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½Ç´ï¿½ ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½È¿ï¿½ï¿½ ï¿½ï¿½ï¿½Í°ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½
     if (ClosestInFront || ClosestActor)
     {
-        // Àü¹æÀ» ¿ì¼±À¸·Î »ç¿ëÇÑ´Ù.
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ì¼±ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
         AActor* TargetActor = (ClosestInFront != nullptr) ? ClosestInFront : ClosestActor;
 
-        // ´ë»ó ¾×ÅÍ°¡ »óÈ£ÀÛ¿ë ÀÎÅÍÆäÀÌ½º¸¦ ±¸ÇöÇß´ÂÁö È®ÀÎÇÏ°í ±¸ÇöÇß´Ù¸é ÀúÀåÇÑ´Ù.
+        // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Í°ï¿½ ï¿½ï¿½È£ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ß´ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ß´Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
         if (TargetActor && TargetActor->GetClass()->ImplementsInterface(URSInteractable::StaticClass()))
         {
             IRSInteractable* Interactable = Cast<IRSInteractable>(TargetActor);
@@ -435,7 +557,7 @@ void ARSDunPlayerCharacter::IncreaseAttackSpeed(float Amount)
 
 void ARSDunPlayerCharacter::DecreaseAttackSpeed(float Amount)
 {
-    // ¾Ö´Ï¸ÞÀÌ¼ÇÀÇ Àç»ý ¼Óµµ°¡ À½¼ö°ªÀÌ µÈ´Ù¸é ¾Ö´Ï¸ÞÀÌ¼ÇÀÌ ¿ªÀç»ý µÇ¹Ç·Î, ¿¹¿ÜÃ³¸®
+    // ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Óµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½È´Ù¸ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ç¹Ç·ï¿½, ï¿½ï¿½ï¿½ï¿½Ã³ï¿½ï¿½
     float NewAttackSpeed = FMath::Max(AttackSpeed - Amount, 0.0f);
     AttackSpeed = NewAttackSpeed;
 }
