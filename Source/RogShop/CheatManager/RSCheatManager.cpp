@@ -172,9 +172,9 @@ void URSCheatManager::ShowRSDunMainWidget()
 {
     ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetOuterAPlayerController());
 
-    if (PC && PC->RSDunMainWidget)
+    if (PC && PC->GetRSDunMainWidget())
     {
-        PC->RSDunMainWidget->AddToViewport();
+        PC->GetRSDunMainWidget()->AddToViewport();
     }
     else
     {

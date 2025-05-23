@@ -17,7 +17,12 @@ void ARSDunPlayerController::BeginPlay()
 
     AddMapping();
 
-    ShowRSDunMainWidget();
+    InitializeRSDunMainWidget();
+
+    if (RSDunMainWidget)
+    {
+        //OnWeaponSlotChange.AddDynamic(RSDunMainWidget, &URSDunMainWidget::UpdateWeaponSlot);
+    }
 }
 
 void ARSDunPlayerController::AddMapping()
@@ -48,7 +53,7 @@ void ARSDunPlayerController::RemoveAllMapping()
     }
 }
 
-void ARSDunPlayerController::ShowRSDunMainWidget()
+void ARSDunPlayerController::InitializeRSDunMainWidget()
 {
     if (RSDunMainWidgetClass)
     {

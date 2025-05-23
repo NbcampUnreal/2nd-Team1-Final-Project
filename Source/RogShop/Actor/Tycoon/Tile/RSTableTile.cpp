@@ -4,9 +4,11 @@
 #include "RSTableTile.h"
 
 #include "RogShop/UtilDefine.h"
+#include "RogShop/Actor/Tycoon/Food/RSBaseFood.h"
 #include "RogShop/GameModeBase/RSTycoonGameModeBase.h"
-#include "Tycoon/RSTycoonCustomerCharacter.h"
+#include "Tycoon/NPC/RSTycoonCustomerCharacter.h"
 #include "Tycoon/RSTycoonPlayerCharacter.h"
+#include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
 
 
 ARSTableTile::ARSTableTile()
@@ -17,10 +19,10 @@ ARSTableTile::ARSTableTile()
 	FoodLocation->SetupAttachment(RootComponent);
 }
 
-void ARSTableTile::Interact()
+void ARSTableTile::Interact(ACharacter* InteractCharacter)
 {
-	Super::Interact();
-	
+	Super::Interact(InteractCharacter);
+
 	if (!Use())
 	{
 		return;
@@ -29,19 +31,19 @@ void ARSTableTile::Interact()
 	TWeakObjectPtr<ARSTycoonCustomerCharacter> MainCustomer = SittingCustomers[0];
 	check(MainCustomer.IsValid())
 
-	if (MainCustomer->State == ETycoonCustomerState::OrderWaiting)
+	if (MainCustomer->GetState() == ETycoonCustomerState::OrderWaiting)
 	{
 		//주문을 받음
 		Order();
 	}
-	else if (MainCustomer->State == ETycoonCustomerState::FoodWaiting)
+	else if (MainCustomer->GetState() == ETycoonCustomerState::FoodWaiting)
 	{
 		//음식을 전달함
-		Serving();
+		Serving(InteractCharacter);
 	}
 	else
 	{
-		RS_LOG_F_C("잘못된 접근, 현재 손님 State : %s", FColor::Red, *UEnum::GetValueAsString(MainCustomer->State))
+		RS_LOG_F_C("잘못된 접근, 현재 손님 State : %s", FColor::Red, *UEnum::GetValueAsString(MainCustomer->GetState()))
 	}
 }
 
@@ -58,8 +60,8 @@ void ARSTableTile::Sit(ARSTycoonCustomerCharacter* Customer)
 	int32 CustomerIndex = SittingCustomers.Num();
 	SittingCustomers.Add(Customer);
 
-	Customer->Sit(SittingLocations[CustomerIndex]->GetComponentTransform());
-	Customer->OnLeave.AddLambda([&](ARSTycoonCustomerCharacter* LeaveCustomer)
+	Customer->Sit(this, SittingLocations[CustomerIndex]->GetComponentTransform());
+	Customer->OnFinishEat.AddLambda([&](ARSTycoonCustomerCharacter* LeaveCustomer)
 	{
 		SittingCustomers.RemoveSingle(LeaveCustomer);
 
@@ -78,27 +80,46 @@ void ARSTableTile::Order()
 	}
 }
 
-void ARSTableTile::Serving()
+void ARSTableTile::Serving(ACharacter* InteractCharacter)
 {
-	ARSTycoonPlayerCharacter* Player = Cast<ARSTycoonPlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
-	check(Player)
+	IRSCanPickup* CanPickupCharacter = Cast<IRSCanPickup>(InteractCharacter);
+	check(CanPickupCharacter)
+	
+	AActor* PickupActor = CanPickupCharacter->GetPickupActor();
+	if (PickupActor == nullptr)
+	{
+		RS_LOG_C("들고있는 음식이 없습니다", FColor::Red)
+		return;
+	}
 
-	AActor* Food = Player->Drop(FoodLocation->GetComponentLocation());
-	if (Food)
+	ARSBaseFood* Food = Cast<ARSBaseFood>(PickupActor);
+	if (Food == nullptr)
+	{
+		RS_LOG_C("들고 있는 액터가 음식이 아닙니다.", FColor::Red)
+		return;
+	}
+
+	ARSTycoonCustomerCharacter* OrderedCustomer = nullptr;
+	for (auto Customer : SittingCustomers)
+	{
+		if (Customer == Food->WantCustomer)
+		{
+			OrderedCustomer = Customer;
+			break;
+		}
+	}
+	
+	if (OrderedCustomer)
 	{
 		RS_LOG("음식을 전달했습니다")
 
-		//임시, 지금 기획이 좀 바뀌면서 이상함.
-		//수정해야함
-		FoodActor = Food;
+		FoodActor = PickupActor;
 		
-		for (auto& Customer : SittingCustomers)
-		{
-			Customer->Eat();
-		}
+		CanPickupCharacter->Drop(FoodLocation->GetComponentLocation());
+		OrderedCustomer->Eat();
 	}
 	else
 	{
-		RS_LOG_C("음식을 전달하지 못했습니다", FColor::Red)
+		RS_LOG_C("주문하신 손님이 아닙니다.", FColor::Red)
 	}
 }

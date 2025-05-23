@@ -23,11 +23,6 @@ ARSTileMap::ARSTileMap()
 	RootComponent = TileParent;
 }
 
-void ARSTileMap::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 void ARSTileMap::BeginPlay()
 {
 	Super::BeginPlay();
@@ -122,7 +117,9 @@ UClass* ARSTileMap::GetTileClass(const FName& TileKey)
 	for (TSubclassOf<ARSBaseTile> TileType : TileTypes)
 	{
 		if (TileType->GetDefaultObject<ARSBaseTile>()->GetTileKey() == TileKey)
+		{
 			return TileType;
+		}
 	}
 	
 	//아무것도 매치되지 않음

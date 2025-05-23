@@ -7,9 +7,10 @@
 #include "RSDunPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/BoxComponent.h"
-#include "RogShop/GameInstanceSubsystem/RSDataSubsystem.h"
+#include "RSDataSubsystem.h"
 #include "DungeonItemData.h"
 #include "RSInteractableWeapon.h"
+#include "RSDunPlayerController.h"
 
 // Sets default values for this component's properties
 URSPlayerWeaponComponent::URSPlayerWeaponComponent()
@@ -50,7 +51,7 @@ void URSPlayerWeaponComponent::HandleNormalAttackInput()
     }
     else
     {
-		uint8 Index = static_cast<uint8>(WeaponSlot) - 1;
+		int8 Index = static_cast<int8>(WeaponSlot) - 1;
         if (WeaponActors.IsValidIndex(Index) && WeaponActors[Index] != nullptr)
         {
 			ARSDunPlayerCharacter* CurCharacter = GetOwner<ARSDunPlayerCharacter>();
@@ -84,7 +85,7 @@ bool URSPlayerWeaponComponent::ContinueComboAttack()
 {
 	if (bComboInputBuffered)
 	{
-		uint8 Index = static_cast<uint8>(WeaponSlot) - 1;
+		int8 Index = static_cast<int8>(WeaponSlot) - 1;
 		if (WeaponActors.IsValidIndex(Index) && WeaponActors[Index] != nullptr)
 		{
 			ARSDunPlayerCharacter* CurCharacter = GetOwner<ARSDunPlayerCharacter>();
@@ -171,11 +172,29 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 	{
 		WeaponActors[0] = NewWeaponActor;
 
+		// UI 갱신되도록 이벤트 디스패처 호출
+		FName NewWeaponKey = NewWeaponActor->GetDataTableKey();
+
+		ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
+		if (PC)
+		{
+			PC->OnWeaponSlotChange.Broadcast(1, NewWeaponKey);
+		}
+
 		RS_LOG("0 Slot Add Weapon")
 	}
 	else if (WeaponActors[1] == nullptr)
 	{
 		WeaponActors[1] = NewWeaponActor;
+
+		// UI 갱신되도록 이벤트 디스패처 호출
+		FName NewWeaponKey = NewWeaponActor->GetDataTableKey();
+
+		ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
+		if (PC)
+		{
+			PC->OnWeaponSlotChange.Broadcast(2, NewWeaponKey);
+		}
 
 		RS_LOG("1 Slot Add Weapon")
 	}
@@ -184,12 +203,12 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 		// 기존에 장착하던 무기를 버리는 로직
 		// 만약, 비어있는 무기 슬롯이 없는 경우 들고 있는 무기와 교체한다.
 		
-		uint8 Index = static_cast<uint8>(WeaponSlot) - 1;
+		int8 Index = static_cast<int8>(WeaponSlot) - 1;
 
 		// 만약 무기를 장착중이지 않은 경우 첫 슬롯의 무기와 교체한다.
 		if (EWeaponSlot::NONE == WeaponSlot)
 		{
-			Index = static_cast<uint8>(EWeaponSlot::FirstWeaponSlot);
+			Index = static_cast<int8>(EWeaponSlot::FirstWeaponSlot) - 1;
 		}
 
 		ARSInteractableWeapon* InteractableWeapon = GetWorld()->SpawnActor<ARSInteractableWeapon>(ARSInteractableWeapon::StaticClass(), CurCharacter->GetActorTransform());
@@ -212,10 +231,20 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 		// 기존에 장착하던 무기 제거
 		WeaponActors[Index]->Destroy();
 		WeaponActors[Index] = NewWeaponActor;
-		WeaponSlot = EWeaponSlot::NONE;
 
 		// 새로운 무기를 장착
-		EquipWeaponToCharacter(WeaponSlot);
+		EWeaponSlot TempWeaponSlot = WeaponSlot;
+		WeaponSlot = EWeaponSlot::NONE;
+		EquipWeaponToCharacter(TempWeaponSlot);
+
+		// UI 갱신되도록 이벤트 디스패처 호출
+		FName NewWeaponKey = NewWeaponActor->GetDataTableKey();
+
+		ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
+		if (PC)
+		{
+			PC->OnWeaponSlotChange.Broadcast(static_cast<int8>(WeaponSlot), NewWeaponKey);
+		}
 	}
 }
 
@@ -228,22 +257,23 @@ void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSl
 	}
 
 	// 바꾸려는 슬롯이 비어있는 경우 취소
-	uint8 TargetIndex = static_cast<uint8>(TargetWeaponSlot) - 1;
+	int8 TargetIndex = static_cast<int8>(TargetWeaponSlot) - 1;
 	if (!WeaponActors.IsValidIndex(TargetIndex) || !WeaponActors[TargetIndex])
 	{
 		return;
 	}
 	
 	// 바꾸려는 슬롯이 현재 슬롯인 경우 취소
-	uint8 CurrentIndex = static_cast<uint8>(WeaponSlot) - 1;
+	int8 CurrentIndex = static_cast<int8>(WeaponSlot) - 1;
 	if (CurrentIndex == TargetIndex)
 	{
 		return;
 	}
 
-	// 현재 착용 중인 무기가 있는 경우 숨김 처리 및 충돌을 끈다.
-	if (WeaponActors.IsValidIndex(CurrentIndex))
+	// 기존에 착용하고 있던 무기가 유효한 경우
+	if (WeaponActors.IsValidIndex(CurrentIndex) && WeaponActors[CurrentIndex])
 	{
+		// 현재 착용 중인 무기가 있는 경우 숨김 처리 및 충돌을 끈다.
 		ARSBaseWeapon* CurEquipWeapon = WeaponActors[CurrentIndex];
 		if (CurEquipWeapon)
 		{
@@ -252,23 +282,50 @@ void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSl
 
 			// 오버랩 이벤트 바인딩 해제
 			WeaponActors[CurrentIndex]->GetBoxComp()->OnComponentBeginOverlap.RemoveDynamic(this, &URSPlayerWeaponComponent::OnBeginOverlap);
+
+			// 무기의 애님 레이어를 해제한다.
+			TSubclassOf<UAnimInstance> CurAnimInstance = CurEquipWeapon->GetWeaponAnimInstnace();
+
+			ACharacter* CurCharacter = GetOwner<ACharacter>();
+			if (CurCharacter)
+			{
+				USkeletalMeshComponent* SkeletalMeshComp = CurCharacter->GetMesh();
+				if (SkeletalMeshComp)
+				{
+					SkeletalMeshComp->UnlinkAnimClassLayers(CurAnimInstance);
+				}
+			}
 		}
 	}
 
-	// 새로 착용할 무기의 숨김 처리를 끄고, 충돌을 켠다.
-	if (WeaponActors.IsValidIndex(TargetIndex))
+	// 새로 착용할 무기가 유효한 경우
+	if (WeaponActors.IsValidIndex(TargetIndex) && WeaponActors[TargetIndex])
 	{
+		// 새로 착용할 무기의 숨김 처리를 끄고, 충돌을 켠다.
 		ARSBaseWeapon* TargetEquipWeapon = WeaponActors[TargetIndex];
 		if (TargetEquipWeapon)
 		{
 			TargetEquipWeapon->SetActorHiddenInGame(false);
 			TargetEquipWeapon->SetActorEnableCollision(true);
-
+			
 			// 오버랩 이벤트 바인딩
 			UBoxComponent* CurWeaponBoxComp = TargetEquipWeapon->GetBoxComp();
 			if (CurWeaponBoxComp)
 			{
 				CurWeaponBoxComp->OnComponentBeginOverlap.AddDynamic(this, &URSPlayerWeaponComponent::OnBeginOverlap);
+			}
+
+			// 무기의 애님 레이어를 적용한다.
+			TSubclassOf<UAnimInstance> TargetAnimInstance = TargetEquipWeapon->GetWeaponAnimInstnace();
+
+			ACharacter* CurCharacter = GetOwner<ACharacter>();
+			if (CurCharacter)
+			{
+				USkeletalMeshComponent* SkeletalMeshComp = CurCharacter->GetMesh();
+				if (SkeletalMeshComp)
+				{
+					SkeletalMeshComp->LinkAnimClassLayers(TargetAnimInstance);
+				}
 			}
 
 			// 현재 슬롯을 변경한다.
@@ -280,7 +337,7 @@ void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSl
 void URSPlayerWeaponComponent::StartAttackOverlap()
 {
 	// 콜리전을 켠다.
-	uint8 Index = static_cast<uint8>(WeaponSlot) - 1;
+	int8 Index = static_cast<int8>(WeaponSlot) - 1;
 	if (WeaponActors.IsValidIndex(Index))
 	{
 		WeaponActors[Index]->StartOverlap();
@@ -290,7 +347,7 @@ void URSPlayerWeaponComponent::StartAttackOverlap()
 void URSPlayerWeaponComponent::EndAttackOverlap()
 {
 	// 콜리전을 끈다.
-	uint8 Index = static_cast<uint8>(WeaponSlot) - 1;
+	int8 Index = static_cast<int8>(WeaponSlot) - 1;
 	if (WeaponActors.IsValidIndex(Index))
 	{
 		WeaponActors[Index]->EndOverlap();
@@ -313,7 +370,7 @@ void URSPlayerWeaponComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedCom
 
 	if (OtherActor && OtherActor != OwnerCharacter && !DamagedActors.Contains(OtherActor))
 	{
-		uint8 Index = static_cast<uint8>(WeaponSlot) - 1;
+		int8 Index = static_cast<int8>(WeaponSlot) - 1;
 		float TotalDamage = 0.f;
 		if (WeaponActors.IsValidIndex(Index) && OwnerCharacter)
 		{
