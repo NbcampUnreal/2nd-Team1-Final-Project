@@ -29,7 +29,7 @@ void ARSDunBossWormCharacter::PlayDeathAnim()
 void ARSDunBossWormCharacter::PerformAttackTrace()
 {
 	FHitResult HitResult;
-	FVector Start = GetMesh()->GetSocketLocation("FrontLeg3_R"); // TODO : 사막 보스 에셋 받으면 여기다 실제 소켓 이름으로 바꿔줘야 함
+	FVector Start = GetMesh()->GetSocketLocation(SocketLocation); // TODO : 사막 보스 에셋 받으면 여기다 실제 소켓 이름으로 바꿔줘야 함
 	Start += GetActorForwardVector() * TraceForwardOffset;
 	Start += GetActorRightVector() * TraceRightOffset;
 	Start += GetActorUpVector() * TraceUpOffset;

@@ -102,6 +102,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "AttackTrace")
 	float TraceUpOffset;        // (선택) 높이 보정
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName SocketLocation;		// 트레이스가 나갈 소켓의 시작점
+
 	FTimerHandle detectDelayTimer;
 
 private:
