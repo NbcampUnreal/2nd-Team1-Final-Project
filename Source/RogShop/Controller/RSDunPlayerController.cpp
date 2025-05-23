@@ -21,7 +21,7 @@ void ARSDunPlayerController::BeginPlay()
 
     if (RSDunMainWidget)
     {
-        //OnWeaponSlotChange.AddDynamic(RSDunMainWidget, &URSDunMainWidget::UpdateWeaponSlot);
+        OnWeaponSlotChange.AddDynamic(RSDunMainWidget, &URSDunMainWidget::UpdateWeaponSlot);
     }
 }
 
@@ -61,8 +61,7 @@ void ARSDunPlayerController::InitializeRSDunMainWidget()
 
         if (RSDunMainWidget)
         {
-            // 상시 출력 필요 시 주석 해제 필요
-            // RSDunMainWidget->AddToViewport();
+            RSDunMainWidget->AddToViewport();
         }
     }
     else
