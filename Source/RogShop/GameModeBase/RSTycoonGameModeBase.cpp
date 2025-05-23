@@ -10,7 +10,7 @@
 #include "RogShop/Actor/Tycoon/Tile/RSTableTile.h"
 #include "RogShop/DataTable/CookFoodData.h"
 #include "RogShop/GameInstanceSubsystem/RSDataSubsystem.h"
-#include "Tycoon/RSTycoonCustomerCharacter.h"
+#include "Tycoon/NPC/RSTycoonCustomerCharacter.h"
 
 
 ARSTycoonGameModeBase::ARSTycoonGameModeBase()
@@ -36,14 +36,14 @@ void ARSTycoonGameModeBase::StartGame()
 	GetWorldTimerManager().SetTimer(CustomerTimerHandle, this, &ARSTycoonGameModeBase::CreateCustomer, 5.f, true);
 }
 
-void ARSTycoonGameModeBase::AddOrder(const FName& OrderFoodName)
+void ARSTycoonGameModeBase::AddOrder(FFoodOrder Order)
 {
-	OrderedFoodKeys.Add(OrderFoodName);
+	FoodOrders.Add(Order);
 }
 
-void ARSTycoonGameModeBase::RemoveOrder(const FName& OrderFoodName)
+void ARSTycoonGameModeBase::RemoveOrder(FFoodOrder Order)
 {
-	OrderedFoodKeys.RemoveSingle(OrderFoodName);
+	FoodOrders.RemoveSingle(Order);
 }
 
 void ARSTycoonGameModeBase::BeginPlay()
@@ -148,10 +148,6 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 		//데이터와 Row의 대응의 순서가 보장된다면 정상작동함
 		auto RowNames = DataSubsystem->Food->GetRowNames();
 		OutOrderFood = RowNames[OrderFoodIndex];
-
-		//디버그
-		FCookFoodData* DebugFood = DataSubsystem->Food->FindRow<FCookFoodData>(OutOrderFood, TEXT("Debug Find Food"));
-		RS_LOG_F_C("만들어야되는 음식 : %s, 지정된 Row 음식 : %s", FColor::Green, *MakeFoodName, *DebugFood->Name)
 	}
 
 	return bResult;
