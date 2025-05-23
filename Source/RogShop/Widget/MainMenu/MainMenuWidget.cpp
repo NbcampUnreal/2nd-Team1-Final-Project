@@ -34,7 +34,14 @@ void UMainMenuWidget::OnStartButtonClicked()
 
 void UMainMenuWidget::OnOptionButtonClicked()
 {
-	//可记 困连 拳搁俊 剁快扁
+	if (OptionMenuWidgetClass)
+	{
+		UUserWidget* OptionMenu = CreateWidget<UUserWidget>(GetWorld(), OptionMenuWidgetClass);
+		if (OptionMenu)
+		{
+			OptionMenu->AddToViewport();
+		}
+	}
 }
 
 void UMainMenuWidget::OnExitButtonClicked()
