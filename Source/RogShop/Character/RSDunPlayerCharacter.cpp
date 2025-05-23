@@ -310,6 +310,50 @@ void ARSDunPlayerCharacter::OnDeath()
     }
 }
 
+void ARSDunPlayerCharacter::IncreaseMaxHP(float Amount)
+{
+    Super::IncreaseMaxHP(Amount);
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnMaxHPChange.Broadcast();
+    }
+}
+
+void ARSDunPlayerCharacter::DecreaseMaxHP(float Amount)
+{
+    Super::DecreaseMaxHP(Amount);
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnMaxHPChange.Broadcast();
+    }
+}
+
+void ARSDunPlayerCharacter::IncreaseHP(float Amount)
+{
+    Super::IncreaseHP(Amount);
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnHPChange.Broadcast();
+    }
+}
+
+void ARSDunPlayerCharacter::DecreaseHP(float Amount)
+{
+    Super::DecreaseHP(Amount);
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnHPChange.Broadcast();
+    }
+}
+
 void ARSDunPlayerCharacter::Move(const FInputActionValue& value)
 {
     // ī�޶� ������ �����Ͽ� �Է¹��� �������� ĳ���� �̵�

@@ -22,6 +22,8 @@ void ARSDunPlayerController::BeginPlay()
     if (RSDunMainWidget)
     {
         OnWeaponSlotChange.AddDynamic(RSDunMainWidget, &URSDunMainWidget::UpdateWeaponSlot);
+        OnHPChange.AddDynamic(RSDunMainWidget, &URSDunMainWidget::UpdateHP);
+        OnMaxHPChange.AddDynamic(RSDunMainWidget, &URSDunMainWidget::UpdateMaxHP);
     }
 }
 

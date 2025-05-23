@@ -22,7 +22,6 @@ void URSPlayerStatRelicEffect::ApplyEffect(ARSDunPlayerCharacter* Player, ARSDun
 			}
 
 			Player->IncreaseMaxHP(FinalValue);
-			PC->GetRSDunMainWidget()->UpdateMaxHP();
 
 			break;
 		}

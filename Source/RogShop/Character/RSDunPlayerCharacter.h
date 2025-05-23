@@ -38,6 +38,11 @@ public:
 
 	void OnDeath();
 
+	virtual void IncreaseMaxHP(float Amount) override;
+	virtual void DecreaseMaxHP(float Amount) override;
+
+	virtual void IncreaseHP(float Amount) override;
+	virtual void DecreaseHP(float Amount) override;
 
 protected:
 	UFUNCTION()
