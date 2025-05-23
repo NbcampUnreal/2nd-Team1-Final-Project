@@ -51,7 +51,9 @@ protected:
 	void FindBossRoom();                             // 가장 먼 방을 보스방으로 설정
 	void StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector& Location, const FRotator& Rotation, const FString& UniqueName);
 	void ChooseShopTile();
-	
+
+	int32 GetConnectedNeighborCount(FVector2D Pos);
+	int32 GetAvailableNeighborCount(FVector2D Pos);
 	bool IsValidPos(FVector2D Pos) const;                // 좌표가 그리드 안에 있는지 확인
 	FVector2D GetNextDirection(FVector2D Current, TArray<FVector2D>& Visited); // 다음 경로 선택
 

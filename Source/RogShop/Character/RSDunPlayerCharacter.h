@@ -9,6 +9,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class URSPlayerWeaponComponent;
+class URSDungeonInventoryComponent;
 class UAIPerceptionStimuliSourceComponent;
 
 struct FInputActionValue;
@@ -78,13 +79,22 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
 	TObjectPtr<URSPlayerWeaponComponent> WeaponComp;
 
+// 인벤토리 관련
+public:
+	URSDungeonInventoryComponent* GetRSDungeonInventoryComponent();
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = true))
+	TObjectPtr<URSDungeonInventoryComponent> InventoryComp;
+
 // 상호작용 관련
 private:
 	void InteractTrace();
 
 private:
 	AActor* InteractActor;	// 라인트레이스를 통해 찾은 상호작용 가능한 액터
-	float InteractDistance;	// 라인트레이스를 할 거리
+	float InteractRadius;	// 라인트레이스를 할 거리(반지름)
+	float InteractAngle;	// 플레이어가 가장 먼저 상호작용 할 액터를 찾을 각도
 
 // AI퍼셉션 자극 소스
 private:

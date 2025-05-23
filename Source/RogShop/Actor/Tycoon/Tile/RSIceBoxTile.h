@@ -16,5 +16,5 @@ public:
 	
 	GENERATED_TILE()
 	
-	virtual void Interact() override;
+	virtual void Interact(ACharacter* InteractCharacter) override;
 };

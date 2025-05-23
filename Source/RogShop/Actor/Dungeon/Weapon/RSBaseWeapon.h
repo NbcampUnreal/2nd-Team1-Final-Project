@@ -36,12 +36,13 @@ private:
 
 // 애니메이션
 public:
-	UAnimMontage* GetNormalAttack(int32 Index);
-	const TArray<UAnimMontage*>& GetNormalAttacks();
+	TSubclassOf<UAnimInstance> GetWeaponAnimInstnace() const;
+	UAnimMontage* GetNormalAttack(int32 Index) const;
+	const TArray<UAnimMontage*>& GetNormalAttacks() const;
 		
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = true))
-	TSubclassOf<UAnimInstance> AnimInstnace; // 무기의 기본 이동 애님 인스턴스
+	TSubclassOf<UAnimInstance> WeaponAnimInstnace; // 무기의 기본 이동 애님 인스턴스
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = true))
 	TArray<TObjectPtr<UAnimMontage>> NormalAttacks; // 무기의 기본 공격 몽타주

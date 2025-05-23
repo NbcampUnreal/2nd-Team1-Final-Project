@@ -7,6 +7,8 @@
 #include "RSDunMainWidget.h"
 #include "RSDunPlayerController.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotChange, uint8, SlotIndex, FName, WeaponKey);
+
 class UInputMappingContext;
 class UInputAction;
 
@@ -25,7 +27,7 @@ public:
 
 	void RemoveAllMapping();
 
-	void ShowRSDunMainWidget();
+	void InitializeRSDunMainWidget();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
@@ -47,11 +49,20 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
 	TObjectPtr<UInputAction> SecondWeaponSlotAction;
 
-	UPROPERTY()
+// 위젯
+public:
+	URSDunMainWidget* GetRSDunMainWidget() const { return RSDunMainWidget; }
+
+private:
+	// 블루프린트에서 지정할 수 있도록 TSubclassOf로 선언
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = true))
+	TSubclassOf<UUserWidget> RSDunMainWidgetClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = true))
 	URSDunMainWidget* RSDunMainWidget;
 
-protected:
-	// 블루프린트에서 지정할 수 있도록 TSubclassOf로 선언
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
-	TSubclassOf<UUserWidget> RSDunMainWidgetClass;
+// 이벤트 디스패처
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnWeaponSlotChange OnWeaponSlotChange;	// WeaponSlot을 변경하는 시점
 };
