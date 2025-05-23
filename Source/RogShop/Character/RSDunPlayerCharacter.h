@@ -62,70 +62,22 @@ protected:
 	UFUNCTION()
 	void SecondWeaponSlot(const FInputActionValue& value);
 
-
-private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Module", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* HeadMeshComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Module", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* HairMeshComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Module", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* EyebrowsMeshComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Module", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* MustacheMeshComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Module", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* BeardMeshComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Module", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* TorsoMeshComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Module", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* ArmsMeshComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Module", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* HandsMeshComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Module", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* FingersMeshComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Module", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* LegsMeshComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Module", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* FeetMeshComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Module", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* TopArmorMeshComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Module", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* GlovesMeshComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Module", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* PantsMeshComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Module", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* BootsMeshComp;
-
-
-// Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½
+// Ä«¸Þ¶ó °ü·Ã
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = true))
 	TObjectPtr<USpringArmComponent> SpringArmComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UCameraComponent> CameraComp;
 
-// ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+// ¾Ö´Ï¸ÞÀÌ¼Ç ¸ùÅ¸ÁÖ °ü·Ã
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = true))
-	TObjectPtr<UAnimMontage> DodgeMontage; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	TObjectPtr<UAnimMontage> DodgeMontage; // ±¸¸£±â
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = true))
-	TObjectPtr<UAnimMontage> DeathMontage; // ï¿½ï¿½ï¿½
+	TObjectPtr<UAnimMontage> DeathMontage; // »ç¸Á
 
-// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+// ¹«±â °ü·Ã
 public:
 	URSPlayerWeaponComponent* GetRSPlayerWeaponComponent();
 
@@ -133,8 +85,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
 	TObjectPtr<URSPlayerWeaponComponent> WeaponComp;
 
-// ï¿½ï¿½È£ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½
-// ï¿½Îºï¿½ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½
+// ÀÎº¥Åä¸® °ü·Ã
 public:
 	URSDungeonInventoryComponent* GetRSDungeonInventoryComponent();
 
@@ -142,21 +93,21 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = true))
 	TObjectPtr<URSDungeonInventoryComponent> InventoryComp;
 
-// ï¿½ï¿½È£ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½
+// »óÈ£ÀÛ¿ë °ü·Ã
 private:
 	void InteractTrace();
 
 private:
-	AActor* InteractActor;	// ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã£ï¿½ï¿½ ï¿½ï¿½È£ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-	float InteractRadius;	// ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Å¸ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
-	float InteractAngle;	// ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È£ï¿½Û¿ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Í¸ï¿½ Ã£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	AActor* InteractActor;	// ¶óÀÎÆ®·¹ÀÌ½º¸¦ ÅëÇØ Ã£Àº »óÈ£ÀÛ¿ë °¡´ÉÇÑ ¾×ÅÍ
+	float InteractRadius;	// ¶óÀÎÆ®·¹ÀÌ½º¸¦ ÇÒ °Å¸®(¹ÝÁö¸§)
+	float InteractAngle;	// ÇÃ·¹ÀÌ¾î°¡ °¡Àå ¸ÕÀú »óÈ£ÀÛ¿ë ÇÒ ¾×ÅÍ¸¦ Ã£À» °¢µµ
 
-// AIï¿½Û¼ï¿½ï¿½ï¿½ ï¿½Ú±ï¿½ ï¿½Ò½ï¿½
+// AIÆÛ¼Á¼Ç ÀÚ±Ø ¼Ò½º
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAIPerceptionStimuliSourceComponent> AIPerceptionStimuliSourceComp;
 
-// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+// ½ºÅÈ °ü·Ã
 public:
 	float GetAttackPower() const;
 	void IncreaseAttackPower(float Amount);
