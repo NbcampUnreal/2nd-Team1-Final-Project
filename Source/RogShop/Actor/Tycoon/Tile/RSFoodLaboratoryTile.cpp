@@ -10,9 +10,9 @@ ARSFoodLaboratoryTile::ARSFoodLaboratoryTile()
 	TileDisplayName = TEXT("요리 연구대");
 }
 
-void ARSFoodLaboratoryTile::Interact()
+void ARSFoodLaboratoryTile::Interact(ACharacter* InteractCharacter)
 {
-	Super::Interact();
+	Super::Interact(InteractCharacter);
 
 	//요리 연구 UI를 띄워 연구를 할 수 있음
 }

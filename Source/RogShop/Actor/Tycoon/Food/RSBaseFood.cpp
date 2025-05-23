@@ -2,6 +2,7 @@
 
 
 #include "RSBaseFood.h"
+#include "Tycoon/NPC/RSTycoonCustomerCharacter.h"
 
 
 ARSBaseFood::ARSBaseFood()

@@ -9,9 +9,9 @@ ARSIceBoxTile::ARSIceBoxTile()
 	TileDisplayName = TEXT("아이스 박스");
 }
 
-void ARSIceBoxTile::Interact()
+void ARSIceBoxTile::Interact(ACharacter* InteractCharacter)
 {
-	Super::Interact();
+	Super::Interact(InteractCharacter);
 
 	//걍 재료 상자칸 + 될거같음
 }

@@ -1,0 +1,42 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "RSInteractable.h"
+#include "RSDungeonGroundItem.generated.h"
+
+UCLASS()
+class ROGSHOP_API ARSDungeonGroundItem : public AActor, public IRSInteractable
+{
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	ARSDungeonGroundItem();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+// 해당 엑터의 메시 세팅 및 상호작용에 필요한 변수 세팅
+public:
+	void InitItemInfo(FName NewDataTableKey, UStaticMesh* NewMesh);
+
+// 상호작용
+public:
+	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
+
+	// 컴포넌트
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
+	TObjectPtr<USceneComponent> SceneComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UStaticMeshComponent> MeshComp;
+
+	// 데이터 테이블의 RowName을 ID값으로 사용한다.
+private:
+	FName DataTableKey;
+
+};

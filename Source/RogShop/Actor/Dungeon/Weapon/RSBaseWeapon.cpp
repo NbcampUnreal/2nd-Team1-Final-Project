@@ -37,7 +37,12 @@ UBoxComponent* ARSBaseWeapon::GetBoxComp() const
 	return BoxComp;
 }
 
-UAnimMontage* ARSBaseWeapon::GetNormalAttack(int32 Index)
+TSubclassOf<UAnimInstance> ARSBaseWeapon::GetWeaponAnimInstnace() const
+{
+	return WeaponAnimInstnace;
+}
+
+UAnimMontage* ARSBaseWeapon::GetNormalAttack(int32 Index) const
 {
 	if (NormalAttacks.Num() > Index)
 	{
@@ -47,7 +52,7 @@ UAnimMontage* ARSBaseWeapon::GetNormalAttack(int32 Index)
 	return nullptr;
 }
 
-const TArray<UAnimMontage*>& ARSBaseWeapon::GetNormalAttacks()
+const TArray<UAnimMontage*>& ARSBaseWeapon::GetNormalAttacks() const
 {
 	return NormalAttacks;
 }

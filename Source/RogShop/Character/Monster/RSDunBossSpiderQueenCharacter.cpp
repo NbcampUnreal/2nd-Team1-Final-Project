@@ -7,11 +7,6 @@
 
 ARSDunBossSpiderQueenCharacter::ARSDunBossSpiderQueenCharacter()
 {
-	TraceBoxHalfSize = FVector(20.f, 20.f, 20.f);
-	TraceLength = 150.f;
-	TraceForwardOffset = 0.f;
-	TraceRightOffset = 0.f;
-	TraceUpOffset = 0.f;
 }
 
 void ARSDunBossSpiderQueenCharacter::PlayBaseAttackAnim()
@@ -24,7 +19,7 @@ void ARSDunBossSpiderQueenCharacter::PlayBaseAttackAnim()
 		if (AnimInstance->Montage_IsPlaying(BaseAttackMontage) == false)
 		{
 			AnimInstance->Montage_Play(BaseAttackMontage);
-			RS_LOG("거미 여왕 공격합니다.");
+			RS_LOG("보스 거미 여왕이 공격합니다.");
 		}
 	}
 }
@@ -44,7 +39,7 @@ void ARSDunBossSpiderQueenCharacter::PlayDeathAnim()
 void ARSDunBossSpiderQueenCharacter::PerformAttackTrace()
 {
 	FHitResult HitResult;
-	FVector Start = GetMesh()->GetSocketLocation("FrontLeg3_R"); // TODO : 여기다 실제 소켓 이름으로 바꿔줘야 함.
+	FVector Start = GetMesh()->GetSocketLocation("FrontLeg3_R"); // 여기다 실제 소켓 이름으로 바꿔줘야 함.
 	Start += GetActorForwardVector() * TraceForwardOffset;
 	Start += GetActorRightVector() * TraceRightOffset;
 	Start += GetActorUpVector() * TraceUpOffset;

@@ -7,9 +7,10 @@
 #include "RSDunPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/BoxComponent.h"
-#include "RogShop/GameInstanceSubsystem/RSDataSubsystem.h"
+#include "RSDataSubsystem.h"
 #include "DungeonItemData.h"
 #include "RSInteractableWeapon.h"
+#include "RSDunPlayerController.h"
 
 // Sets default values for this component's properties
 URSPlayerWeaponComponent::URSPlayerWeaponComponent()
@@ -212,11 +213,21 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 		// 기존에 장착하던 무기 제거
 		WeaponActors[Index]->Destroy();
 		WeaponActors[Index] = NewWeaponActor;
-		WeaponSlot = EWeaponSlot::NONE;
 
 		// 새로운 무기를 장착
-		EquipWeaponToCharacter(WeaponSlot);
+		EWeaponSlot TempWeaponSlot = WeaponSlot;
+		WeaponSlot = EWeaponSlot::NONE;
+		EquipWeaponToCharacter(TempWeaponSlot);
 	}
+
+	FName NewWeaponKey = NewWeaponActor->GetDataTableKey();
+
+	ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
+
+	if (PC)
+	{
+		PC->OnWeaponSlotChange.Broadcast(static_cast<uint8>(WeaponSlot) - 1, NewWeaponKey);
+	}	
 }
 
 void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSlot)
@@ -241,9 +252,10 @@ void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSl
 		return;
 	}
 
-	// 현재 착용 중인 무기가 있는 경우 숨김 처리 및 충돌을 끈다.
-	if (WeaponActors.IsValidIndex(CurrentIndex))
+	// 기존에 착용하고 있던 무기가 유효한 경우
+	if (WeaponActors.IsValidIndex(CurrentIndex) && WeaponActors[CurrentIndex])
 	{
+		// 현재 착용 중인 무기가 있는 경우 숨김 처리 및 충돌을 끈다.
 		ARSBaseWeapon* CurEquipWeapon = WeaponActors[CurrentIndex];
 		if (CurEquipWeapon)
 		{
@@ -252,23 +264,50 @@ void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSl
 
 			// 오버랩 이벤트 바인딩 해제
 			WeaponActors[CurrentIndex]->GetBoxComp()->OnComponentBeginOverlap.RemoveDynamic(this, &URSPlayerWeaponComponent::OnBeginOverlap);
+
+			// 무기의 애님 레이어를 해제한다.
+			TSubclassOf<UAnimInstance> CurAnimInstance = CurEquipWeapon->GetWeaponAnimInstnace();
+
+			ACharacter* CurCharacter = GetOwner<ACharacter>();
+			if (CurCharacter)
+			{
+				USkeletalMeshComponent* SkeletalMeshComp = CurCharacter->GetMesh();
+				if (SkeletalMeshComp)
+				{
+					SkeletalMeshComp->UnlinkAnimClassLayers(CurAnimInstance);
+				}
+			}
 		}
 	}
 
-	// 새로 착용할 무기의 숨김 처리를 끄고, 충돌을 켠다.
-	if (WeaponActors.IsValidIndex(TargetIndex))
+	// 새로 착용할 무기가 유효한 경우
+	if (WeaponActors.IsValidIndex(TargetIndex) && WeaponActors[TargetIndex])
 	{
+		// 새로 착용할 무기의 숨김 처리를 끄고, 충돌을 켠다.
 		ARSBaseWeapon* TargetEquipWeapon = WeaponActors[TargetIndex];
 		if (TargetEquipWeapon)
 		{
 			TargetEquipWeapon->SetActorHiddenInGame(false);
 			TargetEquipWeapon->SetActorEnableCollision(true);
-
+			
 			// 오버랩 이벤트 바인딩
 			UBoxComponent* CurWeaponBoxComp = TargetEquipWeapon->GetBoxComp();
 			if (CurWeaponBoxComp)
 			{
 				CurWeaponBoxComp->OnComponentBeginOverlap.AddDynamic(this, &URSPlayerWeaponComponent::OnBeginOverlap);
+			}
+
+			// 무기의 애님 레이어를 적용한다.
+			TSubclassOf<UAnimInstance> TargetAnimInstance = TargetEquipWeapon->GetWeaponAnimInstnace();
+
+			ACharacter* CurCharacter = GetOwner<ACharacter>();
+			if (CurCharacter)
+			{
+				USkeletalMeshComponent* SkeletalMeshComp = CurCharacter->GetMesh();
+				if (SkeletalMeshComp)
+				{
+					SkeletalMeshComp->LinkAnimClassLayers(TargetAnimInstance);
+				}
 			}
 
 			// 현재 슬롯을 변경한다.
