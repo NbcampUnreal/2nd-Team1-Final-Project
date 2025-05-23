@@ -165,8 +165,6 @@ bool UDunItemWidget::BuyItem()
             {
                 SpawnedWeapon->SetDataTableKey(CurrentRowName);
                 WeaponComp->EquipWeaponToSlot(SpawnedWeapon);
-
-                PC->GetRSDunMainWidget()->UpdateWeaponImage(ItemData.Icon);
             }
             else
             {

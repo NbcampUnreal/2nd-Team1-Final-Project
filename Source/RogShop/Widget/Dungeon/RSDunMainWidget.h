@@ -18,10 +18,7 @@ public:
     virtual void NativeConstruct() override;
 
     UFUNCTION(BlueprintCallable)
-    void UpdateWeaponImage(UTexture2D* NewWeaponImage);
-
-    UFUNCTION(BlueprintCallable)
-    void UpdateWeaponSlot(bool bIsFirst, UTexture2D* NewWeaponImage);
+    void UpdateWeaponSlot(uint8 SlotIndex, FName WeaponKey);
 
     UFUNCTION(BlueprintCallable)
     void UpdateHP();
