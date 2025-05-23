@@ -9,13 +9,18 @@
 /**
  * 
  */
+
+class UButton;
+class UUserwidget;
+
 UCLASS()
 class ROGSHOP_API UMainMenuWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
 public:
-	
+	virtual void NativeConstruct() override;
+
 	UFUNCTION()
 	void OnStartButtonClicked();
 
@@ -26,15 +31,15 @@ public:
 	void OnExitButtonClicked();
 
 protected:
-	virtual void NativeConstruct() override;
-
-private:
 
 	UPROPERTY(meta= (BindWidget))
 	class UButton* StartButton;
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* OptionButton;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UUserWidget> OptionMenuWidgetClass;
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ExitButton;
