@@ -50,8 +50,6 @@ void URSDunMainWidget::UpdateWeaponSlot(uint8 SlotIndex, FName WeaponKey)
                         WeaponSlot2->SetBrushFromTexture(FoundData->ItemIcon);
                     }
                 }
-
-                UE_LOG(LogTemp, Warning, TEXT("SlotIndex: %d"), SlotIndex);
             }
             else
             {
