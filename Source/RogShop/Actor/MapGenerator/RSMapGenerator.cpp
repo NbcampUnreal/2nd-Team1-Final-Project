@@ -268,6 +268,14 @@ void ARSMapGenerator::SpawnTiles()
                 {
                     SelectedLevel.LoadSynchronous(); //강제 로드
                 }
+                if (ConnBits & (int)EDir::Up)
+                    Rot = FRotator(0, 270, 0);     // 입구 아래
+                else if (ConnBits & (int)EDir::Down)
+                    Rot = FRotator(0, 90, 0);   // 입구 오른
+                else if (ConnBits & (int)EDir::Left)
+                    Rot = FRotator(0, 0, 0);   // 입구 왼
+                else if (ConnBits & (int)EDir::Right)
+                    Rot = FRotator(0, 180, 0);    // 입구 위
             }
             else {
                 // 방향 수에 따라 타일 분기
@@ -363,12 +371,23 @@ void ARSMapGenerator::SpawnTiles()
             if (SelectedLevel.IsValid())
             {
                 UE_LOG(LogTemp, Log, TEXT("MapCreate"));
-                StreamTile(SelectedLevel, WorldLoc, Rot, TileName);
+                ULevelStreamingDynamic* StreamingLevel = StreamTile(SelectedLevel, WorldLoc, Rot, TileName);
                 //상점NPC생성
-                if (ShopNPC && Pos == ShopTilePos)
+                if (StreamingLevel && ShopNPC && Pos == ShopTilePos)
                 {
-                    FTransform NPCLocation(Rot, WorldLoc + FVector(0, 0, 30));
-                    GetWorld()->SpawnActor<AActor>(ShopNPC, NPCLocation);
+                    ULevel* LoadedLevel = StreamingLevel->GetLoadedLevel();
+                    if (LoadedLevel)
+                    {
+                        for (AActor* Actor : LoadedLevel->Actors)
+                        {
+                            if (Actor && Actor->IsA<ATargetPoint>() && Actor->GetName().Contains("BP_ShopSpawnPoint"))
+                            {
+                                FTransform SpawnTransform = Actor->GetActorTransform();
+                                GetWorld()->SpawnActor<AActor>(ShopNPC, SpawnTransform);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -376,9 +395,9 @@ void ARSMapGenerator::SpawnTiles()
 }
 
 
-void ARSMapGenerator::StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector & Location, const FRotator & Rotation, const FString & UniqueName)
+ULevelStreamingDynamic* ARSMapGenerator::StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector & Location, const FRotator & Rotation, const FString & UniqueName)
 {
-    if (!LevelToStream.IsValid()) return;
+    if (!LevelToStream.IsValid()) return nullptr;
 
     //위치와 회전을 담을 객체
     FTransform LevelTransform;
@@ -404,6 +423,7 @@ void ARSMapGenerator::StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVe
     {
         UE_LOG(LogTemp, Log, TEXT("레벨 로드 성공: %s"), *LevelToStream.ToString());
     }
+    return StreamingLevel;
 }
 
 void ARSMapGenerator::ChooseShopTile() 
