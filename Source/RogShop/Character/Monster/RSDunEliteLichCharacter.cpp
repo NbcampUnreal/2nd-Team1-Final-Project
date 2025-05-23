@@ -35,7 +35,7 @@ void ARSDunEliteLichCharacter::PlayDeathAnim()
 void ARSDunEliteLichCharacter::PerformAttackTrace()
 {
 	FHitResult HitResult;
-	FVector Start = GetMesh()->GetSocketLocation("FrontLeg3_R"); // 여기다 실제 소켓 이름으로 바꿔줘야 함.
+	FVector Start = GetMesh()->GetSocketLocation("MiddleFinger1_R"); // 여기다 실제 소켓 이름으로 바꿔줘야 함.
 	Start += GetActorForwardVector() * TraceForwardOffset;
 	Start += GetActorRightVector() * TraceRightOffset;
 	Start += GetActorUpVector() * TraceUpOffset;
