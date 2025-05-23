@@ -25,6 +25,9 @@ public:
 	void OnStartButtonClicked();
 
 	UFUNCTION()
+	void OnLoadButtonClicked();
+
+	UFUNCTION()
 	void OnOptionButtonClicked();
 
 	UFUNCTION()
@@ -34,6 +37,9 @@ protected:
 
 	UPROPERTY(meta= (BindWidget))
 	class UButton* StartButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* LoadButton;
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* OptionButton;

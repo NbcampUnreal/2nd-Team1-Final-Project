@@ -25,6 +25,8 @@ URSCheatManager::URSCheatManager()
     MonsterMap.Add("eliteicegolem", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunEliteIceGolemCharacter.BP_RSDunEliteIceGolemCharacter_C")));
     MonsterMap.Add("lich", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunEliteLichCharacter.BP_RSDunEliteLichCharacter_C")));
     MonsterMap.Add("bossdemon", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunFinalBossDemonCharacter.BP_RSDunFinalBossDemonCharacter_C")));
+    MonsterMap.Add("bossworm", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBossWormCharacter.BP_RSDunBossWormCharacter_C")));
+    MonsterMap.Add("lizardman", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunLizardManCharacter.BP_RSDunLizardManCharacter_C")));
    
 }
 
