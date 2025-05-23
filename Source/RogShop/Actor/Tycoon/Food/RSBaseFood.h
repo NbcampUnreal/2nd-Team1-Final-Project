@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "RSBaseFood.generated.h"
 
+class ARSTycoonCustomerCharacter;
+
 UCLASS()
 class ROGSHOP_API ARSBaseFood : public AActor
 {
@@ -18,6 +20,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	FString FoodName;
 
+	UPROPERTY()
+	TWeakObjectPtr<ARSTycoonCustomerCharacter> WantCustomer;
+	
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USceneComponent> Root;

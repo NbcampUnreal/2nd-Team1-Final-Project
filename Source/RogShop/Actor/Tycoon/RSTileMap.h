@@ -16,19 +16,19 @@ class ROGSHOP_API ARSTileMap : public AActor
 
 public:
 	ARSTileMap();
-	
-	virtual void Tick(float DeltaTime) override;
-	
+
+	const TArray<TObjectPtr<ARSBaseTile>>& GetTiles() const { return TileActors; }
+
 protected:
 	virtual void BeginPlay() override;
 
-private:	
+private:
 	void LoadTiles();
 	void SetDefaultSettings();
 	void CreateTiles();
 	UClass* GetTileClass(const FName& TileKey);
-	
-	UFUNCTION(CallInEditor)
+
+	UFUNCTION(CallInEditor) //임시
 	void SaveTiles();
 
 	UFUNCTION(CallInEditor)
@@ -36,7 +36,7 @@ private:
 
 private:
 	static const FString TileMapSaveSlot;
-	
+
 	UPROPERTY(EditAnywhere, Category="TileMap")
 	TSubclassOf<ARSBaseTile> DefaultTileType;
 
@@ -47,16 +47,16 @@ private:
 	int32 DefaultHeight = 3;
 
 	UPROPERTY(EditDefaultsOnly, Category="TileMap")
-	TArray<TSubclassOf<ARSBaseTile>> TileTypes;	
-	
+	TArray<TSubclassOf<ARSBaseTile>> TileTypes;
+
 	UPROPERTY(EditAnywhere, Category="TileMap")
 	TObjectPtr<USceneComponent> TileParent;
-	
+
 	UPROPERTY()
-	TArray<TWeakObjectPtr<ARSBaseTile>> TileActors;
+	TArray<TObjectPtr<ARSBaseTile>> TileActors;
 
 	UPROPERTY(EditAnywhere, Category="TileMap")
 	TArray<FTileRow> TileName2DMap;
-	
+
 	int32 Width, Height;
 };

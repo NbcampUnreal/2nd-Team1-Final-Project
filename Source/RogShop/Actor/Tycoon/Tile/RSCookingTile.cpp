@@ -10,6 +10,7 @@
 #include "RogShop/GameInstanceSubsystem/RSDataSubsystem.h"
 #include "RogShop/GameModeBase/RSTycoonGameModeBase.h"
 #include "Tycoon/RSTycoonPlayerCharacter.h"
+#include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
 
 ARSCookingTile::ARSCookingTile()
 {
@@ -17,11 +18,14 @@ ARSCookingTile::ARSCookingTile()
 
 	FoodLocation = CreateDefaultSubobject<USceneComponent>(TEXT("FoodLocation"));
 	FoodLocation->SetupAttachment(RootComponent);
+
+	ChefLocation = CreateDefaultSubobject<USceneComponent>(TEXT("ChefLocation"));
+	ChefLocation->SetupAttachment(RootComponent);
 }
 
-void ARSCookingTile::Interact()
+void ARSCookingTile::Interact(ACharacter* InteractCharacter)
 {
-	Super::Interact();
+	Super::Interact(InteractCharacter);
 
 	//주문이 들어온 요리를 제작할 수 있음
 	//일단 0번째를 자동으로 요리하는식으로 제작
@@ -34,11 +38,11 @@ void ARSCookingTile::Interact()
 	else if (State == ECookingState::Finish)
 	{
 		//음식 가져감
-		TakeFood();
+		TakeFood(InteractCharacter);
 	}
 	else if (State == ECookingState::Cooking)
 	{
-		RS_LOG_F_C("요리중 입니다 : %s", FColor::Orange, *CookingFoodKey.ToString())
+		RS_LOG_F_C("요리중 입니다 : %s", FColor::Orange, *CookingFoodOrder.FoodKey.ToString())
 	}
 }
 
@@ -55,19 +59,19 @@ void ARSCookingTile::OrderToCook()
 	}
 
 	//임시로 제일 가까이 있는거부터 제작하게
-	FName FoodName = Orders[0];
+	FFoodOrder FoodOrder = Orders[0];
 
-	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->RemoveOrder(FoodName);
-	Cook(FoodName);
+	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->RemoveOrder(FoodOrder);
+	Cook(FoodOrder);
 }
 
-void ARSCookingTile::Cook(const FName& FoodKey)
+void ARSCookingTile::Cook(FFoodOrder Order)
 {
 	State = ECookingState::Cooking;
-	CookingFoodKey = FoodKey;
-	
+	CookingFoodOrder = Order;
+
 	FCookFoodData* Data = GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Food
-	                                       ->FindRow<FCookFoodData>(FoodKey, TEXT("Get FoodData"));
+	                                       ->FindRow<FCookFoodData>(Order.FoodKey, TEXT("Get FoodData"));
 
 	//사용한 재료 제거
 	for (auto& Need : Data->NeedIngredients)
@@ -85,25 +89,30 @@ void ARSCookingTile::FinishCook()
 	State = ECookingState::Finish;
 
 	FCookFoodData const* Data = GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Food->
-	                                               FindRow<FCookFoodData>(CookingFoodKey, TEXT("Find Cook Data"));
-	
+	                                               FindRow<FCookFoodData>(CookingFoodOrder.FoodKey, TEXT("Find Cook Data"));
+
 	ARSBaseFood* Food = GetWorld()->SpawnActor<ARSBaseFood>(Data->ActorType);
 	Food->SetActorLocation(FoodLocation->GetComponentLocation());
+	Food->WantCustomer = CookingFoodOrder.Customer;
 
-	CookingFoodKey = "";
+	//오더 제거
+
+	CookingFoodOrder.FoodKey = FName();
+	CookingFoodOrder.Customer = nullptr;
+
 	CookedFood = Food;
 }
 
-void ARSCookingTile::TakeFood()
+void ARSCookingTile::TakeFood(ACharacter* InteractCharacter)
 {
-	ARSTycoonPlayerCharacter* Player = Cast<ARSTycoonPlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
-	check(Player)
-
-	if (ARSBaseFood* Food = CookedFood.Get())
+	if (CookedFood)
 	{
-		Player->Pickup(Food);
-		CookedFood = nullptr;
+		IRSCanPickup* CanPickupCharacter = Cast<IRSCanPickup>(InteractCharacter);
+		check(CanPickupCharacter)
 
+		CanPickupCharacter->Pickup(CookedFood);
+
+		CookedFood = nullptr;
 		State = ECookingState::None;
 	}
 	else

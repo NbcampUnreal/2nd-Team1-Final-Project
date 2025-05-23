@@ -25,7 +25,7 @@ public:
 	
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void Interact() { }
+	virtual void Interact(ACharacter* InteractCharacter) { }
 
 	FVector GetTileSize();
 	FString GetTileDisplayName() const { return TileDisplayName; }

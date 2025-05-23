@@ -17,7 +17,12 @@ void ARSDunPlayerController::BeginPlay()
 
     AddMapping();
 
-    ShowRSDunMainWidget();
+    InitializeRSDunMainWidget();
+
+    if (RSDunMainWidget)
+    {
+        OnWeaponSlotChange.AddDynamic(RSDunMainWidget, &URSDunMainWidget::UpdateWeaponSlot);
+    }
 }
 
 void ARSDunPlayerController::AddMapping()
@@ -48,7 +53,7 @@ void ARSDunPlayerController::RemoveAllMapping()
     }
 }
 
-void ARSDunPlayerController::ShowRSDunMainWidget()
+void ARSDunPlayerController::InitializeRSDunMainWidget()
 {
     if (RSDunMainWidgetClass)
     {
@@ -56,8 +61,7 @@ void ARSDunPlayerController::ShowRSDunMainWidget()
 
         if (RSDunMainWidget)
         {
-            // 상시 출력 필요 시 주석 해제 필요
-            // RSDunMainWidget->AddToViewport();
+            RSDunMainWidget->AddToViewport();
         }
     }
     else
