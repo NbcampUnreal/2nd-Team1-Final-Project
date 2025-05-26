@@ -3,8 +3,6 @@
 
 #include "RSCheatManager.h"
 #include "RSDunMonsterCharacter.h"
-#include "RSDunAnubisCharacter.h"
-#include "RSDunBossSpiderQueenCharacter.h"
 #include "RSDunPlayerController.h"
 
 #include "Blueprint/UserWidget.h"
@@ -17,7 +15,6 @@ URSCheatManager::URSCheatManager()
     MonsterMap.Add("boar", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBoarCharacter.BP_RSDunBoarCharacter_C")));
     MonsterMap.Add("skeleton", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunSkeletonCharacter.BP_RSDunSkeletonCharacter_C")));
     MonsterMap.Add("bossflower", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBossFlowerCharacter.BP_RSDunBossFlowerCharacter_C")));
-
     MonsterMap.Add("goat", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunGoatCharacter.BP_RSDunGoatCharacter_C")));
     MonsterMap.Add("chicken", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunChickenCharacter.BP_RSDunChickenCharacter_C")));
     MonsterMap.Add("elitebear", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSEliteBearCharacter.BP_RSEliteBearCharacter_C")));
@@ -26,6 +23,8 @@ URSCheatManager::URSCheatManager()
     MonsterMap.Add("eliteicegolem", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunEliteIceGolemCharacter.BP_RSDunEliteIceGolemCharacter_C")));
     MonsterMap.Add("lich", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunEliteLichCharacter.BP_RSDunEliteLichCharacter_C")));
     MonsterMap.Add("bossdemon", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunFinalBossDemonCharacter.BP_RSDunFinalBossDemonCharacter_C")));
+    MonsterMap.Add("bossworm", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBossWormCharacter.BP_RSDunBossWormCharacter_C")));
+    MonsterMap.Add("lizardman", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunLizardManCharacter.BP_RSDunLizardManCharacter_C")));
    
 }
 
@@ -44,24 +43,6 @@ void URSCheatManager::TestDunMonsterAttack()
     if (Monster)
     {
         Monster->PlayBaseAttackAnim();
-    }
-}
-
-void URSCheatManager::TestDunMonsterHItReact()
-{
-    UWorld* World = GetWorld();
-    if (!World)
-    {
-        return;
-    }
-
-    ARSDunMonsterCharacter* Monster = Cast<ARSDunMonsterCharacter>(
-        UGameplayStatics::GetActorOfClass(World, ARSDunMonsterCharacter::StaticClass())
-    );
-
-    if (Monster)
-    {
-        Monster->PlayHitReactAnim();
     }
 }
 

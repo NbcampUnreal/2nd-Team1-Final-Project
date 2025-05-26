@@ -13,7 +13,6 @@
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
-class UMeleeAttackBoxComponent;
 
 UCLASS()
 class ROGSHOP_API ARSDunMonsterCharacter : public ARSDunBaseCharacter
@@ -27,7 +26,6 @@ public:
 
 	// 애니메이션 실행 함수
 	virtual void PlayBaseAttackAnim();
-	virtual void PlayHitReactAnim();
 	virtual void PlayDeathAnim();
 
 	//Navigation Invoker function
@@ -37,7 +35,7 @@ public:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Trace")
-	virtual void PerformAttackTrace() PURE_VIRTUAL(ARSDunMonsterCharacter::PerformAttackTrace, );
+	virtual void PerformAttackTrace();
 
 	//NavLink jump function
 	UFUNCTION(BlueprintCallable)
@@ -101,6 +99,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "AttackTrace")
 	float TraceUpOffset;        // (선택) 높이 보정
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
+	FName SocketLocation;		// 트레이스가 나갈 소켓의 시작점
 
 	FTimerHandle detectDelayTimer;
 

@@ -23,12 +23,12 @@ public:
 	void ChangeMoveSpeed(float Amount);
 
 	float GetMaxHP() const;
-	void IncreaseMaxHP(float Amount);
-	void DecreaseMaxHP(float Amount);
+	virtual void IncreaseMaxHP(float Amount);
+	virtual void DecreaseMaxHP(float Amount);
 
 	float GetHP() const;
-	void IncreaseHP(float Amount);
-	void DecreaseHP(float Amount);
+	virtual void IncreaseHP(float Amount);
+	virtual void DecreaseHP(float Amount);
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))

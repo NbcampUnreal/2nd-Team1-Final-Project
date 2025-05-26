@@ -8,6 +8,8 @@
 #include "RSDunPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotChange, uint8, SlotIndex, FName, WeaponKey);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHPChange);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMaxHPChange);
 
 class UInputMappingContext;
 class UInputAction;
@@ -65,4 +67,10 @@ private:
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnWeaponSlotChange OnWeaponSlotChange;	// WeaponSlot을 변경하는 시점
+
+	UPROPERTY(BlueprintAssignable)
+	FOnHPChange OnHPChange;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnMaxHPChange OnMaxHPChange;
 };
