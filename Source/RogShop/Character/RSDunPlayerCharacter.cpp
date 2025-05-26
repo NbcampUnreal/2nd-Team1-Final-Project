@@ -11,6 +11,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "RSPlayerWeaponComponent.h"
+#include "RSRelicInventoryComponent.h"
 #include "RSDungeonInventoryComponent.h"
 #include "RSInteractable.h"
 #include "DrawDebugHelpers.h"
@@ -49,6 +50,9 @@ ARSDunPlayerCharacter::ARSDunPlayerCharacter()
 
     // 무기 컴포넌트
     WeaponComp = CreateDefaultSubobject<URSPlayerWeaponComponent>(TEXT("RSPlayerWeapon"));
+
+    // 유물 컴포넌트
+    RelicInventoryComp = CreateDefaultSubobject<URSRelicInventoryComponent>(TEXT("RSRelicInventory"));
 
     // 인벤토리 컴포넌트
     InventoryComp = CreateDefaultSubobject<URSDungeonInventoryComponent>(TEXT("RSPlayerInventory"));

@@ -10,6 +10,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class URSPlayerWeaponComponent;
+class URSRelicInventoryComponent;
 class URSDungeonInventoryComponent;
 class UAIPerceptionStimuliSourceComponent;
 
@@ -90,6 +91,14 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
 	TObjectPtr<URSPlayerWeaponComponent> WeaponComp;
+
+// 유물 관련
+public:
+	URSRelicInventoryComponent* GetURSRelicInventoryComponent() { return RelicInventoryComp; }
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Relic", meta = (AllowPrivateAccess = true))
+	TObjectPtr<URSRelicInventoryComponent> RelicInventoryComp;
 
 // 인벤토리 관련
 public:
