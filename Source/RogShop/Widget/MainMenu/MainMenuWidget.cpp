@@ -34,7 +34,7 @@ void UMainMenuWidget::NativeConstruct()
 
 void UMainMenuWidget::OnStartButtonClicked()
 {
-	//UGameplayStatics::OpenLevel(this, FName("다음레벨 이름"));
+	UGameplayStatics::OpenLevel(this, FName("BaseAreaMap"));
 }
 
 void UMainMenuWidget::OnLoadButtonClicked()

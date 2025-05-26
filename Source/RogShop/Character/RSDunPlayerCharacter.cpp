@@ -72,6 +72,9 @@ void ARSDunPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+    // ½ºÄÌ·¹Å» ¸Þ½Ã
+    USkeletalMesh* MergeSkeletalMesh = USkeletalMergingLibrary::MergeMeshes(SkeletalMeshMergeParams);
+    GetMesh()->SetSkeletalMeshAsset(MergeSkeletalMesh);
 }
 
 // Called every frame
@@ -184,6 +187,50 @@ void ARSDunPlayerCharacter::OnDeath()
     if (AIPerceptionStimuliSourceComp)
     {
         AIPerceptionStimuliSourceComp->UnregisterFromPerceptionSystem();
+    }
+}
+
+void ARSDunPlayerCharacter::IncreaseMaxHP(float Amount)
+{
+    Super::IncreaseMaxHP(Amount);
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnMaxHPChange.Broadcast();
+    }
+}
+
+void ARSDunPlayerCharacter::DecreaseMaxHP(float Amount)
+{
+    Super::DecreaseMaxHP(Amount);
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnMaxHPChange.Broadcast();
+    }
+}
+
+void ARSDunPlayerCharacter::IncreaseHP(float Amount)
+{
+    Super::IncreaseHP(Amount);
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnHPChange.Broadcast();
+    }
+}
+
+void ARSDunPlayerCharacter::DecreaseHP(float Amount)
+{
+    Super::DecreaseHP(Amount);
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnHPChange.Broadcast();
     }
 }
 

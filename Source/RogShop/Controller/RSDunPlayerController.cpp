@@ -15,6 +15,13 @@ void ARSDunPlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
+    // 마우스 커서를 감추고, Input모드를 게임온리로 변경
+    bShowMouseCursor = false;
+
+    FInputModeGameOnly InputMode;
+    SetInputMode(InputMode);
+
+    // 기본적인 입력 매핑 추가
     AddMapping();
 
     InitializeRSDunMainWidget();
@@ -22,6 +29,8 @@ void ARSDunPlayerController::BeginPlay()
     if (RSDunMainWidget)
     {
         OnWeaponSlotChange.AddDynamic(RSDunMainWidget, &URSDunMainWidget::UpdateWeaponSlot);
+        OnHPChange.AddDynamic(RSDunMainWidget, &URSDunMainWidget::UpdateHP);
+        OnMaxHPChange.AddDynamic(RSDunMainWidget, &URSDunMainWidget::UpdateMaxHP);
     }
 }
 
