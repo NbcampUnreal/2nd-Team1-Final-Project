@@ -14,8 +14,10 @@ void URSDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	Food = DataSettings->FoodDataTable.LoadSynchronous();
 	Ingredient = DataSettings->IngredientDataTable.LoadSynchronous();
 	Weapon = DataSettings->WeaponDataTable.LoadSynchronous();
+	Relic = DataSettings->RelicDataTable.LoadSynchronous();
 
 	check(Food)
 	check(Ingredient)
 	check(Weapon)
+	check(Relic)
 }

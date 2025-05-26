@@ -23,4 +23,7 @@ public:
 
 	UPROPERTY(Config, EditAnywhere)
 	TSoftObjectPtr<UDataTable> WeaponDataTable;
+
+	UPROPERTY(Config, EditAnywhere)
+	TSoftObjectPtr<UDataTable> RelicDataTable;
 };
