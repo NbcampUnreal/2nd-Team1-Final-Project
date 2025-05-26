@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "RSWeaponSpawnPadActor.h"
 #include "DungeonItemData.h"
-#include "RSInteractableWeapon.h"
+#include "RSDungeonGroundWeapon.h"
 
 // Sets default values
 ARSWeaponSpawnPadActor::ARSWeaponSpawnPadActor()
@@ -83,8 +83,8 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
     {
         FVector SpawnLoc = StartLocation + FVector(0, i * ActualSpacing, 0);
 
-        ARSInteractableWeapon* InteractableWeapon = GetWorld()->SpawnActor<ARSInteractableWeapon>(
-            ARSInteractableWeapon::StaticClass(),
+        ARSDungeonGroundWeapon* GroundWeapon = GetWorld()->SpawnActor<ARSDungeonGroundWeapon>(
+            ARSDungeonGroundWeapon::StaticClass(),
             SpawnLoc,
             FRotator::ZeroRotator
         );
@@ -92,9 +92,9 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
         FName CurDataTableKey = SelectedRowNames[i];
         UStaticMesh* ItemStaticMesh = SelectedWeapons[i]->ItemStaticMesh;
         TSubclassOf<ARSDungeonItemBase> ItemClass = SelectedWeapons[i]->ItemClass;
-        if (InteractableWeapon && ItemStaticMesh && ItemClass)
+        if (GroundWeapon && ItemStaticMesh && ItemClass)
         {
-            InteractableWeapon->InitInteractableWeapon(CurDataTableKey, ItemStaticMesh, ItemClass);
+            GroundWeapon->InitInteractableWeapon(CurDataTableKey, ItemStaticMesh, ItemClass);
         }
 
         // UE_LOG(LogTemp, Warning, TEXT("SelectedWeapon ID: %s"), *SelectedWeapons[i]->ItemID.ToString());

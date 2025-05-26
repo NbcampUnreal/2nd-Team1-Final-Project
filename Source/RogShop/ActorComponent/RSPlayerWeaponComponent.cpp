@@ -9,7 +9,7 @@
 #include "Components/BoxComponent.h"
 #include "RSDataSubsystem.h"
 #include "DungeonItemData.h"
-#include "RSInteractableWeapon.h"
+#include "RSDungeonGroundWeapon.h"
 #include "RSDunPlayerController.h"
 
 // Sets default values for this component's properties
@@ -211,7 +211,7 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 			Index = static_cast<int8>(EWeaponSlot::FirstWeaponSlot) - 1;
 		}
 
-		ARSInteractableWeapon* InteractableWeapon = GetWorld()->SpawnActor<ARSInteractableWeapon>(ARSInteractableWeapon::StaticClass(), CurCharacter->GetActorTransform());
+		ARSDungeonGroundWeapon* GroundWeapon = GetWorld()->SpawnActor<ARSDungeonGroundWeapon>(ARSDungeonGroundWeapon::StaticClass(), CurCharacter->GetActorTransform());
 
 		FName WeaponKey = WeaponActors[Index]->GetDataTableKey();
 
@@ -222,9 +222,9 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 			UStaticMesh* ItemStaticMesh = Data->ItemStaticMesh;
 			TSubclassOf<ARSDungeonItemBase> ItemClass = Data->ItemClass;
 
-			if (InteractableWeapon && ItemStaticMesh && ItemClass)
+			if (GroundWeapon && ItemStaticMesh && ItemClass)
 			{
-				InteractableWeapon->InitInteractableWeapon(WeaponKey, ItemStaticMesh, ItemClass);
+				GroundWeapon->InitInteractableWeapon(WeaponKey, ItemStaticMesh, ItemClass);
 			}
 		}
 

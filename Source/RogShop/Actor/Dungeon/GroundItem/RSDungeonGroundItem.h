@@ -13,30 +13,24 @@ class ROGSHOP_API ARSDungeonGroundItem : public AActor, public IRSInteractable
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ARSDungeonGroundItem();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-// ÇØ´ç ¿¢ÅÍÀÇ ¸Ş½Ã ¼¼ÆÃ ¹× »óÈ£ÀÛ¿ë¿¡ ÇÊ¿äÇÑ º¯¼ö ¼¼ÆÃ
-public:
-	void InitItemInfo(FName NewDataTableKey, UStaticMesh* NewMesh);
-
-// »óÈ£ÀÛ¿ë
+// ìƒí˜¸ì‘ìš©
 public:
 	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
 
-	// ÄÄÆ÷³ÍÆ®
-private:
+// ì»´í¬ë„ŒíŠ¸
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
 	TObjectPtr<USceneComponent> SceneComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UStaticMeshComponent> MeshComp;
 
-	// µ¥ÀÌÅÍ Å×ÀÌºíÀÇ RowNameÀ» ID°ªÀ¸·Î »ç¿ëÇÑ´Ù.
-private:
+// ë°ì´í„° í…Œì´ë¸”ì˜ RowNameì„ IDê°’ìœ¼ë¡œ ì‚¬ìš©í•œë‹¤.
+protected:
 	FName DataTableKey;
 
 };
