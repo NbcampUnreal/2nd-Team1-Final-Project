@@ -35,6 +35,10 @@ void ARSDunMonsterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	GetWorld()->GetTimerManager().SetTimer(detectDelayTimer, this, &ARSDunMonsterCharacter::FindNearPatrolPoint, 0.5f, false);	
+	if (UAnimInstance* animInstance = GetMesh()->GetAnimInstance())
+	{
+		animInstance->OnMontageEnded.AddDynamic(this, &ARSDunMonsterCharacter::OnDeathMontageEnded);
+	}
 }
 
 void ARSDunMonsterCharacter::PlayBaseAttackAnim()
@@ -56,6 +60,15 @@ void ARSDunMonsterCharacter::PlayDeathAnim()
 {
 	PlayAnimMontage(DeathMontage);
 	RS_LOG("몬스터가 죽었습니다.");
+}
+
+void ARSDunMonsterCharacter::OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted)
+{
+	if (montage == DeathMontage)
+	{
+		//GetWorld()->GetTimerManager().SetTimer(animPlayDelayTimer, this, &ARSDunMonsterCharacter::AIDestroy, 5.0f, false);
+		Destroy();
+	}
 }
 
 float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -193,5 +206,12 @@ TArray<AActor*> ARSDunMonsterCharacter::GetPatrolPoint()
 
 void ARSDunMonsterCharacter::OnDeath()
 {
+	AController* ctrl = GetController();
+	if (ctrl)
+	{
+		ctrl->UnPossess();
+		ctrl->Destroy();
+	}
+
 	PlayDeathAnim();
 }
