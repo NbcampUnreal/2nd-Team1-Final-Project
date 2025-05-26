@@ -10,6 +10,7 @@
 #include "Engine/TargetPoint.h"
 #include "Engine/OverlapResult.h"
 #include "TimerManager.h"
+#include "Animation/AnimInstance.h"
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
@@ -29,6 +30,9 @@ public:
 	virtual void PlayBaseAttackAnim();
 	virtual void PlayHitReactAnim();
 	virtual void PlayDeathAnim();
+
+	UFUNCTION()
+	void OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted);//사망 모션이 끝난 경우
 
 	//Navigation Invoker function
 	FORCEINLINE class UNavigationInvokerComponent* GetNavInvoker() const { return navInvoker; };
@@ -50,7 +54,6 @@ public:
 	UFUNCTION()
 	TArray<AActor*> GetPatrolPoint();
 
-protected:
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Status")
 	void OnDeath();
 
