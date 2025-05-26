@@ -55,22 +55,54 @@ void ARSTycoonChefCharacter::FindCookingTile()
 		return;
 	}
 
-	//가장 가까운 거리를 찾음
-	ARSCookingTile* MinCookingTile = nullptr;
-	int32 MinRange = INT32_MAX;
-
-	for (auto Tile : CookingTileActors)
+	//가까운 순서대로 정렬
+	FVector StartLocation = GetActorLocation();
+	CookingTileActors.Sort([StartLocation](const AActor& First, const AActor& Second)
 	{
-		int32 DistanceSquared = FVector::DistSquared(GetActorLocation(), Tile->GetActorLocation());
-		if (DistanceSquared < MinRange)
+		float FirstDistance = FVector::DistSquared(StartLocation, First.GetActorLocation());
+		float SecondDistance = FVector::DistSquared(StartLocation, Second.GetActorLocation());
+
+		return FirstDistance < SecondDistance;
+	});
+
+	//다른 쉐프 NPC가 사용하고 있는지 확인함
+	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
+	ARSCookingTile* TargetCookingTile = nullptr;
+	for (AActor* Element : CookingTileActors)
+	{
+		ARSCookingTile* Tile = Cast<ARSCookingTile>(Element);
+		bool bUse = false;
+
+		//쉐프 중 이 타일을 한명이라도 사용 중이면 다른거에 배치함
+		for (auto& NPC : GameMode->GetNPCs())
 		{
-			MinRange = DistanceSquared;
-			MinCookingTile = Cast<ARSCookingTile>(Tile);
+			if (ARSTycoonChefCharacter* InMapChef = Cast<ARSTycoonChefCharacter>(NPC))
+			{
+				if (InMapChef->PlacedCookingTile == Tile)
+				{
+					bUse = true;
+					break;
+				}
+			}
+		}
+
+		if (!bUse)
+		{
+			TargetCookingTile = Tile;
+			break;
 		}
 	}
 
-	//가까운 화구로 이동
-	MoveToTarget(MinCookingTile->GetChefTransform().GetLocation(), MinCookingTile);
+	//화구가 꽉 차는 등의 이유
+	if (TargetCookingTile == nullptr)
+	{
+		RS_LOG_C("배치될 화구가 없습니다!", FColor::Red)
+		return;
+	}
+	
+	//화구로 이동하는 와중에 쉐프가 생길 수 있기 때문에 여기서 바로 설정해줌
+	PlacedCookingTile = TargetCookingTile;
+	MoveToTarget(TargetCookingTile->GetChefTransform().GetLocation(), TargetCookingTile);
 }
 
 void ARSTycoonChefCharacter::LeaveCookingTile()
@@ -88,11 +120,10 @@ void ARSTycoonChefCharacter::BeginPlay()
 void ARSTycoonChefCharacter::InteractTarget(AActor* TargetActor)
 {
 	Super::InteractTarget(TargetActor);
-	
+
 	if (ARSCookingTile* CookingTile = Cast<ARSCookingTile>(TargetActor))
 	{
 		RS_LOG("요리사가 화구에 배치 되었습니다.")
-		PlacedCookingTile = CookingTile;
 
 		FTransform ChefTransform = PlacedCookingTile->GetChefTransform();
 		SetActorLocation(ChefTransform.GetLocation());

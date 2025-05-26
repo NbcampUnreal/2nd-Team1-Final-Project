@@ -4,6 +4,7 @@
 #include "RSTycoonNPC.h"
 
 #include "AIController.h"
+#include "RSTycoonGameModeBase.h"
 #include "Components/SphereComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "RogShop/UtilDefine.h"
@@ -60,7 +61,8 @@ void ARSTycoonNPC::MoveToTarget(FVector Location, AActor* Target)
 void ARSTycoonNPC::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->AddNPC(this);
 	InteractSphere->OnComponentBeginOverlap.AddDynamic(this, &ARSTycoonNPC::OnInteract);
 }
 
