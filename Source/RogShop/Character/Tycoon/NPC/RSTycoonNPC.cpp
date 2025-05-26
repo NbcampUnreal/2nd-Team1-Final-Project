@@ -6,6 +6,7 @@
 #include "AIController.h"
 #include "RSTycoonGameModeBase.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "RogShop/UtilDefine.h"
 
@@ -23,6 +24,10 @@ ARSTycoonNPC::ARSTycoonNPC()
 	InteractSphere->SetCanEverAffectNavigation(false);
 	InteractSphere->SetGenerateOverlapEvents(true);
 	InteractSphere->SetCollisionProfileName(TEXT("OverlapAll"));
+
+	UCharacterMovementComponent* Movement = GetCharacterMovement();
+	Movement->bUseRVOAvoidance = true;
+	Movement->AvoidanceConsiderationRadius = 100.f;
 }
 
 
