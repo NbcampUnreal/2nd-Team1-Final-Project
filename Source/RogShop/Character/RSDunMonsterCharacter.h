@@ -28,6 +28,9 @@ public:
 	// 애니메이션 실행 함수
 	virtual void PlayBaseAttackAnim();
 	virtual void PlayDeathAnim();
+	virtual void PlaySkill_1();
+	virtual void PlaySkill_2();
+	virtual void PlaySkill_3();
 
 	UFUNCTION()
 	void OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted);//사망 모션이 끝난 경우
@@ -65,6 +68,15 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> DeathMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> SkillMontage_1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> SkillMontage_2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> SkillMontage_3;
 
 	//NavInvoker
 	UPROPERTY(BlueprintReadWrite, Category = Navigation, meta = (AllowPrivateAccess = "true"))//Navigation Invoker Setting

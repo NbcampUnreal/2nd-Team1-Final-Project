@@ -62,6 +62,42 @@ void ARSDunMonsterCharacter::PlayDeathAnim()
 	RS_LOG("몬스터가 죽었습니다.");
 }
 
+void ARSDunMonsterCharacter::PlaySkill_1()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (IsValid(AnimInstance) == true && IsValid(SkillMontage_1) == true)
+	{
+		if (AnimInstance->Montage_IsPlaying(SkillMontage_1) == false)
+		{
+			AnimInstance->Montage_Play(SkillMontage_1);
+		}
+	}
+}
+
+void ARSDunMonsterCharacter::PlaySkill_2()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (IsValid(AnimInstance) == true && IsValid(SkillMontage_2) == true)
+	{
+		if (AnimInstance->Montage_IsPlaying(SkillMontage_2) == false)
+		{
+			AnimInstance->Montage_Play(SkillMontage_2);
+		}
+	}
+}
+
+void ARSDunMonsterCharacter::PlaySkill_3()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (IsValid(AnimInstance) == true && IsValid(SkillMontage_3) == true)
+	{
+		if (AnimInstance->Montage_IsPlaying(SkillMontage_3) == false)
+		{
+			AnimInstance->Montage_Play(SkillMontage_3);
+		}
+	}
+}
+
 void ARSDunMonsterCharacter::OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted)
 {
 	if (montage == DeathMontage)
