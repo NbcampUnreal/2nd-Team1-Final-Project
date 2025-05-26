@@ -101,6 +101,17 @@ void ARSTycoonGameModeBase::RemoveCustomer(ARSTycoonCustomerCharacter* Customer)
 	Customers.RemoveSingle(Customer);
 }
 
+void ARSTycoonGameModeBase::AddNPC(ARSTycoonNPC* NPC)
+{
+	//손님은 추가하지 않음. GameMode에서 생성을 전반해서 맡아야하기 때문
+	if (NPC->IsA<ARSTycoonCustomerCharacter>())
+	{
+		return;
+	}
+	
+	NPCs.Add(NPC);
+}
+
 //남은 재료중에 요리가 가능한지 반환
 //OutOrderFood : true로 통과된다면 해야할 요리
 bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
@@ -114,15 +125,18 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 		FCookFoodData const* Data = DataSubsystem->Food->FindRow<FCookFoodData>(Customer->WantFoodKey, TEXT("Get FoodData"));
 		for (auto& Need : Data->NeedIngredients)
 		{
-			//주문이 들어간 음식은 있는 식재료로 제작 가능한 음식들 이라는 뜻이기 때문에 딱히 Contains 검사를 해주지 않아도 됨
-			Ingredients[Need.Key] -= Need.Value;
+			//손님이 바라는 음식인데 이미 요리가 나와서 재료가 없는 상황엔 재료를 차감하지 않음
+			//어차피 아래쪽에서 만들 수 있는지 검사하기 때문에 여기서 차감만
+			if (Ingredients.Contains(Need.Key))
+			{
+				Ingredients[Need.Key] -= Need.Value;
+			}
 		}
 	}
 	
 	//2. 남은 재료중에 만들 수 있는거 있는지 확인
 	TArray<FCookFoodData*> FoodDatas;
 	int OrderFoodIndex = INDEX_NONE;
-	FString MakeFoodName = "";
 	DataSubsystem->Food->GetAllRows<FCookFoodData>(TEXT("Get All Food Data"), FoodDatas);
 	
 	for (int i = 0; i < FoodDatas.Num(); i++)
@@ -136,13 +150,12 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 				FoodDatas[OrderFoodIndex]->Price < Data->Price)
 			{
 				OrderFoodIndex = i;
-				MakeFoodName = Data->Name;
 			}
 		}
 	}
-
-	bool bResult = OrderFoodIndex >= 0;
+	
 	//3. 요리를 만들 수 있다면 어떤 요리를 만들지 설정
+	bool bResult = OrderFoodIndex >= 0;
 	if (bResult)
 	{
 		//데이터와 Row의 대응의 순서가 보장된다면 정상작동함

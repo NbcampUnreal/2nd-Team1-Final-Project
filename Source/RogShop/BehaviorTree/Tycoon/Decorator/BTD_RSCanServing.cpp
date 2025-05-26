@@ -27,7 +27,8 @@ bool UBTD_RSCanServing::CalculateRawConditionValue(UBehaviorTreeComponent& Owner
 	//== 테스트 ==
 	TArray<AActor*> Tiles;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSCookingTile::StaticClass(), Tiles);
-
+	
+	const static FName TileKey = TEXT("TargetTile");
 	ARSTycoonWaiterCharacter* Waiter = Cast<ARSTycoonWaiterCharacter>(OwnerComp.GetAIOwner()->GetCharacter());
 	for (AActor* Tile : Tiles)
 	{
@@ -35,11 +36,35 @@ bool UBTD_RSCanServing::CalculateRawConditionValue(UBehaviorTreeComponent& Owner
 		{
 			if (CookingTile->GetState() == ECookingState::Finish)
 			{
-				const FName TileKey = TEXT("TargetTile");
-				OwnerComp.GetBlackboardComponent()->SetValueAsObject(TileKey, CookingTile);
+				//이미 다른 웨이터가 타일이 배치가 되있으면 제외
+				if (CheckAssignOtherWaiter(TileKey, CookingTile))
+				{
+					continue;
+				}
 				
-				Waiter->MoveToTarget(CookingTile->GetActorLocation(), CookingTile);
+				OwnerComp.GetBlackboardComponent()->SetValueAsObject(TileKey, CookingTile);
+				return true;
+			}
+		}
+	}
 
+	return false;
+}
+
+
+bool UBTD_RSCanServing::CheckAssignOtherWaiter(const FName& Key, ARSCookingTile* Target) const
+{
+	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
+	for (ARSTycoonNPC* NPC : GameMode->GetNPCs())
+	{
+		if (ARSTycoonWaiterCharacter* Waiter = Cast<ARSTycoonWaiterCharacter>(NPC))
+		{
+			AAIController* WaiterController = Cast<AAIController>(Waiter->GetController());
+			ARSCookingTile* OtherWaiterTargetTile = Cast<ARSCookingTile>(
+				WaiterController->GetBlackboardComponent()->GetValueAsObject(Key));
+
+			if (OtherWaiterTargetTile == Target)
+			{
 				return true;
 			}
 		}
