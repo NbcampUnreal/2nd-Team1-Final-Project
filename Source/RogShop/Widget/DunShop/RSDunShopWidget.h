@@ -31,18 +31,11 @@ private:
     EItemRarity GetRandomRarity();
 
     // 데이터 테이블에서 확률 기반 아이템 랜덤 추출 함수
-    TPair<FName, FDungeonItemData*> GetRandomItemFromDataTable();
+    TPair<FName, struct FDungeonItemData*> GetRandomItemFromDataTable(UDataTable* WeaponDataTable, UDataTable* RelicDataTable);
 
     // BP 할당 필요
     UPROPERTY(EditDefaultsOnly)
     TSubclassOf<UUserWidget> RSDunShopItemWidgetClass;
-
-    // 데이터 테이블 할당 필요
-    UPROPERTY(EditDefaultsOnly)
-    UDataTable* WeaponDataTable;
-
-    UPROPERTY(EditDefaultsOnly)
-    UDataTable* RelicDataTable;
 
     UPROPERTY(meta = (BindWidget))
     class UButton* ExitBtn;
