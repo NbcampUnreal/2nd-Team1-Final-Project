@@ -4,6 +4,7 @@
 #include "RSDunMonsterCharacter.h"
 #include "RogShop/RSMonsterAttackTraceDefine.h"
 #include "RogShop/UtilDefine.h"
+#include "Components/CapsuleComponent.h"
 
 ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 {
@@ -29,6 +30,9 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	TraceRightOffset = 0.f;
 	TraceUpOffset = 0.f;
 
+	// 몬스터 캡슐 컴포넌트에 몬스터가 공격을 받아서 그것을 무시하도록 한 코드
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_MonsterAttackTrace, ECR_Ignore);
+
 }
 
 void ARSDunMonsterCharacter::BeginPlay()
@@ -51,7 +55,7 @@ void ARSDunMonsterCharacter::PlayBaseAttackAnim()
 		if (AnimInstance->Montage_IsPlaying(BaseAttackMontage) == false)
 		{
 			AnimInstance->Montage_Play(BaseAttackMontage);
-			RS_LOG("몬스터가 공격합니다.");
+			RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다.");
 		}
 	}
 }
@@ -107,7 +111,7 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 void ARSDunMonsterCharacter::PerformAttackTrace()
 {
 	FHitResult HitResult;
-	FVector Start = GetMesh()->GetSocketLocation(SocketLocation); // TODO : 사막 보스 에셋 받으면 여기다 실제 소켓 이름으로 바꿔줘야 함
+	FVector Start = GetMesh()->GetSocketLocation(SocketLocation);
 	Start += GetActorForwardVector() * TraceForwardOffset;
 	Start += GetActorRightVector() * TraceRightOffset;
 	Start += GetActorUpVector() * TraceUpOffset;
@@ -146,7 +150,7 @@ void ARSDunMonsterCharacter::PerformAttackTrace()
 		UE_LOG(LogTemp, Warning, TEXT("bHit False"));
 	}
 
-	DrawDebugBox(GetWorld(), Center, TraceBoxHalfSize, Rotation, bHit ? FColor::Red : FColor::Green, false, 10.0f);
+	DrawDebugBox(GetWorld(), Center, TraceBoxHalfSize, Rotation, bHit ? FColor::Red : FColor::Green, false, 5.0f);
 
 	RS_LOG("몬스터 공격이 성공해서 공격 트레이스 디버그 박스를 그립니다.");
 
