@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "RSBaseInventoryComponent.h"
-#include "RSDungeonInventoryComponent.generated.h"
+#include "RSDungeonIngredientInventoryComponent.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ROGSHOP_API URSDungeonInventoryComponent : public URSBaseInventoryComponent
+class ROGSHOP_API URSDungeonIngredientInventoryComponent : public URSBaseInventoryComponent
 {
 	GENERATED_BODY()
 	
