@@ -4,28 +4,31 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "ShopItemData.h"
-#include "DunItemWidget.generated.h"
+#include "DungeonItemData.h"
+#include "RSDunItemWidget.generated.h"
 
-class UDunShopWidget;
+class URSDunShopWidget;
 
 UCLASS()
-class ROGSHOP_API UDunItemWidget : public UUserWidget
+class ROGSHOP_API URSDunItemWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
 public:
+    // 부모 위젯에서 넣어주는 값
+    void SetItemData(const FDungeonItemData& InItemData);
+    void SetParentShop(URSDunShopWidget* InShop);
+    void SetItemRowName(FName RowName);
+
+protected:
     virtual void NativeConstruct() override;
 
-    void SetItemData(const FShopItemData& InItemData);
-
-    void SetParentShop(UDunShopWidget* InShop);
-
-    void SetItemRowName(FName RowName);
+private:
+    UFUNCTION()
+    void OnBuyClicked();
 
     bool BuyItem();
 
-protected:
     UPROPERTY(meta = (BindWidget))
     class UImage* ItemImage;
 
@@ -42,14 +45,11 @@ protected:
     class UButton* BuyBtn;
 
     UPROPERTY()
-    UDunShopWidget* ParentShop;
+    URSDunShopWidget* ParentShop;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-    FShopItemData ItemData;
+    UPROPERTY()
+    FDungeonItemData ItemData;
 
     UPROPERTY()
     FName CurrentRowName;
-
-    UFUNCTION()
-    void OnBuyClicked();
 };

@@ -13,30 +13,24 @@ class ROGSHOP_API ARSInteractableLevelTravel : public AActor, public IRSInteract
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ARSInteractableLevelTravel();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-// »óÈ£ÀÛ¿ë
+// ìƒí˜¸ì‘ìš©
 public:
 	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
 
-// ·¹º§ ÀÌµ¿
+// ë ˆë²¨ ì´ë™
 private:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Level", meta = (AllowPrivateAccess = true))
 	TSoftObjectPtr<UWorld> TargetLevelAsset;
 
-// ÄÄÆ÷³ÍÆ®
+// ì»´í¬ë„ŒíŠ¸
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
 	TObjectPtr<USceneComponent> SceneComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
-	TObjectPtr<UStaticMeshComponent> MeshComp;	// ÀÓ½Ã, ³ªÁß¿¡ ³ªÀÌ¾Æ°¡¶ó µîÀ¸·Î ´ëÃ¼µÉ ¼ö ÀÖ´Ù.
+	TObjectPtr<UStaticMeshComponent> MeshComp;	// ì„ì‹œ, ë‚˜ì¤‘ì— ë‚˜ì´ì•„ê°€ë¼ ë“±ìœ¼ë¡œ ëŒ€ì²´ë  ìˆ˜ ìˆë‹¤.
 };

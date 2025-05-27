@@ -5,6 +5,7 @@
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
+#include "RSGameInstance.h"
 
 
 void UMainMenuWidget::NativeConstruct()
@@ -34,12 +35,19 @@ void UMainMenuWidget::NativeConstruct()
 
 void UMainMenuWidget::OnStartButtonClicked()
 {
-	UGameplayStatics::OpenLevel(this, FName("BaseAreaMap"));
+	// TODO : ê¸°ì¡´ ì„¸ì´ë¸Œ ì œê±°
+
+	// ë ˆë²¨ ì´ë™
+	URSGameInstance* RSGameInstance = Cast<URSGameInstance>(GetWorld()->GetGameInstance());
+	if (RSGameInstance)
+	{
+		RSGameInstance->TravelToLevel(NewGameTargetLevelAsset);
+	}
 }
 
 void UMainMenuWidget::OnLoadButtonClicked()
 {
-	//UGameplayStatics::OpenLevel(this, FName("´ÙÀ½·¹º§ ÀÌ¸§"));
+	//UGameplayStatics::OpenLevel(this, FName("ë‹¤ìŒë ˆë²¨ ì´ë¦„"));
 }
 
 void UMainMenuWidget::OnOptionButtonClicked()
