@@ -11,7 +11,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class URSPlayerWeaponComponent;
 class URSRelicInventoryComponent;
-class URSDungeonInventoryComponent;
+class URSDungeonIngredientInventoryComponent;
 class UAIPerceptionStimuliSourceComponent;
 
 struct FInputActionValue;
@@ -66,27 +66,27 @@ protected:
 	UFUNCTION()
 	void SecondWeaponSlot(const FInputActionValue& value);
 
-// ½ºÄÌ·¹Å» ¸Ş½Ã °ü·Ã
+// ìŠ¤ì¼ˆë ˆíƒˆ ë©”ì‹œ ê´€ë ¨
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SkeletalMesh", meta = (AllowPrivateAccess = true))
 	FSkeletalMeshMergeParams SkeletalMeshMergeParams;
 
-// Ä«¸Ş¶ó °ü·Ã
+// ì¹´ë©”ë¼ ê´€ë ¨
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = true))
 	TObjectPtr<USpringArmComponent> SpringArmComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UCameraComponent> CameraComp;
 
-// ¾Ö´Ï¸ŞÀÌ¼Ç ¸ùÅ¸ÁÖ °ü·Ã
+// ì• ë‹ˆë©”ì´ì…˜ ëª½íƒ€ì£¼ ê´€ë ¨
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = true))
-	TObjectPtr<UAnimMontage> DodgeMontage; // ±¸¸£±â
+	TObjectPtr<UAnimMontage> DodgeMontage; // êµ¬ë¥´ê¸°
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = true))
-	TObjectPtr<UAnimMontage> DeathMontage; // »ç¸Á
+	TObjectPtr<UAnimMontage> DeathMontage; // ì‚¬ë§
 
-// ¹«±â °ü·Ã
+// ë¬´ê¸° ê´€ë ¨
 public:
 	URSPlayerWeaponComponent* GetRSPlayerWeaponComponent();
 
@@ -94,37 +94,37 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
 	TObjectPtr<URSPlayerWeaponComponent> WeaponComp;
 
-// À¯¹° °ü·Ã
+// ìœ ë¬¼ ê´€ë ¨
 public:
-	URSRelicInventoryComponent* GetURSRelicInventoryComponent() { return RelicInventoryComp; }
+	URSRelicInventoryComponent* GetRSRelicInventoryComponent() { return RelicInventoryComp; }
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Relic", meta = (AllowPrivateAccess = true))
 	TObjectPtr<URSRelicInventoryComponent> RelicInventoryComp;
 
-// ÀÎº¥Åä¸® °ü·Ã
+// ì¸ë²¤í† ë¦¬ ê´€ë ¨
 public:
-	URSDungeonInventoryComponent* GetRSDungeonInventoryComponent();
+	URSDungeonIngredientInventoryComponent* GetRSDungeonIngredientInventoryComponent();
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = true))
-	TObjectPtr<URSDungeonInventoryComponent> InventoryComp;
+	TObjectPtr<URSDungeonIngredientInventoryComponent> IngredientInventoryComp;
 
-// »óÈ£ÀÛ¿ë °ü·Ã
+// ìƒí˜¸ì‘ìš© ê´€ë ¨
 private:
 	void InteractTrace();
 
 private:
-	AActor* InteractActor;	// ¶óÀÎÆ®·¹ÀÌ½º¸¦ ÅëÇØ Ã£Àº »óÈ£ÀÛ¿ë °¡´ÉÇÑ ¾×ÅÍ
-	float InteractRadius;	// ¶óÀÎÆ®·¹ÀÌ½º¸¦ ÇÒ °Å¸®(¹İÁö¸§)
-	float InteractAngle;	// ÇÃ·¹ÀÌ¾î°¡ °¡Àå ¸ÕÀú »óÈ£ÀÛ¿ë ÇÒ ¾×ÅÍ¸¦ Ã£À» °¢µµ
+	AActor* InteractActor;	// ë¼ì¸íŠ¸ë ˆì´ìŠ¤ë¥¼ í†µí•´ ì°¾ì€ ìƒí˜¸ì‘ìš© ê°€ëŠ¥í•œ ì•¡í„°
+	float InteractRadius;	// ë¼ì¸íŠ¸ë ˆì´ìŠ¤ë¥¼ í•  ê±°ë¦¬(ë°˜ì§€ë¦„)
+	float InteractAngle;	// í”Œë ˆì´ì–´ê°€ ê°€ì¥ ë¨¼ì € ìƒí˜¸ì‘ìš© í•  ì•¡í„°ë¥¼ ì°¾ì„ ê°ë„
 
-// AIÆÛ¼Á¼Ç ÀÚ±Ø ¼Ò½º
+// AIí¼ì…‰ì…˜ ìê·¹ ì†ŒìŠ¤
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAIPerceptionStimuliSourceComponent> AIPerceptionStimuliSourceComp;
 
-// ½ºÅÈ °ü·Ã
+// ìŠ¤íƒ¯ ê´€ë ¨
 public:
 	float GetAttackPower() const;
 	void IncreaseAttackPower(float Amount);
@@ -141,8 +141,8 @@ private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
 	float AttackSpeed;
 
-// ¼¼ÀÌºê ¹× ·Îµå
+// ì„¸ì´ë¸Œ ë° ë¡œë“œ
 public:
 	UPROPERTY(BlueprintAssignable)
-	FOnSaveRequested OnSaveRequested;	// ÀúÀå ¿äÃ»À» ÀÇ¹ÌÇÏ´Â ÀÌº¥Æ® µğ½ºÆĞÃ³
+	FOnSaveRequested OnSaveRequested;	// ì €ì¥ ìš”ì²­ì„ ì˜ë¯¸í•˜ëŠ” ì´ë²¤íŠ¸ ë””ìŠ¤íŒ¨ì²˜
 };
