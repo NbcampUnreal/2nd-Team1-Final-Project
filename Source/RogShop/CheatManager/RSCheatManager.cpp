@@ -101,16 +101,17 @@ void URSCheatManager::SpawnDunShopNPC()
     APlayerController* PC = GetOuterAPlayerController();
     if (!PC) return;
 
+    if (!DunShopNPCClass)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("DunShopNPCClass is not set!"));
+        return;
+    }
+
     FVector SpawnLocation = PC->GetPawn()->GetActorLocation() + PC->GetPawn()->GetActorForwardVector() * 200.f;
     FActorSpawnParameters Params;
     Params.Owner = PC;
 
-    TSubclassOf<AActor> NPCClass = LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Actor/DungeonNpc/BP_RSDunShopNpcActor.BP_RSDunShopNpcActor_C"));
-
-    if (NPCClass)
-    {
-        World->SpawnActor<AActor>(NPCClass, SpawnLocation, FRotator::ZeroRotator, Params);
-    }
+    World->SpawnActor<AActor>(DunShopNPCClass, SpawnLocation, FRotator::ZeroRotator, Params);
 }
 
 void URSCheatManager::SpawnWeaponPad()
@@ -147,20 +148,6 @@ void URSCheatManager::SpawnWeaponPad()
     FRotator SpawnRotation = FRotator::ZeroRotator;
 
     GetWorld()->SpawnActor<AActor>(WeaponSpawnPadBPClass, SpawnLocation, SpawnRotation);
-}
-
-void URSCheatManager::ShowRSDunMainWidget()
-{
-    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetOuterAPlayerController());
-
-    if (PC && PC->GetRSDunMainWidget())
-    {
-        PC->GetRSDunMainWidget()->AddToViewport();
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("PC or RSDunMainWidget Is Null !"));
-    }
 }
 
 void URSCheatManager::OpenTycoonLevel()

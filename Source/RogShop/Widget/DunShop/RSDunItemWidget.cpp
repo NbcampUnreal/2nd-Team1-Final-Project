@@ -1,68 +1,67 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-#include "DunItemWidget.h"
+#include "RSDunItemWidget.h"
+
+#include "RSDunShopWidget.h"
+#include "RSDunPlayerController.h"
 #include "RSDunPlayerCharacter.h"
 #include "RSPlayerWeaponComponent.h"
-#include "Kismet/GameplayStatics.h"
-
-#include "RSBaseWeapon.h"
-#include "RSDunPlayerController.h"
 
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 
-#include "DunShopWidget.h"
+#include "Kismet/GameplayStatics.h"
 
-void UDunItemWidget::NativeConstruct()
+void URSDunItemWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
     if (BuyBtn)
     {
-        BuyBtn->OnClicked.AddDynamic(this, &UDunItemWidget::OnBuyClicked);
+        BuyBtn->OnClicked.AddDynamic(this, &URSDunItemWidget::OnBuyClicked);
     }
 }
 
-void UDunItemWidget::SetItemData(const FShopItemData& InItemData)
+void URSDunItemWidget::SetItemData(const FShopItemData& InItemData)
 {
     ItemData = InItemData;
 
     if (ItemNameText)
     {
-        ItemNameText->SetText(InItemData.ItemName);
+        ItemNameText->SetText(ItemData.ItemName);
     }
 
     if (ItemDesText)
     {
-        ItemDesText->SetText(InItemData.Description);
+        ItemDesText->SetText(ItemData.Description);
     }
 
     if (ItemPriceText)
     {
-        ItemPriceText->SetText(FText::AsNumber(InItemData.Price));
+        ItemPriceText->SetText(FText::AsNumber(ItemData.Price));
     }
 
-    if (ItemImage && InItemData.Icon)
+    if (ItemImage && ItemData.Icon)
     {
-        ItemImage->SetBrushFromTexture(InItemData.Icon);
+        ItemImage->SetBrushFromTexture(ItemData.Icon);
     }
 }
 
-void UDunItemWidget::SetParentShop(UDunShopWidget* InShop)
+void URSDunItemWidget::SetParentShop(URSDunShopWidget* InShop)
 {
     ParentShop = InShop;
 }
 
-void UDunItemWidget::SetItemRowName(FName RowName)
+void URSDunItemWidget::SetItemRowName(FName RowName)
 {
     CurrentRowName = RowName;
 }
 
-void UDunItemWidget::OnBuyClicked()
+void URSDunItemWidget::OnBuyClicked()
 {
     if (BuyItem())
     {
-        // Character->DecreaseLifeEssence(ItemData.Price); // ÇÃ·¹ÀÌ¾î °ñµå ¼öÁ¤ °ü·Ã ÇÔ¼ö ¶Ç´Â public º¯¼ö ÇÊ¿ä
+        // Character->DecreaseLifeEssence(ItemData.Price); // í”Œë ˆì´ì–´ ê³¨ë“œ ìˆ˜ì • ê´€ë ¨ í•¨ìˆ˜ ë˜ëŠ” public ë³€ìˆ˜ í•„ìš”
 
         if (ItemPriceText)
         {
@@ -89,7 +88,7 @@ void UDunItemWidget::OnBuyClicked()
     }
 }
 
-bool UDunItemWidget::BuyItem()
+bool URSDunItemWidget::BuyItem()
 {
     ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
     ARSDunPlayerCharacter* PlayerChar = Cast<ARSDunPlayerCharacter>(PC->GetCharacter());
@@ -100,7 +99,7 @@ bool UDunItemWidget::BuyItem()
         return false;
     }
 
-    /*if (Character->GetLifeEssence() - ItemData.Price < 0) // ÇÃ·¹ÀÌ¾î ÀçÈ­ °¡Á®¿À±â °ü·Ã ÇÔ¼ö ¶Ç´Â public º¯¼ö ÇÊ¿ä
+    /*if (Character->GetLifeEssence() - ItemData.Price < 0) // í”Œë ˆì´ì–´ ì¬í™” ê°€ì ¸ì˜¤ê¸° ê´€ë ¨ í•¨ìˆ˜ ë˜ëŠ” public ë³€ìˆ˜ í•„ìš”
     {
         UE_LOG(LogTemp, Warning, TEXT("BuyItem - More LifeEssence Need"));
         return false;
@@ -112,7 +111,7 @@ bool UDunItemWidget::BuyItem()
 
     switch (ItemData.ItemList)
     {
-        case EItemList::Potion: // Ã¼·Â Áï½Ã È¸º¹
+        case EItemList::Potion: // ì²´ë ¥ ì¦‰ì‹œ íšŒë³µ
         {
             switch (ItemData.Rarity)
             {
@@ -137,7 +136,7 @@ bool UDunItemWidget::BuyItem()
 
             if (Effect)
             {
-                // ApplyEffect ÇÔ¼ö°¡ URSBaseRelicEffect ÀÚ½Ä Å¬·¡½º¿¡¼­ ±¸ÇöµÇ¾î¾ß ÇÔ
+                // ApplyEffect í•¨ìˆ˜ê°€ URSBaseRelicEffect ìì‹ í´ë˜ìŠ¤ì—ì„œ êµ¬í˜„ë˜ì–´ì•¼ í•¨
                 Effect->ApplyEffect(PlayerChar, PC, ItemData);
             }
             else
@@ -154,7 +153,7 @@ bool UDunItemWidget::BuyItem()
             SpawnParams.Owner = PlayerChar;
             SpawnParams.Instigator = PlayerChar;
 
-            // ¿ùµå¿¡ ¹«±â ¾×ÅÍ »ı¼ºÀ» ÇØ¾ß¸¸ µ¥ÀÌÅÍ¸¦ ³Ñ±æ ¼ö ÀÖÀ½
+            // ì›”ë“œì— ë¬´ê¸° ì•¡í„° ìƒì„±ì„ í•´ì•¼ë§Œ ë°ì´í„°ë¥¼ ë„˜ê¸¸ ìˆ˜ ìˆìŒ
             ARSBaseWeapon* SpawnedWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(
                 ItemData.WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 
@@ -181,4 +180,3 @@ bool UDunItemWidget::BuyItem()
 
     return bIsBuy;
 }
-
