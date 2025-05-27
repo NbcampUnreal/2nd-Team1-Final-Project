@@ -10,7 +10,7 @@
 
 URSCheatManager::URSCheatManager()
 {
-    MonsterMap.Add("anubis", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunAnubisCharacter.BP_RSDunAnubisCharacter_C")));
+    MonsterMap.Add("anubis", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunEliteAnubisCharacter.BP_RSDunEliteAnubisCharacter_C")));
     MonsterMap.Add("bossspiderqueen", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBossSpiderQueenCharacter.BP_RSDunBossSpiderQueenCharacter_C")));
     MonsterMap.Add("boar", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBoarCharacter.BP_RSDunBoarCharacter_C")));
     MonsterMap.Add("skeleton", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunSkeletonCharacter.BP_RSDunSkeletonCharacter_C")));
@@ -25,7 +25,7 @@ URSCheatManager::URSCheatManager()
     MonsterMap.Add("bossdemon", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunFinalBossDemonCharacter.BP_RSDunFinalBossDemonCharacter_C")));
     MonsterMap.Add("bossworm", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBossWormCharacter.BP_RSDunBossWormCharacter_C")));
     MonsterMap.Add("lizardman", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunLizardManCharacter.BP_RSDunLizardManCharacter_C")));
-   
+
 }
 
 void URSCheatManager::TestDunMonsterAttack()
