@@ -18,6 +18,7 @@ public:
 	ARSTycoonCamera();
 
 	void Attach();
+	void ChangeToManagementView();
 
 protected:
 	virtual void BeginPlay() override;

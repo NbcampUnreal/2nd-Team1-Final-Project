@@ -39,7 +39,7 @@ void ARSTycoonGameModeBase::StartSale()
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(Controller)
 	
-	Controller->StartSale();
+	Controller->StartSaleMode();
 	
 	GetWorldTimerManager().SetTimer(CustomerTimerHandle, this, &ARSTycoonGameModeBase::CreateCustomer, 5.f, true);
 	GetWorldTimerManager().SetTimer(GameTimerHandle, this, &ARSTycoonGameModeBase::EndSale, SalePlayMinute * 60, false);
@@ -187,17 +187,19 @@ void ARSTycoonGameModeBase::EndSale()
 	GetWorldTimerManager().ClearTimer(CustomerTimerHandle);
 	GetWorldTimerManager().ClearTimer(GameTimerHandle);
 
-	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->EndSale();
+	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->EndSaleMode();
 }
 
 void ARSTycoonGameModeBase::StartWait()
 {
 	State = ETycoonGameMode::Wait;
 
-	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->StartWait();
+	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->StartWaitMode();
 }
 
 void ARSTycoonGameModeBase::StartManagement()
 {
-	
+	State = ETycoonGameMode::Management;
+
+	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->StartManagementMode();
 }

@@ -6,9 +6,10 @@
 #include "GameFramework/PlayerController.h"
 #include "RSTycoonPlayerController.generated.h"
 
+class URSTycoonManagementWidget;
+class URSTycoonSaleWidget;
 class URSTycoonSaleResultWidget;
 class URSTycoonWaitWidget;
-class URSTycoonHUDWidget;
 class UInputAction;
 class UInputMappingContext;
 /**
@@ -22,16 +23,19 @@ class ROGSHOP_API ARSTycoonPlayerController : public APlayerController
 public:
 	void AddMoney(int32 Value);
 	void AddCustomerCount(int32 Value);
+	void StartWaitMode();
+	void StartSaleMode();
+	void EndSaleMode();
+	void StartManagementMode();
 
-	void StartWait();
-	void StartSale();
-	void EndSale();
-
-	int32 GetMoney() const { return Money;}
+	int32 GetGold() const { return Money;}
 	int32 GetCustomerCount() const { return CustomerCount; }
 	
 protected:
 	virtual void BeginPlay() override;
+
+private:
+	void ChangeMainWidget(UUserWidget* ActiveWidget);
 	
 public:
 	UPROPERTY(EditDefaultsOnly)
@@ -48,22 +52,25 @@ private:
 	TSubclassOf<URSTycoonWaitWidget> WaitWidgetType;
 	
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<URSTycoonHUDWidget> MainHUDType;
+	TSubclassOf<URSTycoonSaleWidget> SaleWidgetType;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<URSTycoonSaleResultWidget> SaleResultWidgetType;
 	
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UUserWidget> ManagementWidgetType;
+	TSubclassOf<URSTycoonManagementWidget> ManagementWidgetType;
 	
 	UPROPERTY()
 	TObjectPtr<URSTycoonWaitWidget> WaitWidget;
 	
 	UPROPERTY()
-	TObjectPtr<URSTycoonHUDWidget> MainHUD;
+	TObjectPtr<URSTycoonSaleWidget> SaleWidget;
 	
 	UPROPERTY()
 	TObjectPtr<URSTycoonSaleResultWidget> SaleResultWidget;
+
+	UPROPERTY()
+	TObjectPtr<URSTycoonManagementWidget> ManagementWidget;
 	
 	int32 Money;
 	int32 CustomerCount;

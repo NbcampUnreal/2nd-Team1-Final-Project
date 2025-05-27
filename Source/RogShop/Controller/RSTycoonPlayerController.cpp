@@ -5,53 +5,49 @@
 
 #include "EnhancedInputSubsystems.h"
 #include "Blueprint/UserWidget.h"
-#include "RogShop/Widget/Tycoon/RSTycoonHUDWidget.h"
+#include "RogShop/Widget/Tycoon/RSTycoonManagementWidget.h"
 #include "RogShop/Widget/Tycoon/RSTycoonSaleResultWidget.h"
+#include "RogShop/Widget/Tycoon/RSTycoonSaleWidget.h"
 #include "RogShop/Widget/Tycoon/RSTycoonWaitWidget.h"
 
 void ARSTycoonPlayerController::AddMoney(int32 Value)
 {
 	Money += Value;
-	MainHUD->SetGold(Money);
+	SaleWidget->SetGold(Money);
 }
 
 void ARSTycoonPlayerController::AddCustomerCount(int32 Value)
 {
 	CustomerCount += Value;
-	MainHUD->SetCustomerCount(CustomerCount);
+	SaleWidget->SetCustomerCount(CustomerCount);
 }
 
-void ARSTycoonPlayerController::StartWait()
+void ARSTycoonPlayerController::StartWaitMode()
 {
 	FInputModeGameAndUI InputMode;
 	SetInputMode(InputMode);
-	
-	MainHUD->RemoveFromParent();
-	SaleResultWidget->RemoveFromParent();
-	
-	WaitWidget->AddToViewport();
+	ChangeMainWidget(WaitWidget);
 }
 
-void ARSTycoonPlayerController::StartSale()
+void ARSTycoonPlayerController::StartSaleMode()
 {
 	FInputModeGameAndUI InputMode;
 	SetInputMode(InputMode);
-	
-	WaitWidget->RemoveFromParent();
-	SaleResultWidget->RemoveFromParent();
-	
-	MainHUD->AddToViewport();
+	ChangeMainWidget(SaleWidget);
 }
 
-void ARSTycoonPlayerController::EndSale()
+void ARSTycoonPlayerController::EndSaleMode()
 {
 	FInputModeUIOnly InputMode;
 	SetInputMode(InputMode);
-	
-	MainHUD->RemoveFromParent();
-	WaitWidget->RemoveFromParent();
-	
-	SaleResultWidget->AddToViewport();
+	ChangeMainWidget(SaleResultWidget);
+}
+
+void ARSTycoonPlayerController::StartManagementMode()
+{
+	FInputModeGameAndUI InputMode;
+	SetInputMode(InputMode);
+	ChangeMainWidget(ManagementWidget);
 }
 
 void ARSTycoonPlayerController::BeginPlay()
@@ -70,8 +66,19 @@ void ARSTycoonPlayerController::BeginPlay()
 	Subsystem->AddMappingContext(IMC, 0);
 
 	WaitWidget = CreateWidget<URSTycoonWaitWidget>(this, WaitWidgetType.Get());
-	MainHUD = CreateWidget<URSTycoonHUDWidget>(this, MainHUDType.Get());
+	SaleWidget = CreateWidget<URSTycoonSaleWidget>(this, SaleWidgetType.Get());
 	SaleResultWidget = CreateWidget<URSTycoonSaleResultWidget>(this, SaleResultWidgetType.Get());
+	ManagementWidget = CreateWidget<URSTycoonManagementWidget>(this, ManagementWidgetType.Get());
 	
-	StartWait();
+	StartWaitMode();
+}
+
+void ARSTycoonPlayerController::ChangeMainWidget(UUserWidget* ActiveWidget)
+{
+	WaitWidget->RemoveFromParent();
+	SaleWidget->RemoveFromParent();
+	SaleResultWidget->RemoveFromParent();
+	ManagementWidget->RemoveFromParent();
+
+	ActiveWidget->AddToViewport();
 }
