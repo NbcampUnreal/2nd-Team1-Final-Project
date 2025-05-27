@@ -3,6 +3,7 @@
 
 #include "RSTycoonWaitWidget.h"
 
+#include "RSGameInstance.h"
 #include "RSTycoonGameModeBase.h"
 #include "Components/Button.h"
 
@@ -27,5 +28,5 @@ void URSTycoonWaitWidget::OnClickManagementButton()
 
 void URSTycoonWaitWidget::OnClickOutButton()
 {
-	
+	GetGameInstance<URSGameInstance>()->TravelToLevel(BaseAreaLevel);
 }
