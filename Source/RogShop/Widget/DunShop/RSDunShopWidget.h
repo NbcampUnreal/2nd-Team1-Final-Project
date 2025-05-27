@@ -1,0 +1,52 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Blueprint/UserWidget.h"
+#include "ShopItemData.h"
+#include "RSDunShopWidget.generated.h"
+
+class UHorizontalBox;
+
+UCLASS()
+class ROGSHOP_API URSDunShopWidget : public UUserWidget
+{
+	GENERATED_BODY()
+	
+public:
+    void HandleItemPurchase(FName PurchasedID);
+
+protected:
+    virtual void NativeConstruct() override;
+
+private:
+    UFUNCTION()
+    void OnExitClicked();
+
+    void SetMouseMode(bool bEnable);
+    void PopulateShopItems();
+
+    // 희귀도 랜덤 추출 함수
+    ERarity GetRandomRarity();
+
+    // 데이터 테이블에서 확률 기반 아이템 랜덤 추출 함수
+    FShopItemData* GetRandomItemFromDataTable(UDataTable* DataTable);
+
+    // BP 할당 필요
+    UPROPERTY(EditDefaultsOnly)
+    TSubclassOf<UUserWidget> RSDunShopItemWidgetClass;
+
+    // 데이터 테이블 할당 필요
+    UPROPERTY(EditDefaultsOnly)
+    UDataTable* ItemDataTable;
+
+    UPROPERTY(meta = (BindWidget))
+    class UButton* ExitBtn;
+
+    UPROPERTY(meta = (BindWidget))
+    class UTextBlock* LifeEssenceText;
+
+    UPROPERTY(meta = (BindWidget))
+    UHorizontalBox* ItemHorizontalBox;
+};
