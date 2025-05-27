@@ -68,7 +68,7 @@ void ARSMonsterAIController::AISkill_2()
 		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
 		if (ctrlChr)
 		{
-			ctrlChr->PlaySkill_1();
+			ctrlChr->PlaySkill_2();
 		}
 	}
 }
@@ -82,7 +82,7 @@ void ARSMonsterAIController::AISkill_3()
 		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
 		if (ctrlChr)
 		{
-			ctrlChr->PlaySkill_1();
+			ctrlChr->PlaySkill_3();
 		}
 	}
 }
