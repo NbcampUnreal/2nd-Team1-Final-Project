@@ -30,6 +30,8 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "DataTable"),
             Path.Combine(ModuleDirectory, "Object", "Relic"),
             Path.Combine(ModuleDirectory, "GameInstanceSubsystem"),
+            Path.Combine(ModuleDirectory, "SaveGame"),
+            Path.Combine(ModuleDirectory, "SaveGame", "Dungeon"),
         });
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule", "NavigationSystem", "DeveloperSettings", "SkeletalMerging" });

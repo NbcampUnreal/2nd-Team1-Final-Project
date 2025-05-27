@@ -3,6 +3,7 @@
 
 #include "RSInteractableLevelTravel.h"
 #include "Kismet/GameplayStatics.h"
+#include "RSDunPlayerCharacter.h"
 
 // Sets default values
 ARSInteractableLevelTravel::ARSInteractableLevelTravel()
@@ -35,6 +36,7 @@ void ARSInteractableLevelTravel::Tick(float DeltaTime)
 void ARSInteractableLevelTravel::Interact(ARSDunPlayerCharacter* Interactor)
 {
 	// TODO : 레벨을 이동하기 전에 세이브 처리가 필요하다.
+	Interactor->OnSaveRequested.Broadcast();
 
 	if (TargetLevelAsset.IsValid())
 	{
