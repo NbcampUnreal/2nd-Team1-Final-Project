@@ -56,6 +56,6 @@ void UMainMenuWidget::OnOptionButtonClicked()
 
 void UMainMenuWidget::OnExitButtonClicked()
 {
-	FGenericPlatformMisc::RequestExit(false);
+	UKismetSystemLibrary::QuitGame(this, GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, false);
 }
 
