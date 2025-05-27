@@ -1,16 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "RSDungeonInventoryComponent.h"
+#include "RSDungeonIngredientInventoryComponent.h"
 #include "RogShop/UtilDefine.h"
 #include "RSDungeonGroundIngredient.h"
 #include "GameFramework/Character.h"
 #include "RSDataSubsystem.h"
 #include "DungeonItemData.h"
 
-void URSDungeonInventoryComponent::DropItem(FName ItemKey)
+void URSDungeonIngredientInventoryComponent::DropItem(FName ItemKey)
 {
-	// TODO : ÀÎº¥Åä¸®¿¡ ÀÖ´Â ¾ÆÀÌÅÛÀÌ ¶¥¿¡ ¹ö·ÁÁöµµ·Ï ±¸ÇöÇØ¾ßÇÑ´Ù.
+	// TODO : ì¸ë²¤í† ë¦¬ì— ìˆëŠ” ì•„ì´í…œì´ ë•…ì— ë²„ë ¤ì§€ë„ë¡ êµ¬í˜„í•´ì•¼í•œë‹¤.
 
 	if (CheckValidItem(ItemKey))
 	{
@@ -40,5 +40,5 @@ void URSDungeonInventoryComponent::DropItem(FName ItemKey)
 		}
 	}
 
-	RS_LOG_C("¾ÆÀÌÅÛ µå¶ø¿¡ ½ÇÆĞÇß½À´Ï´Ù.", FColor::Red);
+	RS_LOG_C("ì•„ì´í…œ ë“œëì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤.", FColor::Red);
 }
