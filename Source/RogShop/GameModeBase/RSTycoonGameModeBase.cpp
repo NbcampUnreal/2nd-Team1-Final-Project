@@ -4,6 +4,7 @@
 #include "RogShop/GameModeBase//RSTycoonGameModeBase.h"
 
 #include "RSTycoonInventoryComponent.h"
+#include "RSTycoonPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "RogShop/UtilDefine.h"
 #include "RogShop/Actor/Tycoon/Tile/RSDoorTile.h"
@@ -21,8 +22,10 @@ ARSTycoonGameModeBase::ARSTycoonGameModeBase()
 	Inventory = CreateDefaultSubobject<URSTycoonInventoryComponent>(TEXT("Inventory"));
 }
 
-void ARSTycoonGameModeBase::StartGame()
+void ARSTycoonGameModeBase::StartSale()
 {
+	State = ETycoonGameMode::Sales;
+
 	TArray<AActor*> TableTiles;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSTableTile::StaticClass(), TableTiles);
 
@@ -33,7 +36,13 @@ void ARSTycoonGameModeBase::StartGame()
 		MaxCustomerCount += Tile->GetMaxPlace();
 	}
 
+	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	check(Controller)
+	
+	Controller->StartSale();
+	
 	GetWorldTimerManager().SetTimer(CustomerTimerHandle, this, &ARSTycoonGameModeBase::CreateCustomer, 5.f, true);
+	GetWorldTimerManager().SetTimer(GameTimerHandle, this, &ARSTycoonGameModeBase::EndSale, SalePlayMinute * 60, false);
 }
 
 void ARSTycoonGameModeBase::AddOrder(FFoodOrder Order)
@@ -44,19 +53,6 @@ void ARSTycoonGameModeBase::AddOrder(FFoodOrder Order)
 void ARSTycoonGameModeBase::RemoveOrder(FFoodOrder Order)
 {
 	FoodOrders.RemoveSingle(Order);
-}
-
-void ARSTycoonGameModeBase::BeginPlay()
-{
-	Super::BeginPlay();
-
-	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
-	
-	//임시, 게임 시작 버튼 생기면 StartGame 호출하게 만들거임
-	GetWorldTimerManager().SetTimerForNextTick([&]()
-	{
-		StartGame();
-	});
 }
 
 void ARSTycoonGameModeBase::CreateCustomer()
@@ -81,8 +77,13 @@ void ARSTycoonGameModeBase::CreateCustomer()
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSTableTile::StaticClass(), TableTiles);
 	check(TableTiles.Num())
 
-	int32 RandomTableIndex = FMath::RandRange(0, TableTiles.Num() - 1);
-	ARSTableTile* TargetTableTile = Cast<ARSTableTile>(TableTiles[RandomTableIndex]);
+	ARSTableTile* TargetTableTile;
+	do
+	{
+		int32 RandomTableIndex = FMath::RandRange(0, TableTiles.Num() - 1);
+		TargetTableTile = Cast<ARSTableTile>(TableTiles[RandomTableIndex]);
+	}
+	while (!TargetTableTile->CanSit());
 
 	//손님을 스폰할 문 결정
 	TArray<AActor*> DoorTiles;
@@ -99,6 +100,14 @@ void ARSTycoonGameModeBase::CreateCustomer()
 void ARSTycoonGameModeBase::RemoveCustomer(ARSTycoonCustomerCharacter* Customer)
 {
 	Customers.RemoveSingle(Customer);
+	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->AddCustomerCount(1);
+
+	//게임 종료
+	FName OrderFoodKey;
+	if (Customers.Num() == 0 && !CanOrder(OrderFoodKey))
+	{
+		EndSale();
+	}
 }
 
 void ARSTycoonGameModeBase::AddNPC(ARSTycoonNPC* NPC)
@@ -108,8 +117,13 @@ void ARSTycoonGameModeBase::AddNPC(ARSTycoonNPC* NPC)
 	{
 		return;
 	}
-	
+
 	NPCs.Add(NPC);
+}
+
+float ARSTycoonGameModeBase::GetGameTime() const
+{
+	return GetWorldTimerManager().GetTimerElapsed(GameTimerHandle);
 }
 
 //남은 재료중에 요리가 가능한지 반환
@@ -133,12 +147,12 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 			}
 		}
 	}
-	
+
 	//2. 남은 재료중에 만들 수 있는거 있는지 확인
 	TArray<FCookFoodData*> FoodDatas;
 	int OrderFoodIndex = INDEX_NONE;
 	DataSubsystem->Food->GetAllRows<FCookFoodData>(TEXT("Get All Food Data"), FoodDatas);
-	
+
 	for (int i = 0; i < FoodDatas.Num(); i++)
 	{
 		FCookFoodData* Data = FoodDatas[i];
@@ -153,7 +167,7 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 			}
 		}
 	}
-	
+
 	//3. 요리를 만들 수 있다면 어떤 요리를 만들지 설정
 	bool bResult = OrderFoodIndex >= 0;
 	if (bResult)
@@ -164,4 +178,26 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 	}
 
 	return bResult;
+}
+
+void ARSTycoonGameModeBase::EndSale()
+{
+	RS_LOG_C("게임 끝", FColor::Orange)
+
+	GetWorldTimerManager().ClearTimer(CustomerTimerHandle);
+	GetWorldTimerManager().ClearTimer(GameTimerHandle);
+
+	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->EndSale();
+}
+
+void ARSTycoonGameModeBase::StartWait()
+{
+	State = ETycoonGameMode::Wait;
+
+	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->StartWait();
+}
+
+void ARSTycoonGameModeBase::StartManagement()
+{
+	
 }

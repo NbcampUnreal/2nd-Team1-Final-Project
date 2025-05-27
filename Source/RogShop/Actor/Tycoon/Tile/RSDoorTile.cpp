@@ -24,8 +24,8 @@ ARSTycoonCustomerCharacter* ARSDoorTile::SpawnCustomer(const FName& FoodKey, ARS
 	ARSTycoonCustomerCharacter* Customer = GetWorld()->SpawnActor<ARSTycoonCustomerCharacter>(
 		CustomerType, CustomerSpawnPoint->GetComponentTransform(), SpawnParameters);
 	Customer->WantFoodKey = FoodKey;
-
-	Customer->MoveToTarget(Target->GetSitTransform().GetLocation(), Target);
+	
+	Customer->MoveToTarget(Target->GetSitTransform().GetLocation(), Target);	
 
 	return Customer;
 }

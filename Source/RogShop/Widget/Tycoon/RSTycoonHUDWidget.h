@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "TycoonOperationWidget.generated.h"
+#include "RSTycoonHUDWidget.generated.h"
 
+class UProgressBar;
 class ARSTycoonWaiterCharacter;
 class ARSTycoonChefCharacter;
 class UButton;
@@ -15,39 +16,40 @@ class UTextBlock;
  * 
  */
 UCLASS()
-class ROGSHOP_API UTycoonOperationWidget : public UUserWidget
+class ROGSHOP_API URSTycoonHUDWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
 	void SetGold(int32 Value);
+	void SetCustomerCount(int32 Value);
 
+protected:
 	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 	
 private:
+	void UpdateTimeUI();
+
 	UFUNCTION()
-	void CreateChef();
-	
-	UFUNCTION()
-	void CreateWaiter();
+	void OnClickStopSales();
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UTextBlock* GoldText;
 
-	//== 시연용 == 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UButton* CreateChefButton;
-	
+	UTextBlock* CustomerCountText;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UButton* CreateWaiterButton;
+	UTextBlock* TimeText;
 
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<ARSTycoonChefCharacter> ChefClass;
-	
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<ARSTycoonWaiterCharacter> WaiterClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UProgressBar* TimeProgressBar; 	//임시, 시계로 바꿀 예정
 
-	UPROPERTY(EditDefaultsOnly)
-	FVector PlusSpawnLo;	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UButton* StopSalesButton;
+
+private:
+	FTimerHandle TimeUIHandle;
 };
