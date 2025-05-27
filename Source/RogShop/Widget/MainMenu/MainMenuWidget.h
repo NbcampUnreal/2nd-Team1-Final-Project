@@ -50,5 +50,7 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ExitButton;
 
-	
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level", meta = (AllowPrivateAccess = true))
+	TSoftObjectPtr<UWorld> NewGameTargetLevelAsset;
 };
