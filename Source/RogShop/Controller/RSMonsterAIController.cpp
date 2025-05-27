@@ -45,6 +45,48 @@ void ARSMonsterAIController::AIAttack()
 	}
 }
 
+void ARSMonsterAIController::AISkill_1()
+{
+	APawn* ctrlPawn = GetPawn();
+	if (ctrlPawn)
+	{
+		ARSDunMonsterCharacter* ctrlChr;
+		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
+		if (ctrlChr)
+		{
+			ctrlChr->PlaySkill_1();
+		}
+	}
+}
+
+void ARSMonsterAIController::AISkill_2()
+{
+	APawn* ctrlPawn = GetPawn();
+	if (ctrlPawn)
+	{
+		ARSDunMonsterCharacter* ctrlChr;
+		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
+		if (ctrlChr)
+		{
+			ctrlChr->PlaySkill_1();
+		}
+	}
+}
+
+void ARSMonsterAIController::AISkill_3()
+{
+	APawn* ctrlPawn = GetPawn();
+	if (ctrlPawn)
+	{
+		ARSDunMonsterCharacter* ctrlChr;
+		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
+		if (ctrlChr)
+		{
+			ctrlChr->PlaySkill_1();
+		}
+	}
+}
+
 void ARSMonsterAIController::MoveToCurrentPatrolPoint()
 {
 	APawn* ctrlPawn = GetPawn();
@@ -76,13 +118,3 @@ void ARSMonsterAIController::MoveToCurrentPatrolPoint()
 		currentPatrolIdx = (currentPatrolIdx + 1) % patrolPoints.Num();
 	}
 }
-/*
-void ARSMonsterAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
-{
-	Super::OnMoveCompleted(RequestID, Result);
-
-	if (Result.Code == EPathFollowingResult::Success)
-	{
-		MoveToCurrentPatrolPoint();
-	}
-}*/

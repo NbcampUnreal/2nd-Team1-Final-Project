@@ -26,4 +26,7 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UDataTable> Weapon;
+
+	UPROPERTY()
+	TObjectPtr<UDataTable> Relic;
 };

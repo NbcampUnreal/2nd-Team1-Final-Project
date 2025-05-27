@@ -10,10 +10,13 @@
 class USpringArmComponent;
 class UCameraComponent;
 class URSPlayerWeaponComponent;
+class URSRelicInventoryComponent;
 class URSDungeonInventoryComponent;
 class UAIPerceptionStimuliSourceComponent;
 
 struct FInputActionValue;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSaveRequested);
 
 UCLASS()
 class ROGSHOP_API ARSDunPlayerCharacter : public ARSDunBaseCharacter
@@ -91,6 +94,14 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
 	TObjectPtr<URSPlayerWeaponComponent> WeaponComp;
 
+// 유물 관련
+public:
+	URSRelicInventoryComponent* GetURSRelicInventoryComponent() { return RelicInventoryComp; }
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Relic", meta = (AllowPrivateAccess = true))
+	TObjectPtr<URSRelicInventoryComponent> RelicInventoryComp;
+
 // 인벤토리 관련
 public:
 	URSDungeonInventoryComponent* GetRSDungeonInventoryComponent();
@@ -129,4 +140,9 @@ private:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
 	float AttackSpeed;
+
+// 세이브 및 로드
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnSaveRequested OnSaveRequested;	// 저장 요청을 의미하는 이벤트 디스패처
 };

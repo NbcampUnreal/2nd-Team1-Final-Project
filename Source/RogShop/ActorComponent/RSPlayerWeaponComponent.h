@@ -23,16 +23,10 @@ class ROGSHOP_API URSPlayerWeaponComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	URSPlayerWeaponComponent();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
 	void HandleNormalAttackInput();
@@ -79,4 +73,14 @@ protected:
 private:
 	UPROPERTY()
 	TSet<AActor*> DamagedActors;	// 데미지 입은 액터 저장
+
+// 세이브/로드
+private:
+	UFUNCTION()
+	void SaveRequested();
+	UFUNCTION()
+	void LoadRequested();
+
+private:
+	const FString WeaponSaveSlotName = TEXT("WeaponSaveSlot");
 };
