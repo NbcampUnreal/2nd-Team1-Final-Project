@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "ShopItemData.h"
+#include "DungeonItemData.h"
 #include "RSDunShopWidget.generated.h"
 
 class UHorizontalBox;
@@ -28,18 +28,14 @@ private:
     void PopulateShopItems();
 
     // 희귀도 랜덤 추출 함수
-    ERarity GetRandomRarity();
+    EItemRarity GetRandomRarity();
 
     // 데이터 테이블에서 확률 기반 아이템 랜덤 추출 함수
-    FShopItemData* GetRandomItemFromDataTable(UDataTable* DataTable);
+    TPair<FName, struct FDungeonItemData*> GetRandomItemFromDataTable(UDataTable* WeaponDataTable, UDataTable* RelicDataTable);
 
     // BP 할당 필요
     UPROPERTY(EditDefaultsOnly)
     TSubclassOf<UUserWidget> RSDunShopItemWidgetClass;
-
-    // 데이터 테이블 할당 필요
-    UPROPERTY(EditDefaultsOnly)
-    UDataTable* ItemDataTable;
 
     UPROPERTY(meta = (BindWidget))
     class UButton* ExitBtn;
