@@ -3,7 +3,7 @@
 
 #include "RSDungeonInventoryComponent.h"
 #include "RogShop/UtilDefine.h"
-#include "RSDungeonGroundItem.h"
+#include "RSDungeonGroundIngredient.h"
 #include "GameFramework/Character.h"
 #include "RSDataSubsystem.h"
 #include "DungeonItemData.h"
@@ -19,7 +19,7 @@ void URSDungeonInventoryComponent::DropItem(FName ItemKey)
 			ACharacter* CurCharacter = GetOwner<ACharacter>();
 			if (CurCharacter)
 			{
-				ARSDungeonGroundItem* DungeonGroundItem = GetWorld()->SpawnActor<ARSDungeonGroundItem>(ARSDungeonGroundItem::StaticClass(), CurCharacter->GetActorTransform());
+				ARSDungeonGroundIngredient* DungeonGroundItem = GetWorld()->SpawnActor<ARSDungeonGroundIngredient>(ARSDungeonGroundIngredient::StaticClass(), CurCharacter->GetActorTransform());
 
 				FDungeonItemData* Data = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Ingredient->FindRow<FDungeonItemData>(ItemKey, TEXT("Get Ingredient"));
 

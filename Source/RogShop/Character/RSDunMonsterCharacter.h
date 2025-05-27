@@ -10,6 +10,7 @@
 #include "Engine/TargetPoint.h"
 #include "Engine/OverlapResult.h"
 #include "TimerManager.h"
+#include "Animation/AnimInstance.h"
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
@@ -27,6 +28,12 @@ public:
 	// 애니메이션 실행 함수
 	virtual void PlayBaseAttackAnim();
 	virtual void PlayDeathAnim();
+	virtual void PlaySkill_1();
+	virtual void PlaySkill_2();
+	virtual void PlaySkill_3();
+
+	UFUNCTION()
+	void OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted);//사망 모션이 끝난 경우
 
 	//Navigation Invoker function
 	FORCEINLINE class UNavigationInvokerComponent* GetNavInvoker() const { return navInvoker; };
@@ -48,7 +55,6 @@ public:
 	UFUNCTION()
 	TArray<AActor*> GetPatrolPoint();
 
-protected:
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Status")
 	void OnDeath();
 
@@ -62,6 +68,15 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> DeathMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> SkillMontage_1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> SkillMontage_2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> SkillMontage_3;
 
 	//NavInvoker
 	UPROPERTY(BlueprintReadWrite, Category = Navigation, meta = (AllowPrivateAccess = "true"))//Navigation Invoker Setting

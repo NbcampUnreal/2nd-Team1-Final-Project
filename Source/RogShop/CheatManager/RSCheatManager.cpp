@@ -64,7 +64,8 @@ void URSCheatManager::TestDunMonsterDeath()
     if (Monster)
     {
         UE_LOG(LogTemp, Warning, TEXT("4"));
-        Monster->PlayDeathAnim();
+        //Monster->PlayDeathAnim();
+        Monster->OnDeath();
     }
 }
 

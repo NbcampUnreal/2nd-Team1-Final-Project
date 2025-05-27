@@ -9,8 +9,9 @@
 #include "Components/BoxComponent.h"
 #include "RSDataSubsystem.h"
 #include "DungeonItemData.h"
-#include "RSInteractableWeapon.h"
+#include "RSDungeonGroundWeapon.h"
 #include "RSDunPlayerController.h"
+#include "RSDungeonWeaponSaveGame.h"
 
 // Sets default values for this component's properties
 URSPlayerWeaponComponent::URSPlayerWeaponComponent()
@@ -30,17 +31,13 @@ void URSPlayerWeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	LoadRequested();
 	
-}
-
-
-// Called every frame
-void URSPlayerWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+	ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
+	if (OwnerCharacter)
+	{
+		OwnerCharacter->OnSaveRequested.AddDynamic(this, &URSPlayerWeaponComponent::SaveRequested);
+	}
 }
 
 void URSPlayerWeaponComponent::HandleNormalAttackInput()
@@ -211,7 +208,7 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 			Index = static_cast<int8>(EWeaponSlot::FirstWeaponSlot) - 1;
 		}
 
-		ARSInteractableWeapon* InteractableWeapon = GetWorld()->SpawnActor<ARSInteractableWeapon>(ARSInteractableWeapon::StaticClass(), CurCharacter->GetActorTransform());
+		ARSDungeonGroundWeapon* GroundWeapon = GetWorld()->SpawnActor<ARSDungeonGroundWeapon>(ARSDungeonGroundWeapon::StaticClass(), CurCharacter->GetActorTransform());
 
 		FName WeaponKey = WeaponActors[Index]->GetDataTableKey();
 
@@ -222,9 +219,9 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 			UStaticMesh* ItemStaticMesh = Data->ItemStaticMesh;
 			TSubclassOf<ARSDungeonItemBase> ItemClass = Data->ItemClass;
 
-			if (InteractableWeapon && ItemStaticMesh && ItemClass)
+			if (GroundWeapon && ItemStaticMesh && ItemClass)
 			{
-				InteractableWeapon->InitInteractableWeapon(WeaponKey, ItemStaticMesh, ItemClass);
+				GroundWeapon->InitInteractableWeapon(WeaponKey, ItemStaticMesh, ItemClass);
 			}
 		}
 
@@ -382,4 +379,98 @@ void URSPlayerWeaponComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedCom
 		UGameplayStatics::ApplyDamage(OtherActor, TotalDamage, OwnerController, WeaponActors[Index], UDamageType::StaticClass());
 		DamagedActors.Add(OtherActor);
 	}
+}
+
+void URSPlayerWeaponComponent::SaveRequested()
+{
+	// SaveGame 오브젝트 생성
+	URSDungeonWeaponSaveGame* WeaponSaveGame = Cast<URSDungeonWeaponSaveGame>(UGameplayStatics::CreateSaveGameObject(URSDungeonWeaponSaveGame::StaticClass()));
+
+	WeaponSaveGame->WeaponActors.SetNum(WeaponSlotSize);
+	// 무기 정보 저장
+	for (int i = 0; i < WeaponActors.Num(); ++i)
+	{
+		ARSBaseWeapon* Weapon = WeaponActors[i];
+		if (Weapon)
+		{
+			WeaponSaveGame->WeaponActors[i] = Weapon->GetDataTableKey();
+		}
+	}
+
+	// 장착 중인 무기 슬롯 저장
+	int8 CurWeaponSlot = static_cast<int8>(WeaponSlot);
+	WeaponSaveGame->WeaponSlot = CurWeaponSlot;
+	
+	// 저장
+	UGameplayStatics::SaveGameToSlot(WeaponSaveGame, WeaponSaveSlotName, 0);
+}
+
+void URSPlayerWeaponComponent::LoadRequested()
+{
+	// 널 체크
+	URSDungeonWeaponSaveGame* WeaponLoadGame = Cast<URSDungeonWeaponSaveGame>(UGameplayStatics::LoadGameFromSlot(WeaponSaveSlotName, 0));
+	if (!WeaponLoadGame)
+	{
+		return;
+	}
+
+
+	ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
+	if (!OwnerCharacter)
+	{
+		return;
+	}
+
+	UGameInstance* CurGameInstance = OwnerCharacter->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	UDataTable* WeaponDataTable = DataSubsystem->Weapon;
+	if (!WeaponDataTable)
+	{
+		return;
+	}
+
+	// 저장된 무기 정보를 가져온다.
+	TArray<FName> LoadWeaponName = WeaponLoadGame->WeaponActors;
+
+	// 저장된 무기 정보를 기준으로 장착할 무기 액터를 생성하고 슬롯에 저장한다.
+	for (int i = 0; i < LoadWeaponName.Num(); ++i)
+	{
+		if (LoadWeaponName[i].IsNone())
+		{
+			continue;
+		}
+
+		FName CurWeaponName = WeaponLoadGame->WeaponActors[i];
+
+		FDungeonItemData* Data = WeaponDataTable->FindRow<FDungeonItemData>(CurWeaponName, TEXT("Get WeaponData"));
+
+		if (Data && Data->ItemClass)
+		{
+			FActorSpawnParameters SpawnParameters;
+			SpawnParameters.Owner = OwnerCharacter;
+			SpawnParameters.Instigator = OwnerCharacter;
+
+			ARSBaseWeapon* SpawnWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(Data->ItemClass, SpawnParameters);
+
+			if (SpawnWeapon)
+			{
+				SpawnWeapon->SetDataTableKey(CurWeaponName);
+				EquipWeaponToSlot(SpawnWeapon);
+			}
+		}
+	}
+
+	// 장착 해야하는 슬롯을 가져오고 무기를 장착한다.
+	EWeaponSlot TargetWeaponSlot = static_cast<EWeaponSlot>(WeaponLoadGame->WeaponSlot);
+	EquipWeaponToCharacter(TargetWeaponSlot);
 }

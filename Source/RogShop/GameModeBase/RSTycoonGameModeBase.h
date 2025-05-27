@@ -7,6 +7,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "RSTycoonGameModeBase.generated.h"
 
+class ARSTycoonNPC;
 class ARSTycoonCustomerCharacter;
 class URSTycoonInventoryComponent;
 
@@ -22,9 +23,11 @@ public:
 	void AddOrder(FFoodOrder Order);
 	void RemoveOrder(FFoodOrder Order);
 	void RemoveCustomer(ARSTycoonCustomerCharacter* Customer);
+	void AddNPC(ARSTycoonNPC* NPC);
 
 	const TArray<FFoodOrder>& GetOrders() const { return FoodOrders; }
 	const TArray<TWeakObjectPtr<ARSTycoonCustomerCharacter>>& GetCustomers() const { return Customers; }
+	const TArray<ARSTycoonNPC*>& GetNPCs() const { return NPCs; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -47,10 +50,14 @@ private:
 	//가게 안에 있는 손님들
 	UPROPERTY()
 	TArray<TWeakObjectPtr<ARSTycoonCustomerCharacter>> Customers; 
-
+	
 	//최대 입장 가능한 손님, TableTile의 영향을 받음
 	UPROPERTY(VisibleAnywhere)
-	int32 MaxCustomerCount; 
+	int32 MaxCustomerCount;
+	
+	//가게 안에 있는 NPC들 (※ 손님 제외)
+	UPROPERTY()
+	TArray<ARSTycoonNPC*> NPCs;
 
 	FTimerHandle CustomerTimerHandle; //손님 등장 타이머
 };

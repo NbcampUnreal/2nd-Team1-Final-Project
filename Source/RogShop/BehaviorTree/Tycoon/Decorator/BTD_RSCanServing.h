@@ -6,7 +6,7 @@
 #include "BehaviorTree/BTDecorator.h"
 #include "BTD_RSCanServing.generated.h"
 
-class ARSTycoonWaiterCharacter;
+class ARSCookingTile;
 /**
  * 
  */
@@ -17,4 +17,7 @@ class ROGSHOP_API UBTD_RSCanServing : public UBTDecorator
 	
 public:
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
+
+private:
+	bool CheckAssignOtherWaiter(const FName& Key, ARSCookingTile* Target) const;
 };
