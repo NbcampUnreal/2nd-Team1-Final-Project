@@ -35,55 +35,65 @@ void URSDunShopWidget::HandleItemPurchase(FName PurchasedID)
     }
 }
 
-ERarity URSDunShopWidget::GetRandomRarity()
+EItemRarity URSDunShopWidget::GetRandomRarity()
 {
     int32 Roll = FMath::RandRange(1, 100); // 1 ~ 100 사이 정수
 
     if (Roll <= 60)
     {
-        return ERarity::Common;
+        return EItemRarity::Common;
     }
     else if (Roll <= 85) // 60 + 25
     {
-        return ERarity::Rare;
+        return EItemRarity::Rare;
     }
     else if (Roll <= 95) // 85 + 10
     {
-        return ERarity::Epic;
+        return EItemRarity::Epic;
     }
     else
     {
-        return ERarity::Legendary;
+        return EItemRarity::Legendary;
     }
 }
 
-FShopItemData* URSDunShopWidget::GetRandomItemFromDataTable(UDataTable* DataTable)
+TPair<FName, FDungeonItemData*> URSDunShopWidget::GetRandomItemFromDataTable()
 {
-    // 1. 등급을 뽑는다
-    ERarity SelectedRarity = GetRandomRarity();
+    // 추출할 아이템 등급 선정
+    EItemRarity SelectedRarity = GetRandomRarity();
+    TArray<TPair<FName, FDungeonItemData*>> AllItems;
 
-    // 2. 전체 데이터 테이블 가져오기
-    TArray<FShopItemData*> AllItems;
-    DataTable->GetAllRows(TEXT("Context"), AllItems);
-
-    // 3. 뽑은 등급과 일치하는 아이템들 필터링
-    TArray<FShopItemData*> FilteredItems;
-    for (FShopItemData* Item : AllItems)
+    // 무기 데이터 테이블 값 추출
+    const TMap<FName, uint8*>& WeaponMapRaw = WeaponDataTable->GetRowMap();
+    for (const auto& Elem : WeaponMapRaw)
     {
-        if (Item && Item->Rarity == SelectedRarity)
+        FDungeonItemData* ItemData = reinterpret_cast<FDungeonItemData*>(Elem.Value);
+        if (ItemData && ItemData->ItemRarity == SelectedRarity)
         {
-            FilteredItems.Add(Item);
+            AllItems.Add(TPair<FName, FDungeonItemData*>(Elem.Key, ItemData));
         }
     }
 
-    // 4. 필터링된 리스트에서 하나 랜덤 선택
-    if (FilteredItems.Num() > 0)
+    // 유물 데이터 테이블 값 추출
+    const TMap<FName, uint8*>& RelicMapRaw = RelicDataTable->GetRowMap();
+    for (const auto& Elem : RelicMapRaw)
     {
-        int32 RandomIndex = FMath::RandRange(0, FilteredItems.Num() - 1);
-        return FilteredItems[RandomIndex];
+        FDungeonItemData* ItemData = reinterpret_cast<FDungeonItemData*>(Elem.Value);
+        if (ItemData && ItemData->ItemRarity == SelectedRarity)
+        {
+            AllItems.Add(TPair<FName, FDungeonItemData*>(Elem.Key, ItemData));
+        }
     }
 
-    return nullptr;
+    // 뽑힌 아이템 중에서 동일 확률로 1개 반환
+    if (AllItems.Num() > 0)
+    {
+        int32 RandomIndex = FMath::RandRange(0, AllItems.Num() - 1);
+        return AllItems[RandomIndex];
+    }
+
+    // 유효하지 않은 경우
+    return TPair<FName, FDungeonItemData*>(FName("Invalid"), nullptr);
 }
 
 void URSDunShopWidget::OnExitClicked()
@@ -104,52 +114,40 @@ void URSDunShopWidget::OnExitClicked()
 
 void URSDunShopWidget::PopulateShopItems()
 {
-    if (ItemDataTable)
+    if (WeaponDataTable && RelicDataTable)
     {
         TSet<FName> AlreadySpawnedIDs;
 
-        const int32 ItemCount = 5;
+        const int32 AddItemCount = 5;
 
-        for (int32 i = 0; i < ItemCount; ++i)
+        for (int32 i = 0; i < AddItemCount; ++i)
         {
-            FShopItemData* RandomItem = GetRandomItemFromDataTable(ItemDataTable);
+            TPair<FName, FDungeonItemData*> RandomItem = GetRandomItemFromDataTable();
 
-            FName FoundRowName = NAME_None;
+            FName FoundRowName = RandomItem.Key;
+            FDungeonItemData* ItemData = RandomItem.Value;
 
-            // 무기를 위해서 해당 구조체를 이용하여 데이터 테이블에서 그 구조체에 해당하는 행 이름을 가져옴
-            for (const TPair<FName, uint8*>& Row : ItemDataTable->GetRowMap())
+            // 유효성 검사
+            if (!ItemData)
             {
-                if (Row.Value == (uint8*)RandomItem)
-                {
-                    FoundRowName = Row.Key;
-                    break;
-                }
+                UE_LOG(LogTemp, Warning, TEXT("ItemData is Null"));
+                continue;
             }
 
             // 중복 랜덤 생성 방지
-            if (!RandomItem || AlreadySpawnedIDs.Contains(RandomItem->ItemID))
+            if (AlreadySpawnedIDs.Contains(FoundRowName))
             {
                 continue;
             }
-            // 이미 샀던 아이템 생성 방지
-            else
-            {
-                URSGameInstance* GI = Cast<URSGameInstance>(GetGameInstance());
 
-                if (GI)
-                {
-                    if (GI->PurchasedItemIDs.Contains(RandomItem->ItemID))
-                    {
-                        continue;
-                    }
-                }
-                else
-                {
-                    UE_LOG(LogTemp, Warning, TEXT("GameInstance is not valid!"));
-                }
+            // 이미 구매한 아이템 생성 방지
+            URSGameInstance* GI = Cast<URSGameInstance>(GetGameInstance());
+            if (!GI || GI->PurchasedItemIDs.Contains(FoundRowName))
+            {
+                continue;
             }
 
-            AlreadySpawnedIDs.Add(RandomItem->ItemID);
+            AlreadySpawnedIDs.Add(FoundRowName);
 
             if (RSDunShopItemWidgetClass && ItemHorizontalBox)
             {
@@ -157,11 +155,10 @@ void URSDunShopWidget::PopulateShopItems()
 
                 if (NewRSDunItemWidget)
                 {
-                    NewRSDunItemWidget->SetItemData(*RandomItem);
+                    NewRSDunItemWidget->SetItemData(*ItemData);
                     NewRSDunItemWidget->SetParentShop(this);
                     NewRSDunItemWidget->SetItemRowName(FoundRowName);
 
-                    // 위젯을 수평 박스에 추가
                     ItemHorizontalBox->AddChild(NewRSDunItemWidget);
                 }
             }
@@ -169,9 +166,8 @@ void URSDunShopWidget::PopulateShopItems()
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("ItemDataTable is Null"));
+        UE_LOG(LogTemp, Warning, TEXT("DataTable is Null"));
     }
-    
 }
 
 void URSDunShopWidget::SetMouseMode(bool bEnable)
