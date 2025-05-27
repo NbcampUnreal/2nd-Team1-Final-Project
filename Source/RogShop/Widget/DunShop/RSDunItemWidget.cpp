@@ -5,6 +5,7 @@
 #include "RSDunPlayerController.h"
 #include "RSDunPlayerCharacter.h"
 #include "RSPlayerWeaponComponent.h"
+#include "RSBaseWeapon.h"
 
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
@@ -22,13 +23,13 @@ void URSDunItemWidget::NativeConstruct()
     }
 }
 
-void URSDunItemWidget::SetItemData(const FShopItemData& InItemData)
+void URSDunItemWidget::SetItemData(const FDungeonItemData& InItemData)
 {
     ItemData = InItemData;
 
     if (ItemNameText)
     {
-        ItemNameText->SetText(ItemData.ItemName);
+        ItemNameText->SetText(FText::FromString(ItemData.ItemName));
     }
 
     if (ItemDesText)
@@ -41,9 +42,9 @@ void URSDunItemWidget::SetItemData(const FShopItemData& InItemData)
         ItemPriceText->SetText(FText::AsNumber(ItemData.Price));
     }
 
-    if (ItemImage && ItemData.Icon)
+    if (ItemImage && ItemData.ItemIcon)
     {
-        ItemImage->SetBrushFromTexture(ItemData.Icon);
+        ItemImage->SetBrushFromTexture(ItemData.ItemIcon);
     }
 }
 
@@ -75,7 +76,7 @@ void URSDunItemWidget::OnBuyClicked()
 
         if (ParentShop)
         {
-            ParentShop->HandleItemPurchase(ItemData.ItemID);
+            ParentShop->HandleItemPurchase(CurrentRowName);
         }
         else
         {
@@ -109,45 +110,25 @@ bool URSDunItemWidget::BuyItem()
 
     float FinalValue = 0.0f;
 
-    switch (ItemData.ItemList)
+    switch (ItemData.ItemType)
     {
-        case EItemList::Potion: // 체력 즉시 회복
+        case EItemType::Relic:
         {
-            switch (ItemData.Rarity)
-            {
-                case ERarity::Common: FinalValue = 10.0f; break;
-                case ERarity::Rare: FinalValue = 20.0f; break;
-                case ERarity::Epic: FinalValue = 30.0f; break;
-                case ERarity::Legendary: FinalValue = 40.0f; break;
-            }
+            // Relic Item Class 적용 로직 필요 . .
 
-            PlayerChar->IncreaseHP(FinalValue);
+            //switch (ItemData.Rarity)
+            //{
+            //    case ERarity::Common: FinalValue = 10.0f; break;
+            //    case ERarity::Rare: FinalValue = 20.0f; break;
+            //    case ERarity::Epic: FinalValue = 30.0f; break;
+            //    case ERarity::Legendary: FinalValue = 40.0f; break;
+            //}
+
+            //PlayerChar->IncreaseHP(FinalValue);
 
             break;
         }
-        case EItemList::Relic:
-        {
-            URSBaseRelicEffect* Effect = nullptr;
-
-            if (ItemData.EffectClass)
-            {
-                Effect = NewObject<URSBaseRelicEffect>(this, ItemData.EffectClass);
-            }
-
-            if (Effect)
-            {
-                // ApplyEffect 함수가 URSBaseRelicEffect 자식 클래스에서 구현되어야 함
-                Effect->ApplyEffect(PlayerChar, PC, ItemData);
-            }
-            else
-            {
-                UE_LOG(LogTemp, Warning, TEXT("BuyItem - EffectClass is null"));
-                bIsBuy = false;
-            }
-
-            break;
-        }
-        case EItemList::Weapon:
+        case EItemType::Weapon:
         {
             FActorSpawnParameters SpawnParams;
             SpawnParams.Owner = PlayerChar;
@@ -155,7 +136,7 @@ bool URSDunItemWidget::BuyItem()
 
             // 월드에 무기 액터 생성을 해야만 데이터를 넘길 수 있음
             ARSBaseWeapon* SpawnedWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(
-                ItemData.WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+                ItemData.ItemClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 
             URSPlayerWeaponComponent* WeaponComp = PlayerChar->GetRSPlayerWeaponComponent();
 

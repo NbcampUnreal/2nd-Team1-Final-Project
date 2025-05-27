@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "ShopItemData.h"
+#include "DungeonItemData.h"
 #include "RSDunItemWidget.generated.h"
 
 class URSDunShopWidget;
@@ -16,7 +16,7 @@ class ROGSHOP_API URSDunItemWidget : public UUserWidget
 	
 public:
     // 부모 위젯에서 넣어주는 값
-    void SetItemData(const FShopItemData& InItemData);
+    void SetItemData(const FDungeonItemData& InItemData);
     void SetParentShop(URSDunShopWidget* InShop);
     void SetItemRowName(FName RowName);
 
@@ -47,8 +47,8 @@ private:
     UPROPERTY()
     URSDunShopWidget* ParentShop;
 
-    UPROPERTY(EditDefaultsOnly)
-    FShopItemData ItemData;
+    UPROPERTY()
+    FDungeonItemData ItemData;
 
     UPROPERTY()
     FName CurrentRowName;
