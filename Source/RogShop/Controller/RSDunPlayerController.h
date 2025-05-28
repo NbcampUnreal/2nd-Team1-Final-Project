@@ -50,23 +50,27 @@ public:
 	TObjectPtr<UInputAction> FirstWeaponSlotAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
 	TObjectPtr<UInputAction> SecondWeaponSlotAction;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
+	TObjectPtr<UInputAction> ToggleInventoryAction;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
+	TObjectPtr<UInputAction> ToggleInGameMenuAction;
 
-// À§Á¬
+// ìœ„ì ¯
 public:
 	URSDunMainWidget* GetRSDunMainWidget() const { return RSDunMainWidget; }
 
 private:
-	// ºí·çÇÁ¸°Æ®¿¡¼­ ÁöÁ¤ÇÒ ¼ö ÀÖµµ·Ï TSubclassOf·Î ¼±¾ğ
+	// ë¸”ë£¨í”„ë¦°íŠ¸ì—ì„œ ì§€ì •í•  ìˆ˜ ìˆë„ë¡ TSubclassOfë¡œ ì„ ì–¸
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = true))
 	TSubclassOf<UUserWidget> RSDunMainWidgetClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = true))
 	URSDunMainWidget* RSDunMainWidget;
 
-// ÀÌº¥Æ® µğ½ºÆĞÃ³
+// ì´ë²¤íŠ¸ ë””ìŠ¤íŒ¨ì²˜
 public:
 	UPROPERTY(BlueprintAssignable)
-	FOnWeaponSlotChange OnWeaponSlotChange;	// WeaponSlotÀ» º¯°æÇÏ´Â ½ÃÁ¡
+	FOnWeaponSlotChange OnWeaponSlotChange;	// WeaponSlotì„ ë³€ê²½í•˜ëŠ” ì‹œì 
 
 	UPROPERTY(BlueprintAssignable)
 	FOnHPChange OnHPChange;

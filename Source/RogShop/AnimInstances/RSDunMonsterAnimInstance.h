@@ -21,24 +21,30 @@ public:
     virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 protected:
-    // ¸ó½ºÅÍ Ä³¸¯ÅÍ ÂüÁ¶ (¼Ò½ºÆÄÀÏ¿¡¼­ ¸ó½ºÅÍ Ä³¸¯ÅÍ Ä³½ºÆÃ¿ë)
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character")
+    // ëª¬ìŠ¤í„° ìºë¦­í„° ì°¸ì¡° (ì†ŒìŠ¤íŒŒì¼ì—ì„œ ëª¬ìŠ¤í„° ìºë¦­í„° ìºìŠ¤íŒ…ìš©)
+    UPROPERTY(EditAnywhere, Category = "Character")
     TObjectPtr<ARSDunMonsterCharacter> MonsterCharacter;
 
-    // ¼Óµµ (°È±â ¾Ö´Ï¸ŞÀÌ¼Ç ÆÇ´Ü¿ë)
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+    // ì†ë„ì™€ ë°©í–¥ (ê±·ê¸° ì• ë‹ˆë©”ì´ì…˜ íŒë‹¨ìš©)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement")
     float GroundSpeed;
 
-    // ÀüÃ¼ ¼Óµµ º¤ÅÍ (ÇÊ¿ä ½Ã »ç¿ë)
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
+    float Speed;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
+    float Direction;
+
+    // ì „ì²´ ì†ë„ ë²¡í„° (í•„ìš” ì‹œ ì‚¬ìš©)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement")
     FVector Velocity;
 
-    // Á×À½ »óÅÂ ¿©ºÎ (Á×¾úÀ» ¶§ ³ª¿À´Â ¾Ö´Ï¸ŞÀÌ¼Ç ÀüÈ¯¿ë)
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State")
+    // ì£½ìŒ ìƒíƒœ ì—¬ë¶€ (ì£½ì—ˆì„ ë•Œ ë‚˜ì˜¤ëŠ” ì• ë‹ˆë©”ì´ì…˜ ì „í™˜ìš©)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "State")
     bool bIsDead;
 
-    // ÀÌµ¿ÇÏ°í ÀÖ´Â Áö »óÅÂ ¿©ºÎ (Idle<->Walk/Run ¾Ö´Ï¸ŞÀÌ¼Ç ÀüÈ¯¿ë)
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State")
+    // ì´ë™í•˜ê³  ìˆëŠ” ì§€ ìƒíƒœ ì—¬ë¶€ (Idle<->Walk/Run ì• ë‹ˆë©”ì´ì…˜ ì „í™˜ìš©)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "State")
     bool bShouldMove;
 	
 };
