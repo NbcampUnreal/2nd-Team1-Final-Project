@@ -65,6 +65,10 @@ protected:
 	void FirstWeaponSlot(const FInputActionValue& value);
 	UFUNCTION()
 	void SecondWeaponSlot(const FInputActionValue& value);
+	UFUNCTION()
+	void ToggleInventoryUI(const FInputActionValue& value);
+	UFUNCTION()
+	void ToggleInGameMenuUI(const FInputActionValue& value);
 
 // 스켈레탈 메시 관련
 private:
