@@ -10,6 +10,8 @@ URSDunMonsterAnimInstance::URSDunMonsterAnimInstance()
 
     Velocity = FVector::ZeroVector;
     GroundSpeed = 0.f;
+    Speed = 0.f;
+    Direction = 0.f;
     bShouldMove = false;
     bIsDead = false;
 }
@@ -28,9 +30,13 @@ void URSDunMonsterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
     if (MonsterCharacter)
     {
         Velocity = MonsterCharacter->GetVelocity();
+        FRotator Rotation = MonsterCharacter->GetActorRotation();
         GroundSpeed = Velocity.Size2D();
+        /*Speed = FMath::FInterpTo(Speed, GroundSpeed, DeltaSeconds, 6.0f);*/
         bShouldMove = GroundSpeed > 5.f;
-        // bIsDead =  << TODO :: ³ªÁß¿¡ ¸ó½ºÅÍ Ã¼·Â °¡Á®¿À±â
-        // ÇÊ¿äÇÏ¸é Ãß°¡ »óÅÂ Ã³¸® (ex. °ø°Ý Áß, ±âÀý Áß µî)
+        // bIsDead =  << TODO :: ë‚˜ì¤‘ì— ëª¬ìŠ¤í„° ì²´ë ¥ ê°€ì ¸ì˜¤ê¸°
+        // í•„ìš”í•˜ë©´ ì¶”ê°€ ìƒíƒœ ì²˜ë¦¬ (ex. ê³µê²© ì¤‘, ê¸°ì ˆ ì¤‘ ë“±
+
+        Direction = CalculateDirection(Velocity, Rotation);
     }
 }
