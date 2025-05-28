@@ -28,8 +28,11 @@ public:
 	// 애니메이션 실행 함수
 	virtual void PlayBaseAttackAnim();
 	virtual void PlayDeathAnim();
+	UFUNCTION(BlueprintCallable)
 	virtual void PlaySkill_1();
+	UFUNCTION(BlueprintCallable)
 	virtual void PlaySkill_2();
+	UFUNCTION(BlueprintCallable)
 	virtual void PlaySkill_3();
 
 	UFUNCTION()
