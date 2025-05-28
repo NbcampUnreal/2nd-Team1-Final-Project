@@ -137,6 +137,16 @@ void ARSDunPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
             {
                 EnhancedInput->BindAction(PlayerController->SecondWeaponSlotAction, ETriggerEvent::Triggered, this, &ARSDunPlayerCharacter::SecondWeaponSlot);
             }
+
+            if (PlayerController->ToggleInventoryAction)
+            {
+                EnhancedInput->BindAction(PlayerController->ToggleInventoryAction, ETriggerEvent::Triggered, this, &ARSDunPlayerCharacter::ToggleInventoryUI);
+            }
+
+            if (PlayerController->ToggleInGameMenuAction)
+            {
+                EnhancedInput->BindAction(PlayerController->ToggleInGameMenuAction, ETriggerEvent::Triggered, this, &ARSDunPlayerCharacter::ToggleInGameMenuUI);
+            }
         }
     }
 }
@@ -358,6 +368,25 @@ void ARSDunPlayerCharacter::SecondWeaponSlot(const FInputActionValue& value)
     }
 
     WeaponComp->EquipWeaponToCharacter(EWeaponSlot::SecondWeaponSlot);
+}
+
+void ARSDunPlayerCharacter::ToggleInventoryUI(const FInputActionValue& value)
+{
+    // TODO : 인벤토리 UI를 켜고 끄기
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("ToggleInventoryUI Activated"));
+    }
+}
+
+void ARSDunPlayerCharacter::ToggleInGameMenuUI(const FInputActionValue& value)
+{
+    // TODO : 다른 UI를 보이지 않도록 설정하고, 인게임 메뉴 UI를 열기
+    // 현재 다른 UI는 DunMainWidget
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("ToggleInGameMenuUI Activated"));
+    }
 }
 
 URSPlayerWeaponComponent* ARSDunPlayerCharacter::GetRSPlayerWeaponComponent()
