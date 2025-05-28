@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "RSDunMainWidget.h"
 #include "RSDunPlayerController.generated.h"
+
+class UInputMappingContext;
+class UInputAction;
+class URSDunMainHUDWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotChange, uint8, SlotIndex, FName, WeaponKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHPChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMaxHPChange);
-
-class UInputMappingContext;
-class UInputAction;
 
 UCLASS()
 class ROGSHOP_API ARSDunPlayerController : public APlayerController
@@ -24,12 +24,11 @@ public:
 
 	virtual void BeginPlay() override;
 
+// ì…ë ¥
 public:
 	void AddMapping();
 
 	void RemoveAllMapping();
-
-	void InitializeRSDunMainWidget();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
@@ -50,23 +49,29 @@ public:
 	TObjectPtr<UInputAction> FirstWeaponSlotAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
 	TObjectPtr<UInputAction> SecondWeaponSlotAction;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
+	TObjectPtr<UInputAction> ToggleInventoryAction;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
+	TObjectPtr<UInputAction> ToggleInGameMenuAction;
 
-// À§Á¬
+// ìœ„ì ¯
 public:
-	URSDunMainWidget* GetRSDunMainWidget() const { return RSDunMainWidget; }
+	void InitializeRSDunMainWidget();
+
+	void ToggleInGameMenuWidget();
 
 private:
-	// ºí·çÇÁ¸°Æ®¿¡¼­ ÁöÁ¤ÇÒ ¼ö ÀÖµµ·Ï TSubclassOf·Î ¼±¾ğ
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = true))
-	TSubclassOf<UUserWidget> RSDunMainWidgetClass;
+	// ë¸”ë£¨í”„ë¦°íŠ¸ì—ì„œ ì§€ì •í•  ìˆ˜ ìˆë„ë¡ TSubclassOfë¡œ ì„ ì–¸
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> RSDunMainHUDWidgetClass;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = true))
-	URSDunMainWidget* RSDunMainWidget;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<URSDunMainHUDWidget> RSDunMainHUDWidget;
 
-// ÀÌº¥Æ® µğ½ºÆĞÃ³
+// ì´ë²¤íŠ¸ ë””ìŠ¤íŒ¨ì²˜
 public:
 	UPROPERTY(BlueprintAssignable)
-	FOnWeaponSlotChange OnWeaponSlotChange;	// WeaponSlotÀ» º¯°æÇÏ´Â ½ÃÁ¡
+	FOnWeaponSlotChange OnWeaponSlotChange;	// WeaponSlotì„ ë³€ê²½í•˜ëŠ” ì‹œì 
 
 	UPROPERTY(BlueprintAssignable)
 	FOnHPChange OnHPChange;
