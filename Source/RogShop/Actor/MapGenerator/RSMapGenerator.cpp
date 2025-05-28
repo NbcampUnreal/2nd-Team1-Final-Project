@@ -2,6 +2,7 @@
 
 
 #include "RSMapGenerator.h"
+#include "RSSpawnManager.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine/LevelStreamingDynamic.h"
 #include "Kismet/GameplayStatics.h"
@@ -13,6 +14,7 @@ ARSMapGenerator::ARSMapGenerator()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+    SpawnManager = CreateDefaultSubobject<URSSpawnManager>(TEXT("SpawnManager"));
 }
 
 // Called when the game starts or when spawned
@@ -367,27 +369,40 @@ void ARSMapGenerator::SpawnTiles()
             }
 
             // 스폰 실행
-            UE_LOG(LogTemp, Log, TEXT("Create map"));
             if (SelectedLevel.IsValid())
             {
-                UE_LOG(LogTemp, Log, TEXT("MapCreate"));
+                SelectedLevel.LoadSynchronous();
+                FTransform TileTransform(Rot, WorldLoc);
                 ULevelStreamingDynamic* StreamingLevel = StreamTile(SelectedLevel, WorldLoc, Rot, TileName);
-                //상점NPC생성
-                if (StreamingLevel && ShopNPC && Pos == ShopTilePos)
+                if (StreamingLevel)
                 {
-                    ULevel* LoadedLevel = StreamingLevel->GetLoadedLevel();
-                    if (LoadedLevel)
+                    FTimerHandle TimerHandle;
+                    FTimerDelegate TimerDelegate;
+                    TimerDelegate.BindLambda([=,this]()
                     {
-                        for (AActor* Actor : LoadedLevel->Actors)
+                        ULevel* LoadedLevel = StreamingLevel->GetLoadedLevel();
+
+                        // 상점 NPC
+                        if (Pos == ShopTilePos && SpawnManager && ShopNPC)
                         {
-                            if (Actor && Actor->IsA<ATargetPoint>() && Actor->GetName().Contains("BP_ShopSpawnPoint"))
-                            {
-                                FTransform SpawnTransform = Actor->GetActorTransform();
-                                GetWorld()->SpawnActor<AActor>(ShopNPC, SpawnTransform);
-                                break;
-                            }
+                            SpawnManager->SpawnShopNPCInLevel(LoadedLevel);
                         }
-                    }
+
+                        // 플레이어 (0, 0)
+                        if (Pos == FVector2D(0, 0) && SpawnManager && PlayerClass)
+                        {
+                            SpawnManager->SpawnPlayerAtStartPoint(LoadedLevel, PlayerClass);
+                        }
+
+                        // 몬스터
+                        if (SpawnManager && MonsterDataTable)
+                        {
+                            SpawnManager->SpawnMonstersInLevel(LoadedLevel);
+                        }
+
+                    });
+
+                    GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false);
                 }
             }
         }
@@ -446,4 +461,30 @@ void ARSMapGenerator::ChooseShopTile()
     {
         ShopTilePos = Candidates[RandomStream.RandRange(0, Candidates.Num() - 1)];
     }
+}
+
+FVector ARSMapGenerator::SpawnBossArenaLevel()
+{
+    if (!BossArenaLevel.IsValid())
+    {
+        BossArenaLevel.LoadSynchronous();
+    }
+
+    FVector ArenaOffset = FVector(TileSize*GridSize*2, TileSize * GridSize * 2, 0.0f); // 현재 맵과 떨어진 좌표
+    FString ArenaUniqueName = TEXT("BossArena");
+
+    bool bSuccess = false;
+    FTransform ArenaTransform;
+    ArenaTransform.SetLocation(ArenaOffset);
+    ArenaTransform.SetRotation(FQuat::Identity);
+
+    ULevelStreamingDynamic* StreamingLevel = ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(
+        GetWorld(),
+        BossArenaLevel,
+        ArenaTransform,
+        bSuccess,
+        ArenaUniqueName
+    );
+
+    return ArenaOffset;
 }

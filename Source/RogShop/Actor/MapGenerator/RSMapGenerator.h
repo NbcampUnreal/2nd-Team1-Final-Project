@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "RSSpawnManager.h"
 #include "Engine/LevelStreamingDynamic.h"
+#include "GameFramework/Character.h"
 #include "Engine/TargetPoint.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -58,6 +60,7 @@ protected:
 	int32 GetAvailableNeighborCount(FVector2D Pos);
 	bool IsValidPos(FVector2D Pos) const;                // 좌표가 그리드 안에 있는지 확인
 	FVector2D GetNextDirection(FVector2D Current, TArray<FVector2D>& Visited); // 다음 경로 선택
+	FVector SpawnBossArenaLevel();
 
 public:
 	FVector2D ShopTilePos = FVector2D::ZeroVector;
@@ -70,10 +73,6 @@ public:
 	// 그리드 크기
 	UPROPERTY(EditAnywhere, Category = "Room Status")
 	int32 GridSize = 3;
-
-	// 상점NPC
-	UPROPERTY(EditAnywhere, Category = "NPC")
-	TSubclassOf<AActor> ShopNPC;
 
 	// ㅣ모양 타일
 	UPROPERTY(EditAnywhere, Category = "Room Spawning")
@@ -97,6 +96,18 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Room Spawning")
 	TSoftObjectPtr<UWorld> BossRoomTileLevel; // 보스방 전용 타일
+	UPROPERTY(EditAnywhere, Category = "Room Spawning")
+	TSoftObjectPtr<UWorld> BossArenaLevel; // 보스방 전용 타일
+
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	TSubclassOf<AActor> ShopNPC;
+
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	TSubclassOf<ACharacter> PlayerClass;
+
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	UDataTable* MonsterDataTable;
+
 
 private:
 	// 그리드 상에 생성된 타일 정보를 저장하는 Map
@@ -105,6 +116,8 @@ private:
 	FRandomStream RandomStream;
 	// 보스방 위치
 	FVector2D BossRoomPos;
+	UPROPERTY()
+	URSSpawnManager* SpawnManager;
 
 
 };
