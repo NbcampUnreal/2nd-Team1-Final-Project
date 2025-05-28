@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "RSDunMainWidget.h"
 #include "RSDunPlayerController.generated.h"
+
+class UInputMappingContext;
+class UInputAction;
+class URSDunMainHUDWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotChange, uint8, SlotIndex, FName, WeaponKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHPChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMaxHPChange);
-
-class UInputMappingContext;
-class UInputAction;
 
 UCLASS()
 class ROGSHOP_API ARSDunPlayerController : public APlayerController
@@ -24,12 +24,11 @@ public:
 
 	virtual void BeginPlay() override;
 
+// 입력
 public:
 	void AddMapping();
 
 	void RemoveAllMapping();
-
-	void InitializeRSDunMainWidget();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
@@ -57,15 +56,17 @@ public:
 
 // 위젯
 public:
-	URSDunMainWidget* GetRSDunMainWidget() const { return RSDunMainWidget; }
+	void InitializeRSDunMainWidget();
+
+	void ToggleInGameMenuWidget();
 
 private:
 	// 블루프린트에서 지정할 수 있도록 TSubclassOf로 선언
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = true))
-	TSubclassOf<UUserWidget> RSDunMainWidgetClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> RSDunMainHUDWidgetClass;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = true))
-	URSDunMainWidget* RSDunMainWidget;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<URSDunMainHUDWidget> RSDunMainHUDWidget;
 
 // 이벤트 디스패처
 public:

@@ -1,24 +1,37 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "RSDunMainWidget.h"
 
+#include "RSPlayerStatusWidget.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
-
+#include "RSDunPlayerController.h"
 #include "RSDunPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "DungeonItemData.h"
 #include "RSDataSubsystem.h"
 
-void URSDunMainWidget::NativeConstruct()
+void URSPlayerStatusWidget::NativeOnInitialized()
 {
-    Super::NativeConstruct();
+    Super::NativeOnInitialized();
 
-    UpdateHP();
-    UpdateMaxHP();
+    ARSDunPlayerController* RSDunPlayerController = GetOwningPlayer<ARSDunPlayerController>();
+    if (RSDunPlayerController)
+    {
+        RSDunPlayerController->OnWeaponSlotChange.AddDynamic(this, &URSPlayerStatusWidget::UpdateWeaponSlot);
+        RSDunPlayerController->OnHPChange.AddDynamic(this, &URSPlayerStatusWidget::UpdateHP);
+        RSDunPlayerController->OnMaxHPChange.AddDynamic(this, &URSPlayerStatusWidget::UpdateMaxHP);
+    }
 }
 
-void URSDunMainWidget::UpdateWeaponSlot(uint8 SlotIndex, FName WeaponKey)
+void URSPlayerStatusWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	UpdateHP();
+	UpdateMaxHP();
+}
+
+void URSPlayerStatusWidget::UpdateWeaponSlot(uint8 SlotIndex, FName WeaponKey)
 {
     if (URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>())
     {
@@ -26,7 +39,7 @@ void URSDunMainWidget::UpdateWeaponSlot(uint8 SlotIndex, FName WeaponKey)
         {
             const FDungeonItemData* FoundData = DataSubsystem->Weapon->FindRow<FDungeonItemData>(
                 WeaponKey,
-                TEXT("Weapon Data Lookup") // µð¹ö±ë¿ë Context
+                TEXT("Weapon Data Lookup") // ë””ë²„ê¹…ìš© Context
             );
 
             if (FoundData)
@@ -59,13 +72,13 @@ void URSDunMainWidget::UpdateWeaponSlot(uint8 SlotIndex, FName WeaponKey)
     }
 }
 
-void URSDunMainWidget::UpdateHP()
+void URSPlayerStatusWidget::UpdateHP()
 {
     ARSDunPlayerCharacter* PlayerChar = Cast<ARSDunPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
     if (PlayerChar && HPText)
     {
-        FString HPString = FString::Printf(TEXT("%.0f"), PlayerChar->GetHP()); // ¼Ò¼öÁ¡ ¾ø´Â Á¤¼ö ÇüÅÂ·Î º¯È¯
+        FString HPString = FString::Printf(TEXT("%.0f"), PlayerChar->GetHP()); // ì†Œìˆ˜ì  ì—†ëŠ” ì •ìˆ˜ í˜•íƒœë¡œ ë³€í™˜
         HPText->SetText(FText::FromString(HPString));
     }
     else
@@ -74,13 +87,13 @@ void URSDunMainWidget::UpdateHP()
     }
 }
 
-void URSDunMainWidget::UpdateMaxHP()
+void URSPlayerStatusWidget::UpdateMaxHP()
 {
     ARSDunPlayerCharacter* PlayerChar = Cast<ARSDunPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
     if (PlayerChar && MaxHPText)
     {
-        FString MaxHPString = FString::Printf(TEXT("%.0f"), PlayerChar->GetMaxHP()); // ¼Ò¼öÁ¡ ¾ø´Â Á¤¼ö ÇüÅÂ·Î º¯È¯
+        FString MaxHPString = FString::Printf(TEXT("%.0f"), PlayerChar->GetMaxHP()); // ì†Œìˆ˜ì  ì—†ëŠ” ì •ìˆ˜ í˜•íƒœë¡œ ë³€í™˜
         MaxHPText->SetText(FText::FromString(MaxHPString));
     }
     else

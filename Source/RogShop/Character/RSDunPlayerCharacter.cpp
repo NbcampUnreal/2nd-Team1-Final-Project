@@ -381,8 +381,13 @@ void ARSDunPlayerCharacter::ToggleInventoryUI(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::ToggleInGameMenuUI(const FInputActionValue& value)
 {
-    // TODO : 다른 UI를 보이지 않도록 설정하고, 인게임 메뉴 UI를 열기
-    // 현재 다른 UI는 DunMainWidget
+    // 인게임 메뉴 UI를 보이도록 하거나 안보이도록 한다.
+    ARSDunPlayerController* PC = GetController<ARSDunPlayerController>();
+    if (PC)
+    {
+        PC->ToggleInGameMenuWidget();
+    }
+
     if (GEngine)
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("ToggleInGameMenuUI Activated"));
