@@ -11,23 +11,21 @@
 URSCheatManager::URSCheatManager()
 {
 #if WITH_EDITOR
-
-    MonsterMap.Add("anubis", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunEliteAnubisCharacter.BP_RSDunEliteAnubisCharacter_C")));
-    MonsterMap.Add("bossspiderqueen", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBossSpiderQueenCharacter.BP_RSDunBossSpiderQueenCharacter_C")));
-    MonsterMap.Add("boar", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBoarCharacter.BP_RSDunBoarCharacter_C")));
-    MonsterMap.Add("skeleton", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunSkeletonCharacter.BP_RSDunSkeletonCharacter_C")));
-    MonsterMap.Add("bossflower", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBossFlowerCharacter.BP_RSDunBossFlowerCharacter_C")));
-    MonsterMap.Add("goat", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunGoatCharacter.BP_RSDunGoatCharacter_C")));
-    MonsterMap.Add("chicken", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunChickenCharacter.BP_RSDunChickenCharacter_C")));
-    MonsterMap.Add("elitebear", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSEliteBearCharacter.BP_RSEliteBearCharacter_C")));
-    MonsterMap.Add("hound", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunUndeadHoundCharacter.BP_RSDunUndeadHoundCharacter_C")));
-    MonsterMap.Add("snail", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunSnailCharacter.BP_RSDunSnailCharacter_C")));
-    MonsterMap.Add("eliteicegolem", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunEliteIceGolemCharacter.BP_RSDunEliteIceGolemCharacter_C")));
-    MonsterMap.Add("lich", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunEliteLichCharacter.BP_RSDunEliteLichCharacter_C")));
-    MonsterMap.Add("bossdemon", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunFinalBossDemonCharacter.BP_RSDunFinalBossDemonCharacter_C")));
-    MonsterMap.Add("bossworm", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBossWormCharacter.BP_RSDunBossWormCharacter_C")));
-    MonsterMap.Add("lizardman", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunLizardManCharacter.BP_RSDunLizardManCharacter_C")));
-
+    MonsterMap.Add("anubis", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunEliteAnubisCharacter.BP_DunEliteAnubisCharacter_C")));
+    MonsterMap.Add("bossspiderqueen", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunBossSpiderQueenCharacter.BP_DunBossSpiderQueenCharacter_C")));
+    MonsterMap.Add("boar", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunBoarCharacter.BP_DunBoarCharacter_C")));
+    MonsterMap.Add("skeleton", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunSkeletonCharacter.BP_DunSkeletonCharacter_C")));
+    MonsterMap.Add("bossflower", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunBossFlowerCharacter.BP_DunBossFlowerCharacter_C")));
+    MonsterMap.Add("goat", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunGoatCharacter.BP_DunGoatCharacter_C")));
+    MonsterMap.Add("chicken", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunChickenCharacter.BP_DunChickenCharacter_C")));
+    MonsterMap.Add("elitebear", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunEliteBearCharacter.BP_DunEliteBearCharacter_C")));
+    MonsterMap.Add("hound", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunUndeadHoundCharacter.BP_DunUndeadHoundCharacter_C")));
+    MonsterMap.Add("snail", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunSnailCharacter.BP_DunSnailCharacter_C")));
+    MonsterMap.Add("eliteicegolem", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunEliteIceGolemCharacter.BP_DunEliteIceGolemCharacter_C")));
+    MonsterMap.Add("lich", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunEliteLichCharacter.BP_DunEliteLichCharacter_C")));
+    MonsterMap.Add("bossdemon", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunFinalBossDemonCharacter.BP_DunFinalBossDemonCharacter_C")));
+    MonsterMap.Add("bossworm", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunBossWormCharacter.BP_DunBossWormCharacter_C")));
+    MonsterMap.Add("lizardman", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunLizardManCharacter.BP_DunLizardManCharacter_C")));
 #endif
 
 }
