@@ -12,7 +12,7 @@ struct FMonsterCount
     GENERATED_BODY()
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FString MonsterRowName;
+    FName MonsterRowName;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 Count;
