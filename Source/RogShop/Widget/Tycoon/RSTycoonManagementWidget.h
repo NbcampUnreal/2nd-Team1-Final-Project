@@ -6,6 +6,10 @@
 #include "Blueprint/UserWidget.h"
 #include "RSTycoonManagementWidget.generated.h"
 
+class USpinBox;
+class UVerticalBox;
+class URSTycoonBuyTileWidget;
+class ARSBaseTile;
 class UTextBlock;
 class UButton;
 /**
@@ -22,11 +26,31 @@ protected:
 private:
 	UFUNCTION()
 	void OnClickExpandTile();
+
+	UFUNCTION()
+	void OnClickWaitMode();
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UTextBlock* GoldText;
+	TObjectPtr<UTextBlock> GoldText;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UButton* ExpandTileButton;
+	TObjectPtr<UButton> ExpandTileButton;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<USpinBox> WidthBox;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<USpinBox> HeightBox;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<UButton> ReturnBaseAreaButton;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<UVerticalBox> BuyTileParent;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<URSTycoonBuyTileWidget> BuyTileWidgetType;
+
+	TArray<URSTycoonBuyTileWidget> BuyTileWidgets;
 };

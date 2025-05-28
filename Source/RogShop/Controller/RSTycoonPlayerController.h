@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RSTycoonPlayerController.generated.h"
 
+class ARSTycoonCamera;
 class URSTycoonManagementWidget;
 class URSTycoonSaleWidget;
 class URSTycoonSaleResultWidget;
@@ -20,58 +21,101 @@ class ROGSHOP_API ARSTycoonPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+#pragma region Mode
+
 public:
-	void AddMoney(int32 Value);
-	void AddCustomerCount(int32 Value);
 	void StartWaitMode();
 	void StartSaleMode();
 	void EndSaleMode();
 	void StartManagementMode();
 
-	int32 GetGold() const { return Money;}
-	int32 GetCustomerCount() const { return CustomerCount; }
+	int32 GetSelectTileIndex() const { return SelectTileIndex; }
+
+private:
+	int32 SelectTileIndex = INDEX_NONE;
 	
-protected:
-	virtual void BeginPlay() override;
+#pragma endregion
+
+#pragma region Widget
 
 private:
 	void ChangeMainWidget(UUserWidget* ActiveWidget);
-	
+	void SettingWidget();
+
+private:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<URSTycoonWaitWidget> WaitWidgetType;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<URSTycoonSaleWidget> SaleWidgetType;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<URSTycoonSaleResultWidget> SaleResultWidgetType;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<URSTycoonManagementWidget> ManagementWidgetType;
+
+	UPROPERTY()
+	TObjectPtr<URSTycoonWaitWidget> WaitWidget;
+
+	UPROPERTY()
+	TObjectPtr<URSTycoonSaleWidget> SaleWidget;
+
+	UPROPERTY()
+	TObjectPtr<URSTycoonSaleResultWidget> SaleResultWidget;
+
+	UPROPERTY()
+	TObjectPtr<URSTycoonManagementWidget> ManagementWidget;
+#pragma endregion
+
+#pragma region Input
+
+protected:
+	virtual void SetupInputComponent() override;
+
+private:
+	void SettingInput();
+
+	UFUNCTION()
+	void OnTileClick();
+
 public:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputAction> MoveAction;
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputAction> InteractAction;
-	
+
 private:
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputAction> TileClickAction;
+
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputMappingContext> IMC;
 
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<URSTycoonWaitWidget> WaitWidgetType;
-	
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<URSTycoonSaleWidget> SaleWidgetType;
-	
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<URSTycoonSaleResultWidget> SaleResultWidgetType;
-	
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<URSTycoonManagementWidget> ManagementWidgetType;
-	
+#pragma endregion
+
+public:
+	void AddGold(int32 Value);
+	void AddCustomerCount(int32 Value);
+	void SetCameraLocationToCenter();
+
+	int32 GetGold() const { return Gold; }
+	int32 GetCustomerCount() const { return CustomerCount; }
+
+protected:
+	virtual void BeginPlay() override;
+
+private:
+	void SettingCamera();
+
+private:
 	UPROPERTY()
-	TObjectPtr<URSTycoonWaitWidget> WaitWidget;
-	
-	UPROPERTY()
-	TObjectPtr<URSTycoonSaleWidget> SaleWidget;
-	
-	UPROPERTY()
-	TObjectPtr<URSTycoonSaleResultWidget> SaleResultWidget;
+	TObjectPtr<ARSTycoonCamera> MainCamera;
 
 	UPROPERTY()
-	TObjectPtr<URSTycoonManagementWidget> ManagementWidget;
-	
-	int32 Money;
+	TObjectPtr<ARSTycoonCamera> TopCamera;
+
+	int32 Gold;
 	int32 CustomerCount;
 };

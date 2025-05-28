@@ -20,14 +20,11 @@ ARSTycoonCamera::ARSTycoonCamera()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	SpringArm->SetupAttachment(RootComponent);
 
-	Camera = CreateDefaultSubobject<UCameraComponent>("MainCamera");
+	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(SpringArm);
-
-	TopCamera = CreateDefaultSubobject<UCameraComponent>("TopCamera");
-	TopCamera->SetupAttachment(RootComponent);
 }
 
-void ARSTycoonCamera::Attach()
+void ARSTycoonCamera::AttachPlayer()
 {
 	ARSTycoonPlayerCharacter* Player = Cast<ARSTycoonPlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	check(Player)
@@ -36,20 +33,15 @@ void ARSTycoonCamera::Attach()
 	SetActorRelativeLocation(FVector::ZeroVector);
 }
 
-void ARSTycoonCamera::ChangeToManagementView()
+void ARSTycoonCamera::ReturnToOrigin()
 {
-	if (ARSTycoonPlayerController* Controller = Cast<ARSTycoonPlayerController>(GetWorld()->GetFirstPlayerController()))
-	{
-		
-	}
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	SetActorTransform(OriginTransform);
 }
 
 void ARSTycoonCamera::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (ARSTycoonPlayerController* Controller = Cast<ARSTycoonPlayerController>(GetWorld()->GetFirstPlayerController()))
-	{
-		Controller->SetViewTarget(this);
-	}
+	OriginTransform = GetActorTransform();
 }

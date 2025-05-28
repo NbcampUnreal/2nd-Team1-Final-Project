@@ -79,7 +79,7 @@ void ARSTycoonCustomerCharacter::Leave()
 	ARSDoorTile* DoorTile = Cast<ARSDoorTile>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSDoorTile::StaticClass()));
 	MoveToTarget(DoorTile->GetSpawnPoint(), DoorTile);
 
-	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->AddMoney(Data->Price);
+	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->AddGold(Data->Price);
 	
 	OnFinishEat.Broadcast(this);
 }
