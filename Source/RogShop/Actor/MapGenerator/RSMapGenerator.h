@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "RSSpawnManager.h"
 #include "Engine/LevelStreamingDynamic.h"
 #include "GameFramework/Character.h"
 #include "Engine/TargetPoint.h"
@@ -12,17 +11,19 @@
 #include "Kismet/GameplayStatics.h"
 #include "RSMapGenerator.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMapFullyLoaded);
+
 UENUM()
-enum class EDir : uint8 //¹æÇâÇ¥½Ã ¿­°ÅÇü(BitmaskÇüÅÂ)
+enum class EDir : uint8 //ë°©í–¥í‘œì‹œ ì—´ê±°í˜•(Bitmaskí˜•íƒœ)
 {
-	None = 0,        // ¹æÇâ ¾øÀ½
-	Up = 1 << 0,   // À§ÂÊ
-	Down = 1 << 1,   // ¾Æ·¡ÂÊ
-	Left = 1 << 2,   // ¿ŞÂÊ
-	Right = 1 << 3    // ¿À¸¥ÂÊ
+	None = 0,        // ë°©í–¥ ì—†ìŒ
+	Up = 1 << 0,   // ìœ„ìª½
+	Down = 1 << 1,   // ì•„ë˜ìª½
+	Left = 1 << 2,   // ì™¼ìª½
+	Right = 1 << 3    // ì˜¤ë¥¸ìª½
 };
 
-// ¿©·¯ ¹æÇâÀ» µ¿½Ã¿¡ »ç¿ëÇÒ ¼ö ÀÖµµ·Ï ÇÃ·¡±×·Î ÁöÁ¤ | ¿¬»ê
+// ì—¬ëŸ¬ ë°©í–¥ì„ ë™ì‹œì— ì‚¬ìš©í•  ìˆ˜ ìˆë„ë¡ í”Œë˜ê·¸ë¡œ ì§€ì • | ì—°ì‚°
 ENUM_CLASS_FLAGS(EDir)
 
 USTRUCT()
@@ -30,10 +31,11 @@ struct FTileData
 {
 	GENERATED_BODY()
 
-	FVector2D GridPos;                // ±×¸®µå »óÀÇ ÁÂÇ¥
-	EDir Connections = EDir::None;  // ÀÌ Å¸ÀÏÀÌ ¿¬°áµÈ ¹æÇâ Á¤º¸ (ex) À§+¾Æ·¡ ¡æ ¤Ó)
-	bool bIsMainPath = false;         // ¸ŞÀÎ °æ·Î(½ÃÀÛÁ¡~º¸½º¹æ)¿¡ Æ÷ÇÔµÇ´Â Å¸ÀÏÀÎÁö ¿©ºÎ
+	FVector2D GridPos;                // ê·¸ë¦¬ë“œ ìƒì˜ ì¢Œí‘œ
+	EDir Connections = EDir::None;  // ì´ íƒ€ì¼ì´ ì—°ê²°ëœ ë°©í–¥ ì •ë³´ (ex) ìœ„+ì•„ë˜ â†’ ã…£)
+	bool bIsMainPath = false;         // ë©”ì¸ ê²½ë¡œ(ì‹œì‘ì ~ë³´ìŠ¤ë°©)ì— í¬í•¨ë˜ëŠ” íƒ€ì¼ì¸ì§€ ì—¬ë¶€
 };
+
 
 
 UCLASS()
@@ -45,78 +47,83 @@ public:
 	// Sets default values for this actor's properties
 	ARSMapGenerator();
 
+	void SetSeed(int32 RandomSeed);
+	UFUNCTION()
+	void OnSubLevelLoaded();
+	bool IsMapFullyLoaded() const;
+	void CheckAllTilesLoaded();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void SpawnTiles();         // ½ÇÁ¦ Å¸ÀÏÀ» ¾×ÅÍ·Î ½ºÆù
-	void GenerateMainPath();   // ½ÃÀÛÁ¡ºÎÅÍ º¸½º¹æ±îÁö ¿¬°áµÈ ÁÖ °æ·Î »ı¼º
-	void ExpandPathToCoverMinTiles(float MinRatio);  // Å¸ÀÏÀÌ ÀüÃ¼ÀÇ ÀÏÁ¤ ºñÀ² ÀÌ»ó µÇµµ·Ï È®Àå
-	void FindBossRoom();                             // °¡Àå ¸Õ ¹æÀ» º¸½º¹æÀ¸·Î ¼³Á¤
+	void SpawnTiles();         // ì‹¤ì œ íƒ€ì¼ì„ ì•¡í„°ë¡œ ìŠ¤í°
+	void GenerateMainPath();   // ì‹œì‘ì ë¶€í„° ë³´ìŠ¤ë°©ê¹Œì§€ ì—°ê²°ëœ ì£¼ ê²½ë¡œ ìƒì„±
+	void ExpandPathToCoverMinTiles(float MinRatio);  // íƒ€ì¼ì´ ì „ì²´ì˜ ì¼ì • ë¹„ìœ¨ ì´ìƒ ë˜ë„ë¡ í™•ì¥
+	void FindBossRoom();                             // ê°€ì¥ ë¨¼ ë°©ì„ ë³´ìŠ¤ë°©ìœ¼ë¡œ ì„¤ì •
 	ULevelStreamingDynamic* StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector& Location, const FRotator& Rotation, const FString& UniqueName);
 	void ChooseShopTile();
 
 	int32 GetConnectedNeighborCount(FVector2D Pos);
 	int32 GetAvailableNeighborCount(FVector2D Pos);
-	bool IsValidPos(FVector2D Pos) const;                // ÁÂÇ¥°¡ ±×¸®µå ¾È¿¡ ÀÖ´ÂÁö È®ÀÎ
-	FVector2D GetNextDirection(FVector2D Current, TArray<FVector2D>& Visited); // ´ÙÀ½ °æ·Î ¼±ÅÃ
+	bool IsValidPos(FVector2D Pos) const;                // ì¢Œí‘œê°€ ê·¸ë¦¬ë“œ ì•ˆì— ìˆëŠ”ì§€ í™•ì¸
+	FVector2D GetNextDirection(FVector2D Current, TArray<FVector2D>& Visited); // ë‹¤ìŒ ê²½ë¡œ ì„ íƒ
 	FVector SpawnBossArenaLevel();
 
-private:
+public:
 	FVector2D ShopTilePos;
-	// Å¸ÀÏ °£ °£°İ
-	UPROPERTY(EditInstanceOnly, Category="Room Status")
+	// íƒ€ì¼ ê°„ ê°„ê²©
+	UPROPERTY(EditAnywhere, Category="Room Status")
 	float TileSize;
-	// ·£´ı ½Ãµå
-	UPROPERTY(EditInstanceOnly, Category = "Room Status")
+	// ëœë¤ ì‹œë“œ
+	UPROPERTY(EditAnywhere, Category = "Room Status")
 	int32 Seed;
-	// ±×¸®µå Å©±â
-	UPROPERTY(EditInstanceOnly, Category = "Room Status")
+	// ê·¸ë¦¬ë“œ í¬ê¸°
+	UPROPERTY(EditAnywhere, Category = "Room Status")
 	int32 GridSize;
 
-	// ¤Ó¸ğ¾ç Å¸ÀÏ
-	UPROPERTY(EditInstanceOnly, Category = "Room Spawning")
+	// ã…£ëª¨ì–‘ íƒ€ì¼
+	UPROPERTY(EditAnywhere, Category = "Room Spawning")
 	TSoftObjectPtr<UWorld> LineTileLevel;
 
-	// ¤¤ ¸ğ¾ç Å¸ÀÏ
-	UPROPERTY(EditInstanceOnly, Category = "Room Spawning")
+	// ã„´ ëª¨ì–‘ íƒ€ì¼
+	UPROPERTY(EditAnywhere, Category = "Room Spawning")
 	TSoftObjectPtr<UWorld> CornerTileLevel;
 
-	// + ¸ğ¾ç Å¸ÀÏ
-	UPROPERTY(EditInstanceOnly, Category = "Room Spawning")
+	// + ëª¨ì–‘ íƒ€ì¼
+	UPROPERTY(EditAnywhere, Category = "Room Spawning")
 	TSoftObjectPtr<UWorld> CrossTileLevel;
 
-	// T ¸ğ¾ç Å¸ÀÏ
-	UPROPERTY(EditInstanceOnly, Category = "Room Spawning")
+	// T ëª¨ì–‘ íƒ€ì¼
+	UPROPERTY(EditAnywhere, Category = "Room Spawning")
 	TSoftObjectPtr<UWorld> TTileLevel;
 
-	// ¸·´Ù¸¥±æ ¸ğ¾ç Å¸ÀÏ
-	UPROPERTY(EditInstanceOnly, Category = "Room Spawning")
+	// ë§‰ë‹¤ë¥¸ê¸¸ ëª¨ì–‘ íƒ€ì¼
+	UPROPERTY(EditAnywhere, Category = "Room Spawning")
 	TSoftObjectPtr<UWorld> DeadEndTileLevel;
 
-	UPROPERTY(EditInstanceOnly, Category = "Room Spawning")
-	TSoftObjectPtr<UWorld> BossRoomTileLevel; // º¸½º¹æ Àü¿ë Å¸ÀÏ
-	UPROPERTY(EditInstanceOnly, Category = "Room Spawning")
-	TSoftObjectPtr<UWorld> BossArenaLevel; // º¸½º¹æ Àü¿ë Å¸ÀÏ
+	UPROPERTY(EditAnywhere, Category = "Room Spawning")
+	TSoftObjectPtr<UWorld> BossRoomTileLevel; // ë³´ìŠ¤ë°© ì „ìš© íƒ€ì¼
+	UPROPERTY(EditAnywhere, Category = "Room Spawning")
+	TSoftObjectPtr<UWorld> BossArenaLevel; // ë³´ìŠ¤ë°© ì „ìš© íƒ€ì¼
+	UPROPERTY(BlueprintAssignable, Category = "Map")
+	FOnMapFullyLoaded OnMapFullyLoaded;
 
-	UPROPERTY(EditInstanceOnly, Category = "Spawning")
-	TSubclassOf<AActor> ShopNPC;
+	bool bIsMapLoaded = false;
 
-	UPROPERTY(EditInstanceOnly, Category = "Spawning")
-	TSubclassOf<ACharacter> PlayerClass;
+	UPROPERTY()
+	TArray<ULevelStreamingDynamic*> SpawnedLevels;
 
-	UPROPERTY(EditInstanceOnly, Category = "Spawning")
-	UDataTable* MonsterDataTable;
 
 
 private:
-	// ±×¸®µå »ó¿¡ »ı¼ºµÈ Å¸ÀÏ Á¤º¸¸¦ ÀúÀåÇÏ´Â Map
+	// ê·¸ë¦¬ë“œ ìƒì— ìƒì„±ëœ íƒ€ì¼ ì •ë³´ë¥¼ ì €ì¥í•˜ëŠ” Map
 	TMap<FVector2D, FTileData> TileMap;
-	// ·£´ı ½ºÆ®¸² °´Ã¼ (½Ãµå ±â¹İ)
+	bool bMapGenerationComplete;
+	// ëœë¤ ìŠ¤íŠ¸ë¦¼ ê°ì²´ (ì‹œë“œ ê¸°ë°˜)
 	FRandomStream RandomStream;
-	// º¸½º¹æ À§Ä¡
+	// ë³´ìŠ¤ë°© ìœ„ì¹˜
 	FVector2D BossRoomPos;
-	URSSpawnManager* SpawnManager;
 
 
 };
