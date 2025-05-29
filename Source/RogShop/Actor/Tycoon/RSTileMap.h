@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "RSTileMap.generated.h"
 
+class ANavMeshBoundsVolume;
 struct FTileRow;
 class ARSBaseTile;
 
@@ -17,33 +18,39 @@ class ROGSHOP_API ARSTileMap : public AActor
 public:
 	ARSTileMap();
 
+	void ChangeTile(int32 Index, FName TileKey);
+	void SaveTiles();
+	void ChangeTileSize(int32 NewWidth, int32 NewHeight);
+	
+	FVector GetCenter();
 	const TArray<TObjectPtr<ARSBaseTile>>& GetTiles() const { return TileActors; }
+	const TArray<TSubclassOf<ARSBaseTile>>& GetTileTypes() const { return TileTypes; };
+	int32 GetWidth() const { return Width; };
+	int32 GetHeight() const { return Height; };
 
 protected:
 	virtual void BeginPlay() override;
-
+	
 private:
 	void LoadTiles();
 	void SetDefaultSettings();
 	void CreateTiles();
-	UClass* GetTileClass(const FName& TileKey);
-
-	UFUNCTION(CallInEditor) //임시
-	void SaveTiles();
-
+	TSubclassOf<ARSBaseTile> GetTileClass(const FName& TileKey);
+	ARSBaseTile* CreateTile(const TSubclassOf<ARSBaseTile>& TileClass, int32 Row, int32 Column);
+	
 	UFUNCTION(CallInEditor)
 	void DeleteTileData();
 
 private:
 	static const FString TileMapSaveSlot;
 
-	UPROPERTY(EditAnywhere, Category="TileMap")
+	UPROPERTY(EditDefaultsOnly, Category="TileMap")
 	TSubclassOf<ARSBaseTile> DefaultTileType;
 
-	UPROPERTY(EditAnywhere, Category="TileMap")
+	UPROPERTY(EditDefaultsOnly, Category="TileMap")
 	int32 DefaultWidth = 3;
 
-	UPROPERTY(EditAnywhere, Category="TileMap")
+	UPROPERTY(EditDefaultsOnly, Category="TileMap")
 	int32 DefaultHeight = 3;
 
 	UPROPERTY(EditDefaultsOnly, Category="TileMap")
@@ -52,11 +59,15 @@ private:
 	UPROPERTY(EditAnywhere, Category="TileMap")
 	TObjectPtr<USceneComponent> TileParent;
 
-	UPROPERTY()
-	TArray<TObjectPtr<ARSBaseTile>> TileActors;
-
+	//에디터에서 편집 가능하게 EditAnywhere
 	UPROPERTY(EditAnywhere, Category="TileMap")
 	TArray<FTileRow> TileName2DMap;
+
+	UPROPERTY()
+	TObjectPtr<ANavMeshBoundsVolume> NavVolume;
+
+	UPROPERTY()
+	TArray<TObjectPtr<ARSBaseTile>> TileActors;
 
 	int32 Width, Height;
 };

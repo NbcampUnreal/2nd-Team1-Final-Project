@@ -4,41 +4,43 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "RSTycoonWaitWidget.generated.h"
+#include "RSTycoonBuyTileWidget.generated.h"
 
 class UButton;
+class ARSBaseTile;
+class UTextBlock;
+class UImage;
 /**
  * 
  */
 UCLASS()
-class ROGSHOP_API URSTycoonWaitWidget : public UUserWidget
+class ROGSHOP_API URSTycoonBuyTileWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	void SetInfo(ARSBaseTile* Tile);
+
 protected:
 	virtual void NativeConstruct() override;
-
+	
 private:
 	UFUNCTION()
-	void OnClickSalesStartButton();
-	
-	UFUNCTION()
-	void OnClickManagementButton();
-	
-	UFUNCTION()
-	void OnClickOutButton();
-	
+	void OnClickButton();
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UButton* SaleStartButton;
+	TObjectPtr<UButton> Button;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UButton* ManagementButton;
+	TObjectPtr<UImage> TileImage;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UButton* OutButton;
+	TObjectPtr<UTextBlock> NameText;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<UTextBlock> PriceText;
 
-	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<UWorld> BaseAreaLevel;
+private:
+	FName TileKey;
 };
