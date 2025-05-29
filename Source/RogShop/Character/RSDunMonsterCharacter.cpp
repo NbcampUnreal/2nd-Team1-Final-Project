@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "RSDunMonsterCharacter.h"
@@ -49,7 +49,7 @@ void ARSDunMonsterCharacter::PlayBaseAttackAnim()
 {
 	// TODO : 퀄리티 업때 PlayBaseAttackAnim()이 비헤이비어 트리에서 몽타주가 실행되고 있으면 호출되지 않도록 최적화 코드 필요.
 
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	/*UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (IsValid(AnimInstance) == true && IsValid(BaseAttackMontage) == true)
 	{
 		if (AnimInstance->Montage_IsPlaying(BaseAttackMontage) == false)
@@ -57,7 +57,7 @@ void ARSDunMonsterCharacter::PlayBaseAttackAnim()
 			AnimInstance->Montage_Play(BaseAttackMontage);
 			RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다.");
 		}
-	}
+	}*/
 }
 
 void ARSDunMonsterCharacter::PlayDeathAnim()
@@ -68,38 +68,38 @@ void ARSDunMonsterCharacter::PlayDeathAnim()
 
 void ARSDunMonsterCharacter::PlaySkill_1()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	/*UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (IsValid(AnimInstance) == true && IsValid(SkillMontage_1) == true)
 	{
 		if (AnimInstance->Montage_IsPlaying(SkillMontage_1) == false)
 		{
 			AnimInstance->Montage_Play(SkillMontage_1);
 		}
-	}
+	}*/
 }
 
 void ARSDunMonsterCharacter::PlaySkill_2()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	/*UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (IsValid(AnimInstance) == true && IsValid(SkillMontage_2) == true)
 	{
 		if (AnimInstance->Montage_IsPlaying(SkillMontage_2) == false)
 		{
 			AnimInstance->Montage_Play(SkillMontage_2);
 		}
-	}
+	}*/
 }
 
 void ARSDunMonsterCharacter::PlaySkill_3()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	/*UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (IsValid(AnimInstance) == true && IsValid(SkillMontage_3) == true)
 	{
 		if (AnimInstance->Montage_IsPlaying(SkillMontage_3) == false)
 		{
 			AnimInstance->Montage_Play(SkillMontage_3);
 		}
-	}
+	}*/
 }
 
 void ARSDunMonsterCharacter::OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted)
