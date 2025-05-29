@@ -373,6 +373,12 @@ void ARSDunPlayerCharacter::SecondWeaponSlot(const FInputActionValue& value)
 void ARSDunPlayerCharacter::ToggleInventoryUI(const FInputActionValue& value)
 {
     // TODO : 인벤토리 UI를 켜고 끄기
+    ARSDunPlayerController* PC = GetController<ARSDunPlayerController>();
+    if (PC)
+    {
+        PC->AddRSPlayerInventoryWidget();
+    }
+
     if (GEngine)
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("ToggleInventoryUI Activated"));

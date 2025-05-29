@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "RSPlayerInventoryWidget.h"
+
 #include "Components/Button.h"
 
 void URSPlayerInventoryWidget::NativeConstruct()
@@ -11,15 +12,13 @@ void URSPlayerInventoryWidget::NativeConstruct()
     {
         ExitBtn->OnClicked.AddDynamic(this, &URSPlayerInventoryWidget::OnExitBtnClicked);
     }
-
-    SetMouseMode(true);
 }
 
 void URSPlayerInventoryWidget::OnExitBtnClicked()
 {
     SetMouseMode(false);
 
-    RemoveFromParent();
+    SetVisibility(ESlateVisibility::Hidden);
 }
 
 void URSPlayerInventoryWidget::SetMouseMode(bool bEnable)

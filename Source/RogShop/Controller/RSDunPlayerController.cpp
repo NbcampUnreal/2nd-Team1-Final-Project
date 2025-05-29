@@ -4,6 +4,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "RSCheatManager.h"
 #include "RSDunMainHUDWidget.h"
+#include "RSPlayerInventoryWidget.h"
 
 ARSDunPlayerController::ARSDunPlayerController()
 {
@@ -25,6 +26,7 @@ void ARSDunPlayerController::BeginPlay()
     AddMapping();
 
     InitializeRSDunMainWidget();
+    InitializeRSPlayerInventoryWidget();
 }
 
 void ARSDunPlayerController::AddMapping()
@@ -69,6 +71,44 @@ void ARSDunPlayerController::InitializeRSDunMainWidget()
     else
     {
         UE_LOG(LogTemp, Warning, TEXT("RSDunMainHUDWidgetClass Null !"));
+    }
+}
+
+void ARSDunPlayerController::InitializeRSPlayerInventoryWidget()
+{
+    if (RSPlayerInventoryWidgetClass)
+    {
+        RSPlayerInventoryWidgetInstance = CreateWidget<URSPlayerInventoryWidget>(this, RSPlayerInventoryWidgetClass);
+
+        if (RSPlayerInventoryWidgetInstance)
+        {
+            RSPlayerInventoryWidgetInstance->AddToViewport();
+            RSPlayerInventoryWidgetInstance->SetVisibility(ESlateVisibility::Hidden); // 시작은 숨김
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("RSPlayerInventoryWidget Null !"));
+    }
+}
+
+void ARSDunPlayerController::AddRSPlayerInventoryWidget()
+{
+    if (RSPlayerInventoryWidgetInstance->IsVisible())
+    {
+        RSPlayerInventoryWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
+
+        FInputModeGameOnly InputMode;
+        SetInputMode(InputMode);
+        bShowMouseCursor = false;
+    }
+    else
+    {
+        RSPlayerInventoryWidgetInstance->SetVisibility(ESlateVisibility::Visible);
+
+        FInputModeUIOnly InputMode;
+        SetInputMode(InputMode);
+        bShowMouseCursor = true;
     }
 }
 
