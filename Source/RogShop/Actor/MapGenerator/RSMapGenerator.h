@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "RSSpawnManager.h"
 #include "Engine/LevelStreamingDynamic.h"
+#include "GameFramework/Character.h"
 #include "Engine/TargetPoint.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -58,45 +60,54 @@ protected:
 	int32 GetAvailableNeighborCount(FVector2D Pos);
 	bool IsValidPos(FVector2D Pos) const;                // 좌표가 그리드 안에 있는지 확인
 	FVector2D GetNextDirection(FVector2D Current, TArray<FVector2D>& Visited); // 다음 경로 선택
+	FVector SpawnBossArenaLevel();
 
-public:
-	FVector2D ShopTilePos = FVector2D::ZeroVector;
+private:
+	FVector2D ShopTilePos;
 	// 타일 간 간격
-	UPROPERTY(EditAnywhere, Category="Room Status")
-	float TileSize = 4000.0f;
+	UPROPERTY(EditInstanceOnly, Category="Room Status")
+	float TileSize;
 	// 랜덤 시드
-	UPROPERTY(EditAnywhere, Category = "Room Status")
-	int32 Seed = 88888;
+	UPROPERTY(EditInstanceOnly, Category = "Room Status")
+	int32 Seed;
 	// 그리드 크기
-	UPROPERTY(EditAnywhere, Category = "Room Status")
-	int32 GridSize = 3;
-
-	// 상점NPC
-	UPROPERTY(EditAnywhere, Category = "NPC")
-	TSubclassOf<AActor> ShopNPC;
+	UPROPERTY(EditInstanceOnly, Category = "Room Status")
+	int32 GridSize;
 
 	// ㅣ모양 타일
-	UPROPERTY(EditAnywhere, Category = "Room Spawning")
+	UPROPERTY(EditInstanceOnly, Category = "Room Spawning")
 	TSoftObjectPtr<UWorld> LineTileLevel;
 
 	// ㄴ 모양 타일
-	UPROPERTY(EditAnywhere, Category = "Room Spawning")
+	UPROPERTY(EditInstanceOnly, Category = "Room Spawning")
 	TSoftObjectPtr<UWorld> CornerTileLevel;
 
 	// + 모양 타일
-	UPROPERTY(EditAnywhere, Category = "Room Spawning")
+	UPROPERTY(EditInstanceOnly, Category = "Room Spawning")
 	TSoftObjectPtr<UWorld> CrossTileLevel;
 
 	// T 모양 타일
-	UPROPERTY(EditAnywhere, Category = "Room Spawning")
+	UPROPERTY(EditInstanceOnly, Category = "Room Spawning")
 	TSoftObjectPtr<UWorld> TTileLevel;
 
 	// 막다른길 모양 타일
-	UPROPERTY(EditAnywhere, Category = "Room Spawning")
+	UPROPERTY(EditInstanceOnly, Category = "Room Spawning")
 	TSoftObjectPtr<UWorld> DeadEndTileLevel;
 
-	UPROPERTY(EditAnywhere, Category = "Room Spawning")
+	UPROPERTY(EditInstanceOnly, Category = "Room Spawning")
 	TSoftObjectPtr<UWorld> BossRoomTileLevel; // 보스방 전용 타일
+	UPROPERTY(EditInstanceOnly, Category = "Room Spawning")
+	TSoftObjectPtr<UWorld> BossArenaLevel; // 보스방 전용 타일
+
+	UPROPERTY(EditInstanceOnly, Category = "Spawning")
+	TSubclassOf<AActor> ShopNPC;
+
+	UPROPERTY(EditInstanceOnly, Category = "Spawning")
+	TSubclassOf<ACharacter> PlayerClass;
+
+	UPROPERTY(EditInstanceOnly, Category = "Spawning")
+	UDataTable* MonsterDataTable;
+
 
 private:
 	// 그리드 상에 생성된 타일 정보를 저장하는 Map
@@ -105,6 +116,7 @@ private:
 	FRandomStream RandomStream;
 	// 보스방 위치
 	FVector2D BossRoomPos;
+	URSSpawnManager* SpawnManager;
 
 
 };
