@@ -1,12 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "RSDunMonsterCharacter.h"
-#include "MeleeAttackBoxComponent.h"
+#include "RogShop/RSMonsterAttackTraceDefine.h"
+#include "RogShop/UtilDefine.h"
+#include "Components/CapsuleComponent.h"
 
 ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 {
-	// ¸ó½ºÅÍ ½ºÆù Å×½ºÆ®ÇÒ ¶§ AIController°¡ ½ºÆù¾ÈµÇ´Â ¹®Á¦°¡ ÀÖ¾î¼­ ¼³Á¤
+	// ëª¬ìŠ¤í„° ìŠ¤í° í…ŒìŠ¤íŠ¸í•  ë•Œ AIControllerê°€ ìŠ¤í°ì•ˆë˜ëŠ” ë¬¸ì œê°€ ìˆì–´ì„œ ì„¤ì •
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	AIControllerClass = ARSDunMonsterCharacter::StaticClass();
 
@@ -21,12 +23,15 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	//Patrol
 	maxDetectPatrolRoute = 2000.f;
 
-	// ¸ó½ºÅÍ °ø°İ Æ®·¹ÀÌ½º °ü·Ã º¯¼ö ÃÊ±âÈ­
+	// ëª¬ìŠ¤í„° ê³µê²© íŠ¸ë ˆì´ìŠ¤ ê´€ë ¨ ë³€ìˆ˜ ì´ˆê¸°í™”
 	TraceBoxHalfSize = FVector(60.f, 60.f, 80.f);
 	TraceLength = 0.f;
 	TraceForwardOffset = 0.f;
 	TraceRightOffset = 0.f;
 	TraceUpOffset = 0.f;
+
+	// ëª¬ìŠ¤í„° ìº¡ìŠ ì»´í¬ë„ŒíŠ¸ì— ëª¬ìŠ¤í„°ê°€ ê³µê²©ì„ ë°›ì•„ì„œ ê·¸ê²ƒì„ ë¬´ì‹œí•˜ë„ë¡ í•œ ì½”ë“œ
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_MonsterAttackTrace, ECR_Ignore);
 
 }
 
@@ -34,33 +39,88 @@ void ARSDunMonsterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	GetWorld()->GetTimerManager().SetTimer(detectDelayTimer, this, &ARSDunMonsterCharacter::FindNearPatrolPoint, 0.5f, false);	
+	if (UAnimInstance* animInstance = GetMesh()->GetAnimInstance())
+	{
+		animInstance->OnMontageEnded.AddDynamic(this, &ARSDunMonsterCharacter::OnDeathMontageEnded);
+	}
 }
 
 void ARSDunMonsterCharacter::PlayBaseAttackAnim()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Attack Complete!!"));
-}
+	// TODO : í€„ë¦¬í‹° ì—…ë•Œ PlayBaseAttackAnim()ì´ ë¹„í—¤ì´ë¹„ì–´ íŠ¸ë¦¬ì—ì„œ ëª½íƒ€ì£¼ê°€ ì‹¤í–‰ë˜ê³  ìˆìœ¼ë©´ í˜¸ì¶œë˜ì§€ ì•Šë„ë¡ ìµœì í™” ì½”ë“œ í•„ìš”.
 
-void ARSDunMonsterCharacter::PlayHitReactAnim()
-{
-	UE_LOG(LogTemp, Warning, TEXT("HitReact Complete!!"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (IsValid(AnimInstance) == true && IsValid(BaseAttackMontage) == true)
+	{
+		if (AnimInstance->Montage_IsPlaying(BaseAttackMontage) == false)
+		{
+			AnimInstance->Montage_Play(BaseAttackMontage);
+			RS_LOG("ëª¬ìŠ¤í„°ê°€ ê³µê²©í•˜ëŠ” ì• ë‹ˆë©”ì´ì…˜ì´ ì˜ ë‚˜ì™”ìŠµë‹ˆë‹¤.");
+		}
+	}
 }
 
 void ARSDunMonsterCharacter::PlayDeathAnim()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Death Complete!!"));
+	PlayAnimMontage(DeathMontage);
+	RS_LOG("ëª¬ìŠ¤í„°ê°€ ì£½ì—ˆìŠµë‹ˆë‹¤.");
+}
+
+void ARSDunMonsterCharacter::PlaySkill_1()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (IsValid(AnimInstance) == true && IsValid(SkillMontage_1) == true)
+	{
+		if (AnimInstance->Montage_IsPlaying(SkillMontage_1) == false)
+		{
+			AnimInstance->Montage_Play(SkillMontage_1);
+		}
+	}
+}
+
+void ARSDunMonsterCharacter::PlaySkill_2()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (IsValid(AnimInstance) == true && IsValid(SkillMontage_2) == true)
+	{
+		if (AnimInstance->Montage_IsPlaying(SkillMontage_2) == false)
+		{
+			AnimInstance->Montage_Play(SkillMontage_2);
+		}
+	}
+}
+
+void ARSDunMonsterCharacter::PlaySkill_3()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (IsValid(AnimInstance) == true && IsValid(SkillMontage_3) == true)
+	{
+		if (AnimInstance->Montage_IsPlaying(SkillMontage_3) == false)
+		{
+			AnimInstance->Montage_Play(SkillMontage_3);
+		}
+	}
+}
+
+void ARSDunMonsterCharacter::OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted)
+{
+	if (montage == DeathMontage)
+	{
+		//GetWorld()->GetTimerManager().SetTimer(animPlayDelayTimer, this, &ARSDunMonsterCharacter::AIDestroy, 5.0f, false);
+		Destroy();
+	}
 }
 
 float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	// TODO : ¸¸¾à ¼±±¹´ÔÀÌ bIsDead º¯¼ö ¸¸µé¾î ÁÖ¸é ³ÖÀ» ·ÎÁ÷
+	// TODO : bIsDead ë³€ìˆ˜ ë‚˜ì¤‘ì— ë„£ì„ ë¡œì§
 	/*if (bIsDead) return 0.0f;*/ 
 
 	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
 	DecreaseHP(damage);
 
-	// µ¥¹ÌÁö ¹ŞÀ¸¸é ·Î±×¿¡ Ãß°¡! (ÀÓ½Ã)
+	// ë°ë¯¸ì§€ ë°›ìœ¼ë©´ ë¡œê·¸ì— ì¶”ê°€! (ì„ì‹œ)
 	UE_LOG(LogTemp, Warning, TEXT("[%s] took %.1f damage from [%s]"),
 		*GetName(),
 		damage,
@@ -72,7 +132,7 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 		OnDeath();
 	}
 
-	// TODO : ¸¸¾à ¿µºó´ÔÀÌ ºí·¢º¸µå¿¡ IsHit °°Àº º¯¼ö ÀÖ´Ù°í ÇÏ¸é ³ÖÀ» ·ÎÁ÷
+	// TODO : ë§Œì•½ ì˜ë¹ˆë‹˜ì´ ë¸”ë™ë³´ë“œì— IsHit ê°™ì€ ë³€ìˆ˜ ìˆë‹¤ê³  í•˜ë©´ ë„£ì„ ë¡œì§
 	/*if (AAIController* AIController = Cast<AAIController>(GetController()))
 	{
 		if (UBlackboardComponent* BBComponent = AIController->GetBlackboardComponent())
@@ -82,6 +142,54 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 	}*/
 
 	return damage;
+}
+
+void ARSDunMonsterCharacter::PerformAttackTrace()
+{
+	FHitResult HitResult;
+	FVector Start = GetMesh()->GetSocketLocation(SocketLocation);
+	Start += GetActorForwardVector() * TraceForwardOffset;
+	Start += GetActorRightVector() * TraceRightOffset;
+	Start += GetActorUpVector() * TraceUpOffset;
+
+	FVector End = Start + GetActorForwardVector() * TraceLength;
+	FQuat Rotation = GetActorRotation().Quaternion();
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	// DrawDebugBoxì—ì„œ ì“°ëŠ” ë³€ìˆ˜
+	FVector Center = (Start + End) * 0.5f;
+
+	// ëª¬ìŠ¤í„° ê³µê²©ì´ í”Œë ˆì´ì–´ì—ê²Œ ì ìš©ë˜ê²Œ í•˜ë ¤ëŠ” Traceì…ë‹ˆë‹¤. ì €í¬ ê²Œì„ì€ í”Œë ˆì´ì–´ê°€ 1ëª…ì´ë‹ˆ SweepSingleByChannelì„ ì‚¬ìš©í–ˆìŠµë‹ˆë‹¤.
+	bool bHit = GetWorld()->SweepSingleByChannel(
+		HitResult,
+		Start,
+		End,
+		Rotation,
+		ECC_MonsterAttackTrace,
+		FCollisionShape::MakeBox(TraceBoxHalfSize),
+		Params
+	);
+
+	if (bHit)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("bHit True"));
+		AActor* HitActor = HitResult.GetActor();
+		if (IsValid(HitActor))
+		{
+			UGameplayStatics::ApplyDamage(HitActor, 1.f, GetController(), this, nullptr);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("bHit False"));
+	}
+
+	DrawDebugBox(GetWorld(), Center, TraceBoxHalfSize, Rotation, bHit ? FColor::Red : FColor::Green, false, 5.0f);
+
+	RS_LOG("ëª¬ìŠ¤í„° ê³µê²©ì´ ì„±ê³µí•´ì„œ ê³µê²© íŠ¸ë ˆì´ìŠ¤ ë””ë²„ê·¸ ë°•ìŠ¤ë¥¼ ê·¸ë¦½ë‹ˆë‹¤.");
+
 }
 
 void ARSDunMonsterCharacter::JumpTo(FVector destination)
@@ -138,5 +246,12 @@ TArray<AActor*> ARSDunMonsterCharacter::GetPatrolPoint()
 
 void ARSDunMonsterCharacter::OnDeath()
 {
+	AController* ctrl = GetController();
+	if (ctrl)
+	{
+		ctrl->UnPossess();
+		ctrl->Destroy();
+	}
+
 	PlayDeathAnim();
 }

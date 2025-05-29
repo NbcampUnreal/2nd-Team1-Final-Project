@@ -5,6 +5,7 @@
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
+#include "RSGameInstance.h"
 
 
 void UMainMenuWidget::NativeConstruct()
@@ -14,6 +15,11 @@ void UMainMenuWidget::NativeConstruct()
 	if (StartButton)
 	{
 		StartButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnStartButtonClicked);
+	}
+
+	if (LoadButton)
+	{
+		LoadButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnLoadButtonClicked);
 	}
 
 	if (OptionButton)
@@ -29,16 +35,35 @@ void UMainMenuWidget::NativeConstruct()
 
 void UMainMenuWidget::OnStartButtonClicked()
 {
-	//UGameplayStatics::OpenLevel(this, FName("´ÙÀ½·¹º§ ÀÌ¸§"));
+	// TODO : ê¸°ì¡´ ì„¸ì´ë¸Œ ì œê±°
+
+	// ë ˆë²¨ ì´ë™
+	URSGameInstance* RSGameInstance = Cast<URSGameInstance>(GetWorld()->GetGameInstance());
+	if (RSGameInstance)
+	{
+		RSGameInstance->TravelToLevel(NewGameTargetLevelAsset);
+	}
+}
+
+void UMainMenuWidget::OnLoadButtonClicked()
+{
+	//UGameplayStatics::OpenLevel(this, FName("ë‹¤ìŒë ˆë²¨ ì´ë¦„"));
 }
 
 void UMainMenuWidget::OnOptionButtonClicked()
 {
-	//¿É¼Ç À§Á¬ È­¸é¿¡ ¶ç¿ì±â
+	if (OptionMenuWidgetClass)
+	{
+		UUserWidget* OptionMenu = CreateWidget<UUserWidget>(GetWorld(), OptionMenuWidgetClass);
+		if (OptionMenu)
+		{
+			OptionMenu->AddToViewport();
+		}
+	}
 }
 
 void UMainMenuWidget::OnExitButtonClicked()
 {
-	FGenericPlatformMisc::RequestExit(false);
+	UKismetSystemLibrary::QuitGame(this, GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, false);
 }
 

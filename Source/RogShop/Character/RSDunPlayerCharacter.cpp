@@ -11,7 +11,8 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "RSPlayerWeaponComponent.h"
-#include "RSDungeonInventoryComponent.h"
+#include "RSRelicInventoryComponent.h"
+#include "RSDungeonIngredientInventoryComponent.h"
 #include "RSInteractable.h"
 #include "DrawDebugHelpers.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
@@ -24,45 +25,48 @@ ARSDunPlayerCharacter::ARSDunPlayerCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-    // ½ºÇÁ¸µ ¾Ï ÄÄÆ÷³ÍÆ® »ı¼º ¹× ÄÁÆ®·Ñ·¯ È¸Àü¿¡ µû¶ó ½ºÇÁ¸µ ¾Ïµµ È¸ÀüÇÏµµ·Ï ¼³Á¤
+    // ìŠ¤í”„ë§ ì•” ì»´í¬ë„ŒíŠ¸ ìƒì„± ë° ì»¨íŠ¸ë¡¤ëŸ¬ íšŒì „ì— ë”°ë¼ ìŠ¤í”„ë§ ì•”ë„ íšŒì „í•˜ë„ë¡ ì„¤ì •
     SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
     SpringArmComp->SetupAttachment(RootComponent);
     SpringArmComp->bUsePawnControlRotation = true;
 
-    // Ä«¸Ş¶ó ÄÄÆ÷³ÍÆ® »ı¼º
+    // ì¹´ë©”ë¼ ì»´í¬ë„ŒíŠ¸ ìƒì„±
     CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
     CameraComp->SetupAttachment(SpringArmComp);
 
-    // Ä³¸¯ÅÍÀÇ ÀÌµ¿ ¹æÇâÀ¸·Î È¸ÀüÇÏµµ·Ï ¼³Á¤
+    // ìºë¦­í„°ì˜ ì´ë™ ë°©í–¥ìœ¼ë¡œ íšŒì „í•˜ë„ë¡ ì„¤ì •
     if (UCharacterMovementComponent* CharacterMovementComp = GetCharacterMovement())
     {
         CharacterMovementComp->bOrientRotationToMovement = true;
-        GetCharacterMovement()->RotationRate = FRotator(0.0f, 360.0f, 0.0f); // È¸Àü ¼Óµµ
+        GetCharacterMovement()->RotationRate = FRotator(0.0f, 360.0f, 0.0f); // íšŒì „ ì†ë„
     }
 
-    // Ä³¸¯ÅÍ°¡ ÄÁÆ®·Ñ·¯ Yaw¸¦ µû¸£Áö ¾Êµµ·Ï ¼³Á¤
+    // ìºë¦­í„°ê°€ ì»¨íŠ¸ë¡¤ëŸ¬ Yawë¥¼ ë”°ë¥´ì§€ ì•Šë„ë¡ ì„¤ì •
     bUseControllerRotationYaw = false;
 
-    // ±¸¸£±â ¹× »ç¸Á ½Ã Àç»ıÇÏ´Â ¾Ö´Ï¸ŞÀÌ¼Ç ¸ùÅ¸ÁÖ
+    // êµ¬ë¥´ê¸° ë° ì‚¬ë§ ì‹œ ì¬ìƒí•˜ëŠ” ì• ë‹ˆë©”ì´ì…˜ ëª½íƒ€ì£¼
     DodgeMontage = nullptr;
     DeathMontage = nullptr;
 
-    // ¹«±â ÄÄÆ÷³ÍÆ®
+    // ë¬´ê¸° ì»´í¬ë„ŒíŠ¸
     WeaponComp = CreateDefaultSubobject<URSPlayerWeaponComponent>(TEXT("RSPlayerWeapon"));
 
-    // ÀÎº¥Åä¸® ÄÄÆ÷³ÍÆ®
-    InventoryComp = CreateDefaultSubobject<URSDungeonInventoryComponent>(TEXT("RSPlayerInventory"));
+    // ìœ ë¬¼ ì»´í¬ë„ŒíŠ¸
+    RelicInventoryComp = CreateDefaultSubobject<URSRelicInventoryComponent>(TEXT("RSRelicInventory"));
 
-    // »óÈ£ÀÛ¿ë
+    // ì¸ë²¤í† ë¦¬ ì»´í¬ë„ŒíŠ¸
+    IngredientInventoryComp = CreateDefaultSubobject<URSDungeonIngredientInventoryComponent>(TEXT("IngredientInventory"));
+
+    // ìƒí˜¸ì‘ìš©
     InteractActor = nullptr;
     InteractRadius = 200.f;
 
-    // AIÆÛ¼Á¼Ç ÀÚ±Ø ¼Ò½º
+    // AIí¼ì…‰ì…˜ ìê·¹ ì†ŒìŠ¤
     AIPerceptionStimuliSourceComp = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("AIPerceptionStimuliSource"));
     AIPerceptionStimuliSourceComp->bAutoRegister = true;
     AIPerceptionStimuliSourceComp->RegisterForSense(UAISense_Sight::StaticClass());
 
-    // ½ºÅÈ
+    // ìŠ¤íƒ¯
     AttackPower = 0.f;
     AttackSpeed = 1.f;
 }
@@ -72,6 +76,9 @@ void ARSDunPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+    // ìŠ¤ì¼ˆë ˆíƒˆ ë©”ì‹œ
+    USkeletalMesh* MergeSkeletalMesh = USkeletalMergingLibrary::MergeMeshes(SkeletalMeshMergeParams);
+    GetMesh()->SetSkeletalMeshAsset(MergeSkeletalMesh);
 }
 
 // Called every frame
@@ -130,6 +137,16 @@ void ARSDunPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
             {
                 EnhancedInput->BindAction(PlayerController->SecondWeaponSlotAction, ETriggerEvent::Triggered, this, &ARSDunPlayerCharacter::SecondWeaponSlot);
             }
+
+            if (PlayerController->ToggleInventoryAction)
+            {
+                EnhancedInput->BindAction(PlayerController->ToggleInventoryAction, ETriggerEvent::Triggered, this, &ARSDunPlayerCharacter::ToggleInventoryUI);
+            }
+
+            if (PlayerController->ToggleInGameMenuAction)
+            {
+                EnhancedInput->BindAction(PlayerController->ToggleInGameMenuAction, ETriggerEvent::Triggered, this, &ARSDunPlayerCharacter::ToggleInGameMenuUI);
+            }
         }
     }
 }
@@ -159,23 +176,23 @@ void ARSDunPlayerCharacter::OnDeath()
 {
     Super::OnDeath();
 
-    // ·¹º§ ¿ÀºêÁ§Æ®¸¦ Á¦¿ÜÇÑ ¸ğµç ¿ÀºêÁ§Æ®¿Í Ãæµ¹ÇÏÁö ¾Êµµ·Ï Äİ¸®Àü ¼³Á¤ º¯°æ
+    // ë ˆë²¨ ì˜¤ë¸Œì íŠ¸ë¥¼ ì œì™¸í•œ ëª¨ë“  ì˜¤ë¸Œì íŠ¸ì™€ ì¶©ëŒí•˜ì§€ ì•Šë„ë¡ ì½œë¦¬ì „ ì„¤ì • ë³€ê²½
     GetCapsuleComponent()->SetCollisionProfileName(TEXT("DeadCharacter"));
     GetMesh()->SetCollisionProfileName(TEXT("DeadCharacter"));
 
-    // »ç¸Á ¾Ö´Ï¸ŞÀÌ¼Ç Àç»ı
+    // ì‚¬ë§ ì• ë‹ˆë©”ì´ì…˜ ì¬ìƒ
     if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
     {
         AnimInstance->Montage_Play(DeathMontage);
     }
 
-    // ´õÀÌ»ó ÀÔ·Â¹ŞÁö ¸øÇÏµµ·Ï ÇÃ·¹ÀÌ¾î ÄÁÆ®·Ñ·¯ÀÇ ÀÔ·Â ¸ÅÇÎ Á¦°Å
+    // ë”ì´ìƒ ì…ë ¥ë°›ì§€ ëª»í•˜ë„ë¡ í”Œë ˆì´ì–´ ì»¨íŠ¸ë¡¤ëŸ¬ì˜ ì…ë ¥ ë§¤í•‘ ì œê±°
     if (ARSDunPlayerController* PlayerController = Cast<ARSDunPlayerController>(GetController()))
     {
         PlayerController->RemoveAllMapping();
     }
 
-    // ´õÀÌ»ó ¿òÁ÷ÀÏ ¼ö ¾øµµ·Ï ¼³Á¤
+    // ë”ì´ìƒ ì›€ì§ì¼ ìˆ˜ ì—†ë„ë¡ ì„¤ì •
     if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
     {
         MovementComponent->SetMovementMode(EMovementMode::MOVE_None);
@@ -187,9 +204,53 @@ void ARSDunPlayerCharacter::OnDeath()
     }
 }
 
+void ARSDunPlayerCharacter::IncreaseMaxHP(float Amount)
+{
+    Super::IncreaseMaxHP(Amount);
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnMaxHPChange.Broadcast();
+    }
+}
+
+void ARSDunPlayerCharacter::DecreaseMaxHP(float Amount)
+{
+    Super::DecreaseMaxHP(Amount);
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnMaxHPChange.Broadcast();
+    }
+}
+
+void ARSDunPlayerCharacter::IncreaseHP(float Amount)
+{
+    Super::IncreaseHP(Amount);
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnHPChange.Broadcast();
+    }
+}
+
+void ARSDunPlayerCharacter::DecreaseHP(float Amount)
+{
+    Super::DecreaseHP(Amount);
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnHPChange.Broadcast();
+    }
+}
+
 void ARSDunPlayerCharacter::Move(const FInputActionValue& value)
 {
-    // Ä«¸Ş¶ó ½ÃÁ¡À» ±âÁØÇÏ¿© ÀÔ·Â¹ŞÀº ¹æÇâÀ¸·Î Ä³¸¯ÅÍ ÀÌµ¿
+    // ì¹´ë©”ë¼ ì‹œì ì„ ê¸°ì¤€í•˜ì—¬ ì…ë ¥ë°›ì€ ë°©í–¥ìœ¼ë¡œ ìºë¦­í„° ì´ë™
     if (Controller)
     {
         const FVector2D MoveInput = value.Get<FVector2D>();
@@ -211,21 +272,21 @@ void ARSDunPlayerCharacter::Move(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::Look(const FInputActionValue& value)
 {
-    // ¸¶¿ì½ºÀÇ X, Y ¿òÁ÷ÀÓÀ» 2D ÃàÀ¸·Î °¡Á®¿Í ½ºÇÁ¸µ¾Ï È¸Àü
+    // ë§ˆìš°ìŠ¤ì˜ X, Y ì›€ì§ì„ì„ 2D ì¶•ìœ¼ë¡œ ê°€ì ¸ì™€ ìŠ¤í”„ë§ì•” íšŒì „
     if (Controller)
     {
         FVector2D LookInput = value.Get<FVector2D>();
 
-        // ÁÂ¿ì È¸Àü
+        // ì¢Œìš° íšŒì „
         AddControllerYawInput(LookInput.X);
-        // »óÇÏ È¸Àü
+        // ìƒí•˜ íšŒì „
         AddControllerPitchInput(LookInput.Y);
     }
 }
 
 void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
 {
-    // ³«ÇÏ Áß ±¸¸£±â°¡ µÇÁö ¾Êµµ·ÏÇÑ´Ù.
+    // ë‚™í•˜ ì¤‘ êµ¬ë¥´ê¸°ê°€ ë˜ì§€ ì•Šë„ë¡í•œë‹¤.
     if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
     {
         if (MovementComponent->IsFalling())
@@ -242,7 +303,7 @@ void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
         SetActorRotation(DesiredRotation);
     }
 
-    // ¸ùÅ¸ÁÖ¸¦ Àç»ıÁßÀÌÁö ¾ÊÀº °æ¿ì ±¸¸£±â ½ÇÇà
+    // ëª½íƒ€ì£¼ë¥¼ ì¬ìƒì¤‘ì´ì§€ ì•Šì€ ê²½ìš° êµ¬ë¥´ê¸° ì‹¤í–‰
     UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
     if (AnimInstance && DodgeMontage)
     {
@@ -255,7 +316,7 @@ void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::Interaction(const FInputActionValue& value)
 {
-    // ¾Ö´Ï¸ŞÀÌ¼Ç°ú ±âÈ¹ÀÌ ¾ÆÁ÷ ÁØºñµÇÁö ¾Ê¾ÒÀ¸¹Ç·Î µğ¹ö±ë¿ë Ãâ·Â
+    // ì• ë‹ˆë©”ì´ì…˜ê³¼ ê¸°íšì´ ì•„ì§ ì¤€ë¹„ë˜ì§€ ì•Šì•˜ìœ¼ë¯€ë¡œ ë””ë²„ê¹…ìš© ì¶œë ¥
     if (GEngine)
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Interaction Activated"));
@@ -278,7 +339,7 @@ void ARSDunPlayerCharacter::NormalAttack(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::StrongAttack(const FInputActionValue& value)
 {
-    // ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ¾ÆÁ÷ ÁØºñµÇÁö ¾Ê¾ÒÀ¸¹Ç·Î µğ¹ö±ë¿ë Ãâ·Â
+    // ì• ë‹ˆë©”ì´ì…˜ì´ ì•„ì§ ì¤€ë¹„ë˜ì§€ ì•Šì•˜ìœ¼ë¯€ë¡œ ë””ë²„ê¹…ìš© ì¶œë ¥
     if (GEngine)
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("StrongAttack Activated"));
@@ -287,8 +348,8 @@ void ARSDunPlayerCharacter::StrongAttack(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::FirstWeaponSlot(const FInputActionValue& value)
 {
-    // ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ¾ÆÁ÷ ÁØºñµÇÁö ¾Ê¾ÒÀ¸¹Ç·Î µğ¹ö±ë¿ë Ãâ·Â
-    // ÃßÈÄ¿¡ ÇØ´ç ¹«±â·Î ÀüÈ¯µÇ´Â ±â´É ±¸ÇöÇØ¾ßÇÑ´Ù.
+    // ì• ë‹ˆë©”ì´ì…˜ì´ ì•„ì§ ì¤€ë¹„ë˜ì§€ ì•Šì•˜ìœ¼ë¯€ë¡œ ë””ë²„ê¹…ìš© ì¶œë ¥
+    // ì¶”í›„ì— í•´ë‹¹ ë¬´ê¸°ë¡œ ì „í™˜ë˜ëŠ” ê¸°ëŠ¥ êµ¬í˜„í•´ì•¼í•œë‹¤.
     if (GEngine)
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("FirstWeaponSlot Activated"));
@@ -299,8 +360,8 @@ void ARSDunPlayerCharacter::FirstWeaponSlot(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::SecondWeaponSlot(const FInputActionValue& value)
 {
-    // ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ¾ÆÁ÷ ÁØºñµÇÁö ¾Ê¾ÒÀ¸¹Ç·Î µğ¹ö±ë¿ë Ãâ·Â
-    // ÃßÈÄ¿¡ ÇØ´ç ¹«±â·Î ÀüÈ¯µÇ´Â ±â´É ±¸ÇöÇØ¾ßÇÑ´Ù.
+    // ì• ë‹ˆë©”ì´ì…˜ì´ ì•„ì§ ì¤€ë¹„ë˜ì§€ ì•Šì•˜ìœ¼ë¯€ë¡œ ë””ë²„ê¹…ìš© ì¶œë ¥
+    // ì¶”í›„ì— í•´ë‹¹ ë¬´ê¸°ë¡œ ì „í™˜ë˜ëŠ” ê¸°ëŠ¥ êµ¬í˜„í•´ì•¼í•œë‹¤.
     if (GEngine)
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("SecondWeaponSlot Activated"));
@@ -309,29 +370,53 @@ void ARSDunPlayerCharacter::SecondWeaponSlot(const FInputActionValue& value)
     WeaponComp->EquipWeaponToCharacter(EWeaponSlot::SecondWeaponSlot);
 }
 
+void ARSDunPlayerCharacter::ToggleInventoryUI(const FInputActionValue& value)
+{
+    // TODO : ì¸ë²¤í† ë¦¬ UIë¥¼ ì¼œê³  ë„ê¸°
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("ToggleInventoryUI Activated"));
+    }
+}
+
+void ARSDunPlayerCharacter::ToggleInGameMenuUI(const FInputActionValue& value)
+{
+    // ì¸ê²Œì„ ë©”ë‰´ UIë¥¼ ë³´ì´ë„ë¡ í•˜ê±°ë‚˜ ì•ˆë³´ì´ë„ë¡ í•œë‹¤.
+    ARSDunPlayerController* PC = GetController<ARSDunPlayerController>();
+    if (PC)
+    {
+        PC->ToggleInGameMenuWidget();
+    }
+
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("ToggleInGameMenuUI Activated"));
+    }
+}
+
 URSPlayerWeaponComponent* ARSDunPlayerCharacter::GetRSPlayerWeaponComponent()
 {
     return WeaponComp;
 }
 
-URSDungeonInventoryComponent* ARSDunPlayerCharacter::GetRSDungeonInventoryComponent()
+URSDungeonIngredientInventoryComponent* ARSDunPlayerCharacter::GetRSDungeonIngredientInventoryComponent()
 {
-    return InventoryComp;
+    return IngredientInventoryComp;
 }
 
 void ARSDunPlayerCharacter::InteractTrace()
 {
-    // Ä³¸¯ÅÍ¸¦ Áß½ÉÀ¸·Î »ç¿ëÇÒ À§Ä¡ ¼±Á¤
+    // ìºë¦­í„°ë¥¼ ì¤‘ì‹¬ìœ¼ë¡œ ì‚¬ìš©í•  ìœ„ì¹˜ ì„ ì •
     FVector Center = GetActorLocation();
 
-    // ¹«½ÃÇÒ ¾×ÅÍ, ÀÚ±â ÀÚ½ÅÀº Á¦¿Ü
+    // ë¬´ì‹œí•  ì•¡í„°, ìê¸° ìì‹ ì€ ì œì™¸
     FCollisionQueryParams Params;
     Params.AddIgnoredActor(this);
 
-    // ¿À¹ö·¦µÈ ¾×ÅÍ¸¦ ÀúÀåÇÒ ¹è¿­
+    // ì˜¤ë²„ë©ëœ ì•¡í„°ë¥¼ ì €ì¥í•  ë°°ì—´
     TArray<FOverlapResult> OutOverlaps;
 
-    // Ä³¸¯ÅÍ¸¦ Áß½ÉÀ¸·Î ¹İÁö¸§ Å©±âÀÇ ±¸Ã¼¸¦ »ç¿ëÇØ InteractTrace Ã¤³Î°ú ¿À¹ö·¦µÈ ¾×ÅÍµéÀ» Å½»öÇÑ´Ù.
+    // ìºë¦­í„°ë¥¼ ì¤‘ì‹¬ìœ¼ë¡œ ë°˜ì§€ë¦„ í¬ê¸°ì˜ êµ¬ì²´ë¥¼ ì‚¬ìš©í•´ InteractTrace ì±„ë„ê³¼ ì˜¤ë²„ë©ëœ ì•¡í„°ë“¤ì„ íƒìƒ‰í•œë‹¤.
     bool bHit = GetWorld()->OverlapMultiByChannel(OutOverlaps, Center, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(InteractRadius), Params);
     
     if (!bHit)
@@ -343,7 +428,7 @@ void ARSDunPlayerCharacter::InteractTrace()
 
     FVector Forward = GetActorForwardVector();
 
-    // Àü¹æ ³»¿¡ ÀÖ´Â ¾×ÅÍ¿Í °¡Àå °¡±îÀÌ ÀÖ´Â ¾×ÅÍ¸¦ º´ÇàÇØ¼­ °è»êÇÑ´Ù.
+    // ì „ë°© ë‚´ì— ìˆëŠ” ì•¡í„°ì™€ ê°€ì¥ ê°€ê¹Œì´ ìˆëŠ” ì•¡í„°ë¥¼ ë³‘í–‰í•´ì„œ ê³„ì‚°í•œë‹¤.
     AActor* ClosestInFront = nullptr;
     float ClosestInFrontDist = TNumericLimits<float>::Max();
 
@@ -358,23 +443,23 @@ void ARSDunPlayerCharacter::InteractTrace()
             continue;
         }
 
-        // ´ë»ó ¾×ÅÍ±îÁöÀÇ º¤ÅÍ ¹× °Å¸® °è»ê
+        // ëŒ€ìƒ ì•¡í„°ê¹Œì§€ì˜ ë²¡í„° ë° ê±°ë¦¬ ê³„ì‚°
         FVector ToTarget = Target->GetActorLocation() - Center;
         float Distance = ToTarget.Size();
         FVector DirToTarget = ToTarget.GetSafeNormal();
 
-        // Àü¹æ º¤ÅÍ¿ÍÀÇ ³»ÀûÀ¸·Î Àü¹æ°úÀÇ °¢µµ °è»ê
+        // ì „ë°© ë²¡í„°ì™€ì˜ ë‚´ì ìœ¼ë¡œ ì „ë°©ê³¼ì˜ ê°ë„ ê³„ì‚°
         float Dot = FVector::DotProduct(Forward, DirToTarget);
         float Angle = FMath::RadiansToDegrees(FMath::Acos(Dot));
 
-        // Àü¹æ ³» Çô¿ë °¢µµ ¾È¿¡ ÀÖÀ¸¸ç, ÇöÀç±îÁö °¡Àå °¡±î¿î ¾×ÅÍÀÏ °æ¿ì
+        // ì „ë°© ë‚´ í˜€ìš© ê°ë„ ì•ˆì— ìˆìœ¼ë©°, í˜„ì¬ê¹Œì§€ ê°€ì¥ ê°€ê¹Œìš´ ì•¡í„°ì¼ ê²½ìš°
         if (Angle <= InteractAngle && Distance < ClosestInFrontDist)
         {
             ClosestInFront = Target;
             ClosestInFrontDist = Distance;
         }
 
-        // Àü¹æ ¿©ºÎ¿Í °ü°è¾øÀÌ °¡Àå °¡±î¿î ¾×ÅÍÀÏ °æ¿ì
+        // ì „ë°© ì—¬ë¶€ì™€ ê´€ê³„ì—†ì´ ê°€ì¥ ê°€ê¹Œìš´ ì•¡í„°ì¼ ê²½ìš°
         if (Distance < CosestActorDistance)
         {
             ClosestActor = Target;
@@ -382,13 +467,13 @@ void ARSDunPlayerCharacter::InteractTrace()
         }
     }
 
-    // Àü¹æ ¶Ç´Â ÀüÃ¼ ¾×ÅÍ Áß À¯È¿ÇÑ ¾×ÅÍ°¡ ÀÖ´Â °æ¿ì
+    // ì „ë°© ë˜ëŠ” ì „ì²´ ì•¡í„° ì¤‘ ìœ íš¨í•œ ì•¡í„°ê°€ ìˆëŠ” ê²½ìš°
     if (ClosestInFront || ClosestActor)
     {
-        // Àü¹æÀ» ¿ì¼±À¸·Î »ç¿ëÇÑ´Ù.
+        // ì „ë°©ì„ ìš°ì„ ìœ¼ë¡œ ì‚¬ìš©í•œë‹¤.
         AActor* TargetActor = (ClosestInFront != nullptr) ? ClosestInFront : ClosestActor;
 
-        // ´ë»ó ¾×ÅÍ°¡ »óÈ£ÀÛ¿ë ÀÎÅÍÆäÀÌ½º¸¦ ±¸ÇöÇß´ÂÁö È®ÀÎÇÏ°í ±¸ÇöÇß´Ù¸é ÀúÀåÇÑ´Ù.
+        // ëŒ€ìƒ ì•¡í„°ê°€ ìƒí˜¸ì‘ìš© ì¸í„°í˜ì´ìŠ¤ë¥¼ êµ¬í˜„í–ˆëŠ”ì§€ í™•ì¸í•˜ê³  êµ¬í˜„í–ˆë‹¤ë©´ ì €ì¥í•œë‹¤.
         if (TargetActor && TargetActor->GetClass()->ImplementsInterface(URSInteractable::StaticClass()))
         {
             IRSInteractable* Interactable = Cast<IRSInteractable>(TargetActor);
@@ -444,7 +529,7 @@ void ARSDunPlayerCharacter::IncreaseAttackSpeed(float Amount)
 
 void ARSDunPlayerCharacter::DecreaseAttackSpeed(float Amount)
 {
-    // ¾Ö´Ï¸ŞÀÌ¼ÇÀÇ Àç»ı ¼Óµµ°¡ À½¼ö°ªÀÌ µÈ´Ù¸é ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ¿ªÀç»ı µÇ¹Ç·Î, ¿¹¿ÜÃ³¸®
+    // ì• ë‹ˆë©”ì´ì…˜ì˜ ì¬ìƒ ì†ë„ê°€ ìŒìˆ˜ê°’ì´ ëœë‹¤ë©´ ì• ë‹ˆë©”ì´ì…˜ì´ ì—­ì¬ìƒ ë˜ë¯€ë¡œ, ì˜ˆì™¸ì²˜ë¦¬
     float NewAttackSpeed = FMath::Max(AttackSpeed - Amount, 0.0f);
     AttackSpeed = NewAttackSpeed;
 }

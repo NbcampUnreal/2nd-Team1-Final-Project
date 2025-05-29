@@ -3,7 +3,7 @@
 #include "RSDunPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "RSCheatManager.h"
-#include "Blueprint/UserWidget.h"
+#include "RSDunMainHUDWidget.h"
 
 ARSDunPlayerController::ARSDunPlayerController()
 {
@@ -15,22 +15,24 @@ void ARSDunPlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
+    // ë§ˆìš°ìŠ¤ ì»¤ì„œë¥¼ ê°ì¶”ê³ , Inputëª¨ë“œë¥¼ ê²Œìž„ì˜¨ë¦¬ë¡œ ë³€ê²½
+    bShowMouseCursor = false;
+
+    FInputModeGameOnly InputMode;
+    SetInputMode(InputMode);
+
+    // ê¸°ë³¸ì ì¸ ìž…ë ¥ ë§¤í•‘ ì¶”ê°€
     AddMapping();
 
     InitializeRSDunMainWidget();
-
-    if (RSDunMainWidget)
-    {
-        //OnWeaponSlotChange.AddDynamic(RSDunMainWidget, &URSDunMainWidget::UpdateWeaponSlot);
-    }
 }
 
 void ARSDunPlayerController::AddMapping()
 {
-    // ¸ÅÇÎ Ãß°¡
+    // ë§¤í•‘ ì¶”ê°€
     if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
     {
-        // SubsystemÀ» ÅëÇØ ¿ì¸®°¡ ÇÒ´çÇÑ IMC¸¦ È°¼ºÈ­
+        // Subsystemì„ í†µí•´ ìš°ë¦¬ê°€ í• ë‹¹í•œ IMCë¥¼ í™œì„±í™”
         if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
         {
             if (IMC)
@@ -43,7 +45,7 @@ void ARSDunPlayerController::AddMapping()
 
 void ARSDunPlayerController::RemoveAllMapping()
 {
-    // ¸ðµç ¸ÅÇÎ Á¦°Å
+    // ëª¨ë“  ë§¤í•‘ ì œê±°
     if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
     {
         if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
@@ -55,18 +57,25 @@ void ARSDunPlayerController::RemoveAllMapping()
 
 void ARSDunPlayerController::InitializeRSDunMainWidget()
 {
-    if (RSDunMainWidgetClass)
+    if (RSDunMainHUDWidgetClass)
     {
-        RSDunMainWidget = CreateWidget<URSDunMainWidget>(this, RSDunMainWidgetClass);
+        RSDunMainHUDWidget = CreateWidget<URSDunMainHUDWidget>(this, RSDunMainHUDWidgetClass);
 
-        if (RSDunMainWidget)
+        if (RSDunMainHUDWidget)
         {
-            // »ó½Ã Ãâ·Â ÇÊ¿ä ½Ã ÁÖ¼® ÇØÁ¦ ÇÊ¿ä
-            // RSDunMainWidget->AddToViewport();
+            RSDunMainHUDWidget->AddToViewport();
         }
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("RSDunMainWidgetClass Null !"));
+        UE_LOG(LogTemp, Warning, TEXT("RSDunMainHUDWidgetClass Null !"));
+    }
+}
+
+void ARSDunPlayerController::ToggleInGameMenuWidget()
+{
+    if (RSDunMainHUDWidget)
+    {
+        RSDunMainHUDWidget->HandleInGameMenuWidget();
     }
 }

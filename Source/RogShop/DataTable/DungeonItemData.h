@@ -32,9 +32,6 @@ struct ROGSHOP_API FDungeonItemData : public FTableRowBase
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 ItemID;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EItemType ItemType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

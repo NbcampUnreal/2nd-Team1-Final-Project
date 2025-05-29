@@ -17,6 +17,7 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "Widget", "DunShop"),
             Path.Combine(ModuleDirectory, "Widget", "Mainmenu"),
             Path.Combine(ModuleDirectory, "Widget", "Dungeon"),
+            Path.Combine(ModuleDirectory, "Widget", "InGameMenu"),
             Path.Combine(ModuleDirectory, "AnimInstances"),
             Path.Combine(ModuleDirectory, "AnimNotifyState"),
             Path.Combine(ModuleDirectory, "AnimNotify"),
@@ -24,15 +25,18 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "CheatManager"),
             Path.Combine(ModuleDirectory, "GameModeBase"),
             Path.Combine(ModuleDirectory, "GameInstance"),
-            Path.Combine(ModuleDirectory, "Actor", "Dungeon", "Weapon"),
             Path.Combine(ModuleDirectory, "Actor", "Dungeon"),
+            Path.Combine(ModuleDirectory, "Actor", "Dungeon", "Weapon"),
+            Path.Combine(ModuleDirectory, "Actor", "Dungeon", "GroundItem"),
             Path.Combine(ModuleDirectory, "Interface"),
             Path.Combine(ModuleDirectory, "DataTable"),
             Path.Combine(ModuleDirectory, "Object", "Relic"),
             Path.Combine(ModuleDirectory, "GameInstanceSubsystem"),
+            Path.Combine(ModuleDirectory, "SaveGame"),
+            Path.Combine(ModuleDirectory, "SaveGame", "Dungeon"),
         });
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule", "NavigationSystem", "DeveloperSettings" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule", "NavigationSystem", "DeveloperSettings", "SkeletalMerging", "UMG" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

@@ -3,8 +3,6 @@
 
 #include "RSCheatManager.h"
 #include "RSDunMonsterCharacter.h"
-#include "RSDunAnubisCharacter.h"
-#include "RSDunBossSpiderQueenCharacter.h"
 #include "RSDunPlayerController.h"
 
 #include "Blueprint/UserWidget.h"
@@ -12,12 +10,24 @@
 
 URSCheatManager::URSCheatManager()
 {
-    MonsterMap.Add("anubis", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunAnubisCharacter.BP_RSDunAnubisCharacter_C")));
-    MonsterMap.Add("bossspiderqueen", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBossSpiderQueenCharacter.BP_RSDunBossSpiderQueenCharacter_C")));
-    MonsterMap.Add("boar", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBoarCharacter.BP_RSDunBoarCharacter_C")));
-    MonsterMap.Add("skeleton", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunSkeletonCharacter.BP_RSDunSkeletonCharacter_C")));
-    MonsterMap.Add("bossflower", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_RSDunBossFlowerCharacter.BP_RSDunBossFlowerCharacter_C")));
-   
+#if WITH_EDITOR
+    MonsterMap.Add("anubis", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunEliteAnubisCharacter.BP_DunEliteAnubisCharacter_C")));
+    MonsterMap.Add("bossspiderqueen", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunBossSpiderQueenCharacter.BP_DunBossSpiderQueenCharacter_C")));
+    MonsterMap.Add("boar", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunBoarCharacter.BP_DunBoarCharacter_C")));
+    MonsterMap.Add("skeleton", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunSkeletonCharacter.BP_DunSkeletonCharacter_C")));
+    MonsterMap.Add("bossflower", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunBossFlowerCharacter.BP_DunBossFlowerCharacter_C")));
+    MonsterMap.Add("goat", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunGoatCharacter.BP_DunGoatCharacter_C")));
+    MonsterMap.Add("chicken", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunChickenCharacter.BP_DunChickenCharacter_C")));
+    MonsterMap.Add("elitebear", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunEliteBearCharacter.BP_DunEliteBearCharacter_C")));
+    MonsterMap.Add("hound", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunUndeadHoundCharacter.BP_DunUndeadHoundCharacter_C")));
+    MonsterMap.Add("snail", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunSnailCharacter.BP_DunSnailCharacter_C")));
+    MonsterMap.Add("eliteicegolem", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunEliteIceGolemCharacter.BP_DunEliteIceGolemCharacter_C")));
+    MonsterMap.Add("lich", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunEliteLichCharacter.BP_DunEliteLichCharacter_C")));
+    MonsterMap.Add("bossdemon", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunFinalBossDemonCharacter.BP_DunFinalBossDemonCharacter_C")));
+    MonsterMap.Add("bossworm", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunBossWormCharacter.BP_DunBossWormCharacter_C")));
+    MonsterMap.Add("lizardman", LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Characters/BP_DunLizardManCharacter.BP_DunLizardManCharacter_C")));
+#endif
+
 }
 
 void URSCheatManager::TestDunMonsterAttack()
@@ -35,24 +45,6 @@ void URSCheatManager::TestDunMonsterAttack()
     if (Monster)
     {
         Monster->PlayBaseAttackAnim();
-    }
-}
-
-void URSCheatManager::TestDunMonsterHItReact()
-{
-    UWorld* World = GetWorld();
-    if (!World)
-    {
-        return;
-    }
-
-    ARSDunMonsterCharacter* Monster = Cast<ARSDunMonsterCharacter>(
-        UGameplayStatics::GetActorOfClass(World, ARSDunMonsterCharacter::StaticClass())
-    );
-
-    if (Monster)
-    {
-        Monster->PlayHitReactAnim();
     }
 }
 
@@ -74,7 +66,8 @@ void URSCheatManager::TestDunMonsterDeath()
     if (Monster)
     {
         UE_LOG(LogTemp, Warning, TEXT("4"));
-        Monster->PlayDeathAnim();
+        //Monster->PlayDeathAnim();
+        Monster->OnDeath();
     }
 }
 
@@ -111,16 +104,17 @@ void URSCheatManager::SpawnDunShopNPC()
     APlayerController* PC = GetOuterAPlayerController();
     if (!PC) return;
 
+    if (!DunShopNPCClass)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("DunShopNPCClass is not set!"));
+        return;
+    }
+
     FVector SpawnLocation = PC->GetPawn()->GetActorLocation() + PC->GetPawn()->GetActorForwardVector() * 200.f;
     FActorSpawnParameters Params;
     Params.Owner = PC;
 
-    TSubclassOf<AActor> NPCClass = LoadClass<AActor>(nullptr, TEXT("/Game/Blueprints/Actor/DungeonNpc/BP_RSDunShopNpcActor.BP_RSDunShopNpcActor_C"));
-
-    if (NPCClass)
-    {
-        World->SpawnActor<AActor>(NPCClass, SpawnLocation, FRotator::ZeroRotator, Params);
-    }
+    World->SpawnActor<AActor>(DunShopNPCClass, SpawnLocation, FRotator::ZeroRotator, Params);
 }
 
 void URSCheatManager::SpawnWeaponPad()
@@ -157,20 +151,6 @@ void URSCheatManager::SpawnWeaponPad()
     FRotator SpawnRotation = FRotator::ZeroRotator;
 
     GetWorld()->SpawnActor<AActor>(WeaponSpawnPadBPClass, SpawnLocation, SpawnRotation);
-}
-
-void URSCheatManager::ShowRSDunMainWidget()
-{
-    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetOuterAPlayerController());
-
-    if (PC && PC->GetRSDunMainWidget())
-    {
-        PC->GetRSDunMainWidget()->AddToViewport();
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("PC or RSDunMainWidget Is Null !"));
-    }
 }
 
 void URSCheatManager::OpenTycoonLevel()

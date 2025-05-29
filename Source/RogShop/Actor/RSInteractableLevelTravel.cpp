@@ -2,12 +2,11 @@
 
 
 #include "RSInteractableLevelTravel.h"
-#include "Kismet/GameplayStatics.h"
+#include "RSDunPlayerCharacter.h"
+#include "RSGameInstance.h"
 
-// Sets default values
 ARSInteractableLevelTravel::ARSInteractableLevelTravel()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
@@ -18,45 +17,21 @@ ARSInteractableLevelTravel::ARSInteractableLevelTravel()
 	MeshComp->SetCollisionProfileName("Interactable");
 }
 
-// Called when the game starts or when spawned
 void ARSInteractableLevelTravel::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-// Called every frame
-void ARSInteractableLevelTravel::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 void ARSInteractableLevelTravel::Interact(ARSDunPlayerCharacter* Interactor)
 {
-	// TODO : ·¹º§À» ÀÌµ¿ÇÏ±â Àü¿¡ ¼¼ÀÌºê Ã³¸®°¡ ÇÊ¿äÇÏ´Ù.
+	// ë ˆë²¨ì„ ì´ë™í•˜ê¸° ì „ì— ì„¸ì´ë¸Œ ìš”ì²­ì„ ì˜ë¯¸í•˜ëŠ” ì´ë²¤íŠ¸ ë””ìŠ¤íŒ¨ì²˜ì— ë°”ì¸ë”© ëœ í•¨ìˆ˜ë¥¼ í˜¸ì¶œí•œë‹¤.
+	Interactor->OnSaveRequested.Broadcast();
 
-	if (TargetLevelAsset.IsValid())
+	// ë ˆë²¨ ì´ë™ í•¨ìˆ˜ í˜¸ì¶œ
+	URSGameInstance* RSGameInstance = Interactor->GetGameInstance<URSGameInstance>();
+	if (RSGameInstance)
 	{
-		// ·ÎµåµÈ °æ¿ì
-
-		FStringAssetReference AssetRef = TargetLevelAsset.ToSoftObjectPath();
-		FString LevelPath = AssetRef.ToString();
-		FName LevelName = FName(*FPackageName::GetShortName(LevelPath));
-		UGameplayStatics::OpenLevel(GetWorld(), LevelName);
-	}
-	else if (TargetLevelAsset.IsNull() == false)
-	{
-		// ¾ÆÁ÷ ·ÎµåµÇÁö ¾Ê¾ÒÀ» °æ¿ì
-		
-		// ÆÐÅ°Áö °æ·Î ¿¹½Ã: /Game/Maps/MyLevel
-		FString LevelPackagePath = TargetLevelAsset.ToSoftObjectPath().GetLongPackageName();
-
-		if (!LevelPackagePath.IsEmpty())
-		{
-			// ·¹º§ ÀÌ¸§¸¸ ÃßÃâ
-			FName LevelName = FName(*FPackageName::GetShortName(LevelPackagePath));
-			UGameplayStatics::OpenLevel(GetWorld(), LevelName);
-		}
+		RSGameInstance->TravelToLevel(TargetLevelAsset);
 	}
 }

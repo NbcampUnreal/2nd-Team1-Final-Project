@@ -23,9 +23,6 @@ public:
 	void TestDunMonsterAttack();
 
 	UFUNCTION(exec)
-	void TestDunMonsterHItReact();
-
-	UFUNCTION(exec)
 	void TestDunMonsterDeath();
   
 	UFUNCTION(exec)
@@ -41,13 +38,13 @@ public:
 	UFUNCTION(exec)
 	void SpawnWeaponPad();
 
-	UFUNCTION(exec)
-	void ShowRSDunMainWidget();
-
-public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SpawnMonster")
 	TMap<FString, TSubclassOf<AActor>> MonsterMap;
 
-	UPROPERTY(EditAnywhere, Category = "Spawn")
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Spawn")
 	TSubclassOf<AActor> WeaponSpawnPadBPClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Spawn")
+	TSubclassOf<AActor> DunShopNPCClass;
 };

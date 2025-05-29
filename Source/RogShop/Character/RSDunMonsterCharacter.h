@@ -10,10 +10,10 @@
 #include "Engine/TargetPoint.h"
 #include "Engine/OverlapResult.h"
 #include "TimerManager.h"
+#include "Animation/AnimInstance.h"
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
-class UMeleeAttackBoxComponent;
 
 UCLASS()
 class ROGSHOP_API ARSDunMonsterCharacter : public ARSDunBaseCharacter
@@ -25,10 +25,18 @@ public:
 
 	virtual void BeginPlay()override;
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÇà ÇÔ¼ö
+	// ì• ë‹ˆë©”ì´ì…˜ ì‹¤í–‰ í•¨ìˆ˜
 	virtual void PlayBaseAttackAnim();
-	virtual void PlayHitReactAnim();
 	virtual void PlayDeathAnim();
+	UFUNCTION(BlueprintCallable)
+	virtual void PlaySkill_1();
+	UFUNCTION(BlueprintCallable)
+	virtual void PlaySkill_2();
+	UFUNCTION(BlueprintCallable)
+	virtual void PlaySkill_3();
+
+	UFUNCTION()
+	void OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted);  //ì‚¬ë§ ëª¨ì…˜ì´ ëë‚œ ê²½ìš°
 
 	//Navigation Invoker function
 	FORCEINLINE class UNavigationInvokerComponent* GetNavInvoker() const { return navInvoker; };
@@ -37,7 +45,7 @@ public:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Trace")
-	virtual void PerformAttackTrace() PURE_VIRTUAL(ARSDunMonsterCharacter::PerformAttackTrace, );
+	virtual void PerformAttackTrace();
 
 	//NavLink jump function
 	UFUNCTION(BlueprintCallable)
@@ -50,20 +58,25 @@ public:
 	UFUNCTION()
 	TArray<AActor*> GetPatrolPoint();
 
-protected:
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Status")
 	void OnDeath();
 
 protected:
-	// ¾Ö´Ï¸ŞÀÌ¼Ç ¸ùÅ¸ÁÖ
+	// ì• ë‹ˆë©”ì´ì…˜ ëª½íƒ€ì£¼
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> BaseAttackMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> HitReactMontage;
+	TObjectPtr<UAnimMontage> DeathMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> DeathMontage;
+	TObjectPtr<UAnimMontage> SkillMontage_1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> SkillMontage_2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> SkillMontage_3;
 
 	//NavInvoker
 	UPROPERTY(BlueprintReadWrite, Category = Navigation, meta = (AllowPrivateAccess = "true"))//Navigation Invoker Setting
@@ -86,25 +99,28 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Patrol")
 	float maxDetectPatrolRoute;
 
-	// Æ®·¹ÀÌ½º °ü·Ã
+	// íŠ¸ë ˆì´ìŠ¤ ê´€ë ¨
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
 	FVector TraceBoxHalfSize;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
-	float TraceLength;        // Æ®·¹ÀÌ½º ±æÀÌ (¾ÕÀ¸·Î ¾ó¸¶¸¸Å­ ½òÁö)
+	float TraceLength;			// íŠ¸ë ˆì´ìŠ¤ ê¸¸ì´ (ì•ìœ¼ë¡œ ì–¼ë§ˆë§Œí¼ ì ì§€)
 
 	UPROPERTY(EditAnywhere, Category = "AttackTrace")
-	float TraceForwardOffset; // ¼ÒÄÏ ±âÁØ ¾ÕÀ¸·Î ¾ó¸¶³ª ¹ĞÁö
+	float TraceForwardOffset;	// ì†Œì¼“ ì‹œì‘ì  ì•ë’¤ ë³´ì •
 
 	UPROPERTY(EditAnywhere, Category = "AttackTrace")
-	float TraceRightOffset;     // (¼±ÅÃ) ÁÂ¿ì º¸Á¤
+	float TraceRightOffset;     // ì†Œì¼“ ì‹œì‘ì  ì¢Œìš° ë³´ì •
 
 	UPROPERTY(EditAnywhere, Category = "AttackTrace")
-	float TraceUpOffset;        // (¼±ÅÃ) ³ôÀÌ º¸Á¤
+	float TraceUpOffset;        // ì†Œì¼“ ì‹œì‘ì  ë†’ì´ ë³´ì •
+
+	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	FName SocketLocation;		// íŠ¸ë ˆì´ìŠ¤ê°€ ì´ì§ˆ ì†Œì¼“ì˜ ì‹œì‘ì 
 
 	FTimerHandle detectDelayTimer;
 
 private:
-	TObjectPtr<ARSMonsterAIController> AIController;  // TODO : È¤½Ã³ª Ä³½ÌÇØ¼­ ¾µ ÀÏ »ı±æ±îºÁ ¹Ì¸® ¸¸µé¾îµÒ.
+	TObjectPtr<ARSMonsterAIController> AIController;  // TODO : í˜¹ì‹œë‚˜ ìºì‹±í•´ì„œ ì“¸ ì¼ ìƒê¸¸ê¹Œë´ ë¯¸ë¦¬ ë§Œë“¤ì–´ë‘ .
 
 };

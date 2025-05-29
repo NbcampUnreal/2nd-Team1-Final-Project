@@ -37,9 +37,16 @@ public://Function
 	UFUNCTION(BlueprintCallable)
 	void AIAttack();
 
+	UFUNCTION(BlueprintCallable)
+	void AISkill_1();
+
+	UFUNCTION(BlueprintCallable)
+	void AISkill_2();
+
+	UFUNCTION(BlueprintCallable)
+	void AISkill_3();
+
 	//Patrol
 	UFUNCTION(BlueprintCallable)
 	void MoveToCurrentPatrolPoint();
-
-//	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
 };
