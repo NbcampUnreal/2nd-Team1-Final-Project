@@ -4,6 +4,7 @@
 #include "RSTileMap.h"
 
 #include "NavigationSystem.h"
+#include "RSTycoonGameModeBase.h"
 #include "Components/BrushComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
@@ -15,6 +16,9 @@
 #include "Tile/RSFoodLaboratoryTile.h"
 #include "Tile/RSIceBoxTile.h"
 #include "Tile/RSTableTile.h"
+#include "Tycoon/NPC/RSTycoonChefCharacter.h"
+#include "Tycoon/NPC/RSTycoonNPC.h"
+#include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
 
 const FString ARSTileMap::TileMapSaveSlot = TEXT("TileMapSaveSlot");
 
@@ -40,12 +44,12 @@ void ARSTileMap::ChangeTile(int32 Index, FName TileKey)
 	TSubclassOf<ARSBaseTile> TileType = GetTileClass(TileKey);
 	int32 Row = Index / Width;
 	int32 Column = Index % Width;
-	
+
 	TileActors[Index] = CreateTile(TileType, Row, Column);
 	TileName2DMap[Row].Tiles[Column] = TileKey;
 }
 
-void ARSTileMap::SaveTiles()
+void ARSTileMap::SaveTileMap()
 {
 	// SaveGame 오브젝트 생성
 	URSTycoonSaveGame* SaveGameInstance = Cast<URSTycoonSaveGame>(
@@ -54,6 +58,26 @@ void ARSTileMap::SaveTiles()
 	SaveGameInstance->Tile2DMap = TileName2DMap;
 	SaveGameInstance->Width = Width;
 	SaveGameInstance->Height = Height;
+
+	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
+	check(GameMode)
+
+	int32 WaiterCount = 0, ChefCount = 0;
+	for (ARSTycoonNPC* NPC : GameMode->GetNPCs())
+	{
+		if (NPC->IsA<ARSTycoonWaiterCharacter>())
+		{
+			WaiterCount++;
+		}
+
+		if (NPC->IsA<ARSTycoonChefCharacter>())
+		{
+			ChefCount++;
+		}
+	}
+
+	SaveGameInstance->WaiterCount = WaiterCount;
+	SaveGameInstance->ChefCount = ChefCount;
 
 	// 저장
 	UGameplayStatics::SaveGameToSlot(SaveGameInstance, TileMapSaveSlot, 0);
@@ -77,29 +101,42 @@ void ARSTileMap::ChangeTileSize(int32 NewWidth, int32 NewHeight)
 			}
 		}
 	}
-	
+
 	CreateTiles();
 }
 
-FVector ARSTileMap::GetCenter()
+FVector ARSTileMap::GetMapCenter()
 {
-	FVector TileSize = DefaultTileType.GetDefaultObject()->GetTileSize();
+	FVector Size = GetMapSize();
 	FVector Center = GetActorLocation();
-	Center.Y += TileSize.Y * 0.5f * (Width - 1);
-	Center.X += TileSize.X * 0.5f * (Height - 1);
+	FVector HalfTileSize = DefaultTileType.GetDefaultObject()->GetTileSize() * 0.5f; 
+
+	//Center에서 타일의 중심이 생성되기 때문에 위치를 보정해줘야함
+	Center.Y += Size.Y * 0.5f - HalfTileSize.Y;  
+	Center.X += Size.X * 0.5f - HalfTileSize.X;
 
 	return Center;
+}
+
+FVector ARSTileMap::GetMapSize()
+{
+	FVector Result = DefaultTileType.GetDefaultObject()->GetTileSize();
+	Result.Y *= Width;
+	Result.X *= Height;
+
+	return Result;
 }
 
 void ARSTileMap::BeginPlay()
 {
 	Super::BeginPlay();
 
-	LoadTiles();
+	LoadTileMap();
 	CreateTiles();
+	ActiveNPC();
 }
 
-void ARSTileMap::LoadTiles()
+void ARSTileMap::LoadTileMap()
 {
 	URSTycoonSaveGame* LoadedGame = Cast<URSTycoonSaveGame>(
 		UGameplayStatics::LoadGameFromSlot(TileMapSaveSlot, 0));
@@ -110,6 +147,16 @@ void ARSTileMap::LoadTiles()
 		TileName2DMap = LoadedGame->Tile2DMap;
 		Width = LoadedGame->Width;
 		Height = LoadedGame->Height;
+
+		for (int i = 0; i < LoadedGame->WaiterCount; i++)
+		{
+			SpawnActorInMap(WaiterType.Get());
+		}
+
+		for (int i = 0; i < LoadedGame->ChefCount; i++)
+		{
+			SpawnActorInMap(ChefType.Get());
+		}
 	}
 	else
 	{
@@ -169,7 +216,7 @@ void ARSTileMap::CreateTiles()
 	NavVolume = Cast<ANavMeshBoundsVolume>(UGameplayStatics::GetActorOfClass(GetWorld(), ANavMeshBoundsVolume::StaticClass()));
 	check(NavVolume)
 
-	NavVolume->SetActorLocation(GetCenter());
+	NavVolume->SetActorLocation(GetMapCenter());
 
 	FVector NavMeshSize = FVector(TileSize.X * (Height + 1), TileSize.Y * (Width + 1), 100);
 	UBrushComponent* BrushComp = NavVolume->GetBrushComponent();
@@ -209,7 +256,7 @@ ARSBaseTile* ARSTileMap::CreateTile(const TSubclassOf<ARSBaseTile>& TileClass, i
 #if WITH_EDITOR
 	TileActor->SetActorLabel(FString::Printf(TEXT("Tile %d x %d"), Row, Column));
 #endif
-	
+
 	FVector TileSize = DefaultTileType.GetDefaultObject()->GetTileSize();
 	FVector Location = GetActorLocation();
 	Location.X += TileSize.X * Row;
@@ -220,6 +267,35 @@ ARSBaseTile* ARSTileMap::CreateTile(const TSubclassOf<ARSBaseTile>& TileClass, i
 
 	return TileActor;
 }
+
+void ARSTileMap::SpawnActorInMap(UClass* ActorClass)
+{
+	FVector HalfTileSize = DefaultTileType->GetDefaultObject<ARSBaseTile>()->GetTileSize() * 0.5f;
+	FVector MapSize = GetMapSize();
+	FVector RandomLocation = FVector(FMath::FRand()) * MapSize;
+	FVector SpawnLocation = GetActorLocation() + RandomLocation - HalfTileSize;
+	SpawnLocation.Z = GetActorLocation().Z + 100;
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	
+	GetWorld()->SpawnActor(ActorClass, &SpawnLocation, &FRotator::ZeroRotator, SpawnParams);
+}
+
+void ARSTileMap::ActiveNPC()
+{
+	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
+	check(GameMode)
+	
+	for (auto NPC : GameMode->GetNPCs())
+	{
+		if (ARSTycoonChefCharacter* Chef = Cast<ARSTycoonChefCharacter>(NPC))
+		{
+			Chef->FindCookingTile();
+		}
+	}
+}
+
 
 void ARSTileMap::DeleteTileData()
 {

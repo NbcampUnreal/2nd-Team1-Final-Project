@@ -61,5 +61,5 @@ void URSTycoonManagementWidget::OnClickWaitMode()
 	
 	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
 	check(TileMap)
-	TileMap->SaveTiles();
+	TileMap->SaveTileMap();
 }
