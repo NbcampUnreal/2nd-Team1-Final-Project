@@ -40,5 +40,5 @@ protected:
 	UButton* OutButton;
 
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UWorld> BaseAreaLevel;
+	TSoftObjectPtr<UWorld> BaseAreaLevel;
 };

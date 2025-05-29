@@ -9,6 +9,7 @@
 class UInputMappingContext;
 class UInputAction;
 class URSDunMainHUDWidget;
+class URSPlayerInventoryWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotChange, uint8, SlotIndex, FName, WeaponKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHPChange);
@@ -57,7 +58,9 @@ public:
 // 위젯
 public:
 	void InitializeRSDunMainWidget();
+	void InitializeRSPlayerInventoryWidget();
 
+	void AddRSPlayerInventoryWidget();
 	void ToggleInGameMenuWidget();
 
 private:
@@ -67,6 +70,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<URSDunMainHUDWidget> RSDunMainHUDWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<URSPlayerInventoryWidget> RSPlayerInventoryWidgetClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<URSPlayerInventoryWidget> RSPlayerInventoryWidgetInstance;
 
 // 이벤트 디스패처
 public:

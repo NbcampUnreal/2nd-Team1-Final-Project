@@ -17,21 +17,21 @@ class ROGSHOP_API ARSTycoonCamera : public AActor
 public:
 	ARSTycoonCamera();
 
-	void Attach();
+	void AttachPlayer();
+	void ReturnToOrigin();
 
 protected:
 	virtual void BeginPlay() override;
-	
+
 private:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<USceneComponent> Root;
-	
-	UPROPERTY(EditDefaultsOnly)
+
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<USpringArmComponent> SpringArm;
-	
-	UPROPERTY(EditDefaultsOnly)
+
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UCameraComponent> Camera;
-	
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UCameraComponent> TopCamera;	//식당 관리 때 쓰일 탑뷰 카메라
+
+	FTransform OriginTransform;
 };

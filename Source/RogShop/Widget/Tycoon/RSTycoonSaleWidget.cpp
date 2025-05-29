@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "RSTycoonHUDWidget.h"
+#include "RSTycoonSaleWidget.h"
 
 #include "RSTycoonGameModeBase.h"
 #include "Components/Button.h"
@@ -11,33 +11,33 @@
 #include "Tycoon/NPC/RSTycoonChefCharacter.h"
 #include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
 
-void URSTycoonHUDWidget::SetGold(int32 Value)
+void URSTycoonSaleWidget::SetGold(int32 Value)
 {
 	GoldText->SetText(FText::AsNumber(Value));
 }
 
-void URSTycoonHUDWidget::SetCustomerCount(int32 Value)
+void URSTycoonSaleWidget::SetCustomerCount(int32 Value)
 {
 	CustomerCountText->SetText(FText::AsNumber(Value));
 }
 
-void URSTycoonHUDWidget::NativeConstruct()
+void URSTycoonSaleWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
-	GetWorld()->GetTimerManager().SetTimer(TimeUIHandle, this, &URSTycoonHUDWidget::UpdateTimeUI, 0.1f, true);
+	GetWorld()->GetTimerManager().SetTimer(TimeUIHandle, this, &URSTycoonSaleWidget::UpdateTimeUI, 0.1f, true);
 	
-	StopSalesButton->OnClicked.AddDynamic(this, &URSTycoonHUDWidget::OnClickStopSales);
+	StopSalesButton->OnClicked.AddDynamic(this, &URSTycoonSaleWidget::OnClickStopSales);
 }
 
-void URSTycoonHUDWidget::NativeDestruct()
+void URSTycoonSaleWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimeUIHandle);
 }
 
-void URSTycoonHUDWidget::UpdateTimeUI()
+void URSTycoonSaleWidget::UpdateTimeUI()
 {
 	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
 	check(GameMode)
@@ -57,7 +57,7 @@ void URSTycoonHUDWidget::UpdateTimeUI()
 	TimeProgressBar->SetPercent(Percent);
 }
 
-void URSTycoonHUDWidget::OnClickStopSales()
+void URSTycoonSaleWidget::OnClickStopSales()
 {
 	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->EndSale();
 }

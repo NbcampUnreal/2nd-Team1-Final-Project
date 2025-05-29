@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "RSTycoonHUDWidget.generated.h"
+#include "RSTycoonSaleWidget.generated.h"
 
 class UProgressBar;
 class ARSTycoonWaiterCharacter;
@@ -16,7 +16,7 @@ class UTextBlock;
  * 
  */
 UCLASS()
-class ROGSHOP_API URSTycoonHUDWidget : public UUserWidget
+class ROGSHOP_API URSTycoonSaleWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
