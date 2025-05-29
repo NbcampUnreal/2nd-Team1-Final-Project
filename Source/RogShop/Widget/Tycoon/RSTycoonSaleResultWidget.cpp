@@ -15,7 +15,7 @@ void URSTycoonSaleResultWidget::NativeConstruct()
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(Controller)
 	
-	CoinText->SetText(FText::FromString(FString::FromInt(Controller->GetMoney())));
+	CoinText->SetText(FText::FromString(FString::FromInt(Controller->GetGold())));
 	CustomerCountText->SetText(FText::FromString(FString::FromInt(Controller->GetCustomerCount())));
 
 	SubmitButton->OnClicked.AddDynamic(this, &URSTycoonSaleResultWidget::ReturnWaitMode);

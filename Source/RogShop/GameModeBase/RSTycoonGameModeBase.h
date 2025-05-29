@@ -43,6 +43,7 @@ public:
 	int32 GetSaleStartHour() const { return SaleStartHour; }
 	int32 GetSaleHourDuration() const { return SaleEndHour - SaleStartHour; }
 	float GetSaleRealPlayMinute() const { return SalePlayMinute; }
+	ETycoonGameMode GetState() const { return State; }
 
 private:
 	void CreateCustomer();

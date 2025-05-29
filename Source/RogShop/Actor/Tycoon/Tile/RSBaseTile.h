@@ -29,17 +29,26 @@ public:
 
 	FVector GetTileSize();
 	FString GetTileDisplayName() const { return TileDisplayName; }
+	int32 GetPrice() const { return Price; }
+	TObjectPtr<UTexture2D> GetThumbnail() const { return Thumbnail; }
 	
 protected:
 	virtual void BeginPlay() override;
 
-public:
+protected:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USceneComponent> SceneComp;
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UStaticMeshComponent> Plane;
 
+	//데이터 테이블로 옮길수도?
+	UPROPERTY(EditDefaultsOnly)
+	int32 Price = 10;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UTexture2D> Thumbnail;
+	
 protected:
 	FString TileDisplayName = TEXT("기본");
 };
