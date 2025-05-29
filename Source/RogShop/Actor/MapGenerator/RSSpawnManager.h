@@ -8,6 +8,7 @@
 #include "Engine/TargetPoint.h"
 #include "RSDunPlayerCharacter.h"
 #include "GameFramework/Character.h"
+#include "MonsterSpawnGroupData.h"
 
 #include "Engine/Level.h"
 #include "RSSpawnManager.generated.h"
@@ -15,17 +16,6 @@
 /**
  * 
  */
-
-USTRUCT(BlueprintType)
-struct FMonsterSpawnData : public FTableRowBase
-{
-	GENERATED_BODY()
-
-	// 스폰할 몬스터 클래스
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AActor> MonsterClass;
-};
-
 UCLASS()
 class ROGSHOP_API URSSpawnManager : public UObject
 {
@@ -42,16 +32,10 @@ public:
 	void SpawnPlayerAtStartPoint(TSubclassOf<ACharacter> PlayerClass);
 
 private:
-	// 특정 TargetPoint 위치에 몬스터 하나 스폰
-	AActor* SpawnMonsterAtTarget(AActor* TargetPoint);
-	// DataTable에서 무작위로 몬스터 클래스 선택
-	TSubclassOf<AActor> SelectMonsterClass();
-	// 스폰할 월드 객체 참조
-
-private:
 	UWorld* World;
 	// 몬스터 정보가 담긴 에디터용 데이터 테이블
-	UDataTable* MonsterTable;
+	UDataTable* MonsterRawTable;
+	UDataTable* MonsterStateTable;
 	// 상점 NPC 클래스
 	TSubclassOf<AActor> ShopNPCClass;
 };

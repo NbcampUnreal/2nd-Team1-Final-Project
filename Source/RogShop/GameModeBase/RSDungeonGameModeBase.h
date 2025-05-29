@@ -27,6 +27,7 @@ class ROGSHOP_API ARSDungeonGameModeBase : public AGameModeBase
 public:
 	ARSDungeonGameModeBase();
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	UFUNCTION()
 	void OnMapReady();
 private:
@@ -56,5 +57,6 @@ public:
 
 private:
 	FTimerHandle WaitForMapHandle;
+
 	
 };
