@@ -6,9 +6,14 @@
 #include "Blueprint/UserWidget.h"
 #include "RSInventoryWeaponSlotWidget.generated.h"
 
-/**
- * 
- */
+UENUM()
+enum class EWeaponSlotType : uint8
+{
+	None,
+	Slot1,
+	Slot2
+};
+
 UCLASS()
 class ROGSHOP_API URSInventoryWeaponSlotWidget : public UUserWidget
 {
@@ -20,6 +25,8 @@ public:
 
 protected:
 	virtual void NativeConstruct() override;
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
@@ -27,4 +34,13 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
 	class UImage* WeaponSlot2;
+
+	FTimerHandle HoldTimerHandle;
+	EWeaponSlotType HeldSlotType = EWeaponSlotType::None;
+
+	// 마우스 좌클릭 키다운 시간
+	float HoldThreshold = 0.5f; 
+
+	// 슬롯 홀드 완료 시 처리 함수
+	void HandleLongPress();
 };

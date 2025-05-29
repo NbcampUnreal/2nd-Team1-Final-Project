@@ -21,6 +21,53 @@ void URSInventoryWeaponSlotWidget::NativeConstruct()
     }
 }
 
+FReply URSInventoryWeaponSlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+    // 좌클릭 키다운
+    if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+    {
+        if (WeaponSlot1 && WeaponSlot1->IsHovered())
+        {
+            HeldSlotType = EWeaponSlotType::Slot1;
+        }
+        else if (WeaponSlot2 && WeaponSlot2->IsHovered())
+        {
+            HeldSlotType = EWeaponSlotType::Slot2;
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Invalid slot on mouse down"));
+            return FReply::Unhandled();
+        }
+
+        GetWorld()->GetTimerManager().SetTimer(HoldTimerHandle, this, &URSInventoryWeaponSlotWidget::HandleLongPress, HoldThreshold, false);
+
+        return FReply::Handled();
+    }
+
+    return FReply::Unhandled();
+}
+
+FReply URSInventoryWeaponSlotWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+    if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+    {
+        GetWorld()->GetTimerManager().ClearTimer(HoldTimerHandle);
+        HeldSlotType = EWeaponSlotType::None;
+
+        return FReply::Handled();
+    }
+
+    return FReply::Unhandled();
+}
+
+void URSInventoryWeaponSlotWidget::HandleLongPress()
+{
+    UE_LOG(LogTemp, Warning, TEXT("Long Press Detected on URSInventoryWeaponSlotWidget Index: %d"), (int32)HeldSlotType);
+
+    // 추가 작업 필요
+}
+
 void URSInventoryWeaponSlotWidget::UpdateWeaponSlot(uint8 SlotIndex, FName WeaponKey)
 {
     if (URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>())
