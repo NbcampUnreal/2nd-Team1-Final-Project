@@ -28,6 +28,7 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "Actor", "Dungeon"),
             Path.Combine(ModuleDirectory, "Actor", "Dungeon", "Weapon"),
             Path.Combine(ModuleDirectory, "Actor", "Dungeon", "GroundItem"),
+            Path.Combine(ModuleDirectory, "Actor", "Dungeon", "Relic"),
             Path.Combine(ModuleDirectory, "Interface"),
             Path.Combine(ModuleDirectory, "DataTable"),
             Path.Combine(ModuleDirectory, "Object", "Relic"),
