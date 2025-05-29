@@ -36,7 +36,7 @@ public:
 	// 주어진 Level에 있는 TargetPoint들을 찾아 몬스터 스폰
 	void SpawnMonstersInLevel(ULevel* LoadedLevel);
 	// 상점NPC스폰을 위한 함수
-	void SpawnShopNPCInLevel(ULevel* LoadedLevel, const FString& TargetPointName = TEXT("BP_ShopSpawnPoint"));
+	void SpawnShopNPCInLevel(ULevel* LoadedLevel);
 	// Player스폰을 위한 함수
 	void SpawnPlayerAtStartPoint(ULevel* LoadedLevel, TSubclassOf<ACharacter> PlayerClass);
 

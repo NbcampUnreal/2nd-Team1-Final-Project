@@ -14,6 +14,10 @@ ARSMapGenerator::ARSMapGenerator()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+    ShopTilePos = FVector2D::ZeroVector;
+    TileSize = 4000.0f;
+    Seed = 8888;
+    GridSize = 3;
     SpawnManager = CreateDefaultSubobject<URSSpawnManager>(TEXT("SpawnManager"));
 }
 
@@ -29,6 +33,7 @@ void ARSMapGenerator::BeginPlay()
     ExpandPathToCoverMinTiles(0.5f);
     FindBossRoom(); // 경로 중 가장 먼 타일을 보스방으로 설정
     SpawnTiles();
+    SpawnBossArenaLevel();
 }
 // 유효한 위치인지 확인 (그리드 안에 있는지)
 bool ARSMapGenerator::IsValidPos(FVector2D Pos) const
@@ -78,10 +83,22 @@ void ARSMapGenerator::GenerateMainPath()
 
         // 현재→다음 방향 계산
         EDir From, To;
-        if (Next.X > Current.X) { From = EDir::Right; To = EDir::Left; }
-        else if (Next.X < Current.X) { From = EDir::Left; To = EDir::Right; }
-        else if (Next.Y > Current.Y) { From = EDir::Up; To = EDir::Down; }
-        else { From = EDir::Down; To = EDir::Up; }
+        if (Next.X > Current.X) 
+        { 
+            From = EDir::Right; To = EDir::Left;
+        }
+        else if (Next.X < Current.X) 
+        { 
+            From = EDir::Left; To = EDir::Right;
+        }
+        else if (Next.Y > Current.Y) 
+        {
+            From = EDir::Up; To = EDir::Down; 
+        }
+        else 
+        {
+            From = EDir::Down; To = EDir::Up;
+        }
 
         // 양방향 연결 설정
         TileMap.FindOrAdd(Current).Connections |= From;
@@ -196,15 +213,29 @@ void ARSMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
             {
                 FVector2D Neighbor = Next + Dir2;
 
-                if (!IsValidPos(Neighbor) || !TileMap.Contains(Neighbor))
+                if (!IsValidPos(Neighbor) || !TileMap.Contains(Neighbor)) 
+                {
                     continue;
+                }
 
                 // 방향 계산
                 EDir From2, To2;
-                if (Dir2 == FVector2D(1, 0)) { From2 = EDir::Right; To2 = EDir::Left; }
-                else if (Dir2 == FVector2D(-1, 0)) { From2 = EDir::Left; To2 = EDir::Right; }
-                else if (Dir2 == FVector2D(0, 1)) { From2 = EDir::Up; To2 = EDir::Down; }
-                else { From2 = EDir::Down; To2 = EDir::Up; }
+                if (Dir2 == FVector2D(1, 0)) 
+                { 
+                    From2 = EDir::Right; To2 = EDir::Left; 
+                }
+                else if (Dir2 == FVector2D(-1, 0)) 
+                {
+                    From2 = EDir::Left; To2 = EDir::Right;
+                }
+                else if (Dir2 == FVector2D(0, 1)) 
+                {
+                    From2 = EDir::Up; To2 = EDir::Down; 
+                }
+                else 
+                {
+                    From2 = EDir::Down; To2 = EDir::Up; 
+                }
 
                 TileMap[Next].Connections |= From2;
                 TileMap[Neighbor].Connections |= To2;
@@ -227,7 +258,10 @@ int32 ARSMapGenerator::GetConnectedNeighborCount(FVector2D Pos)
     int32 Count = 0;
     for (FVector2D Offset : { FVector2D(0, 1), FVector2D(0, -1), FVector2D(1, 0), FVector2D(-1, 0) })
     {
-        if (TileMap.Contains(Pos + Offset)) Count++;
+        if (TileMap.Contains(Pos + Offset)) 
+        {
+            Count++;
+        }
     }
     return Count;
 }
@@ -237,7 +271,10 @@ int32 ARSMapGenerator::GetAvailableNeighborCount(FVector2D Pos)
     for (FVector2D Offset : { FVector2D(0, 1), FVector2D(0, -1), FVector2D(1, 0), FVector2D(-1, 0) })
     {
         FVector2D Check = Pos + Offset;
-        if (IsValidPos(Check) && !TileMap.Contains(Check)) Count++;
+        if (IsValidPos(Check) && !TileMap.Contains(Check))
+        {
+            Count++;
+        }
     }
     return Count;
 }
@@ -252,7 +289,11 @@ void ARSMapGenerator::SpawnTiles()
             FVector2D Pos(X, Y);
             FVector WorldLoc = GetActorLocation() + FVector(X * TileSize, Y * TileSize, 0);
 
-            if (!TileMap.Contains(Pos)) continue;
+            if (!TileMap.Contains(Pos)) 
+            {
+                continue;
+            }
+
 
             FTileData Data = TileMap[Pos];
             FRotator Rot = FRotator::ZeroRotator;
@@ -271,13 +312,21 @@ void ARSMapGenerator::SpawnTiles()
                     SelectedLevel.LoadSynchronous(); //강제 로드
                 }
                 if (ConnBits & (int)EDir::Up)
-                    Rot = FRotator(0, 270, 0);     // 입구 아래
+                {
+                    Rot = FRotator(0, 270, 0);
+                }   // 입구 아래
                 else if (ConnBits & (int)EDir::Down)
-                    Rot = FRotator(0, 90, 0);   // 입구 오른
+                {
+                    Rot = FRotator(0, 90, 0);
+                }  // 입구 오른
                 else if (ConnBits & (int)EDir::Left)
-                    Rot = FRotator(0, 0, 0);   // 입구 왼
+                {
+                    Rot = FRotator(0, 0, 0);
+                }  // 입구 왼
                 else if (ConnBits & (int)EDir::Right)
-                    Rot = FRotator(0, 180, 0);    // 입구 위
+                {
+                    Rot = FRotator(0, 180, 0);
+                }   // 입구 위
             }
             else {
                 // 방향 수에 따라 타일 분기
@@ -290,13 +339,21 @@ void ARSMapGenerator::SpawnTiles()
                         SelectedLevel.LoadSynchronous(); //강제 로드
                     }
                     if (ConnBits & (int)EDir::Up)
-                        Rot = FRotator(0, 270, 0);     // 입구 아래
+                    {
+                        Rot = FRotator(0, 270, 0);
+                    }    // 입구 아래
                     else if (ConnBits & (int)EDir::Down)
-                        Rot = FRotator(0, 90, 0);   // 입구 오른
+                    {
+                        Rot = FRotator(0, 90, 0);
+                    }  // 입구 오른
                     else if (ConnBits & (int)EDir::Left)
-                        Rot = FRotator(0, 0, 0);   // 입구 왼
+                    {
+                        Rot = FRotator(0, 0, 0);
+                    } // 입구 왼
                     else if (ConnBits & (int)EDir::Right)
-                        Rot = FRotator(0, 180, 0);    // 입구 위
+                    {
+                        Rot = FRotator(0, 180, 0);
+                    }  // 입구 위
                     break;
 
                 case 2: // 직선 또는 ㄴ자형
@@ -327,13 +384,21 @@ void ARSMapGenerator::SpawnTiles()
                         }
 
                         if (ConnBits == ((int)(EDir::Down | EDir::Right)))
+                        {
                             Rot = FRotator(0, 180, 0);
+                        }
                         else if (ConnBits == ((int)(EDir::Down | EDir::Left)))
+                        {
                             Rot = FRotator(0, 90, 0);
+                        }
                         else if (ConnBits == ((int)(EDir::Up | EDir::Left)))
+                        {
                             Rot = FRotator(0, 0, 0);
+                        }
                         else if (ConnBits == ((int)(EDir::Up | EDir::Right)))
+                        {
                             Rot = FRotator(0, 270, 0);
+                        }
                     }
                     break;
 
@@ -345,13 +410,21 @@ void ARSMapGenerator::SpawnTiles()
                     }
 
                     if ((ConnBits & (int)EDir::Up) == 0)
-                        Rot = FRotator(0, 90, 0); // ┴
+                    {
+                        Rot = FRotator(0, 90, 0);
+                    } // ┴
                     else if ((ConnBits & (int)EDir::Down) == 0)
-                        Rot = FRotator(0, 270, 0);   // ┬
+                    {
+                        Rot = FRotator(0, 270, 0);
+                    }  // ┬
                     else if ((ConnBits & (int)EDir::Left) == 0)
-                        Rot = FRotator(0, 180, 0); // ┤
+                    {
+                        Rot = FRotator(0, 180, 0);
+                    } // ┤
                     else if ((ConnBits & (int)EDir::Right) == 0)
-                        Rot = FRotator(0, 0, 0);  // ├
+                    {
+                        Rot = FRotator(0, 0, 0);
+                    }  // ├
                     break;
 
                 case 4: // 십자 타일
@@ -369,18 +442,18 @@ void ARSMapGenerator::SpawnTiles()
             }
 
             // 스폰 실행
-            if (SelectedLevel.IsValid())
+            if (SelectedLevel.IsValid()) //선택된 레벨이 유효한 레벨인지 확인
             {
-                SelectedLevel.LoadSynchronous();
-                FTransform TileTransform(Rot, WorldLoc);
-                ULevelStreamingDynamic* StreamingLevel = StreamTile(SelectedLevel, WorldLoc, Rot, TileName);
-                if (StreamingLevel)
+                SelectedLevel.LoadSynchronous(); //동기적 로딩
+                FTransform TileTransform(Rot, WorldLoc); //타일 위치와 회전을 기반으로 변환
+                ULevelStreamingDynamic* StreamingLevel = StreamTile(SelectedLevel, WorldLoc, Rot, TileName); //선택된 타일을 스트리밍 방식으로 로드하고 포인터에 저장
+                if (StreamingLevel) // 스트리밍 레벨 확인
                 {
-                    FTimerHandle TimerHandle;
-                    FTimerDelegate TimerDelegate;
-                    TimerDelegate.BindLambda([=,this]()
+                    FTimerHandle TimerHandle; //타이머 핸들
+                    FTimerDelegate TimerDelegate; //타이머 핸들 델리게이트
+                    TimerDelegate.BindLambda([=,this]() //람다 바인딩
                     {
-                        ULevel* LoadedLevel = StreamingLevel->GetLoadedLevel();
+                        ULevel* LoadedLevel = StreamingLevel->GetLoadedLevel(); //로드된 레벨 가져오기
 
                         // 상점 NPC
                         if (Pos == ShopTilePos && SpawnManager && ShopNPC)
@@ -402,7 +475,7 @@ void ARSMapGenerator::SpawnTiles()
 
                     });
 
-                    GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false);
+                    GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false); //0.2초후 위 람다 실행(레벨 완전히 로드되기를 기다림)
                 }
             }
         }

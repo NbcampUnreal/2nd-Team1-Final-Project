@@ -22,11 +22,7 @@ void URSSpawnManager::SpawnMonstersInLevel(ULevel* LoadedLevel)
     for (AActor* Actor : LoadedLevel->Actors)
     {
         // TargetPoint인지 확인 후 스폰
-        if (Actor && Actor->IsA<ATargetPoint>())
-        {
-            continue;
-        }
-        if (Actor->Tags.Contains(FName("Monster")))
+        if (Actor && Actor->IsA<ATargetPoint>() && Actor->Tags.Contains(FName("Monster")))
         {
             SpawnMonsterAtTarget(Actor);
         }
@@ -59,7 +55,7 @@ TSubclassOf<AActor> URSSpawnManager::SelectMonsterClass()
     return AllRows[Index]->MonsterClass;
 }
 
-void URSSpawnManager::SpawnShopNPCInLevel(ULevel* LoadedLevel, const FString& TargetPointName)
+void URSSpawnManager::SpawnShopNPCInLevel(ULevel* LoadedLevel)
 {
     if (!World || !ShopNPCClass || !LoadedLevel) return;
 
@@ -68,7 +64,7 @@ void URSSpawnManager::SpawnShopNPCInLevel(ULevel* LoadedLevel, const FString& Ta
     // 모든 TargetPoint 중 이름이 일치하는 것들을 후보로 수집
     for (AActor* Actor : LoadedLevel->Actors)
     {
-        if (Actor && Actor->IsA<ATargetPoint>() && Actor->GetName().Contains(TargetPointName))
+        if (Actor && Actor->IsA<ATargetPoint>() && Actor->Tags.Contains("NPC"))
         {
             ShopPoints.Add(Cast<ATargetPoint>(Actor));
         }
