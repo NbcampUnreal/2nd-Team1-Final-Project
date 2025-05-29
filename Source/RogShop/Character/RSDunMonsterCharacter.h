@@ -11,10 +11,57 @@
 #include "Engine/OverlapResult.h"
 #include "TimerManager.h"
 #include "Animation/AnimInstance.h"
-#include "MonsterSkillData.h"
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
+
+USTRUCT(BlueprintType)
+struct FMonsterAttackTraceData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
+	FVector TraceBoxHalfSize;	// 트레이스 반경 (옆으로 얼마만큼 쏠지)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
+	float TraceLength;			// 트레이스 길이 (앞으로 얼마만큼 쏠지)
+
+	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	float TraceForwardOffset;	// 소켓 시작점 앞뒤 보정
+
+	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	float TraceRightOffset;     // 소켓 시작점 좌우 보정
+
+	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	float TraceUpOffset;        // 소켓 시작점 높이 보정
+
+	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	FName SocketLocation;		// 트레이스가 쏴질 소켓의 시작점
+
+};
+
+USTRUCT(BlueprintType)
+struct FMonsterSkillData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName SkillName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> SkillMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 PlayRate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Damage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FMonsterAttackTraceData AttackTrace;
+};
 
 UCLASS()
 class ROGSHOP_API ARSDunMonsterCharacter : public ARSDunBaseCharacter
