@@ -16,10 +16,12 @@ void URSDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	Weapon = DataSettings->WeaponDataTable.LoadSynchronous();
 	Relic = DataSettings->RelicDataTable.LoadSynchronous();
 	ForestMonsterSpawnGroup = DataSettings->ForestMonsterSpawnGroupDataTable.LoadSynchronous();
+	MonsterStateGroup = DataSettings->MonsterDataTable.LoadSynchronous();
 
 	check(Food)
 	check(Ingredient)
 	check(Weapon)
 	check(Relic)
 	check(ForestMonsterSpawnGroup)
+	check(MonsterStateGroup)
 }

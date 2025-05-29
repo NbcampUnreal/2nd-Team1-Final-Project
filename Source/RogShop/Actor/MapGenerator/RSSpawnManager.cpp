@@ -5,7 +5,11 @@
 #include "Engine/TargetPoint.h"
 #include "Kismet/GameplayStatics.h"
 #include "EngineUtils.h"
+#include "MonsterSpawnGroupData.h"
+#include "MonsterData.h"
+#include "Algo/RandomShuffle.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "RSDunMonsterCharacter.h"
 #include "RSDataSubsystem.h"
 #include "RSDunPlayerCharacter.h"
 #include "Engine/World.h"
@@ -25,9 +29,16 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance,TS
     {
         return;
     }
-    MonsterTable = DataSubsystem->ForestMonsterSpawnGroup;
-    if (!MonsterTable)
+    MonsterRawTable = DataSubsystem->ForestMonsterSpawnGroup;
+    MonsterStateTable = DataSubsystem->MonsterStateGroup;
+    if (!MonsterRawTable)
     {
+        UE_LOG(LogTemp, Warning, TEXT("Failed Update MonsterRawTable"));
+        return;
+    }
+    if (!MonsterStateTable)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Failed Update MonsterStateGroup"));
         return;
     }
 }
@@ -35,50 +46,59 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance,TS
 // 로드된 레벨에 있는 모든 TargetPoint를 찾아 몬스터 스폰
 void URSSpawnManager::SpawnMonstersInLevel()
 {
-    if (!World || !MonsterTable) return;
+    if (!World || !MonsterRawTable || !MonsterStateTable)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("몬스터 스폰 실패"));
+        return;
+    }
 
+    UE_LOG(LogTemp, Warning, TEXT("몬스터 스폰 시작"));
+    TArray<AActor*> MonsterTargets;
     for (TActorIterator<ATargetPoint> It(World); It; ++It)
     {
-        ATargetPoint* Point = *It;
-        if (Point && Point->Tags.Contains(FName("Monster")))
+        if (It->Tags.Contains(FName("Monster")))
         {
-            SpawnMonsterAtTarget(Point);
+            MonsterTargets.Add(*It);
         }
     }
-}
 
-// 지정된 위치(TargetPoint)에서 몬스터 하나 스폰
-AActor* URSSpawnManager::SpawnMonsterAtTarget(AActor* TargetPoint)
-{
-    // DataTable에서 몬스터 클래스 선택
-    TSubclassOf<AActor> MonsterClass = SelectMonsterClass();
-    if (!MonsterClass) return nullptr;
+    Algo::RandomShuffle(MonsterTargets);
 
-    // TargetPoint 위치에서 스폰
-    FTransform SpawnTransform = TargetPoint->GetActorTransform();
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-    return World->SpawnActor<AActor>(MonsterClass, SpawnTransform,SpawnParams);
-}
+    int32 TargetIndex = 0;
 
-TSubclassOf<AActor> URSSpawnManager::SelectMonsterClass()
-{
-    if (!MonsterTable) return nullptr;
+    TArray<FMonsterSpawnGroupData*> AllGroups;
+    MonsterRawTable->GetAllRows(TEXT("MonsterRawData"), AllGroups);
 
-    TArray<FMonsterSpawnData*> AllRows;
-    MonsterTable->GetAllRows(TEXT("Monster Data"), AllRows);
+    for (FMonsterSpawnGroupData* Group : AllGroups)
+    {
+        for (const FMonsterCount& Entry : Group->SpawnGroup)
+        {
+            FName RowName = Entry.MonsterRowName;
+            int32 Count = Entry.Count;
 
-    if (AllRows.Num() == 0) return nullptr;
+            FMonsterData* StateRow = MonsterStateTable->FindRow<FMonsterData>(RowName, TEXT("MonsterStateLookup"));
+            if (!StateRow || !StateRow->MonsterClass) continue;
 
-    // 무작위 인덱스로 몬스터 클래스 선택
-    int32 Index = FMath::RandRange(0, AllRows.Num() - 1);
-    return AllRows[Index]->MonsterClass;
+            for (int32 i = 0; i < Count && TargetIndex < MonsterTargets.Num(); ++i)
+            {
+                AActor* Target = MonsterTargets[TargetIndex++];
+                FTransform SpawnTransform = Target->GetActorTransform();
+                FActorSpawnParameters Params;
+                Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+                ARSDunMonsterCharacter* Monster =  World->SpawnActor<ARSDunMonsterCharacter>(StateRow->MonsterClass, SpawnTransform, Params);
+                Monster->IncreaseHP(StateRow->MaxHP);
+                Monster->ChangeMoveSpeed(StateRow->MoveSpeed);
+            }
+        }
+    }
 }
 
 void URSSpawnManager::SpawnShopNPCInLevel()
 {
     if (!World || !ShopNPCClass) 
     {
+        UE_LOG(LogTemp, Warning, TEXT("상점 생성 실패"));
         return;
     } 
 
