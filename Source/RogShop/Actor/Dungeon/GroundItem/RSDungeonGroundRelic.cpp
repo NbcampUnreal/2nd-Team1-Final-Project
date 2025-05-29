@@ -33,11 +33,10 @@ void ARSDungeonGroundRelic::Interact(ARSDunPlayerCharacter* Interactor)
 		return;
 	}
 
-	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.Owner = Interactor;
-	SpawnParameters.Instigator = Interactor;
+	FString ObjectString = DataTableKey.ToString() + TEXT("Object");
+	FName ObjectName = FName(*ObjectString);
 
-	URSBaseRelic* SpawnRelic = GetWorld()->SpawnActor<URSBaseRelic>(RelicClass, SpawnParameters);
+	URSBaseRelic* SpawnRelic = NewObject<URSBaseRelic>(Interactor, ObjectName, EObjectFlags::RF_Transient, RelicClass->StaticClass());
 
 	URSRelicInventoryComponent* RSPlayerWeaponComponent = Interactor->GetRSRelicInventoryComponent();
 	if (SpawnRelic && RSPlayerWeaponComponent)
