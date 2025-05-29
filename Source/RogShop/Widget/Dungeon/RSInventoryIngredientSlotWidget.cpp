@@ -33,6 +33,9 @@ void URSInventoryIngredientSlotWidget::CreateSlots(int32 NumSlots, int32 NumColu
             int32 Row = i / NumColumns;
             int32 Col = i % NumColumns;
 
+            // 슬롯 인덱스 설정
+            NewSlotImage->SetSlotIndex(i);
+
             UniformGridPanel_RelicSlots->AddChildToUniformGrid(NewSlotImage, Row, Col);
             SlotImages.Add(NewSlotImage);
         }
