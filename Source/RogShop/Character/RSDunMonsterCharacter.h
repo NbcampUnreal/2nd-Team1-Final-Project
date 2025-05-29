@@ -11,6 +11,7 @@
 #include "Engine/OverlapResult.h"
 #include "TimerManager.h"
 #include "Animation/AnimInstance.h"
+#include "MonsterSkillData.h"
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
@@ -63,11 +64,14 @@ public:
 
 protected:
 	// 애니메이션 몽타주
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> BaseAttackMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FMonsterSkillData> MonsterSkill;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> DeathMontage;
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> BaseAttackMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> SkillMontage_1;
@@ -76,7 +80,7 @@ protected:
 	TObjectPtr<UAnimMontage> SkillMontage_2;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> SkillMontage_3;
+	TObjectPtr<UAnimMontage> SkillMontage_3;*/
 
 	//NavInvoker
 	UPROPERTY(BlueprintReadWrite, Category = Navigation, meta = (AllowPrivateAccess = "true"))//Navigation Invoker Setting
@@ -99,9 +103,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Patrol")
 	float maxDetectPatrolRoute;
 
-	// 트레이스 관련
+	// 트레이스 설정
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
-	FVector TraceBoxHalfSize;
+	FVector TraceBoxHalfSize;	// 트레이스 반경 (옆으로 얼마만큼 쏠지)
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
 	float TraceLength;			// 트레이스 길이 (앞으로 얼마만큼 쏠지)
