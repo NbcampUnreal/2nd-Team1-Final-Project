@@ -29,4 +29,7 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UDataTable> Relic;
+
+	UPROPERTY()
+	TObjectPtr<UDataTable> ForestMonsterSpawnGroup;
 };

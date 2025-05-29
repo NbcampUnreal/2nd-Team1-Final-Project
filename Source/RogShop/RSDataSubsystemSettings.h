@@ -26,4 +26,7 @@ public:
 
 	UPROPERTY(Config, EditAnywhere)
 	TSoftObjectPtr<UDataTable> RelicDataTable;
+
+	UPROPERTY(Config, EditAnywhere)
+	TSoftObjectPtr<UDataTable> ForestMonsterSpawnGroupDataTable;
 };
