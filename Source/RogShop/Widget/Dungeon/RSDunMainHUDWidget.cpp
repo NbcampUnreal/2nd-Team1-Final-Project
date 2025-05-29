@@ -3,6 +3,7 @@
 #include "RSDunMainHUDWidget.h"
 #include "RSInGameMenuWidget.h"
 #include "RSPlayerStatusWidget.h"
+#include "RSPlayerInventoryWidget.h"
 #include "GameFramework/PlayerController.h"
 
 void URSDunMainHUDWidget::NativeConstruct()
@@ -14,11 +15,15 @@ void URSDunMainHUDWidget::NativeConstruct()
         InGameMenuWidget->SetVisibility(ESlateVisibility::Hidden);
     }
     
+    if (PlayerInventoryWidget)
+    {
+        PlayerInventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+    }
+
     if (PlayerStatusWidget)
     {
         PlayerStatusWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
     }
-    
 }
 
 void URSDunMainHUDWidget::HandleInGameMenuWidget()
@@ -63,6 +68,35 @@ void URSDunMainHUDWidget::HandleInGameMenuWidget()
 
                 PC->FlushPressedKeys();
             }
+        }
+    }
+}
+
+void URSDunMainHUDWidget::HandlePlayerInventoryWidget()
+{
+    APlayerController* PC = GetOwningPlayer();
+
+    if (PC)
+    {
+        // 이 창을 끄는건 Exit 버튼으로 해서 이 부분은 현재 실행 안 됨, 방어 코드
+        if (PlayerInventoryWidget->IsVisible())
+        {
+            PlayerInventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+
+            FInputModeGameOnly InputMode;
+            PC->SetInputMode(InputMode);
+            PC->bShowMouseCursor = false;
+            PC->FlushPressedKeys();
+        }
+        // 현재는 위젯을 켜기만 해서 이 부분만 계속 실행
+        else
+        {
+            PlayerInventoryWidget->SetVisibility(ESlateVisibility::Visible);
+
+            FInputModeUIOnly InputMode;
+            PC->SetInputMode(InputMode);
+            PC->bShowMouseCursor = true;
+            PC->FlushPressedKeys();
         }
     }
 }

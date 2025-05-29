@@ -8,6 +8,7 @@
 
 class URSPlayerStatusWidget;
 class URSInGameMenuWidget;
+class URSPlayerInventoryWidget;
 
 UCLASS()
 class ROGSHOP_API URSDunMainHUDWidget : public UUserWidget
@@ -19,6 +20,7 @@ public:
 
 public:
     void HandleInGameMenuWidget();
+    void HandlePlayerInventoryWidget();
 
 private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
@@ -26,4 +28,7 @@ private:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<URSInGameMenuWidget> InGameMenuWidget;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
+    TObjectPtr<URSPlayerInventoryWidget> PlayerInventoryWidget;
 };
