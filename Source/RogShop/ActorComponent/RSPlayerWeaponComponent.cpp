@@ -269,10 +269,13 @@ void URSPlayerWeaponComponent::DropWeaponToSlot(EWeaponSlot TargetWeaponSlot)
 		}
 	}
 
-	// 기존에 장착하던 무기 장착 해제
-	UnEquipWeaponToCharacter();
+	// 장착 중이었을 경우 무기 장착 해제
+	if (TargetWeaponSlot == WeaponSlot)
+	{
+		UnEquipWeaponToCharacter();
+	}
 
-	// 기존에 장착하던 무기 제거
+	// 기존에 소유하던 무기 제거
 	WeaponActors[TargetIndex]->Destroy();
 	WeaponActors[TargetIndex] = nullptr;
 
