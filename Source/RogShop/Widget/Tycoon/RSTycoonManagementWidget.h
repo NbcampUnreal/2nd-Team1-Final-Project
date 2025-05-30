@@ -12,25 +12,20 @@ class URSTycoonBuyTileWidget;
 class ARSBaseTile;
 class UTextBlock;
 class UButton;
-/**
- * 
- */
+class UBorder;
+
 UCLASS()
 class ROGSHOP_API URSTycoonManagementWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	UFUNCTION(BlueprintCallable)
+	void PlayBuyTileParentBorderSlideIn();
+
 protected:
 	virtual void NativeConstruct() override;
 
-private:
-	UFUNCTION()
-	void OnClickExpandTile();
-
-	UFUNCTION()
-	void OnClickWaitMode();
-	
-protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UTextBlock> GoldText;
 	
@@ -53,4 +48,19 @@ protected:
 	TSubclassOf<URSTycoonBuyTileWidget> BuyTileWidgetType;
 
 	TArray<URSTycoonBuyTileWidget> BuyTileWidgets;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UBorder> BuyTileParentBorder;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UWidgetAnimation* SlideIn;
+
+private:
+	UFUNCTION()
+	void OnClickExpandTile();
+
+	UFUNCTION()
+	void OnClickWaitMode();
+
+	bool bIsBuyTileParentBorderValid = false;
 };

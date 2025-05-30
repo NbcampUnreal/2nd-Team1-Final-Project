@@ -11,9 +11,33 @@
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
+#include "Components/Border.h"
+
 #include "Kismet/GameplayStatics.h"
 #include "RogShop/Actor/Tycoon/RSTileMap.h"
 #include "RogShop/Actor/Tycoon/Tile/RSBaseTile.h"
+
+void URSTycoonManagementWidget::PlayBuyTileParentBorderSlideIn()
+{
+	if (SlideIn)
+	{
+		if (bIsBuyTileParentBorderValid == false)
+		{
+			PlayAnimation(SlideIn);
+
+			// 이 창을 다시 닫으려면 해당값 false로 변환 후 닫는 애니메이션 및 닫는 함수 필요
+			bIsBuyTileParentBorderValid = true;
+		}
+		else
+		{
+			// UE_LOG(LogTemp, Warning, TEXT("Exist BuyTileParentBorder !"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SlidIn Null"));
+	}
+}
 
 void URSTycoonManagementWidget::NativeConstruct()
 {
@@ -40,6 +64,12 @@ void URSTycoonManagementWidget::NativeConstruct()
 	
 	ExpandTileButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OnClickExpandTile);
 	ReturnBaseAreaButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OnClickWaitMode);
+
+	// 보더 초기 위치 세팅
+	if (BuyTileParentBorder)
+	{
+		BuyTileParentBorder->SetRenderTranslation(FVector2D(0.f, 0.f));
+	}
 }
 
 void URSTycoonManagementWidget::OnClickExpandTile()
