@@ -96,7 +96,7 @@ void ARSMonsterAIController::AISkill_4(FVector interrestedPos)
 		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
 		if (ctrlChr)
 		{
-			ctrlChr->PlaySkill_4(interrestedPos);
+//			ctrlChr->PlaySkill_4(interrestedPos);
 		}
 	}
 }

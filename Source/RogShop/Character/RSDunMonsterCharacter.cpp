@@ -152,12 +152,12 @@ void ARSDunMonsterCharacter::PlaySkill_3()
 	}
 }
 
-void ARSDunMonsterCharacter::PlaySkill_4(FVector interrestedPos)
+/*void ARSDunMonsterCharacter::PlaySkill_4(FVector interrestedPos)
 {
 	FRotator spawnRot = FRotator::ZeroRotator;
 	//GetWorld()->SpawnActor<ARSDunMonsterCharacter>(ARSDunMonsterCharacter::StaticClass(), interrestedPos, spawnRot);
 	GetWorld()->SpawnActor<AActor>(servant, interrestedPos, spawnRot);
-}
+}*/
 
 void ARSDunMonsterCharacter::OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted)
 {
