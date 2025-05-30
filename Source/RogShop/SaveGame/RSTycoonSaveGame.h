@@ -32,7 +32,8 @@ public:
 	TArray<FTileRow> Tile2DMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FName> Inventory;
-
+	int32 ChefCount;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 WaiterCount;
 };

@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "RSTileMap.generated.h"
 
+class ARSTycoonChefCharacter;
+class ARSTycoonWaiterCharacter;
 class ANavMeshBoundsVolume;
 struct FTileRow;
 class ARSBaseTile;
@@ -19,10 +21,14 @@ public:
 	ARSTileMap();
 
 	void ChangeTile(int32 Index, FName TileKey);
-	void SaveTiles();
+	void SaveTileMap();
 	void ChangeTileSize(int32 NewWidth, int32 NewHeight);
+
+	UFUNCTION(BlueprintCallable)
+	void SpawnActorInMap(UClass* ActorClass);
 	
-	FVector GetCenter();
+	FVector GetMapCenter();
+	FVector GetMapSize();
 	const TArray<TObjectPtr<ARSBaseTile>>& GetTiles() const { return TileActors; }
 	const TArray<TSubclassOf<ARSBaseTile>>& GetTileTypes() const { return TileTypes; };
 	int32 GetWidth() const { return Width; };
@@ -32,11 +38,12 @@ protected:
 	virtual void BeginPlay() override;
 	
 private:
-	void LoadTiles();
+	void LoadTileMap();
 	void SetDefaultSettings();
 	void CreateTiles();
 	TSubclassOf<ARSBaseTile> GetTileClass(const FName& TileKey);
 	ARSBaseTile* CreateTile(const TSubclassOf<ARSBaseTile>& TileClass, int32 Row, int32 Column);
+	void ActiveNPC();
 	
 	UFUNCTION(CallInEditor)
 	void DeleteTileData();
@@ -63,6 +70,12 @@ private:
 	UPROPERTY(EditAnywhere, Category="TileMap")
 	TArray<FTileRow> TileName2DMap;
 
+	UPROPERTY(EditDefaultsOnly, Category="NPC")
+	TSubclassOf<ARSTycoonWaiterCharacter> WaiterType;
+	
+	UPROPERTY(EditDefaultsOnly, Category="NPC")
+	TSubclassOf<ARSTycoonChefCharacter> ChefType;
+	
 	UPROPERTY()
 	TObjectPtr<ANavMeshBoundsVolume> NavVolume;
 

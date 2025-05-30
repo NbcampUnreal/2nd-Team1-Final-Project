@@ -157,7 +157,7 @@ void ARSTycoonPlayerController::SetCameraLocationToCenter()
 	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
 	check(TileMap)
 
-	FVector Center = TileMap->GetCenter();
+	FVector Center = TileMap->GetMapCenter();
 	MainCamera->SetActorLocation(Center);
 	TopCamera->SetActorLocation(Center);
 }
