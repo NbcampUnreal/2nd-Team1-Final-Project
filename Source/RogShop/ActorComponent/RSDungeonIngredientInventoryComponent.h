@@ -15,5 +15,9 @@ class ROGSHOP_API URSDungeonIngredientInventoryComponent : public URSBaseInvento
 	GENERATED_BODY()
 	
 public:
+	virtual void AddItem(FName ItemKey, int32 Amount = 1) override;
+
+	virtual void RemoveItem(FName ItemKey, int32 Amount = 1) override;
+
 	void DropItem(FName ItemKey);
 };

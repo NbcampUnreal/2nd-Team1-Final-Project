@@ -12,6 +12,7 @@ class URSDunMainHUDWidget;
 class URSPlayerInventoryWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotChange, uint8, SlotIndex, FName, WeaponKey);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnIngredientChange, uint8, SlotIndex, FName, IngredientKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHPChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMaxHPChange);
 
@@ -74,6 +75,9 @@ private:
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnWeaponSlotChange OnWeaponSlotChange;	// WeaponSlot을 변경하는 시점
+
+	UPROPERTY(BlueprintAssignable)
+	FOnIngredientChange OnIngredientChange;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnHPChange OnHPChange;

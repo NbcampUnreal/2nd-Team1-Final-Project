@@ -18,30 +18,30 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-// µ¥ÀÌÅÍ °ü¸®
+// ë°ì´í„° ê´€ë¦¬
 public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void AddItem(FName ItemKey, int32 Amount = 1);
+	virtual void AddItem(FName ItemKey, int32 Amount = 1);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void RemoveItem(FName ItemKey, int32 Amount = 1);
+	virtual void RemoveItem(FName ItemKey, int32 Amount = 1);
 
 	int32 GetAmount(const FName& ItemKey);
 	const TMap<FName, int32>& GetItems() const { return ItemMap; }
-	int32 GetFilledSize() const { return ItemMap.Num(); }	//ÇöÀç Ã¤¿öÁø ÀÎº¥Åä¸® Å©±â
-	int32 GetSlotMaxSize() const { return SlotMaxSize; }	//ÀÎº¥Åä¸® Å©±â
+	int32 GetFilledSize() const { return ItemMap.Num(); }	//í˜„ì¬ ì±„ì›Œì§„ ì¸ë²¤í† ë¦¬ í¬ê¸°
+	int32 GetSlotMaxSize() const { return SlotMaxSize; }	//ì¸ë²¤í† ë¦¬ í¬ê¸°
 
 protected:
-	bool CheckValidItem(const FName& ItemKey); //À¯È¿ÇÑ Å°°ªÀÎÁö °Ë»ç
+	bool CheckValidItem(const FName& ItemKey); //ìœ íš¨í•œ í‚¤ê°’ì¸ì§€ ê²€ì‚¬
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<FName, int32> ItemMap; //°¡Áö°í ÀÖ´Â ¾ÆÀÌÅÛµé
+	TMap<FName, int32> ItemMap; //ê°€ì§€ê³  ìˆëŠ” ì•„ì´í…œë“¤
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 SlotMaxSize; //ÀÎº¥Åä¸®ÀÇ ÃÖ´ë Å©±â
+	int32 SlotMaxSize; //ì¸ë²¤í† ë¦¬ì˜ ìµœëŒ€ í¬ê¸°
 
-// ¼¼ÀÌºê/·Îµå
+// ì„¸ì´ë¸Œ/ë¡œë“œ
 public:
 	void SaveItemData();
 
