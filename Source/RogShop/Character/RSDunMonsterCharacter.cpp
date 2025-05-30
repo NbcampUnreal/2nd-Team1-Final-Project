@@ -57,16 +57,23 @@ void ARSDunMonsterCharacter::PlayAttackAnim()
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-	// TODO : 지금은 기본 공격 밖에 없어 이렇게 넣었지만 나중에 거리/확률 기반으로 몬스터의 랜덤한 공격이 나가게 설정할 듯
-	UAnimMontage* AttackMontage00 = MonsterSkill[0].SkillMontage;  
-	
-	if (IsValid(AnimInstance) == true && IsValid(AttackMontage00) == true)
+	if (MonsterSkill.Num() > 0)
 	{
-		if (AnimInstance->Montage_IsPlaying(AttackMontage00) == false)
+		// TODO : 지금은 기본 공격 밖에 없어 이렇게 넣었지만 나중에 거리/확률 기반으로 몬스터의 랜덤한 공격이 나가게 설정할 듯
+		UAnimMontage* AttackMontage00 = MonsterSkill[0].SkillMontage;
+
+		if (IsValid(AnimInstance) == true && IsValid(AttackMontage00) == true)
 		{
-			AnimInstance->Montage_Play(AttackMontage00);
-			RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다");
+			if (AnimInstance->Montage_IsPlaying(AttackMontage00) == false)
+			{
+				AnimInstance->Montage_Play(AttackMontage00);
+				RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다");
+			}
 		}
+	}
+	else
+	{
+		RS_LOG("해당 몬스터의 스킬 구조체가 비어있습니다.");
 	}
 }
 
@@ -80,14 +87,22 @@ void ARSDunMonsterCharacter::PlaySkill_1()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-	UAnimMontage* AttackMontage01 = MonsterSkill[1].SkillMontage; 
-
-	if (IsValid(AnimInstance) == true && IsValid(AttackMontage01) == true)
+	if (MonsterSkill.Num() > 0)
 	{
-		if (AnimInstance->Montage_IsPlaying(AttackMontage01) == false)
+		UAnimMontage* AttackMontage01 = MonsterSkill[1].SkillMontage;
+
+		if (IsValid(AnimInstance) == true && IsValid(AttackMontage01) == true)
 		{
-			AnimInstance->Montage_Play(AttackMontage01);
+			if (AnimInstance->Montage_IsPlaying(AttackMontage01) == false)
+			{
+				AnimInstance->Montage_Play(AttackMontage01);
+				RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다");
+			}
 		}
+	}
+	else
+	{
+		RS_LOG("해당 몬스터의 스킬 구조체가 비어있습니다.");
 	}
 }
 
@@ -95,29 +110,45 @@ void ARSDunMonsterCharacter::PlaySkill_2()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-	UAnimMontage* AttackMontage02 = MonsterSkill[2].SkillMontage;	
-
-	if (IsValid(AnimInstance) == true && IsValid(AttackMontage02) == true)
+	if (MonsterSkill.Num() > 0)
 	{
-		if (AnimInstance->Montage_IsPlaying(AttackMontage02) == false)
+		UAnimMontage* AttackMontage02 = MonsterSkill[2].SkillMontage;
+
+		if (IsValid(AnimInstance) == true && IsValid(AttackMontage02) == true)
 		{
-			AnimInstance->Montage_Play(AttackMontage02);
+			if (AnimInstance->Montage_IsPlaying(AttackMontage02) == false)
+			{
+				AnimInstance->Montage_Play(AttackMontage02);
+				RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다");
+			}
 		}
+	}
+	else
+	{
+		RS_LOG("해당 몬스터의 스킬 구조체가 비어있습니다.");
 	}
 }
 
 void ARSDunMonsterCharacter::PlaySkill_3()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();	
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-	UAnimMontage* AttackMontage03 = MonsterSkill[3].SkillMontage;	
-
-	if (IsValid(AnimInstance) == true && IsValid(AttackMontage03) == true)
+	if (MonsterSkill.Num() > 0)
 	{
-		if (AnimInstance->Montage_IsPlaying(AttackMontage03) == false)
+		UAnimMontage* AttackMontage03 = MonsterSkill[3].SkillMontage;
+
+		if (IsValid(AnimInstance) == true && IsValid(AttackMontage03) == true)
 		{
-			AnimInstance->Montage_Play(AttackMontage03);
+			if (AnimInstance->Montage_IsPlaying(AttackMontage03) == false)
+			{
+				AnimInstance->Montage_Play(AttackMontage03);
+				RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다");
+			}
 		}
+	}
+	else
+	{
+		RS_LOG("해당 몬스터의 스킬 구조체가 비어있습니다.");
 	}
 }
 
