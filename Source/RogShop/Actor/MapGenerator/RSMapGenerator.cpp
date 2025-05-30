@@ -2,7 +2,6 @@
 
 
 #include "RSMapGenerator.h"
-#include "RSSpawnManager.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine/LevelStreamingDynamic.h"
 #include "Kismet/GameplayStatics.h"
@@ -15,10 +14,10 @@ ARSMapGenerator::ARSMapGenerator()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
     ShopTilePos = FVector2D::ZeroVector;
+    bMapGenerationComplete = false;
     TileSize = 4000.0f;
     Seed = 8888;
     GridSize = 3;
-    SpawnManager = CreateDefaultSubobject<URSSpawnManager>(TEXT("SpawnManager"));
 }
 
 // Called when the game starts or when spawned
@@ -31,27 +30,27 @@ void ARSMapGenerator::BeginPlay()
     GenerateMainPath(); 
     ChooseShopTile();
     ExpandPathToCoverMinTiles(0.5f);
-    FindBossRoom(); // °æ·Î Áß °¡Àå ¸Õ Å¸ÀÏÀ» º¸½º¹æÀ¸·Î ¼³Á¤
+    FindBossRoom(); // ê²½ë¡œ ì¤‘ ê°€ì¥ ë¨¼ íƒ€ì¼ì„ ë³´ìŠ¤ë°©ìœ¼ë¡œ ì„¤ì •
     SpawnTiles();
     SpawnBossArenaLevel();
 }
-// À¯È¿ÇÑ À§Ä¡ÀÎÁö È®ÀÎ (±×¸®µå ¾È¿¡ ÀÖ´ÂÁö)
+// ìœ íš¨í•œ ìœ„ì¹˜ì¸ì§€ í™•ì¸ (ê·¸ë¦¬ë“œ ì•ˆì— ìˆëŠ”ì§€)
 bool ARSMapGenerator::IsValidPos(FVector2D Pos) const
 {
     return Pos.X >= 0 && Pos.X < GridSize && Pos.Y >= 0 && Pos.Y < GridSize;
 }
 
-//ÇöÀç À§Ä¡¿¡¼­ ÀÌµ¿ÇÒ ¼ö ÀÖ´Â ´ÙÀ½ À§Ä¡ ¼±ÅÃ
+//í˜„ì¬ ìœ„ì¹˜ì—ì„œ ì´ë™í•  ìˆ˜ ìˆëŠ” ë‹¤ìŒ ìœ„ì¹˜ ì„ íƒ
 FVector2D ARSMapGenerator::GetNextDirection(FVector2D Current, TArray<FVector2D>& Visited)
 {
     TArray<FVector2D> Candidates;
 
-    // 4¹æÇâ Å½»ö
+    // 4ë°©í–¥ íƒìƒ‰
     TArray<FVector2D> Directions = {
-        FVector2D(0, 1),   // À§
-        FVector2D(0, -1),  // ¾Æ·¡
-        FVector2D(-1, 0),  // ¿Ş
-        FVector2D(1, 0)    // ¿À
+        FVector2D(0, 1),   // ìœ„
+        FVector2D(0, -1),  // ì•„ë˜
+        FVector2D(-1, 0),  // ì™¼
+        FVector2D(1, 0)    // ì˜¤
     };
 
     for (auto& Dir : Directions)
@@ -63,25 +62,25 @@ FVector2D ARSMapGenerator::GetNextDirection(FVector2D Current, TArray<FVector2D>
         }
     }
 
-    // ÈÄº¸°¡ ¾øÀ¸¸é (-1, -1) ¹İÈ¯
+    // í›„ë³´ê°€ ì—†ìœ¼ë©´ (-1, -1) ë°˜í™˜
     return Candidates.Num() > 0 ? Candidates[RandomStream.RandRange(0, Candidates.Num() - 1)] : FVector2D(-1, -1);
 }
 
-//½ÃÀÛÁ¡¿¡¼­ºÎÅÍ ¸ŞÀÎ °æ·Î »ı¼º
+//ì‹œì‘ì ì—ì„œë¶€í„° ë©”ì¸ ê²½ë¡œ ìƒì„±
 void ARSMapGenerator::GenerateMainPath()
 {
     FVector2D Current = FVector2D(0, 0);
     TArray<FVector2D> Path;
     Path.Add(Current);
 
-    const int32 MinPathLength = FMath::Clamp(GridSize + 1, 5, GridSize * GridSize); //±×¸®µå »çÀÌÁî¿¡ µû¶ó µ¿ÀûÀ¸·Î ÃÖ¼Ò Å¸ÀÏ °³¼ö »ı¼º
+    const int32 MinPathLength = FMath::Clamp(GridSize + 1, 5, GridSize * GridSize); //ê·¸ë¦¬ë“œ ì‚¬ì´ì¦ˆì— ë”°ë¼ ë™ì ìœ¼ë¡œ ìµœì†Œ íƒ€ì¼ ê°œìˆ˜ ìƒì„±
 
-    while (Path.Num() < 5) //ÃÖ¼Ò 4°³ // ³ªÁß¿¡ ±×¸®µå Å©±â°¡ Ä¿Áö¸é À§ÀÇ µ¿Àû Å¸ÀÏ °³¼ö·Î º¯°æ¿¹Á¤
+    while (Path.Num() < 5) //ìµœì†Œ 4ê°œ // ë‚˜ì¤‘ì— ê·¸ë¦¬ë“œ í¬ê¸°ê°€ ì»¤ì§€ë©´ ìœ„ì˜ ë™ì  íƒ€ì¼ ê°œìˆ˜ë¡œ ë³€ê²½ì˜ˆì •
     {
         FVector2D Next = GetNextDirection(Current, Path);
         if (Next == FVector2D(-1, -1)) break;
 
-        // ÇöÀç¡æ´ÙÀ½ ¹æÇâ °è»ê
+        // í˜„ì¬â†’ë‹¤ìŒ ë°©í–¥ ê³„ì‚°
         EDir From, To;
         if (Next.X > Current.X) 
         { 
@@ -100,7 +99,7 @@ void ARSMapGenerator::GenerateMainPath()
             From = EDir::Down; To = EDir::Up;
         }
 
-        // ¾ç¹æÇâ ¿¬°á ¼³Á¤
+        // ì–‘ë°©í–¥ ì—°ê²° ì„¤ì •
         TileMap.FindOrAdd(Current).Connections |= From;
         TileMap.FindOrAdd(Next).Connections |= To;
         TileMap[Next].bIsMainPath = true;
@@ -110,7 +109,7 @@ void ARSMapGenerator::GenerateMainPath()
     }
 }
 
-//º¸½º¹æ À§Ä¡ Ã£±â (BFS·Î °¡Àå ¸Õ Å¸ÀÏ Å½»ö)
+//ë³´ìŠ¤ë°© ìœ„ì¹˜ ì°¾ê¸° (BFSë¡œ ê°€ì¥ ë¨¼ íƒ€ì¼ íƒìƒ‰)
 void ARSMapGenerator::FindBossRoom()
 {
     TQueue<FVector2D> Queue;
@@ -129,14 +128,14 @@ void ARSMapGenerator::FindBossRoom()
         Queue.Dequeue(Current);
         int32 CurrDist = Distance[Current];
 
-        // °¡Àå ¸Õ °Å¸® °»½Å
+        // ê°€ì¥ ë¨¼ ê±°ë¦¬ ê°±ì‹ 
         if (CurrDist > MaxDist)
         {
             MaxDist = CurrDist;
             Farthest = Current;
         }
 
-        // ÇöÀç À§Ä¡ÀÇ ¿¬°á Á¤º¸ ±âÁØÀ¸·Î ÀÌ¿ô Å½»ö
+        // í˜„ì¬ ìœ„ì¹˜ì˜ ì—°ê²° ì •ë³´ ê¸°ì¤€ìœ¼ë¡œ ì´ì›ƒ íƒìƒ‰
         EDir Conn = TileMap[Current].Connections;
         TArray<TPair<EDir, FVector2D>> Neighbors = {
             {EDir::Up, Current + FVector2D(0, 1)},
@@ -155,10 +154,10 @@ void ARSMapGenerator::FindBossRoom()
         }
     }
 
-    BossRoomPos = Farthest; // °¡Àå ¸Õ ¹æ = º¸½º¹æ
+    BossRoomPos = Farthest; // ê°€ì¥ ë¨¼ ë°© = ë³´ìŠ¤ë°©
 }
 
-//ÀüÃ¼ Å¸ÀÏ ¼ö°¡ ÃÖ¼Ò ºñÀ² ÀÌ»óÀÌ µÇµµ·Ï °æ·Î È®Àå
+//ì „ì²´ íƒ€ì¼ ìˆ˜ê°€ ìµœì†Œ ë¹„ìœ¨ ì´ìƒì´ ë˜ë„ë¡ ê²½ë¡œ í™•ì¥
 void ARSMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
 {
     const int32 MinTiles = FMath::CeilToInt(GridSize * GridSize * MinRatio);
@@ -172,7 +171,7 @@ void ARSMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
 
     while (TileMap.Num() < MinTiles && Attempts++ < MaxAttempts)
     {
-        // ¸»´Ü Å¸ÀÏ Áß ÇÏ³ª ¼±ÅÃ
+        // ë§ë‹¨ íƒ€ì¼ ì¤‘ í•˜ë‚˜ ì„ íƒ
         TArray<FVector2D> TipCandidates;
         for (const FVector2D& Pos : AllUsed)
         {
@@ -218,7 +217,7 @@ void ARSMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
                     continue;
                 }
 
-                // ¹æÇâ °è»ê
+                // ë°©í–¥ ê³„ì‚°
                 EDir From2, To2;
                 if (Dir2 == FVector2D(1, 0)) 
                 { 
@@ -241,7 +240,7 @@ void ARSMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
                 TileMap[Neighbor].Connections |= To2;
             }
 
-            // ÁÖº¯¿¡ ´õ È®ÀåÇÒ °÷ ¾øÀ¸¸é ¸·´Ù¸¥ ±æ·Î ÁöÁ¤
+            // ì£¼ë³€ì— ë” í™•ì¥í•  ê³³ ì—†ìœ¼ë©´ ë§‰ë‹¤ë¥¸ ê¸¸ë¡œ ì§€ì •
             if (GetAvailableNeighborCount(Next) == 0 && DeadEndCount < MaxDeadEnds)
             {
                 TileMap[Next].Connections &= ~To;
@@ -279,7 +278,7 @@ int32 ARSMapGenerator::GetAvailableNeighborCount(FVector2D Pos)
     return Count;
 }
 
-//Å¸ÀÏ ½ºÆù (¿¬°á ¹æÇâ¿¡ µû¶ó È¸Àü ¼³Á¤)
+//íƒ€ì¼ ìŠ¤í° (ì—°ê²° ë°©í–¥ì— ë”°ë¼ íšŒì „ ì„¤ì •)
 void ARSMapGenerator::SpawnTiles()
 {
     for (int32 X = 0; X < GridSize; ++X)
@@ -298,89 +297,89 @@ void ARSMapGenerator::SpawnTiles()
             FTileData Data = TileMap[Pos];
             FRotator Rot = FRotator::ZeroRotator;
             int ConnBits = (int)Data.Connections;
-            int DirCount = FMath::CountBits(ConnBits); // ¿¬°áµÈ ¹æÇâ ¼ö
+            int DirCount = FMath::CountBits(ConnBits); // ì—°ê²°ëœ ë°©í–¥ ìˆ˜
 
-            FString TileName = FString::Printf(TEXT("Tile_%d_%d"), X, Y); //À¯´ÏÅ©ÇÑ ÀÌ¸§
+            FString TileName = FString::Printf(TEXT("Tile_%d_%d"), X, Y); //ìœ ë‹ˆí¬í•œ ì´ë¦„
             TSoftObjectPtr<UWorld> SelectedLevel = nullptr;
 
-            // º¸½º¹æÀÏ °æ¿ì º¸½º Å¸ÀÏ »ç¿ë
+            // ë³´ìŠ¤ë°©ì¼ ê²½ìš° ë³´ìŠ¤ íƒ€ì¼ ì‚¬ìš©
             if (BossRoomTileLevel.IsValid() && Pos == BossRoomPos)
             {
                 SelectedLevel = BossRoomTileLevel;
                 if (!SelectedLevel.IsValid())
                 {
-                    SelectedLevel.LoadSynchronous(); //°­Á¦ ·Îµå
+                    SelectedLevel.LoadSynchronous(); //ê°•ì œ ë¡œë“œ
                 }
                 if (ConnBits & (int)EDir::Up)
                 {
                     Rot = FRotator(0, 270, 0);
-                }   // ÀÔ±¸ ¾Æ·¡
+                }   // ì…êµ¬ ì•„ë˜
                 else if (ConnBits & (int)EDir::Down)
                 {
                     Rot = FRotator(0, 90, 0);
-                }  // ÀÔ±¸ ¿À¸¥
+                }  // ì…êµ¬ ì˜¤ë¥¸
                 else if (ConnBits & (int)EDir::Left)
                 {
                     Rot = FRotator(0, 0, 0);
-                }  // ÀÔ±¸ ¿Ş
+                }  // ì…êµ¬ ì™¼
                 else if (ConnBits & (int)EDir::Right)
                 {
                     Rot = FRotator(0, 180, 0);
-                }   // ÀÔ±¸ À§
+                }   // ì…êµ¬ ìœ„
             }
             else {
-                // ¹æÇâ ¼ö¿¡ µû¶ó Å¸ÀÏ ºĞ±â
+                // ë°©í–¥ ìˆ˜ì— ë”°ë¼ íƒ€ì¼ ë¶„ê¸°
                 switch (DirCount)
                 {
-                case 1: // ¸·´Ù¸¥±æ
+                case 1: // ë§‰ë‹¤ë¥¸ê¸¸
                     SelectedLevel = DeadEndTileLevel;
                     if (!SelectedLevel.IsValid())
                     {
-                        SelectedLevel.LoadSynchronous(); //°­Á¦ ·Îµå
+                        SelectedLevel.LoadSynchronous(); //ê°•ì œ ë¡œë“œ
                     }
                     if (ConnBits & (int)EDir::Up)
                     {
                         Rot = FRotator(0, 270, 0);
-                    }    // ÀÔ±¸ ¾Æ·¡
+                    }    // ì…êµ¬ ì•„ë˜
                     else if (ConnBits & (int)EDir::Down)
                     {
                         Rot = FRotator(0, 90, 0);
-                    }  // ÀÔ±¸ ¿À¸¥
+                    }  // ì…êµ¬ ì˜¤ë¥¸
                     else if (ConnBits & (int)EDir::Left)
                     {
                         Rot = FRotator(0, 0, 0);
-                    } // ÀÔ±¸ ¿Ş
+                    } // ì…êµ¬ ì™¼
                     else if (ConnBits & (int)EDir::Right)
                     {
                         Rot = FRotator(0, 180, 0);
-                    }  // ÀÔ±¸ À§
+                    }  // ì…êµ¬ ìœ„
                     break;
 
-                case 2: // Á÷¼± ¶Ç´Â ¤¤ÀÚÇü
+                case 2: // ì§ì„  ë˜ëŠ” ã„´ìí˜•
                     if (ConnBits == ((int)(EDir::Up | EDir::Down)))
                     {
                         SelectedLevel = LineTileLevel;
                         if (!SelectedLevel.IsValid())
                         {
-                            SelectedLevel.LoadSynchronous(); //°­Á¦ ·Îµå
+                            SelectedLevel.LoadSynchronous(); //ê°•ì œ ë¡œë“œ
                         }
-                        Rot = FRotator(0, 90, 0); // ¤Ó
+                        Rot = FRotator(0, 90, 0); // ã…£
                     }
                     else if (ConnBits == ((int)(EDir::Left | EDir::Right)))
                     {
                         SelectedLevel = LineTileLevel;
                         if (!SelectedLevel.IsValid())
                         {
-                            SelectedLevel.LoadSynchronous(); //°­Á¦ ·Îµå
+                            SelectedLevel.LoadSynchronous(); //ê°•ì œ ë¡œë“œ
                         }
-                        Rot = FRotator(0, 0, 0); // ¦¡
+                        Rot = FRotator(0, 0, 0); // â”€
                     }
                     else
                     {
                         SelectedLevel = CornerTileLevel;
                         if (!SelectedLevel.IsValid())
                         {
-                            SelectedLevel.LoadSynchronous(); //°­Á¦ ·Îµå
+                            SelectedLevel.LoadSynchronous(); //ê°•ì œ ë¡œë“œ
                         }
 
                         if (ConnBits == ((int)(EDir::Down | EDir::Right)))
@@ -402,36 +401,36 @@ void ARSMapGenerator::SpawnTiles()
                     }
                     break;
 
-                case 3: // TÇü Å¸ÀÏ
+                case 3: // Tí˜• íƒ€ì¼
                     SelectedLevel = TTileLevel;
                     if (!SelectedLevel.IsValid())
                     {
-                        SelectedLevel.LoadSynchronous(); //°­Á¦ ·Îµå
+                        SelectedLevel.LoadSynchronous(); //ê°•ì œ ë¡œë“œ
                     }
 
                     if ((ConnBits & (int)EDir::Up) == 0)
                     {
                         Rot = FRotator(0, 90, 0);
-                    } // ¦ª
+                    } // â”´
                     else if ((ConnBits & (int)EDir::Down) == 0)
                     {
                         Rot = FRotator(0, 270, 0);
-                    }  // ¦¨
+                    }  // â”¬
                     else if ((ConnBits & (int)EDir::Left) == 0)
                     {
                         Rot = FRotator(0, 180, 0);
-                    } // ¦©
+                    } // â”¤
                     else if ((ConnBits & (int)EDir::Right) == 0)
                     {
                         Rot = FRotator(0, 0, 0);
-                    }  // ¦§
+                    }  // â”œ
                     break;
 
-                case 4: // ½ÊÀÚ Å¸ÀÏ
+                case 4: // ì‹­ì íƒ€ì¼
                     SelectedLevel = CrossTileLevel;
                     if (!SelectedLevel.IsValid())
                     {
-                        SelectedLevel.LoadSynchronous(); //°­Á¦ ·Îµå
+                        SelectedLevel.LoadSynchronous(); //ê°•ì œ ë¡œë“œ
                     }
                     Rot = FRotator(0, 0, 0);
                     break;
@@ -441,42 +440,12 @@ void ARSMapGenerator::SpawnTiles()
                 }
             }
 
-            // ½ºÆù ½ÇÇà
-            if (SelectedLevel.IsValid()) //¼±ÅÃµÈ ·¹º§ÀÌ À¯È¿ÇÑ ·¹º§ÀÎÁö È®ÀÎ
+            // ìŠ¤í° ì‹¤í–‰
+            if (SelectedLevel.IsValid()) //ì„ íƒëœ ë ˆë²¨ì´ ìœ íš¨í•œ ë ˆë²¨ì¸ì§€ í™•ì¸
             {
-                SelectedLevel.LoadSynchronous(); //µ¿±âÀû ·Îµù
-                FTransform TileTransform(Rot, WorldLoc); //Å¸ÀÏ À§Ä¡¿Í È¸ÀüÀ» ±â¹İÀ¸·Î º¯È¯
-                ULevelStreamingDynamic* StreamingLevel = StreamTile(SelectedLevel, WorldLoc, Rot, TileName); //¼±ÅÃµÈ Å¸ÀÏÀ» ½ºÆ®¸®¹Ö ¹æ½ÄÀ¸·Î ·ÎµåÇÏ°í Æ÷ÀÎÅÍ¿¡ ÀúÀå
-                if (StreamingLevel) // ½ºÆ®¸®¹Ö ·¹º§ È®ÀÎ
-                {
-                    FTimerHandle TimerHandle; //Å¸ÀÌ¸Ó ÇÚµé
-                    FTimerDelegate TimerDelegate; //Å¸ÀÌ¸Ó ÇÚµé µ¨¸®°ÔÀÌÆ®
-                    TimerDelegate.BindLambda([=,this]() //¶÷´Ù ¹ÙÀÎµù
-                    {
-                        ULevel* LoadedLevel = StreamingLevel->GetLoadedLevel(); //·ÎµåµÈ ·¹º§ °¡Á®¿À±â
-
-                        // »óÁ¡ NPC
-                        if (Pos == ShopTilePos && SpawnManager && ShopNPC)
-                        {
-                            SpawnManager->SpawnShopNPCInLevel(LoadedLevel);
-                        }
-
-                        // ÇÃ·¹ÀÌ¾î (0, 0)
-                        if (Pos == FVector2D(0, 0) && SpawnManager && PlayerClass)
-                        {
-                            SpawnManager->SpawnPlayerAtStartPoint(LoadedLevel, PlayerClass);
-                        }
-
-                        // ¸ó½ºÅÍ
-                        if (SpawnManager && MonsterDataTable)
-                        {
-                            SpawnManager->SpawnMonstersInLevel(LoadedLevel);
-                        }
-
-                    });
-
-                    GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false); //0.2ÃÊÈÄ À§ ¶÷´Ù ½ÇÇà(·¹º§ ¿ÏÀüÈ÷ ·ÎµåµÇ±â¸¦ ±â´Ù¸²)
-                }
+                SelectedLevel.LoadSynchronous(); //ë™ê¸°ì  ë¡œë”©
+                FTransform TileTransform(Rot, WorldLoc); //íƒ€ì¼ ìœ„ì¹˜ì™€ íšŒì „ì„ ê¸°ë°˜ìœ¼ë¡œ ë³€í™˜
+                ULevelStreamingDynamic* StreamingLevel = StreamTile(SelectedLevel, WorldLoc, Rot, TileName); //ì„ íƒëœ íƒ€ì¼ì„ ìŠ¤íŠ¸ë¦¬ë° ë°©ì‹ìœ¼ë¡œ ë¡œë“œí•˜ê³  í¬ì¸í„°ì— ì €ì¥
             }
         }
     }
@@ -487,7 +456,7 @@ ULevelStreamingDynamic* ARSMapGenerator::StreamTile(TSoftObjectPtr<UWorld> Level
 {
     if (!LevelToStream.IsValid()) return nullptr;
 
-    //À§Ä¡¿Í È¸ÀüÀ» ´ãÀ» °´Ã¼
+    //ìœ„ì¹˜ì™€ íšŒì „ì„ ë‹´ì„ ê°ì²´
     FTransform LevelTransform;
     LevelTransform.SetLocation(Location);
     LevelTransform.SetRotation(Rotation.Quaternion());
@@ -495,21 +464,26 @@ ULevelStreamingDynamic* ARSMapGenerator::StreamTile(TSoftObjectPtr<UWorld> Level
 
     bool bLoadSuccess = false;
 
-    //µ¿ÀûÀ¸·Î ·¹º§ »ı¼º
+    //ë™ì ìœ¼ë¡œ ë ˆë²¨ ìƒì„±
     ULevelStreamingDynamic* StreamingLevel = ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(
         GetWorld(),
         LevelToStream, 
         LevelTransform, 
         bLoadSuccess,
         UniqueName);
+    if (StreamingLevel)
+    {
+        SpawnedLevels.Add(StreamingLevel);
+    }
 
     if (!bLoadSuccess || !StreamingLevel)
     {
-        UE_LOG(LogTemp, Warning, TEXT("·¹º§ ·Îµå ½ÇÆĞ: %s"), *LevelToStream.ToString());
+        UE_LOG(LogTemp, Warning, TEXT("ë ˆë²¨ ë¡œë“œ ì‹¤íŒ¨: %s"), *LevelToStream.ToString());
     }
     else
     {
-        UE_LOG(LogTemp, Log, TEXT("·¹º§ ·Îµå ¼º°ø: %s"), *LevelToStream.ToString());
+        StreamingLevel->OnLevelShown.AddUniqueDynamic(this, &ARSMapGenerator::OnSubLevelLoaded);
+        UE_LOG(LogTemp, Log, TEXT("ë ˆë²¨ ë¡œë“œ ì„±ê³µ: %s"), *LevelToStream.ToString());
     }
     return StreamingLevel;
 }
@@ -519,7 +493,7 @@ void ARSMapGenerator::ChooseShopTile()
 
     TArray<FVector2D> Candidates;
 
-    //º¸½º¹æÀ» Á¦¿ÜÇÑ Å¸ÀÏ¿¡¼­ ÈÄº¸ ¼±Ãâ
+    //ë³´ìŠ¤ë°©ì„ ì œì™¸í•œ íƒ€ì¼ì—ì„œ í›„ë³´ ì„ ì¶œ
     for (const auto& Pair : TileMap)
     {
         const FVector2D& Pos = Pair.Key;
@@ -529,7 +503,7 @@ void ARSMapGenerator::ChooseShopTile()
         }
     }
 
-    // ÈÄº¸¿¡¼­ ÇÏ³ª ¼±ÅÃ
+    // í›„ë³´ì—ì„œ í•˜ë‚˜ ì„ íƒ
     if (Candidates.Num() > 0)
     {
         ShopTilePos = Candidates[RandomStream.RandRange(0, Candidates.Num() - 1)];
@@ -543,7 +517,7 @@ FVector ARSMapGenerator::SpawnBossArenaLevel()
         BossArenaLevel.LoadSynchronous();
     }
 
-    FVector ArenaOffset = FVector(TileSize*GridSize*2, TileSize * GridSize * 2, 0.0f); // ÇöÀç ¸Ê°ú ¶³¾îÁø ÁÂÇ¥
+    FVector ArenaOffset = FVector(TileSize*GridSize*2, TileSize * GridSize * 2, 0.0f); // í˜„ì¬ ë§µê³¼ ë–¨ì–´ì§„ ì¢Œí‘œ
     FString ArenaUniqueName = TEXT("BossArena");
 
     bool bSuccess = false;
@@ -561,3 +535,51 @@ FVector ARSMapGenerator::SpawnBossArenaLevel()
 
     return ArenaOffset;
 }
+
+void ARSMapGenerator::SetSeed(int32 RandomSeed)
+{
+    Seed = RandomSeed;
+}
+
+void ARSMapGenerator::OnSubLevelLoaded()
+{
+    UE_LOG(LogTemp, Warning, TEXT("ì„œë¸Œ ë ˆë²¨ ë¡œë”© ì™„ë£Œë¨"));
+    CheckAllTilesLoaded();
+
+    //ì§€ì—°ì„ ë‘ê³  ë¡œë“œ ì²´í¬
+    FTimerHandle TempHandle;
+    GetWorld()->GetTimerManager().SetTimer(TempHandle, this, &ARSMapGenerator::CheckAllTilesLoaded, 0.2f, false);
+}
+
+bool ARSMapGenerator::IsMapFullyLoaded() const
+{
+    return bIsMapLoaded;
+}
+
+void ARSMapGenerator::CheckAllTilesLoaded()
+{
+    // ëª¨ë“  LevelStreamingDynamicì´ ë¡œë“œë˜ì—ˆëŠ”ì§€ í™•ì¸
+    bool bAllLoaded = true;
+    for (ULevelStreamingDynamic* Level : SpawnedLevels)
+    {
+        if (!Level || !Level->IsLevelLoaded())
+        {
+            bAllLoaded = false;
+            break;
+        }
+    }
+
+    if (bAllLoaded && !bIsMapLoaded)
+    {
+        bIsMapLoaded = true;
+        OnMapFullyLoaded.Broadcast(); // GameModeì— ì•Œë¦¼
+        UE_LOG(LogTemp, Warning, TEXT("ëª¨ë“  íƒ€ì¼ ë¡œë”© ì™„ë£Œ. Broadcast ì‹¤í–‰"));
+    }
+    else if (!bAllLoaded)
+    {
+        // ë‹¤ì‹œ ì²´í¬ ì˜ˆì•½
+        FTimerHandle RetryHandle;
+        GetWorld()->GetTimerManager().SetTimer(RetryHandle, this, &ARSMapGenerator::CheckAllTilesLoaded, 0.3f, false);
+    }
+}
+

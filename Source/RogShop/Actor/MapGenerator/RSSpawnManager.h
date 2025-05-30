@@ -6,7 +6,9 @@
 #include "UObject/NoExportTypes.h"
 #include "Engine/DataTable.h"
 #include "Engine/TargetPoint.h"
+#include "RSDunPlayerCharacter.h"
 #include "GameFramework/Character.h"
+#include "MonsterSpawnGroupData.h"
 
 #include "Engine/Level.h"
 #include "RSSpawnManager.generated.h"
@@ -14,43 +16,26 @@
 /**
  * 
  */
-
-USTRUCT(BlueprintType)
-struct FMonsterSpawnData : public FTableRowBase
-{
-	GENERATED_BODY()
-
-	// ½ºÆùÇÒ ¸ó½ºÅÍ Å¬·¡½º
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AActor> MonsterClass;
-};
-
 UCLASS()
 class ROGSHOP_API URSSpawnManager : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	// ¿ÜºÎ¿¡¼­ ¿ùµå¿Í DataTableÀ» ÃÊ±âÈ­ÇÒ ÇÔ¼ö
-	void Initialize(UWorld* InWorld, UDataTable* InDataTable, TSubclassOf<AActor> ShopNPC);
-	// ÁÖ¾îÁø Level¿¡ ÀÖ´Â TargetPointµéÀ» Ã£¾Æ ¸ó½ºÅÍ ½ºÆù
-	void SpawnMonstersInLevel(ULevel* LoadedLevel);
-	// »óÁ¡NPC½ºÆùÀ» À§ÇÑ ÇÔ¼ö
-	void SpawnShopNPCInLevel(ULevel* LoadedLevel);
-	// Player½ºÆùÀ» À§ÇÑ ÇÔ¼ö
-	void SpawnPlayerAtStartPoint(ULevel* LoadedLevel, TSubclassOf<ACharacter> PlayerClass);
-
-private:
-	// Æ¯Á¤ TargetPoint À§Ä¡¿¡ ¸ó½ºÅÍ ÇÏ³ª ½ºÆù
-	AActor* SpawnMonsterAtTarget(AActor* TargetPoint);
-	// DataTable¿¡¼­ ¹«ÀÛÀ§·Î ¸ó½ºÅÍ Å¬·¡½º ¼±ÅÃ
-	TSubclassOf<AActor> SelectMonsterClass();
-	// ½ºÆùÇÒ ¿ùµå °´Ã¼ ÂüÁ¶
+	// ì™¸ë¶€ì—ì„œ ì›”ë“œì™€ DataTableì„ ì´ˆê¸°í™”í•  í•¨ìˆ˜
+	void Initialize(UWorld* InWorld, UGameInstance* GameInstance, TSubclassOf<AActor> ShopNPC);
+	// ì£¼ì–´ì§„ Levelì— ìˆëŠ” TargetPointë“¤ì„ ì°¾ì•„ ëª¬ìŠ¤í„° ìŠ¤í°
+	void SpawnMonstersInLevel();
+	// ìƒì NPCìŠ¤í°ì„ ìœ„í•œ í•¨ìˆ˜
+	void SpawnShopNPCInLevel();
+	// PlayerìŠ¤í°ì„ ìœ„í•œ í•¨ìˆ˜
+	void SpawnPlayerAtStartPoint(TSubclassOf<ACharacter> PlayerClass);
 
 private:
 	UWorld* World;
-	// ¸ó½ºÅÍ Á¤º¸°¡ ´ã±ä ¿¡µğÅÍ¿ë µ¥ÀÌÅÍ Å×ÀÌºí
-	UDataTable* MonsterTable;
-	// »óÁ¡ NPC Å¬·¡½º
+	// ëª¬ìŠ¤í„° ì •ë³´ê°€ ë‹´ê¸´ ì—ë””í„°ìš© ë°ì´í„° í…Œì´ë¸”
+	UDataTable* MonsterRawTable;
+	UDataTable* MonsterStateTable;
+	// ìƒì  NPC í´ë˜ìŠ¤
 	TSubclassOf<AActor> ShopNPCClass;
 };

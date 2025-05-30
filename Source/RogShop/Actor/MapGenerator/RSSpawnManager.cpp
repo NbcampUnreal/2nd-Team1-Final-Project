@@ -4,108 +4,186 @@
 #include "RSSpawnManager.h"
 #include "Engine/TargetPoint.h"
 #include "Kismet/GameplayStatics.h"
+#include "EngineUtils.h"
+#include "MonsterSpawnGroupData.h"
+#include "MonsterData.h"
+#include "Algo/RandomShuffle.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "RSDunMonsterCharacter.h"
+#include "RSDataSubsystem.h"
+#include "RSDunPlayerCharacter.h"
 #include "Engine/World.h"
 
-// ¿ÜºÎ¿¡¼­ Àü´Ş¹ŞÀº ¿ùµå¿Í ¸ó½ºÅÍ Å×ÀÌºíÀ» ÃÊ±âÈ­
-void URSSpawnManager::Initialize(UWorld* InWorld, UDataTable* InDataTable, TSubclassOf<AActor> ShopNPC)
+// ì™¸ë¶€ì—ì„œ ì „ë‹¬ë°›ì€ ì›”ë“œì™€ ëª¬ìŠ¤í„° í…Œì´ë¸”ì„ ì´ˆê¸°í™”
+void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance,TSubclassOf<AActor> ShopNPC)
 {
     World = InWorld;
-    MonsterTable = InDataTable;
     ShopNPCClass = ShopNPC;
+    UGameInstance* CurGameInstance = GameInstance;
+    if (!CurGameInstance)
+    {
+        return;
+    }
+    URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+    if (!DataSubsystem)
+    {
+        return;
+    }
+    MonsterRawTable = DataSubsystem->ForestMonsterSpawnGroup;
+    MonsterStateTable = DataSubsystem->MonsterStateGroup;
+    if (!MonsterRawTable)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Failed Update MonsterRawTable"));
+        return;
+    }
+    if (!MonsterStateTable)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Failed Update MonsterStateGroup"));
+        return;
+    }
 }
 
-// ·ÎµåµÈ ·¹º§¿¡ ÀÖ´Â ¸ğµç TargetPoint¸¦ Ã£¾Æ ¸ó½ºÅÍ ½ºÆù
-void URSSpawnManager::SpawnMonstersInLevel(ULevel* LoadedLevel)
+// ë¡œë“œëœ ë ˆë²¨ì— ìˆëŠ” ëª¨ë“  TargetPointë¥¼ ì°¾ì•„ ëª¬ìŠ¤í„° ìŠ¤í°
+void URSSpawnManager::SpawnMonstersInLevel()
 {
-    if (!World || !MonsterTable || !LoadedLevel) return;
-
-    for (AActor* Actor : LoadedLevel->Actors)
+    if (!World || !MonsterRawTable || !MonsterStateTable)
     {
-        // TargetPointÀÎÁö È®ÀÎ ÈÄ ½ºÆù
-        if (Actor && Actor->IsA<ATargetPoint>() && Actor->Tags.Contains(FName("Monster")))
+        UE_LOG(LogTemp, Warning, TEXT("ëª¬ìŠ¤í„° ìŠ¤í° ì‹¤íŒ¨"));
+        return;
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("ëª¬ìŠ¤í„° ìŠ¤í° ì‹œì‘"));
+    TArray<AActor*> MonsterTargets;
+    for (TActorIterator<ATargetPoint> It(World); It; ++It)
+    {
+        if (It->Tags.Contains(FName("Monster")))
         {
-            SpawnMonsterAtTarget(Actor);
+            MonsterTargets.Add(*It);
+        }
+    }
+
+    Algo::RandomShuffle(MonsterTargets);
+
+    int32 TargetIndex = 0;
+
+    TArray<FMonsterSpawnGroupData*> AllGroups;
+    MonsterRawTable->GetAllRows(TEXT("MonsterRawData"), AllGroups);
+
+    for (FMonsterSpawnGroupData* Group : AllGroups)
+    {
+        for (const FMonsterCount& Entry : Group->SpawnGroup)
+        {
+            FName RowName = Entry.MonsterRowName;
+            int32 Count = Entry.Count;
+
+            FMonsterData* StateRow = MonsterStateTable->FindRow<FMonsterData>(RowName, TEXT("MonsterStateLookup"));
+            if (!StateRow || !StateRow->MonsterClass) continue;
+
+            for (int32 i = 0; i < Count && TargetIndex < MonsterTargets.Num(); ++i)
+            {
+                AActor* Target = MonsterTargets[TargetIndex++];
+                FTransform SpawnTransform = Target->GetActorTransform();
+                FActorSpawnParameters Params;
+                Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+                ARSDunMonsterCharacter* Monster =  World->SpawnActor<ARSDunMonsterCharacter>(StateRow->MonsterClass, SpawnTransform, Params);
+                Monster->IncreaseHP(StateRow->MaxHP);
+                Monster->ChangeMoveSpeed(StateRow->MoveSpeed);
+            }
         }
     }
 }
 
-// ÁöÁ¤µÈ À§Ä¡(TargetPoint)¿¡¼­ ¸ó½ºÅÍ ÇÏ³ª ½ºÆù
-AActor* URSSpawnManager::SpawnMonsterAtTarget(AActor* TargetPoint)
+void URSSpawnManager::SpawnShopNPCInLevel()
 {
-    // DataTable¿¡¼­ ¸ó½ºÅÍ Å¬·¡½º ¼±ÅÃ
-    TSubclassOf<AActor> MonsterClass = SelectMonsterClass();
-    if (!MonsterClass) return nullptr;
-
-    // TargetPoint À§Ä¡¿¡¼­ ½ºÆù
-    FTransform SpawnTransform = TargetPoint->GetActorTransform();
-    return World->SpawnActor<AActor>(MonsterClass, SpawnTransform);
-}
-
-TSubclassOf<AActor> URSSpawnManager::SelectMonsterClass()
-{
-    if (!MonsterTable) return nullptr;
-
-    TArray<FMonsterSpawnData*> AllRows;
-    MonsterTable->GetAllRows(TEXT("Monster Data"), AllRows);
-
-    if (AllRows.Num() == 0) return nullptr;
-
-    // ¹«ÀÛÀ§ ÀÎµ¦½º·Î ¸ó½ºÅÍ Å¬·¡½º ¼±ÅÃ
-    int32 Index = FMath::RandRange(0, AllRows.Num() - 1);
-    return AllRows[Index]->MonsterClass;
-}
-
-void URSSpawnManager::SpawnShopNPCInLevel(ULevel* LoadedLevel)
-{
-    if (!World || !ShopNPCClass || !LoadedLevel) return;
+    if (!World || !ShopNPCClass) 
+    {
+        UE_LOG(LogTemp, Warning, TEXT("ìƒì  ìƒì„± ì‹¤íŒ¨"));
+        return;
+    } 
 
     TArray<ATargetPoint*> ShopPoints;
 
-    // ¸ğµç TargetPoint Áß ÀÌ¸§ÀÌ ÀÏÄ¡ÇÏ´Â °ÍµéÀ» ÈÄº¸·Î ¼öÁı
-    for (AActor* Actor : LoadedLevel->Actors)
+    // ëª¨ë“  TargetPoint ì¤‘ ì´ë¦„ì´ ì¼ì¹˜í•˜ëŠ” ê²ƒë“¤ì„ í›„ë³´ë¡œ ìˆ˜ì§‘
+    for (TActorIterator<ATargetPoint> It(World); It; ++It)
     {
-        if (Actor && Actor->IsA<ATargetPoint>() && Actor->Tags.Contains("NPC"))
+        ATargetPoint* Point = *It;
+        if (Point && Point->Tags.Contains(FName("NPC")))
         {
-            ShopPoints.Add(Cast<ATargetPoint>(Actor));
+            ShopPoints.Add(Point);
         }
     }
 
-    // ¹«ÀÛÀ§·Î ÇÏ³ª ¼±ÅÃ
-    if (ShopPoints.Num() == 0) return;
+    // ë¬´ì‘ìœ„ë¡œ í•˜ë‚˜ ì„ íƒ
+    if (ShopPoints.Num() == 0) 
+    {
+        return;
+    } 
+    
     int32 Index = FMath::RandRange(0, ShopPoints.Num() - 1);
     ATargetPoint* ChosenPoint = ShopPoints[Index];
 
     FTransform SpawnTransform = ChosenPoint->GetActorTransform();
-    World->SpawnActor<AActor>(ShopNPCClass, SpawnTransform);
+
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    World->SpawnActor<AActor>(ShopNPCClass, SpawnTransform,SpawnParams);
 }
 
-void URSSpawnManager::SpawnPlayerAtStartPoint(ULevel* LoadedLevel, TSubclassOf<ACharacter> PlayerClass)
+void URSSpawnManager::SpawnPlayerAtStartPoint(TSubclassOf<ACharacter> PlayerClass)
 {
-    if (!World || !LoadedLevel || !PlayerClass) return;
+    if (!World || !PlayerClass)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Failed CratePlayerCharacter"));
+        return;
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("In PlayerCharacter"));
 
     ATargetPoint* StartPoint = nullptr;
 
-    for (AActor* Actor : LoadedLevel->Actors)
+    for (TActorIterator<ATargetPoint> It(World); It; ++It)
     {
-        //TargetPointÀÎÁö È®ÀÎ
-        if (!Actor || !Actor->IsA<ATargetPoint>()) continue;
-        if (Actor->Tags.Contains(FName("Player")))
+        ATargetPoint* Point = *It;
+        if (Point && Point->Tags.Contains(FName("Player")))
         {
-            StartPoint = Cast<ATargetPoint>(Actor);
-            break;
+            UE_LOG(LogTemp, Warning, TEXT("ì°¾ì€ ìœ„ì¹˜: %s"), *Point->GetActorLocation().ToString());
+
+            if(FVector::Dist(Point->GetActorLocation(), FVector::ZeroVector) < 3000.f)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Find StartPos"));
+                StartPoint = Point;
+                break;
+            }
         }
     }
+
+    if (!StartPoint) return;
+
+
     FTransform SpawnTransform = StartPoint->GetActorTransform();
     ACharacter* ExistingPlayer = UGameplayStatics::GetPlayerCharacter(World, 0);
 
     if (ExistingPlayer)
     {
-        // À§Ä¡¸¸ ÀÌµ¿
+        // ìœ„ì¹˜ë§Œ ì´ë™
+        UE_LOG(LogTemp, Warning, TEXT("MovePlayerCharacter"));
         ExistingPlayer->SetActorTransform(SpawnTransform);
     }
     else
     {
-        // »õ·Î »ı¼º
-        World->SpawnActor<ACharacter>(PlayerClass, SpawnTransform);
+        UE_LOG(LogTemp, Warning, TEXT("CratePlayerCharacter"));
+        FActorSpawnParameters SpawnParams;
+        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+        // ìƒˆë¡œ ìƒì„±
+        ACharacter* PlayerCharacter = World->SpawnActor<ACharacter>(PlayerClass, SpawnTransform, SpawnParams);
+        if (PlayerCharacter)
+        {
+            APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
+            if (PC)
+            {
+                PC->Possess(PlayerCharacter);
+            }
+        }
     }
 }

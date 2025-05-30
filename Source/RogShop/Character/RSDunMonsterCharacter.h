@@ -15,6 +15,54 @@
 
 class ARSMonsterAIController;
 
+USTRUCT(BlueprintType)
+struct FMonsterAttackTraceData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
+	FVector TraceBoxHalfSize;	// 트레이스 반경 (옆으로 얼마만큼 쏠지)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
+	float TraceLength;			// 트레이스 길이 (앞으로 얼마만큼 쏠지)
+
+	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	float TraceForwardOffset;	// 소켓 시작점 앞뒤 보정
+
+	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	float TraceRightOffset;     // 소켓 시작점 좌우 보정
+
+	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	float TraceUpOffset;        // 소켓 시작점 높이 보정
+
+	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	FName SocketLocation;		// 트레이스가 쏴질 소켓의 시작점
+
+};
+
+USTRUCT(BlueprintType)
+struct FMonsterSkillData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName SkillName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> SkillMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 PlayRate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Damage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FMonsterAttackTraceData AttackTrace;
+};
+
 UCLASS()
 class ROGSHOP_API ARSDunMonsterCharacter : public ARSDunBaseCharacter
 {
@@ -65,11 +113,14 @@ public:
 
 protected:
 	// 애니메이션 몽타주
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> BaseAttackMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FMonsterSkillData> MonsterSkill;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> DeathMontage;
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> BaseAttackMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> SkillMontage_1;
@@ -78,7 +129,7 @@ protected:
 	TObjectPtr<UAnimMontage> SkillMontage_2;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> SkillMontage_3;
+	TObjectPtr<UAnimMontage> SkillMontage_3;*/
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> SkillMontage_4;
@@ -104,9 +155,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Patrol")
 	float maxDetectPatrolRoute;
 
-	// 트레이스 관련
+	// 트레이스 설정
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
-	FVector TraceBoxHalfSize;
+	FVector TraceBoxHalfSize;	// 트레이스 반경 (옆으로 얼마만큼 쏠지)
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
 	float TraceLength;			// 트레이스 길이 (앞으로 얼마만큼 쏠지)

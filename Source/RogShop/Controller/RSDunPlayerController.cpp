@@ -26,7 +26,6 @@ void ARSDunPlayerController::BeginPlay()
     AddMapping();
 
     InitializeRSDunMainWidget();
-    InitializeRSPlayerInventoryWidget();
 }
 
 void ARSDunPlayerController::AddMapping()
@@ -74,41 +73,11 @@ void ARSDunPlayerController::InitializeRSDunMainWidget()
     }
 }
 
-void ARSDunPlayerController::InitializeRSPlayerInventoryWidget()
+void ARSDunPlayerController::TogglePlayerInventoryWidget()
 {
-    if (RSPlayerInventoryWidgetClass)
+    if (RSDunMainHUDWidget)
     {
-        RSPlayerInventoryWidgetInstance = CreateWidget<URSPlayerInventoryWidget>(this, RSPlayerInventoryWidgetClass);
-
-        if (RSPlayerInventoryWidgetInstance)
-        {
-            RSPlayerInventoryWidgetInstance->AddToViewport();
-            RSPlayerInventoryWidgetInstance->SetVisibility(ESlateVisibility::Hidden); // 시작은 숨김
-        }
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("RSPlayerInventoryWidget Null !"));
-    }
-}
-
-void ARSDunPlayerController::AddRSPlayerInventoryWidget()
-{
-    if (RSPlayerInventoryWidgetInstance->IsVisible())
-    {
-        RSPlayerInventoryWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
-
-        FInputModeGameOnly InputMode;
-        SetInputMode(InputMode);
-        bShowMouseCursor = false;
-    }
-    else
-    {
-        RSPlayerInventoryWidgetInstance->SetVisibility(ESlateVisibility::Visible);
-
-        FInputModeUIOnly InputMode;
-        SetInputMode(InputMode);
-        bShowMouseCursor = true;
+        RSDunMainHUDWidget->HandlePlayerInventoryWidget();
     }
 }
 

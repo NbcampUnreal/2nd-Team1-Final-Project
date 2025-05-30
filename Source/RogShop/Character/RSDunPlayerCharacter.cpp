@@ -376,7 +376,7 @@ void ARSDunPlayerCharacter::ToggleInventoryUI(const FInputActionValue& value)
     ARSDunPlayerController* PC = GetController<ARSDunPlayerController>();
     if (PC)
     {
-        PC->AddRSPlayerInventoryWidget();
+        PC->TogglePlayerInventoryWidget();
     }
 
     if (GEngine)

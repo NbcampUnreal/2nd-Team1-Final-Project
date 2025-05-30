@@ -58,9 +58,8 @@ public:
 // 위젯
 public:
 	void InitializeRSDunMainWidget();
-	void InitializeRSPlayerInventoryWidget();
 
-	void AddRSPlayerInventoryWidget();
+	void TogglePlayerInventoryWidget();
 	void ToggleInGameMenuWidget();
 
 private:
@@ -70,12 +69,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<URSDunMainHUDWidget> RSDunMainHUDWidget;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<URSPlayerInventoryWidget> RSPlayerInventoryWidgetClass;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<URSPlayerInventoryWidget> RSPlayerInventoryWidgetInstance;
 
 // 이벤트 디스패처
 public:
