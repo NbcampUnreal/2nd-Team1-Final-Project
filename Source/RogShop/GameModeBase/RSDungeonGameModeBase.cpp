@@ -20,11 +20,12 @@ void ARSDungeonGameModeBase::BeginPlay()
 
     SpawnMap(CurrentMapType);
 
+ 
+
     if (MapGeneratorInstance)
     {
         MapGeneratorInstance->OnMapFullyLoaded.AddDynamic(this, &ARSDungeonGameModeBase::OnMapReady);
     }
-
 }
 
 void ARSDungeonGameModeBase::SpawnMap(EMapType MapType)
@@ -73,16 +74,33 @@ void ARSDungeonGameModeBase::OnMapReady()
 {
     UE_LOG(LogTemp, Warning, TEXT("맵 로딩 완료, 캐릭터 생성 시작"));
 
-    GetWorld()->GetTimerManager().SetTimer(WaitForMapHandle, [this]()
-    {
-        if (!SpawnManager)
-        {
-            SpawnManager = NewObject<URSSpawnManager>(this, URSSpawnManager::StaticClass());
-            SpawnManager->Initialize(GetWorld(), GetGameInstance(), ShopNPCClass);
 
-            SpawnManager->SpawnPlayerAtStartPoint(PlayerClass);
-            SpawnManager->SpawnMonstersInLevel();
-            SpawnManager->SpawnShopNPCInLevel();
+    TWeakObjectPtr<ARSDungeonGameModeBase> WeakThis(this);
+
+    GetWorld()->GetTimerManager().SetTimer(WaitForMapHandle, [WeakThis]() {
+        if (!WeakThis.IsValid()) return;
+
+        ARSDungeonGameModeBase* StrongThis = WeakThis.Get();
+
+        if (!StrongThis->SpawnManager)
+        {
+            StrongThis->SpawnManager = NewObject<URSSpawnManager>(StrongThis, URSSpawnManager::StaticClass());
+
+            StrongThis->SpawnManager->Initialize(StrongThis->GetWorld(), StrongThis->GetGameInstance(), StrongThis->ShopNPCClass);
+
+            StrongThis->SpawnManager->SpawnPlayerAtStartPoint(StrongThis->PlayerClass);
+            StrongThis->SpawnManager->SpawnMonstersInLevel();
+            StrongThis->SpawnManager->SpawnShopNPCInLevel();
         }
-    }, 0.2f, false);
+    }, 0.5f, false);
+}
+
+void ARSDungeonGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    Super::EndPlay(EndPlayReason);
+
+    if (MapGeneratorInstance)
+    {
+        MapGeneratorInstance->OnMapFullyLoaded.RemoveDynamic(this, &ARSDungeonGameModeBase::OnMapReady);
+    }
 }
