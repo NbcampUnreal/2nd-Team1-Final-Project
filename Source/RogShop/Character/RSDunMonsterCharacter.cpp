@@ -102,16 +102,11 @@ void ARSDunMonsterCharacter::PlaySkill_3()
 	}*/
 }
 
-void ARSDunMonsterCharacter::PlaySkill_4()
+void ARSDunMonsterCharacter::PlaySkill_4(FVector interrestedPos)
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (IsValid(AnimInstance) == true && IsValid(SkillMontage_4) == true)
-	{
-		if (AnimInstance->Montage_IsPlaying(SkillMontage_4) == false)
-		{
-			AnimInstance->Montage_Play(SkillMontage_4);
-		}
-	}
+	FRotator spawnRot = FRotator::ZeroRotator;
+	//GetWorld()->SpawnActor<ARSDunMonsterCharacter>(ARSDunMonsterCharacter::StaticClass(), interrestedPos, spawnRot);
+	GetWorld()->SpawnActor<AActor>(servant, interrestedPos, spawnRot);
 }
 
 void ARSDunMonsterCharacter::OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted)

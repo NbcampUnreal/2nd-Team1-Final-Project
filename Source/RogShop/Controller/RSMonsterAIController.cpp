@@ -87,7 +87,7 @@ void ARSMonsterAIController::AISkill_3()
 	}
 }
 
-void ARSMonsterAIController::AISkill_4()
+void ARSMonsterAIController::AISkill_4(FVector interrestedPos)
 {
 	APawn* ctrlPawn = GetPawn();
 	if (ctrlPawn)
@@ -96,7 +96,7 @@ void ARSMonsterAIController::AISkill_4()
 		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
 		if (ctrlChr)
 		{
-			ctrlChr->PlaySkill_4();
+			ctrlChr->PlaySkill_4(interrestedPos);
 		}
 	}
 }

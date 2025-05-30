@@ -47,7 +47,7 @@ public://Function
 	void AISkill_3();
 
 	UFUNCTION(BlueprintCallable)
-	void AISkill_4();
+	void AISkill_4(FVector interrestedPos);
 
 	//Patrol
 	UFUNCTION(BlueprintCallable)
