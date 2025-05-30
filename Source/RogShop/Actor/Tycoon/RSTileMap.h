@@ -23,6 +23,9 @@ public:
 	void ChangeTile(int32 Index, FName TileKey);
 	void SaveTileMap();
 	void ChangeTileSize(int32 NewWidth, int32 NewHeight);
+
+	UFUNCTION(BlueprintCallable)
+	void SpawnActorInMap(UClass* ActorClass);
 	
 	FVector GetMapCenter();
 	FVector GetMapSize();
@@ -40,7 +43,6 @@ private:
 	void CreateTiles();
 	TSubclassOf<ARSBaseTile> GetTileClass(const FName& TileKey);
 	ARSBaseTile* CreateTile(const TSubclassOf<ARSBaseTile>& TileClass, int32 Row, int32 Column);
-	void SpawnActorInMap(UClass* ActorClass);
 	void ActiveNPC();
 	
 	UFUNCTION(CallInEditor)

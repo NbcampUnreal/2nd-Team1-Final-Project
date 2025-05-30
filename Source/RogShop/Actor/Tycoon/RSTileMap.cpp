@@ -105,6 +105,20 @@ void ARSTileMap::ChangeTileSize(int32 NewWidth, int32 NewHeight)
 	CreateTiles();
 }
 
+void ARSTileMap::SpawnActorInMap(UClass* ActorClass)
+{
+	FVector HalfTileSize = DefaultTileType->GetDefaultObject<ARSBaseTile>()->GetTileSize() * 0.5f;
+	FVector MapSize = GetMapSize();
+	FVector RandomLocation = FVector(FMath::FRand()) * MapSize;
+	FVector SpawnLocation = GetActorLocation() + RandomLocation - HalfTileSize;
+	SpawnLocation.Z = GetActorLocation().Z + 100;
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	
+	GetWorld()->SpawnActor(ActorClass, &SpawnLocation, &FRotator::ZeroRotator, SpawnParams);
+}
+
 FVector ARSTileMap::GetMapCenter()
 {
 	FVector Size = GetMapSize();
@@ -266,20 +280,6 @@ ARSBaseTile* ARSTileMap::CreateTile(const TSubclassOf<ARSBaseTile>& TileClass, i
 	TileActor->SetActorLocation(Location);
 
 	return TileActor;
-}
-
-void ARSTileMap::SpawnActorInMap(UClass* ActorClass)
-{
-	FVector HalfTileSize = DefaultTileType->GetDefaultObject<ARSBaseTile>()->GetTileSize() * 0.5f;
-	FVector MapSize = GetMapSize();
-	FVector RandomLocation = FVector(FMath::FRand()) * MapSize;
-	FVector SpawnLocation = GetActorLocation() + RandomLocation - HalfTileSize;
-	SpawnLocation.Z = GetActorLocation().Z + 100;
-	
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	
-	GetWorld()->SpawnActor(ActorClass, &SpawnLocation, &FRotator::ZeroRotator, SpawnParams);
 }
 
 void ARSTileMap::ActiveNPC()
