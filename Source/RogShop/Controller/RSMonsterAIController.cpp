@@ -40,7 +40,7 @@ void ARSMonsterAIController::AIAttack()
 		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
 		if (ctrlChr)
 		{
-			ctrlChr->PlayBaseAttackAnim();
+			ctrlChr->PlayAttackAnim();
 		}
 	}
 }

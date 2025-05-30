@@ -44,7 +44,7 @@ void URSCheatManager::TestDunMonsterAttack()
 
     if (Monster)
     {
-        Monster->PlayBaseAttackAnim();
+        Monster->PlayAttackAnim();
     }
 }
 

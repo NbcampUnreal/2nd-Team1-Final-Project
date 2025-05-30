@@ -21,22 +21,22 @@ struct FMonsterAttackTraceData
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FVector TraceBoxHalfSize;	// 트레이스 반경 (옆으로 얼마만큼 쏠지)
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float TraceLength;			// 트레이스 길이 (앞으로 얼마만큼 쏠지)
 
-	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float TraceForwardOffset;	// 소켓 시작점 앞뒤 보정
 
-	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float TraceRightOffset;     // 소켓 시작점 좌우 보정
 
-	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float TraceUpOffset;        // 소켓 시작점 높이 보정
 
-	UPROPERTY(EditAnywhere, Category = "AttackTrace")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName SocketLocation;		// 트레이스가 쏴질 소켓의 시작점
 
 };
@@ -74,16 +74,14 @@ public:
 	virtual void BeginPlay()override;
 
 	// 애니메이션 실행 함수
-	virtual void PlayBaseAttackAnim();
-	virtual void PlayDeathAnim();
+	void PlayAttackAnim();
+	void PlayDeathAnim();
 	UFUNCTION(BlueprintCallable)
-	virtual void PlaySkill_1();
+	void PlaySkill_1();
 	UFUNCTION(BlueprintCallable)
-	virtual void PlaySkill_2();
+	void PlaySkill_2();
 	UFUNCTION(BlueprintCallable)
-	virtual void PlaySkill_3();
-	UFUNCTION(BlueprintCallable)
-	virtual void PlaySkill_4(FVector interrestedPos);
+	void PlaySkill_3();
 
 	UFUNCTION()
 	void OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted);  //사망 모션이 끝난 경우
@@ -92,10 +90,10 @@ public:
 	FORCEINLINE class UNavigationInvokerComponent* GetNavInvoker() const { return navInvoker; };
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy")
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Trace")
-	virtual void PerformAttackTrace();
+	void PerformAttackTrace(int32 SkillIndex);
 
 	//NavLink jump function
 	UFUNCTION(BlueprintCallable)
@@ -112,15 +110,15 @@ public:
 	void OnDeath();
 
 protected:
+	void InitMonsterData();
+
+protected:
 	// 애니메이션 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FMonsterSkillData> MonsterSkill;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> DeathMontage;
-
-	/*UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> BaseAttackMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> SkillMontage_1;
@@ -129,10 +127,7 @@ protected:
 	TObjectPtr<UAnimMontage> SkillMontage_2;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> SkillMontage_3;*/
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AActor> servant;
+	TObjectPtr<UAnimMontage> SkillMontage_3;
 
 	//NavInvoker
 	UPROPERTY(BlueprintReadWrite, Category = Navigation, meta = (AllowPrivateAccess = "true"))//Navigation Invoker Setting
@@ -174,6 +169,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "AttackTrace")
 	FName SocketLocation;		// 트레이스가 쏴질 소켓의 시작점
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName MonsterRowName;			 // 이 몬스터가 참조하는 RowName
+
+	UDataTable* MonsterDataTable;	 // 연결된 데이터 테이블
 	FTimerHandle detectDelayTimer;
 
 private:
