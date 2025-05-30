@@ -40,7 +40,7 @@ void ARSMonsterAIController::AIAttack()
 		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
 		if (ctrlChr)
 		{
-			ctrlChr->PlayBaseAttackAnim();
+			ctrlChr->PlayAttackAnim();
 		}
 	}
 }
@@ -99,7 +99,7 @@ void ARSMonsterAIController::MoveToCurrentPatrolPoint()
 			return;
 		}
 		TArray<AActor*> patrolPoints = monster->GetPatrolPoint();
-		// ¼øÂû Æ÷ÀÎÆ®°¡ ÇÏ³ªµµ ¾ø´Ù¸é ÀÌµ¿ÇÒ ÇÊ¿ä ¾øÀ½
+		// ìˆœì°° í¬ì¸íŠ¸ê°€ í•˜ë‚˜ë„ ì—†ë‹¤ë©´ ì´ë™í•  í•„ìš” ì—†ìŒ
 		if (patrolPoints.Num() == 0)
 		{
 			return;
@@ -107,12 +107,12 @@ void ARSMonsterAIController::MoveToCurrentPatrolPoint()
 
 		MoveToActor(
 			patrolPoints[currentPatrolIdx],
-			5.0f,   // AcceptanceRadius: ¸ñÇ¥ ÁöÁ¡ ±ÙÃ³ ¸î À¯´Ö ÀÌ³»¿¡ µµ´ŞÇÏ¸é ¸ØÃâÁö
+			5.0f,   // AcceptanceRadius: ëª©í‘œ ì§€ì  ê·¼ì²˜ ëª‡ ìœ ë‹› ì´ë‚´ì— ë„ë‹¬í•˜ë©´ ë©ˆì¶œì§€
 			true,   // bStopOnOverlap
 			true,   // bUsePathfinding
-			false,  // bCanStrafe: ±âº» ÀÌµ¿ ¸ğµå¿¡¼­ ÁÂ¿ì·Î È¸Àü ¾øÀÌ ÀÌµ¿ °¡´É ¿©ºÎ
-			nullptr,// FilterClass: °æ·Î ÇÊÅÍ. µğÆúÆ® »ç¿ë
-			true    // bAllowPartialPath: ºÎºĞ °æ·Î Çã¿ë ¿©ºÎ
+			false,  // bCanStrafe: ê¸°ë³¸ ì´ë™ ëª¨ë“œì—ì„œ ì¢Œìš°ë¡œ íšŒì „ ì—†ì´ ì´ë™ ê°€ëŠ¥ ì—¬ë¶€
+			nullptr,// FilterClass: ê²½ë¡œ í•„í„°. ë””í´íŠ¸ ì‚¬ìš©
+			true    // bAllowPartialPath: ë¶€ë¶„ ê²½ë¡œ í—ˆìš© ì—¬ë¶€
 		);
 
 		currentPatrolIdx = (currentPatrolIdx + 1) % patrolPoints.Num();
