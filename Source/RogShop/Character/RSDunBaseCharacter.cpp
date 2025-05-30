@@ -15,6 +15,11 @@ ARSDunBaseCharacter::ARSDunBaseCharacter()
 	bIsDead = false;
 }
 
+float ARSDunBaseCharacter::GetMoveSpeed() const
+{
+	return MoveSpeed;
+}
+
 void ARSDunBaseCharacter::ChangeMoveSpeed(float Amount)
 {
 	MoveSpeed = Amount;
@@ -31,6 +36,24 @@ float ARSDunBaseCharacter::GetMaxHP() const
 	return MaxHP;
 }
 
+void ARSDunBaseCharacter::ChangeMaxHP(float Amount)
+{
+	float NewMaxHP = FMath::Max(Amount, 0.0f);
+	MaxHP = NewMaxHP;
+
+	// 현재 체력이 더 많은 경우 최대체력으로 갱신
+	if (HP > MaxHP)
+	{
+		HP = MaxHP;
+	}
+
+	// 현재 체력이 0이하가 된 경우 사망 처리
+	if (HP <= 0.f)
+	{
+		OnDeath();
+	}
+}
+
 void ARSDunBaseCharacter::IncreaseMaxHP(float Amount)
 {
 	float NewMaxHP = Amount + MaxHP;
@@ -42,13 +65,13 @@ void ARSDunBaseCharacter::DecreaseMaxHP(float Amount)
 	float NewMaxHP = FMath::Clamp(MaxHP - Amount, 0.0f, MaxHP);
 	MaxHP = NewMaxHP;
 
-	// ���� ü���� �� ���� ��� �ִ�ü������ ����
+	// 현재 체력이 더 많은 경우 최대체력으로 갱신
 	if (HP > MaxHP)
 	{
 		HP = MaxHP;
 	}
 
-	// ���� ü���� 0���ϰ� �� ��� ��� ó��
+	// 현재 체력이 0이하가 된 경우 사망 처리
 	if (HP <= 0.f)
 	{
 		OnDeath();
@@ -58,6 +81,18 @@ void ARSDunBaseCharacter::DecreaseMaxHP(float Amount)
 float ARSDunBaseCharacter::GetHP() const
 {
 	return HP;
+}
+
+void ARSDunBaseCharacter::ChangeHP(float Amount)
+{
+	float NewHP = FMath::Clamp(Amount, 0.0f, MaxHP);
+	HP = NewHP;
+
+	// 현재 체력이 0이하가 된 경우 사망 처리
+	if (HP <= 0.f)
+	{
+		OnDeath();
+	}
 }
 
 void ARSDunBaseCharacter::IncreaseHP(float Amount)
@@ -71,7 +106,7 @@ void ARSDunBaseCharacter::DecreaseHP(float Amount)
 	float NewHP = FMath::Clamp(HP - Amount, 0.0f, MaxHP);
 	HP = NewHP;
 
-	// ���� ü���� 0���ϰ� �� ��� ��� ó��
+	// 현재 체력이 0이하가 된 경우 사망 처리
 	if (HP <= 0.f)
 	{
 		OnDeath();
