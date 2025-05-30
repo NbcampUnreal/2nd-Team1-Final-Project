@@ -5,6 +5,7 @@
 #include "RogShop/RSMonsterAttackTraceDefine.h"
 #include "RogShop/UtilDefine.h"
 #include "Components/CapsuleComponent.h"
+#include "MonsterData.h"
 
 ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 {
@@ -30,76 +31,94 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	TraceRightOffset = 0.f;
 	TraceUpOffset = 0.f;
 
-	// 몬스터 캡슐 컴포넌트에 몬스터가 공격을 받아서 그것을 무시하도록 한 코드
+	// 몬스터 캡슐 컴포넌트에 몬스터 공격을 받지 않도록 무시하는 함수
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_MonsterAttackTrace, ECR_Ignore);
+
+	MonsterDataTable = nullptr;
 
 }
 
 void ARSDunMonsterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 	GetWorld()->GetTimerManager().SetTimer(detectDelayTimer, this, &ARSDunMonsterCharacter::FindNearPatrolPoint, 0.5f, false);	
 	if (UAnimInstance* animInstance = GetMesh()->GetAnimInstance())
 	{
 		animInstance->OnMontageEnded.AddDynamic(this, &ARSDunMonsterCharacter::OnDeathMontageEnded);
 	}
+
+	InitMonsterData();
 }
 
-void ARSDunMonsterCharacter::PlayBaseAttackAnim()
+void ARSDunMonsterCharacter::PlayAttackAnim()
 {
 	// TODO : 퀄리티 업때 PlayBaseAttackAnim()이 비헤이비어 트리에서 몽타주가 실행되고 있으면 호출되지 않도록 최적화 코드 필요.
 
-	/*UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (IsValid(AnimInstance) == true && IsValid(BaseAttackMontage) == true)
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	// TODO : 지금은 기본 공격 밖에 없어 이렇게 넣었지만 나중에 거리/확률 기반으로 몬스터의 랜덤한 공격이 나가게 설정할 듯
+	UAnimMontage* AttackMontage00 = MonsterSkill[0].SkillMontage;  
+	
+	if (IsValid(AnimInstance) == true && IsValid(AttackMontage00) == true)
 	{
-		if (AnimInstance->Montage_IsPlaying(BaseAttackMontage) == false)
+		if (AnimInstance->Montage_IsPlaying(AttackMontage00) == false)
 		{
-			AnimInstance->Montage_Play(BaseAttackMontage);
-			RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다.");
+			AnimInstance->Montage_Play(AttackMontage00);
+			RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다");
 		}
-	}*/
+	}
 }
 
 void ARSDunMonsterCharacter::PlayDeathAnim()
 {
 	PlayAnimMontage(DeathMontage);
-	RS_LOG("몬스터가 죽었습니다.");
+	RS_LOG("몬스터가 죽는 애니메이션이 실행되었습니다");
 }
 
 void ARSDunMonsterCharacter::PlaySkill_1()
 {
-	/*UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (IsValid(AnimInstance) == true && IsValid(SkillMontage_1) == true)
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	UAnimMontage* AttackMontage01 = MonsterSkill[1].SkillMontage; 
+
+	if (IsValid(AnimInstance) == true && IsValid(AttackMontage01) == true)
 	{
-		if (AnimInstance->Montage_IsPlaying(SkillMontage_1) == false)
+		if (AnimInstance->Montage_IsPlaying(AttackMontage01) == false)
 		{
-			AnimInstance->Montage_Play(SkillMontage_1);
+			AnimInstance->Montage_Play(AttackMontage01);
 		}
-	}*/
+	}
 }
 
 void ARSDunMonsterCharacter::PlaySkill_2()
 {
-	/*UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (IsValid(AnimInstance) == true && IsValid(SkillMontage_2) == true)
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	UAnimMontage* AttackMontage02 = MonsterSkill[2].SkillMontage;	
+
+	if (IsValid(AnimInstance) == true && IsValid(AttackMontage02) == true)
 	{
-		if (AnimInstance->Montage_IsPlaying(SkillMontage_2) == false)
+		if (AnimInstance->Montage_IsPlaying(AttackMontage02) == false)
 		{
-			AnimInstance->Montage_Play(SkillMontage_2);
+			AnimInstance->Montage_Play(AttackMontage02);
 		}
-	}*/
+	}
 }
 
 void ARSDunMonsterCharacter::PlaySkill_3()
 {
-	/*UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (IsValid(AnimInstance) == true && IsValid(SkillMontage_3) == true)
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();	
+
+	UAnimMontage* AttackMontage03 = MonsterSkill[3].SkillMontage;	
+
+	if (IsValid(AnimInstance) == true && IsValid(AttackMontage03) == true)
 	{
-		if (AnimInstance->Montage_IsPlaying(SkillMontage_3) == false)
+		if (AnimInstance->Montage_IsPlaying(AttackMontage03) == false)
 		{
-			AnimInstance->Montage_Play(SkillMontage_3);
+			AnimInstance->Montage_Play(AttackMontage03);
 		}
-	}*/
+	}
 }
 
 void ARSDunMonsterCharacter::OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted)
@@ -113,14 +132,13 @@ void ARSDunMonsterCharacter::OnDeathMontageEnded(UAnimMontage* montage, bool bIn
 
 float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	// TODO : bIsDead 변수 나중에 넣을 로직
-	/*if (bIsDead) return 0.0f;*/ 
+	if (GetIsDead()) return 0.f;	// 죽으면 데미지 안들어오게 방지
 
 	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
 	DecreaseHP(damage);
 
-	// 데미지 받으면 로그에 추가! (임시)
+	// 데미지 받으면 로그에 추가!
 	UE_LOG(LogTemp, Warning, TEXT("[%s] took %.1f damage from [%s]"),
 		*GetName(),
 		damage,
@@ -132,19 +150,10 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 		OnDeath();
 	}
 
-	// TODO : 만약 영빈님이 블랙보드에 IsHit 같은 변수 있다고 하면 넣을 로직
-	/*if (AAIController* AIController = Cast<AAIController>(GetController()))
-	{
-		if (UBlackboardComponent* BBComponent = AIController->GetBlackboardComponent())
-		{
-			BBComponent->SetValueAsBool(TEXT("IsHit"), true);
-		}
-	}*/
-
 	return damage;
 }
 
-void ARSDunMonsterCharacter::PerformAttackTrace()
+void ARSDunMonsterCharacter::PerformAttackTrace(int32 SkillIndex)
 {
 	FHitResult HitResult;
 	FVector Start = GetMesh()->GetSocketLocation(SocketLocation);
@@ -178,7 +187,9 @@ void ARSDunMonsterCharacter::PerformAttackTrace()
 		AActor* HitActor = HitResult.GetActor();
 		if (IsValid(HitActor))
 		{
-			UGameplayStatics::ApplyDamage(HitActor, 1.f, GetController(), this, nullptr);
+			float AttackDamage = MonsterSkill[SkillIndex].Damage;
+
+			UGameplayStatics::ApplyDamage(HitActor, AttackDamage, GetController(), this, nullptr);
 		}
 	}
 	else
@@ -254,4 +265,37 @@ void ARSDunMonsterCharacter::OnDeath()
 	}
 
 	PlayDeathAnim();
+}
+
+void ARSDunMonsterCharacter::InitMonsterData()
+{
+	static const FString DataTablePath = TEXT("/Game/Datas/MonsterDataTable.MonsterDataTable");
+
+	UDataTable* LoadedTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath));
+
+	if (LoadedTable)
+	{
+		MonsterDataTable = LoadedTable;
+	}
+	else
+	{
+		RS_LOG("몬스터 데이터테이블 로딩 실패");
+	}
+
+	if (MonsterDataTable)
+	{
+		FMonsterData* Row = MonsterDataTable->FindRow<FMonsterData>(MonsterRowName, TEXT("Set MonsterRowName"));
+
+		if (Row)
+		{
+			//MaxHP = Row->MaxHP; // TODO : 바로 최신꺼 pull받고 고칠꺼
+			ChangeMoveSpeed(Row->MoveSpeed);
+			RS_LOG_F("MoveSpeed가 잘 적용 되었습니다! MoveSpeed : %f", Row->MoveSpeed);
+		}
+		else
+		{
+			RS_LOG_F("MaxHP 적용 실패: %s", *MonsterRowName.ToString());
+			RS_LOG_F("MoveSpeed 적용 실패: %s", *MonsterRowName.ToString());
+		}
+	}
 }
