@@ -4,6 +4,8 @@
 #include "RSInventoryWeaponSlotWidget.h"
 
 #include "RSDunPlayerController.h"
+#include "RSDunPlayerCharacter.h"
+#include "RSPlayerWeaponComponent.h"
 #include "RSDataSubsystem.h"
 #include "DungeonItemData.h"
 
@@ -66,6 +68,17 @@ void URSInventoryWeaponSlotWidget::HandleLongPress()
     UE_LOG(LogTemp, Warning, TEXT("Long Press Detected on URSInventoryWeaponSlotWidget Index: %d"), (int32)HeldSlotType);
 
     // 추가 작업 필요
+    ARSDunPlayerCharacter* DunPlayerChar = GetOwningPlayerPawn<ARSDunPlayerCharacter>();
+    if (!DunPlayerChar)
+    {
+        return;
+    }
+
+    URSPlayerWeaponComponent* PlayerWeaponComp = DunPlayerChar->GetRSPlayerWeaponComponent();
+    if (PlayerWeaponComp)
+    {
+        PlayerWeaponComp->DropWeaponToSlot(static_cast<EWeaponSlot>(HeldSlotType));
+    }
 }
 
 void URSInventoryWeaponSlotWidget::UpdateWeaponSlot(uint8 SlotIndex, FName WeaponKey)
@@ -103,7 +116,14 @@ void URSInventoryWeaponSlotWidget::UpdateWeaponSlot(uint8 SlotIndex, FName Weapo
             }
             else
             {
-                UE_LOG(LogTemp, Warning, TEXT("Not FoundData"));
+                if (SlotIndex == 1)
+                {
+                    WeaponSlot1->SetBrushFromTexture(nullptr);
+                }
+                else if (SlotIndex == 2)
+                {
+                    WeaponSlot2->SetBrushFromTexture(nullptr);
+                }
             }
         }
     }

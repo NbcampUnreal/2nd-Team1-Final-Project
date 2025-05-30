@@ -97,21 +97,21 @@ bool URSPlayerWeaponComponent::ContinueComboAttack()
 				return false;
 			}
 
-			// ÄŞº¸ °ø°İÀÌ ¹è¿­ÀÇ Å©±â¸¦ ³Ñ¾î¼­Áö ¾Ê°Ô ÇØÁØ´Ù.
+			// ì½¤ë³´ ê³µê²©ì´ ë°°ì—´ì˜ í¬ê¸°ë¥¼ ë„˜ì–´ì„œì§€ ì•Šê²Œ í•´ì¤€ë‹¤.
 			const TArray<UAnimMontage*>& CurNormalAttacks = WeaponActors[Index]->GetNormalAttacks();
 			if (CurNormalAttacks.Num() <= ComboIndex)
 			{
 				ComboIndex %= CurNormalAttacks.Num();
 			}
 
-			// ÇöÀç Àç»ıÇØ¾ßÇÏ´Â ¸ùÅ¸ÁÖ¸¦ Ã£´Â´Ù.
+			// í˜„ì¬ ì¬ìƒí•´ì•¼í•˜ëŠ” ëª½íƒ€ì£¼ë¥¼ ì°¾ëŠ”ë‹¤.
 			UAnimMontage* CurAttackMontage = CurNormalAttacks[ComboIndex];
 			UAnimInstance* AnimInstance = SkeletalMeshComp->GetAnimInstance();
 
 			if (CurAttackMontage && AnimInstance)
 			{
-				// ¸ùÅ¸ÁÖ¸¦ Àç»ı½ÃÄÑÁØ´Ù.
-				// ÀÔ·ÂµÈ ¹öÆÛ °ªÀ» ÃÊ±âÈ­ÇÏ°í, ´ÙÀ½ °ø°İÀ» À§ÇØ ÄŞº¸ ÀÎµ¦½º¸¦ Áõ°¡½ÃÅ²´Ù.
+				// ëª½íƒ€ì£¼ë¥¼ ì¬ìƒì‹œì¼œì¤€ë‹¤.
+				// ì…ë ¥ëœ ë²„í¼ ê°’ì„ ì´ˆê¸°í™”í•˜ê³ , ë‹¤ìŒ ê³µê²©ì„ ìœ„í•´ ì½¤ë³´ ì¸ë±ìŠ¤ë¥¼ ì¦ê°€ì‹œí‚¨ë‹¤.
 
 				float AttackSpeed = CurCharacter->GetAttackSpeed();
 
@@ -133,8 +133,8 @@ bool URSPlayerWeaponComponent::ContinueComboAttack()
 
 void URSPlayerWeaponComponent::ResetCombo()
 {
-	// °ø°İ ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ Àç»ıµÈ ÈÄ ´õÀÌ»ó ÀÔ·ÂÀÌ ¾øÀ» ¶§ È£ÃâµÈ´Ù.
-	// °ø°İ¿¡ ´ëÇØ ¸ğµÎ ±âº»°ªÀ¸·Î ¼³Á¤
+	// ê³µê²© ì• ë‹ˆë©”ì´ì…˜ì´ ì¬ìƒëœ í›„ ë”ì´ìƒ ì…ë ¥ì´ ì—†ì„ ë•Œ í˜¸ì¶œëœë‹¤.
+	// ê³µê²©ì— ëŒ€í•´ ëª¨ë‘ ê¸°ë³¸ê°’ìœ¼ë¡œ ì„¤ì •
 	ComboIndex = 0;
 	bComboInputBuffered = false;
 	bIsAttack = false;
@@ -142,17 +142,17 @@ void URSPlayerWeaponComponent::ResetCombo()
 
 void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 {
-	// ½½·ÔÀÇ Å©±â°¡ Àß¸ø ¼³Á¤µÈ °æ¿ì
+	// ìŠ¬ë¡¯ì˜ í¬ê¸°ê°€ ì˜ëª» ì„¤ì •ëœ ê²½ìš°
 	if (WeaponActors.Num() != WeaponSlotSize)
 	{
 		WeaponActors.SetNum(WeaponSlotSize);
 	}
 
-	// ½½·Ô¿¡ Æ÷ÇÔÇÒ ¾×ÅÍ¸¦ ¼û±èÃ³¸® ¹× Ãæµ¹À» ²ö´Ù.
+	// ìŠ¬ë¡¯ì— í¬í•¨í•  ì•¡í„°ë¥¼ ìˆ¨ê¹€ì²˜ë¦¬ ë° ì¶©ëŒì„ ëˆë‹¤.
 	NewWeaponActor->SetActorHiddenInGame(true);
 	NewWeaponActor->SetActorEnableCollision(false);
 
-	// Ä³¸¯ÅÍÀÇ ¼Õ¿¡ ¹«±â¸¦ ºÎÂøÇÑ´Ù.
+	// ìºë¦­í„°ì˜ ì†ì— ë¬´ê¸°ë¥¼ ë¶€ì°©í•œë‹¤.
 	ACharacter* CurCharacter = GetOwner<ACharacter>();
 	if (CurCharacter)
 	{
@@ -164,12 +164,12 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 		}
 	}
 
-	// ÇöÀç ºñ¾îÀÖ´Â ¹«±â ½½·ÔÀÌ ÀÖÀ» °æ¿ì ºñ¾îÀÖ´Â ½½·Ô¿¡ ¿ì¼±ÀûÀ¸·Î Ã¤¿î´Ù.
+	// í˜„ì¬ ë¹„ì–´ìˆëŠ” ë¬´ê¸° ìŠ¬ë¡¯ì´ ìˆì„ ê²½ìš° ë¹„ì–´ìˆëŠ” ìŠ¬ë¡¯ì— ìš°ì„ ì ìœ¼ë¡œ ì±„ìš´ë‹¤.
 	if (WeaponActors[0] == nullptr)
 	{
 		WeaponActors[0] = NewWeaponActor;
 
-		// UI °»½ÅµÇµµ·Ï ÀÌº¥Æ® µğ½ºÆĞÃ³ È£Ãâ
+		// UI ê°±ì‹ ë˜ë„ë¡ ì´ë²¤íŠ¸ ë””ìŠ¤íŒ¨ì²˜ í˜¸ì¶œ
 		FName NewWeaponKey = NewWeaponActor->GetDataTableKey();
 
 		ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
@@ -184,7 +184,7 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 	{
 		WeaponActors[1] = NewWeaponActor;
 
-		// UI °»½ÅµÇµµ·Ï ÀÌº¥Æ® µğ½ºÆĞÃ³ È£Ãâ
+		// UI ê°±ì‹ ë˜ë„ë¡ ì´ë²¤íŠ¸ ë””ìŠ¤íŒ¨ì²˜ í˜¸ì¶œ
 		FName NewWeaponKey = NewWeaponActor->GetDataTableKey();
 
 		ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
@@ -197,44 +197,29 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 	}
 	else
 	{
-		// ±âÁ¸¿¡ ÀåÂøÇÏ´ø ¹«±â¸¦ ¹ö¸®´Â ·ÎÁ÷
-		// ¸¸¾à, ºñ¾îÀÖ´Â ¹«±â ½½·ÔÀÌ ¾ø´Â °æ¿ì µé°í ÀÖ´Â ¹«±â¿Í ±³Ã¼ÇÑ´Ù.
+		// ê¸°ì¡´ì— ì¥ì°©í•˜ë˜ ë¬´ê¸°ë¥¼ ë²„ë¦¬ëŠ” ë¡œì§
+		// ë§Œì•½, ë¹„ì–´ìˆëŠ” ë¬´ê¸° ìŠ¬ë¡¯ì´ ì—†ëŠ” ê²½ìš° ë“¤ê³  ìˆëŠ” ë¬´ê¸°ì™€ êµì²´í•œë‹¤.
 		
 		int8 Index = static_cast<int8>(WeaponSlot) - 1;
 
-		// ¸¸¾à ¹«±â¸¦ ÀåÂøÁßÀÌÁö ¾ÊÀº °æ¿ì Ã¹ ½½·ÔÀÇ ¹«±â¿Í ±³Ã¼ÇÑ´Ù.
+		// ë§Œì•½ ë¬´ê¸°ë¥¼ ì¥ì°©ì¤‘ì´ì§€ ì•Šì€ ê²½ìš° ì²« ìŠ¬ë¡¯ì˜ ë¬´ê¸°ì™€ êµì²´í•œë‹¤.
 		if (EWeaponSlot::NONE == WeaponSlot)
 		{
 			Index = static_cast<int8>(EWeaponSlot::FirstWeaponSlot) - 1;
+			WeaponSlot = EWeaponSlot::FirstWeaponSlot;
 		}
 
-		ARSDungeonGroundWeapon* GroundWeapon = GetWorld()->SpawnActor<ARSDungeonGroundWeapon>(ARSDungeonGroundWeapon::StaticClass(), CurCharacter->GetActorTransform());
+		// ê¸°ì¡´ ë¬´ê¸°ë¥¼ ë²„ë¦°ë‹¤.
+		DropWeaponToSlot(WeaponSlot);
 
-		FName WeaponKey = WeaponActors[Index]->GetDataTableKey();
-
-		FDungeonItemData* Data = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Weapon->FindRow<FDungeonItemData>(WeaponKey, TEXT("Get WeaponData"));
-
-		if (Data)
-		{
-			UStaticMesh* ItemStaticMesh = Data->ItemStaticMesh;
-			TSubclassOf<ARSDungeonItemBase> ItemClass = Data->ItemClass;
-
-			if (GroundWeapon && ItemStaticMesh && ItemClass)
-			{
-				GroundWeapon->InitInteractableWeapon(WeaponKey, ItemStaticMesh, ItemClass);
-			}
-		}
-
-		// ±âÁ¸¿¡ ÀåÂøÇÏ´ø ¹«±â Á¦°Å
-		WeaponActors[Index]->Destroy();
+		// ìƒˆë¡œìš´ ë¬´ê¸°ë¥¼ ì¥ì°©
 		WeaponActors[Index] = NewWeaponActor;
 
-		// »õ·Î¿î ¹«±â¸¦ ÀåÂø
 		EWeaponSlot TempWeaponSlot = WeaponSlot;
 		WeaponSlot = EWeaponSlot::NONE;
 		EquipWeaponToCharacter(TempWeaponSlot);
 
-		// UI °»½ÅµÇµµ·Ï ÀÌº¥Æ® µğ½ºÆĞÃ³ È£Ãâ
+		// UI ê°±ì‹ ë˜ë„ë¡ ì´ë²¤íŠ¸ ë””ìŠ¤íŒ¨ì²˜ í˜¸ì¶œ
 		FName NewWeaponKey = NewWeaponActor->GetDataTableKey();
 
 		ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
@@ -245,74 +230,107 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 	}
 }
 
-void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSlot)
+void URSPlayerWeaponComponent::DropWeaponToSlot(EWeaponSlot TargetWeaponSlot)
 {
-	// Àß¸øµÈ °ªÀÌ µé¾î¿Ô´ÂÁö È®ÀÎ
+	// ì˜ëª»ëœ ê°’ì´ ë“¤ì–´ì™”ëŠ”ì§€ í™•ì¸
 	if (EWeaponSlot::NONE == TargetWeaponSlot)
 	{
 		return;
 	}
 
-	// ¹Ù²Ù·Á´Â ½½·ÔÀÌ ºñ¾îÀÖ´Â °æ¿ì Ãë¼Ò
+	// ë²„ë¦¬ë ¤ëŠ” ìŠ¬ë¡¯ì´ ë¹„ì–´ìˆëŠ” ê²½ìš° ì·¨ì†Œ
+	int8 TargetIndex = static_cast<int8>(TargetWeaponSlot) - 1;
+	if (!WeaponActors.IsValidIndex(TargetIndex) || !WeaponActors[TargetIndex])
+	{
+		return;
+	}
+
+	ACharacter* CurCharacter = GetOwner<ACharacter>();
+	if (!CurCharacter)
+	{
+		return;
+	}
+
+	// ë•…ì— ë²„ë ¤ì§ˆ ì•¡í„° ìƒì„±
+	ARSDungeonGroundWeapon* GroundWeapon = GetWorld()->SpawnActor<ARSDungeonGroundWeapon>(ARSDungeonGroundWeapon::StaticClass(), CurCharacter->GetActorTransform());
+
+	// ë•…ì— ë²„ë ¤ì§ˆ ì•¡í„°ì— ì„¸íŒ…í•  ê°’ì„ ë°ì´í„° í…Œì´ë¸”ì— ê°€ì ¸ì™€ ì„¸íŒ…í•œë‹¤.
+	FName WeaponKey = WeaponActors[TargetIndex]->GetDataTableKey();
+
+	FDungeonItemData* Data = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Weapon->FindRow<FDungeonItemData>(WeaponKey, TEXT("Get WeaponData"));
+	if (Data)
+	{
+		UStaticMesh* ItemStaticMesh = Data->ItemStaticMesh;
+		TSubclassOf<ARSDungeonItemBase> ItemClass = Data->ItemClass;
+
+		if (GroundWeapon && ItemStaticMesh && ItemClass)
+		{
+			GroundWeapon->InitInteractableWeapon(WeaponKey, ItemStaticMesh, ItemClass);
+		}
+	}
+
+	// ê¸°ì¡´ì— ì¥ì°©í•˜ë˜ ë¬´ê¸° ì¥ì°© í•´ì œ
+	UnEquipWeaponToCharacter();
+
+	// ê¸°ì¡´ì— ì¥ì°©í•˜ë˜ ë¬´ê¸° ì œê±°
+	WeaponActors[TargetIndex]->Destroy();
+	WeaponActors[TargetIndex] = nullptr;
+
+	// UI ê°±ì‹ ë˜ë„ë¡ ì´ë²¤íŠ¸ ë””ìŠ¤íŒ¨ì²˜ í˜¸ì¶œ
+	ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
+	if (PC)
+	{
+		PC->OnWeaponSlotChange.Broadcast(static_cast<int8>(TargetWeaponSlot), FName(""));
+	}
+}
+
+void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSlot)
+{
+	// ì˜ëª»ëœ ê°’ì´ ë“¤ì–´ì™”ëŠ”ì§€ í™•ì¸
+	if (EWeaponSlot::NONE == TargetWeaponSlot)
+	{
+		return;
+	}
+
+	// ë°”ê¾¸ë ¤ëŠ” ìŠ¬ë¡¯ì´ ë¹„ì–´ìˆëŠ” ê²½ìš° ì·¨ì†Œ
 	int8 TargetIndex = static_cast<int8>(TargetWeaponSlot) - 1;
 	if (!WeaponActors.IsValidIndex(TargetIndex) || !WeaponActors[TargetIndex])
 	{
 		return;
 	}
 	
-	// ¹Ù²Ù·Á´Â ½½·ÔÀÌ ÇöÀç ½½·ÔÀÎ °æ¿ì Ãë¼Ò
+	// ë°”ê¾¸ë ¤ëŠ” ìŠ¬ë¡¯ì´ í˜„ì¬ ìŠ¬ë¡¯ì¸ ê²½ìš° ì·¨ì†Œ
 	int8 CurrentIndex = static_cast<int8>(WeaponSlot) - 1;
 	if (CurrentIndex == TargetIndex)
 	{
 		return;
 	}
 
-	// ±âÁ¸¿¡ Âø¿ëÇÏ°í ÀÖ´ø ¹«±â°¡ À¯È¿ÇÑ °æ¿ì
+	// ê¸°ì¡´ì— ì°©ìš©í•˜ê³  ìˆë˜ ë¬´ê¸°ê°€ ìœ íš¨í•œ ê²½ìš°
 	if (WeaponActors.IsValidIndex(CurrentIndex) && WeaponActors[CurrentIndex])
 	{
-		// ÇöÀç Âø¿ë ÁßÀÎ ¹«±â°¡ ÀÖ´Â °æ¿ì ¼û±è Ã³¸® ¹× Ãæµ¹À» ²ö´Ù.
-		ARSBaseWeapon* CurEquipWeapon = WeaponActors[CurrentIndex];
-		if (CurEquipWeapon)
-		{
-			CurEquipWeapon->SetActorHiddenInGame(true);
-			CurEquipWeapon->SetActorEnableCollision(false);
-
-			// ¿À¹ö·¦ ÀÌº¥Æ® ¹ÙÀÎµù ÇØÁ¦
-			WeaponActors[CurrentIndex]->GetBoxComp()->OnComponentBeginOverlap.RemoveDynamic(this, &URSPlayerWeaponComponent::OnBeginOverlap);
-
-			// ¹«±âÀÇ ¾Ö´Ô ·¹ÀÌ¾î¸¦ ÇØÁ¦ÇÑ´Ù.
-			TSubclassOf<UAnimInstance> CurAnimInstance = CurEquipWeapon->GetWeaponAnimInstnace();
-
-			ACharacter* CurCharacter = GetOwner<ACharacter>();
-			if (CurCharacter)
-			{
-				USkeletalMeshComponent* SkeletalMeshComp = CurCharacter->GetMesh();
-				if (SkeletalMeshComp)
-				{
-					SkeletalMeshComp->UnlinkAnimClassLayers(CurAnimInstance);
-				}
-			}
-		}
+		// ì¥ì°© ì¤‘ì¸ ë¬´ê¸°ë¥¼ ì œê±°í•œë‹¤.
+		UnEquipWeaponToCharacter();
 	}
 
-	// »õ·Î Âø¿ëÇÒ ¹«±â°¡ À¯È¿ÇÑ °æ¿ì
+	// ìƒˆë¡œ ì°©ìš©í•  ë¬´ê¸°ê°€ ìœ íš¨í•œ ê²½ìš°
 	if (WeaponActors.IsValidIndex(TargetIndex) && WeaponActors[TargetIndex])
 	{
-		// »õ·Î Âø¿ëÇÒ ¹«±âÀÇ ¼û±è Ã³¸®¸¦ ²ô°í, Ãæµ¹À» ÄÒ´Ù.
 		ARSBaseWeapon* TargetEquipWeapon = WeaponActors[TargetIndex];
 		if (TargetEquipWeapon)
 		{
+			// ìƒˆë¡œ ì°©ìš©í•  ë¬´ê¸°ì˜ ìˆ¨ê¹€ ì²˜ë¦¬ë¥¼ ë„ê³ , ì¶©ëŒì„ ì¼ ë‹¤.
 			TargetEquipWeapon->SetActorHiddenInGame(false);
 			TargetEquipWeapon->SetActorEnableCollision(true);
 			
-			// ¿À¹ö·¦ ÀÌº¥Æ® ¹ÙÀÎµù
+			// ì˜¤ë²„ë© ì´ë²¤íŠ¸ ë°”ì¸ë”©
 			UBoxComponent* CurWeaponBoxComp = TargetEquipWeapon->GetBoxComp();
 			if (CurWeaponBoxComp)
 			{
 				CurWeaponBoxComp->OnComponentBeginOverlap.AddDynamic(this, &URSPlayerWeaponComponent::OnBeginOverlap);
 			}
 
-			// ¹«±âÀÇ ¾Ö´Ô ·¹ÀÌ¾î¸¦ Àû¿ëÇÑ´Ù.
+			// ë¬´ê¸°ì˜ ì• ë‹˜ ë ˆì´ì–´ë¥¼ ì ìš©í•œë‹¤.
 			TSubclassOf<UAnimInstance> TargetAnimInstance = TargetEquipWeapon->GetWeaponAnimInstnace();
 
 			ACharacter* CurCharacter = GetOwner<ACharacter>();
@@ -325,15 +343,53 @@ void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSl
 				}
 			}
 
-			// ÇöÀç ½½·ÔÀ» º¯°æÇÑ´Ù.
+			// í˜„ì¬ ìŠ¬ë¡¯ì„ ë³€ê²½í•œë‹¤.
 			WeaponSlot = TargetWeaponSlot;
 		}
 	}
 }
 
+void URSPlayerWeaponComponent::UnEquipWeaponToCharacter()
+{
+	// ì˜ëª»ëœ ê°’ì´ ë“¤ì–´ì™”ëŠ”ì§€ í™•ì¸
+	if (EWeaponSlot::NONE == WeaponSlot)
+	{
+		return;
+	}
+
+	int8 CurrentIndex = static_cast<int8>(WeaponSlot) - 1;
+
+	// í˜„ì¬ ì°©ìš© ì¤‘ì¸ ë¬´ê¸°ê°€ ìˆëŠ” ê²½ìš° ìˆ¨ê¹€ ì²˜ë¦¬ ë° ì¶©ëŒì„ ëˆë‹¤.
+	ARSBaseWeapon* CurEquipWeapon = WeaponActors[CurrentIndex];
+	if (CurEquipWeapon)
+	{
+		CurEquipWeapon->SetActorHiddenInGame(true);
+		CurEquipWeapon->SetActorEnableCollision(false);
+
+		// ì˜¤ë²„ë© ì´ë²¤íŠ¸ ë°”ì¸ë”© í•´ì œ
+		WeaponActors[CurrentIndex]->GetBoxComp()->OnComponentBeginOverlap.RemoveDynamic(this, &URSPlayerWeaponComponent::OnBeginOverlap);
+
+		// ë¬´ê¸°ì˜ ì• ë‹˜ ë ˆì´ì–´ë¥¼ í•´ì œí•œë‹¤.
+		TSubclassOf<UAnimInstance> CurAnimInstance = CurEquipWeapon->GetWeaponAnimInstnace();
+
+		ACharacter* CurCharacter = GetOwner<ACharacter>();
+		if (CurCharacter)
+		{
+			USkeletalMeshComponent* SkeletalMeshComp = CurCharacter->GetMesh();
+			if (SkeletalMeshComp)
+			{
+				SkeletalMeshComp->UnlinkAnimClassLayers(CurAnimInstance);
+			}
+		}
+
+		// í˜„ì¬ ìŠ¬ë¡¯ì„ ë³€ê²½í•œë‹¤.
+		WeaponSlot = EWeaponSlot::NONE;
+	}
+}
+
 void URSPlayerWeaponComponent::StartAttackOverlap()
 {
-	// Äİ¸®ÀüÀ» ÄÒ´Ù.
+	// ì½œë¦¬ì „ì„ ì¼ ë‹¤.
 	int8 Index = static_cast<int8>(WeaponSlot) - 1;
 	if (WeaponActors.IsValidIndex(Index))
 	{
@@ -343,20 +399,20 @@ void URSPlayerWeaponComponent::StartAttackOverlap()
 
 void URSPlayerWeaponComponent::EndAttackOverlap()
 {
-	// Äİ¸®ÀüÀ» ²ö´Ù.
+	// ì½œë¦¬ì „ì„ ëˆë‹¤.
 	int8 Index = static_cast<int8>(WeaponSlot) - 1;
 	if (WeaponActors.IsValidIndex(Index))
 	{
 		WeaponActors[Index]->EndOverlap();
 	}
 
-	// ÇØ´ç ¹«±â·Î ÇÇÇØ¸¦ ÀÔÀº ¾×ÅÍµéÀÇ ¸ñ·ÏÀ» ÃÊ±âÈ­ÇÑ´Ù.
+	// í•´ë‹¹ ë¬´ê¸°ë¡œ í”¼í•´ë¥¼ ì…ì€ ì•¡í„°ë“¤ì˜ ëª©ë¡ì„ ì´ˆê¸°í™”í•œë‹¤.
 	DamagedActors.Empty();
 }
 
 void URSPlayerWeaponComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// ¿À¹ö·¦ µÈ ¾×ÅÍ¿¡°Ô µ¥¹ÌÁö¸¦ °¡ÇÑ´Ù.
+	// ì˜¤ë²„ë© ëœ ì•¡í„°ì—ê²Œ ë°ë¯¸ì§€ë¥¼ ê°€í•œë‹¤.
 	ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
 
 	AController* OwnerController = nullptr;
@@ -383,11 +439,11 @@ void URSPlayerWeaponComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedCom
 
 void URSPlayerWeaponComponent::SaveRequested()
 {
-	// SaveGame ¿ÀºêÁ§Æ® »ı¼º
+	// SaveGame ì˜¤ë¸Œì íŠ¸ ìƒì„±
 	URSDungeonWeaponSaveGame* WeaponSaveGame = Cast<URSDungeonWeaponSaveGame>(UGameplayStatics::CreateSaveGameObject(URSDungeonWeaponSaveGame::StaticClass()));
 
 	WeaponSaveGame->WeaponActors.SetNum(WeaponSlotSize);
-	// ¹«±â Á¤º¸ ÀúÀå
+	// ë¬´ê¸° ì •ë³´ ì €ì¥
 	for (int i = 0; i < WeaponActors.Num(); ++i)
 	{
 		ARSBaseWeapon* Weapon = WeaponActors[i];
@@ -397,17 +453,17 @@ void URSPlayerWeaponComponent::SaveRequested()
 		}
 	}
 
-	// ÀåÂø ÁßÀÎ ¹«±â ½½·Ô ÀúÀå
+	// ì¥ì°© ì¤‘ì¸ ë¬´ê¸° ìŠ¬ë¡¯ ì €ì¥
 	int8 CurWeaponSlot = static_cast<int8>(WeaponSlot);
 	WeaponSaveGame->WeaponSlot = CurWeaponSlot;
 	
-	// ÀúÀå
+	// ì €ì¥
 	UGameplayStatics::SaveGameToSlot(WeaponSaveGame, WeaponSaveSlotName, 0);
 }
 
 void URSPlayerWeaponComponent::LoadRequested()
 {
-	// ³Î Ã¼Å©
+	// ë„ ì²´í¬
 	URSDungeonWeaponSaveGame* WeaponLoadGame = Cast<URSDungeonWeaponSaveGame>(UGameplayStatics::LoadGameFromSlot(WeaponSaveSlotName, 0));
 	if (!WeaponLoadGame)
 	{
@@ -439,10 +495,10 @@ void URSPlayerWeaponComponent::LoadRequested()
 		return;
 	}
 
-	// ÀúÀåµÈ ¹«±â Á¤º¸¸¦ °¡Á®¿Â´Ù.
+	// ì €ì¥ëœ ë¬´ê¸° ì •ë³´ë¥¼ ê°€ì ¸ì˜¨ë‹¤.
 	TArray<FName> LoadWeaponName = WeaponLoadGame->WeaponActors;
 
-	// ÀúÀåµÈ ¹«±â Á¤º¸¸¦ ±âÁØÀ¸·Î ÀåÂøÇÒ ¹«±â ¾×ÅÍ¸¦ »ı¼ºÇÏ°í ½½·Ô¿¡ ÀúÀåÇÑ´Ù.
+	// ì €ì¥ëœ ë¬´ê¸° ì •ë³´ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ì¥ì°©í•  ë¬´ê¸° ì•¡í„°ë¥¼ ìƒì„±í•˜ê³  ìŠ¬ë¡¯ì— ì €ì¥í•œë‹¤.
 	for (int i = 0; i < LoadWeaponName.Num(); ++i)
 	{
 		if (LoadWeaponName[i].IsNone())
@@ -470,7 +526,7 @@ void URSPlayerWeaponComponent::LoadRequested()
 		}
 	}
 
-	// ÀåÂø ÇØ¾ßÇÏ´Â ½½·ÔÀ» °¡Á®¿À°í ¹«±â¸¦ ÀåÂøÇÑ´Ù.
+	// ì¥ì°© í•´ì•¼í•˜ëŠ” ìŠ¬ë¡¯ì„ ê°€ì ¸ì˜¤ê³  ë¬´ê¸°ë¥¼ ì¥ì°©í•œë‹¤.
 	EWeaponSlot TargetWeaponSlot = static_cast<EWeaponSlot>(WeaponLoadGame->WeaponSlot);
 	EquipWeaponToCharacter(TargetWeaponSlot);
 }
