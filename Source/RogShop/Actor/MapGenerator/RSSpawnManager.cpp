@@ -13,9 +13,10 @@
 #include "RSDataSubsystem.h"
 #include "RSDunPlayerCharacter.h"
 #include "Engine/World.h"
+#include "Components/CapsuleComponent.h"
 
 // 외부에서 전달받은 월드와 몬스터 테이블을 초기화
-void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance,TSubclassOf<AActor> ShopNPC)
+void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, TSubclassOf<AActor> ShopNPC)
 {
     World = InWorld;
     ShopNPCClass = ShopNPC;
@@ -77,16 +78,26 @@ void URSSpawnManager::SpawnMonstersInLevel()
             int32 Count = Entry.Count;
 
             FMonsterData* StateRow = MonsterStateTable->FindRow<FMonsterData>(RowName, TEXT("MonsterStateLookup"));
-            if (!StateRow || !StateRow->MonsterClass) continue;
+            if (!StateRow || !StateRow->MonsterClass)
+            {
+                continue;
+            }
 
             for (int32 i = 0; i < Count && TargetIndex < MonsterTargets.Num(); ++i)
             {
                 AActor* Target = MonsterTargets[TargetIndex++];
+
                 FTransform SpawnTransform = Target->GetActorTransform();
+
                 FActorSpawnParameters Params;
                 Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
                 ARSDunMonsterCharacter* Monster =  World->SpawnActor<ARSDunMonsterCharacter>(StateRow->MonsterClass, SpawnTransform, Params);
+
+                FVector SpawnLocation = SpawnTransform.GetLocation();
+                SpawnLocation.Z += Monster->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+                Monster->SetActorLocation(SpawnLocation);
+
                 Monster->IncreaseHP(StateRow->MaxHP);
                 Monster->ChangeMoveSpeed(StateRow->MoveSpeed);
             }
@@ -177,6 +188,11 @@ void URSSpawnManager::SpawnPlayerAtStartPoint(TSubclassOf<ACharacter> PlayerClas
         SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
         // 새로 생성
         ACharacter* PlayerCharacter = World->SpawnActor<ACharacter>(PlayerClass, SpawnTransform, SpawnParams);
+
+        FVector SpawnLocation = SpawnTransform.GetLocation();
+        SpawnLocation.Z += PlayerCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+        PlayerCharacter->SetActorLocation(SpawnLocation);
+
         if (PlayerCharacter)
         {
             APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
