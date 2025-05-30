@@ -34,6 +34,8 @@ public:
 	virtual void PlaySkill_2();
 	UFUNCTION(BlueprintCallable)
 	virtual void PlaySkill_3();
+	UFUNCTION(BlueprintCallable)
+	virtual void PlaySkill_4();
 
 	UFUNCTION()
 	void OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted);  //사망 모션이 끝난 경우
@@ -77,6 +79,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> SkillMontage_3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> SkillMontage_4;
 
 	//NavInvoker
 	UPROPERTY(BlueprintReadWrite, Category = Navigation, meta = (AllowPrivateAccess = "true"))//Navigation Invoker Setting

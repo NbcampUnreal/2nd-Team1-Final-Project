@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "RSDunMonsterCharacter.h"
@@ -98,6 +98,18 @@ void ARSDunMonsterCharacter::PlaySkill_3()
 		if (AnimInstance->Montage_IsPlaying(SkillMontage_3) == false)
 		{
 			AnimInstance->Montage_Play(SkillMontage_3);
+		}
+	}
+}
+
+void ARSDunMonsterCharacter::PlaySkill_4()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (IsValid(AnimInstance) == true && IsValid(SkillMontage_4) == true)
+	{
+		if (AnimInstance->Montage_IsPlaying(SkillMontage_4) == false)
+		{
+			AnimInstance->Montage_Play(SkillMontage_4);
 		}
 	}
 }
