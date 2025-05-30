@@ -42,7 +42,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct FMonsterSkillData
+struct FMonsterAttackSkillData
 {
 	GENERATED_BODY()
 
@@ -115,7 +115,7 @@ protected:
 protected:
 	// 애니메이션 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FMonsterSkillData> MonsterSkill;
+	TArray<FMonsterAttackSkillData> MonsterAttackSkills;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> DeathMontage;

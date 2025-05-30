@@ -34,6 +34,10 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	// 몬스터 캡슐 컴포넌트에 몬스터 공격을 받지 않도록 무시하는 함수
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_MonsterAttackTrace, ECR_Ignore);
 
+	// 캡슐 컴포넌트의 오버랩 이벤트는 끄고 스켈레탈 메시의 오버랩 이벤트는 켜기
+	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
+	GetMesh()->SetGenerateOverlapEvents(true);
+
 	MonsterDataTable = nullptr;
 
 }
@@ -57,10 +61,10 @@ void ARSDunMonsterCharacter::PlayAttackAnim()
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-	if (MonsterSkill.Num() > 0)
+	if (MonsterAttackSkills.Num() > 0)
 	{
 		// TODO : 지금은 기본 공격 밖에 없어 이렇게 넣었지만 나중에 거리/확률 기반으로 몬스터의 랜덤한 공격이 나가게 설정할 듯
-		UAnimMontage* AttackMontage00 = MonsterSkill[0].SkillMontage;
+		UAnimMontage* AttackMontage00 = MonsterAttackSkills[0].SkillMontage;
 
 		if (IsValid(AnimInstance) == true && IsValid(AttackMontage00) == true)
 		{
@@ -87,9 +91,10 @@ void ARSDunMonsterCharacter::PlaySkill_1()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-	if (MonsterSkill.Num() > 0)
+	if (MonsterAttackSkills.Num() > 0)
 	{
-		UAnimMontage* AttackMontage01 = MonsterSkill[1].SkillMontage;
+		// TODO : 지금은 기본 공격 밖에 없어 이렇게 넣었지만 나중에 거리/확률 기반으로 몬스터의 랜덤한 공격이 나가게 설정할 듯
+		UAnimMontage* AttackMontage01 = MonsterAttackSkills[1].SkillMontage;
 
 		if (IsValid(AnimInstance) == true && IsValid(AttackMontage01) == true)
 		{
@@ -110,15 +115,16 @@ void ARSDunMonsterCharacter::PlaySkill_2()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-	if (MonsterSkill.Num() > 0)
+	if (MonsterAttackSkills.Num() > 0)
 	{
-		UAnimMontage* AttackMontage02 = MonsterSkill[2].SkillMontage;
+		// TODO : 지금은 기본 공격 밖에 없어 이렇게 넣었지만 나중에 거리/확률 기반으로 몬스터의 랜덤한 공격이 나가게 설정할 듯
+		UAnimMontage* AttackMontage01 = MonsterAttackSkills[1].SkillMontage;
 
-		if (IsValid(AnimInstance) == true && IsValid(AttackMontage02) == true)
+		if (IsValid(AnimInstance) == true && IsValid(AttackMontage01) == true)
 		{
-			if (AnimInstance->Montage_IsPlaying(AttackMontage02) == false)
+			if (AnimInstance->Montage_IsPlaying(AttackMontage01) == false)
 			{
-				AnimInstance->Montage_Play(AttackMontage02);
+				AnimInstance->Montage_Play(AttackMontage01);
 				RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다");
 			}
 		}
@@ -133,15 +139,16 @@ void ARSDunMonsterCharacter::PlaySkill_3()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-	if (MonsterSkill.Num() > 0)
+	if (MonsterAttackSkills.Num() > 0)
 	{
-		UAnimMontage* AttackMontage03 = MonsterSkill[3].SkillMontage;
+		// TODO : 지금은 기본 공격 밖에 없어 이렇게 넣었지만 나중에 거리/확률 기반으로 몬스터의 랜덤한 공격이 나가게 설정할 듯
+		UAnimMontage* AttackMontage01 = MonsterAttackSkills[1].SkillMontage;
 
-		if (IsValid(AnimInstance) == true && IsValid(AttackMontage03) == true)
+		if (IsValid(AnimInstance) == true && IsValid(AttackMontage01) == true)
 		{
-			if (AnimInstance->Montage_IsPlaying(AttackMontage03) == false)
+			if (AnimInstance->Montage_IsPlaying(AttackMontage01) == false)
 			{
-				AnimInstance->Montage_Play(AttackMontage03);
+				AnimInstance->Montage_Play(AttackMontage01);
 				RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다");
 			}
 		}
@@ -170,17 +177,23 @@ void ARSDunMonsterCharacter::OnDeathMontageEnded(UAnimMontage* montage, bool bIn
 
 float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	RS_LOG("TakeDamage 들어 오긴함");
+
 	if (GetIsDead()) return 0.f;	// 죽으면 데미지 안들어오게 방지
 
-	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	RS_LOG("TakeDamage 들어와서 데미지까지 실제로 입힘");
+
+	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
-	DecreaseHP(damage);
+	DecreaseHP(Damage);
 
 	// 데미지 받으면 로그에 추가!
-	UE_LOG(LogTemp, Warning, TEXT("[%s] took %.1f damage from [%s]"),
+	UE_LOG(LogTemp, Warning, TEXT("[%s] took %.1f damage from [%s], Current Hp is %f"),
 		*GetName(),
-		damage,
-		DamageCauser ? *DamageCauser->GetName() : TEXT("Unknown"));
+		Damage,
+		DamageCauser ? *DamageCauser->GetName() : TEXT("Unknown"),
+		GetHP()
+	);
 
 	
 	if (GetHP() <= 0)
@@ -188,7 +201,7 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 		OnDeath();
 	}
 
-	return damage;
+	return Damage;
 }
 
 void ARSDunMonsterCharacter::PerformAttackTrace(int32 SkillIndex)
@@ -225,9 +238,9 @@ void ARSDunMonsterCharacter::PerformAttackTrace(int32 SkillIndex)
 		AActor* HitActor = HitResult.GetActor();
 		if (IsValid(HitActor))
 		{
-			float AttackDamage = MonsterSkill[SkillIndex].Damage;
+			/*float AttackDamage = MonsterSkill[SkillIndex].Damage;
 
-			UGameplayStatics::ApplyDamage(HitActor, AttackDamage, GetController(), this, nullptr);
+			UGameplayStatics::ApplyDamage(HitActor, AttackDamage, GetController(), this, nullptr);*/
 		}
 	}
 	else
