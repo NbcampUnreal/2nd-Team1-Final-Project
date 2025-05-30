@@ -46,6 +46,9 @@ public://Function
 	UFUNCTION(BlueprintCallable)
 	void AISkill_3();
 
+	UFUNCTION(BlueprintCallable)
+	void AISkill_4();
+
 	//Patrol
 	UFUNCTION(BlueprintCallable)
 	void MoveToCurrentPatrolPoint();
