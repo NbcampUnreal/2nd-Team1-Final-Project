@@ -101,7 +101,7 @@ void ARSMonsterAIController::AISkill_4(FVector interrestedPos)
 	}
 }
 
-void ARSMonsterAIController::AISkillAction(int32 actionIdx)
+void ARSMonsterAIController::AISkillAction(int32 actionIdx, FVector interestedPos)
 {
 	APawn* ctrlPawn = GetPawn();
 	if (ctrlPawn)
@@ -110,7 +110,7 @@ void ARSMonsterAIController::AISkillAction(int32 actionIdx)
 		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
 		if (ctrlChr)
 		{
-			ctrlChr->AIAction(actionIdx);
+			ctrlChr->AIAction(actionIdx, interestedPos);
 		}
 	}
 }
