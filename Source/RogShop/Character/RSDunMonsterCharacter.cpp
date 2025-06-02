@@ -160,7 +160,7 @@ void ARSDunMonsterCharacter::PlaySkill_3()
 	GetWorld()->SpawnActor<AActor>(servant, interrestedPos, spawnRot);
 }*/
 
-void ARSDunMonsterCharacter::AIAction(int32 actionIdx)
+void ARSDunMonsterCharacter::AIAction(int32 actionIdx, FVector interestedPos)
 {
 	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
 
@@ -397,4 +397,9 @@ void ARSDunMonsterCharacter::InitMonsterData()
 			RS_LOG_F("MoveSpeed 적용 실패: %s", *MonsterRowName.ToString());
 		}
 	}
+}
+
+int ARSDunMonsterCharacter::GetActionLength()
+{
+	return MonsterAttackSkills.Num();
 }
