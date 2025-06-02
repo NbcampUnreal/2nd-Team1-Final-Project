@@ -2,6 +2,7 @@
 
 
 #include "RSDunMonsterCharacter.h"
+#include "RSDunPlayerCharacter.h"
 #include "RogShop/RSMonsterAttackTraceDefine.h"
 #include "RogShop/UtilDefine.h"
 #include "Components/CapsuleComponent.h"
@@ -253,7 +254,7 @@ void ARSDunMonsterCharacter::PerformAttackTrace()
 		{
 			RS_LOG("bHit True! 무언가 공격에 맞았습니다!");
 			AActor* HitActor = HitResult.GetActor();
-			bool bPlayerHit = IsValid(HitActor) && HitActor->IsA(ARSDunMonsterCharacter::StaticClass());
+			bool bPlayerHit = IsValid(HitActor) && HitActor->IsA(ARSDunPlayerCharacter::StaticClass());
 			// bool bPlayerHit = IsValid(HitActor); // TODO: MonsterPawn Block->Ignore 설정 가능하면 이 코드로 변경
 
 			if (bPlayerHit)
