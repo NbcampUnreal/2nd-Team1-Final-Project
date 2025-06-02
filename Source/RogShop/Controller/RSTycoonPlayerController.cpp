@@ -137,7 +137,7 @@ void ARSTycoonPlayerController::OnTileClick()
 
 			if (ManagementWidget)
 			{
-				ManagementWidget->PlayBuyTileParentBorderSlide();
+				ManagementWidget->BuyTileBorderSlide();
 			}
 			else
 			{

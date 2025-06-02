@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "RSTycoonBuyTileWidget.h"
+#include "RSTycoonBuyNPCWidget.h"
 #include "RSTycoonManagementWidget.generated.h"
 
 class USpinBox;
@@ -14,19 +15,17 @@ class UTextBlock;
 class UButton;
 class UBorder;
 
-//class URSTycoonBuyNPCWidget;
-
 UCLASS()
 class ROGSHOP_API URSTycoonManagementWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
-	void PlayBuyTileParentBorderSlide();
+	UFUNCTION()
+	void BuyTileBorderSlide();
 
-	UFUNCTION(BlueprintCallable)
-	void PlayBuyNPCParentBorderSlide();
+	UFUNCTION()
+	void BuyNPCBorderSlide();
 
 protected:
 	virtual void NativeConstruct() override;
@@ -54,38 +53,49 @@ protected:
 
 	TArray<URSTycoonBuyTileWidget> BuyTileWidgets;
 
-	UFUNCTION()
+#pragma region UI Animation, NPC Buy
+
+	UFUNCTION(BlueprintCallable)
 	void HandleWaiterClick();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void HandleChefClick();
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UButton> CreateNPCButton;
+	// BP 노드 실행용 함수, BP 빠지면 이 함수도 필요없음
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnWaiterClicked_BP();
 
-	//UPROPERTY(meta = (BindWidget))
-	//TObjectPtr<URSTycoonBuyNPCWidget> BuyNPCWidget_Waiter;
-
-	//UPROPERTY(meta = (BindWidget))
-	//TObjectPtr<URSTycoonBuyNPCWidget> BuyNPCWidget_Chef;
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnChefClicked_BP();
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UBorder> BuyTileParentBorder;
 
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
-	UWidgetAnimation* BuyTileParentBorderSlide;
+	UWidgetAnimation* BuyTileBorderSlideAni;
 
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
-	UWidgetAnimation* BuyTileParentBorderClose;
+	UWidgetAnimation* BuyTileBorderCloseAni;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UBorder> BuyNPCBorder;
 
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
-	UWidgetAnimation* BuyNPCParentBorderSlide;
+	UWidgetAnimation* BuyNPCBorderSlideAni;
 
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
-	UWidgetAnimation* BuyNPCParentBorderClose;
+	UWidgetAnimation* BuyNPCBorderCloseAni;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UButton> CreateNPCButton;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<URSTycoonBuyNPCWidget> BuyNPCWidget_Waiter;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<URSTycoonBuyNPCWidget> BuyNPCWidget_Chef;
+
+#pragma endregion
 
 private:
 	UFUNCTION()
@@ -94,6 +104,6 @@ private:
 	UFUNCTION()
 	void OnClickWaitMode();
 
-	bool bIsBuyTileParentBorderValid = false;
-	bool bIsBuyNPCParentBorderValid = false;
+	bool bIsBuyTileBorderValid = false;
+	bool bIsBuyNPCBorderValid = false;
 };

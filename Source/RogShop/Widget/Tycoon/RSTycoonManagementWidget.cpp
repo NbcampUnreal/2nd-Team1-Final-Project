@@ -17,8 +17,6 @@
 #include "RogShop/Actor/Tycoon/RSTileMap.h"
 #include "RogShop/Actor/Tycoon/Tile/RSBaseTile.h"
 
-// #include "RSTycoonBuyNPCWidget.h"
-
 void URSTycoonManagementWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -56,20 +54,22 @@ void URSTycoonManagementWidget::NativeConstruct()
 		BuyNPCBorder->SetRenderTranslation(FVector2D(0.f, 0.f));
 	}
 
-	// NPC 버튼 입력 세팅 (WBP의 OnClicked 라는 브로드캐스트를 받으면 밑에 함수를 실행)
-	//if (BuyNPCWidget_Waiter)
-	//{
-	//	BuyNPCWidget_Waiter->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::HandleWaiterClick);
-	//}
-
-	//if (BuyNPCWidget_Chef)
-	//{
-	//	BuyNPCWidget_Chef->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::HandleChefClick);
-	//}
-
 	if (CreateNPCButton)
 	{
-		CreateNPCButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::PlayBuyNPCParentBorderSlide);
+		CreateNPCButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::BuyNPCBorderSlide);
+	}
+
+	// NPC 버튼 입력 세팅 (부모 WBP의 OnClick 라는 브로드캐스트를 받으면 밑에 함수를 실행)
+	if (BuyNPCWidget_Waiter)
+	{
+		BuyNPCWidget_Waiter->OnClick.AddDynamic(this, &URSTycoonManagementWidget::HandleWaiterClick);
+		BuyNPCWidget_Waiter->SetNPCName(FText::FromString(TEXT("Waiter")));
+	}
+
+	if (BuyNPCWidget_Chef)
+	{
+		BuyNPCWidget_Chef->OnClick.AddDynamic(this, &URSTycoonManagementWidget::HandleChefClick);
+		BuyNPCWidget_Chef->SetNPCName(FText::FromString(TEXT("Chef")));
 	}
 }
 
@@ -95,52 +95,52 @@ void URSTycoonManagementWidget::OnClickWaitMode()
 	TileMap->SaveTileMap();
 }
 
-void URSTycoonManagementWidget::PlayBuyTileParentBorderSlide()
+void URSTycoonManagementWidget::BuyTileBorderSlide()
 {
-	if (BuyTileParentBorderSlide)
+	if (BuyTileBorderSlideAni)
 	{
-		if (bIsBuyTileParentBorderValid == false)
+		if (bIsBuyTileBorderValid == false)
 		{
-			if (bIsBuyNPCParentBorderValid)
+			if (bIsBuyNPCBorderValid)
 			{
-				PlayAnimation(BuyNPCParentBorderClose);
-				bIsBuyNPCParentBorderValid = false;
+				PlayAnimation(BuyNPCBorderCloseAni);
+				bIsBuyNPCBorderValid = false;
 			}
 
-			PlayAnimation(BuyTileParentBorderSlide);
-			bIsBuyTileParentBorderValid = true;
+			PlayAnimation(BuyTileBorderSlideAni);
+			bIsBuyTileBorderValid = true;
 		}
 		else
 		{
-			PlayAnimation(BuyTileParentBorderClose);
-			bIsBuyTileParentBorderValid = false;
+			PlayAnimation(BuyTileBorderCloseAni);
+			bIsBuyTileBorderValid = false;
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("BuyTileParentBorderSlide Null"));
+		UE_LOG(LogTemp, Warning, TEXT("BuyTileBorderSlideAni Null"));
 	}
 }
 
-void URSTycoonManagementWidget::PlayBuyNPCParentBorderSlide()
+void URSTycoonManagementWidget::BuyNPCBorderSlide()
 {
-	if (BuyNPCParentBorderSlide)
+	if (BuyNPCBorderSlideAni)
 	{
-		if (bIsBuyNPCParentBorderValid == false)
+		if (bIsBuyNPCBorderValid == false)
 		{
-			if (bIsBuyTileParentBorderValid)
+			if (bIsBuyTileBorderValid)
 			{
-				PlayAnimation(BuyTileParentBorderClose);
-				bIsBuyTileParentBorderValid = false;
+				PlayAnimation(BuyTileBorderCloseAni);
+				bIsBuyTileBorderValid = false;
 			}
 
-			PlayAnimation(BuyNPCParentBorderSlide);
-			bIsBuyNPCParentBorderValid = true;
+			PlayAnimation(BuyNPCBorderSlideAni);
+			bIsBuyNPCBorderValid = true;
 		}
 		else
 		{
-			PlayAnimation(BuyNPCParentBorderClose);
-			bIsBuyNPCParentBorderValid = false;
+			PlayAnimation(BuyNPCBorderCloseAni);
+			bIsBuyNPCBorderValid = false;
 		}
 	}
 	else
@@ -151,10 +151,10 @@ void URSTycoonManagementWidget::PlayBuyNPCParentBorderSlide()
 
 void URSTycoonManagementWidget::HandleWaiterClick()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Waiter Clicked!"));
+	OnWaiterClicked_BP();
 }
 
 void URSTycoonManagementWidget::HandleChefClick()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Chef Clicked!"));
+	OnChefClicked_BP();
 }
