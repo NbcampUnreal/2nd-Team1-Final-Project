@@ -8,7 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/BoxComponent.h"
 #include "RSDataSubsystem.h"
-#include "DungeonItemData.h"
+#include "ItemInfoData.h"
 #include "RSDungeonGroundWeapon.h"
 #include "RSDunPlayerController.h"
 #include "RSDungeonWeaponSaveGame.h"
@@ -257,15 +257,16 @@ void URSPlayerWeaponComponent::DropWeaponToSlot(EWeaponSlot TargetWeaponSlot)
 	// 땅에 버려질 액터에 세팅할 값을 데이터 테이블에 가져와 세팅한다.
 	FName WeaponKey = WeaponActors[TargetIndex]->GetDataTableKey();
 
-	FDungeonItemData* Data = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Weapon->FindRow<FDungeonItemData>(WeaponKey, TEXT("Get WeaponData"));
-	if (Data)
+	FItemInfoData* ItemInfoData = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Weapon->FindRow<FItemInfoData>(WeaponKey, TEXT("Get WeaponData"));
+	FDungeonWeaponData* WeaponData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponClass->FindRow<FDungeonWeaponData>(WeaponKey, TEXT("Get WeaponData"));
+	if (ItemInfoData && WeaponData)
 	{
-		UStaticMesh* ItemStaticMesh = Data->ItemStaticMesh;
-		TSubclassOf<ARSDungeonItemBase> ItemClass = Data->ItemClass;
+		UStaticMesh* ItemStaticMesh = ItemInfoData->ItemStaticMesh;
+		TSubclassOf<ARSDungeonItemBase> WeaponClass = WeaponData->WeaponClass;
 
-		if (GroundWeapon && ItemStaticMesh && ItemClass)
+		if (GroundWeapon && ItemStaticMesh && WeaponClass)
 		{
-			GroundWeapon->InitInteractableWeapon(WeaponKey, ItemStaticMesh, ItemClass);
+			GroundWeapon->InitInteractableWeapon(WeaponKey, ItemStaticMesh, WeaponClass);
 		}
 	}
 
@@ -493,6 +494,7 @@ void URSPlayerWeaponComponent::LoadRequested()
 	}
 
 	UDataTable* WeaponDataTable = DataSubsystem->Weapon;
+	UDataTable* WeaponClassDataTable = DataSubsystem->WeaponClass;
 	if (!WeaponDataTable)
 	{
 		return;
@@ -511,15 +513,16 @@ void URSPlayerWeaponComponent::LoadRequested()
 
 		FName CurWeaponName = WeaponLoadGame->WeaponActors[i];
 
-		FDungeonItemData* Data = WeaponDataTable->FindRow<FDungeonItemData>(CurWeaponName, TEXT("Get WeaponData"));
+		FItemInfoData* Data = WeaponDataTable->FindRow<FItemInfoData>(CurWeaponName, TEXT("Get WeaponData"));
+		FDungeonWeaponData* WeaponData = WeaponClassDataTable->FindRow<FDungeonWeaponData>(CurWeaponName, TEXT("Get WeaponData"));
 
-		if (Data && Data->ItemClass)
+		if (Data && WeaponData && WeaponData->WeaponClass)
 		{
 			FActorSpawnParameters SpawnParameters;
 			SpawnParameters.Owner = OwnerCharacter;
 			SpawnParameters.Instigator = OwnerCharacter;
 
-			ARSBaseWeapon* SpawnWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(Data->ItemClass, SpawnParameters);
+			ARSBaseWeapon* SpawnWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(WeaponData->WeaponClass, SpawnParameters);
 
 			if (SpawnWeapon)
 			{
