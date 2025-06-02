@@ -2,6 +2,7 @@
 
 
 #include "RSDunMonsterCharacter.h"
+#include "RSDunPlayerCharacter.h"
 #include "RogShop/RSMonsterAttackTraceDefine.h"
 #include "RogShop/UtilDefine.h"
 #include "Components/CapsuleComponent.h"
@@ -220,10 +221,9 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 void ARSDunMonsterCharacter::PerformAttackTrace()
 {
 	// 미리 캐싱해둔 몬스터 데이터 중 공격 트레이스 배열 데이터를 가져와서 인덱스에 따라 트레이스가 변경되도록 설정
-//	const FMonsterAttackTraceData& TraceData = CachedAttackTraceDataArray[SkillIndex];	
 	const FMonsterAttackSkillData& actionData = MonsterAttackSkills[skillActionIdx];
 
-	if (actionData.skillType == ESkillType::Melee)//근접 공격인 경우
+	if (actionData.skillType == ESkillType::Melee) // 근접 공격인 경우
 	{
 		const FMonsterAttackTraceData& TraceData = CachedAttackTraceDataArray[skillActionIdx];
 		FVector Start = GetMesh()->GetSocketLocation(TraceData.SocketLocation);
@@ -240,7 +240,6 @@ void ARSDunMonsterCharacter::PerformAttackTrace()
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActor(this);
 
-		// 몬스터 공격이 플레이어에게 적용되게 하려는 Trace입니다. 저희 게임은 플레이어가 1명이니 SweepSingleByChannel을 사용했습니다.
 		bool bHit = GetWorld()->SweepSingleByChannel(
 			HitResult,
 			Start,
@@ -253,35 +252,44 @@ void ARSDunMonsterCharacter::PerformAttackTrace()
 
 		if (bHit)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("bHit True"));
+			RS_LOG("bHit True! 무언가 공격에 맞았습니다!");
 			AActor* HitActor = HitResult.GetActor();
-			if (IsValid(HitActor))
+			bool bPlayerHit = IsValid(HitActor) && HitActor->IsA(ARSDunPlayerCharacter::StaticClass());
+			// bool bPlayerHit = IsValid(HitActor); // TODO: MonsterPawn Block->Ignore 설정 가능하면 이 코드로 변경
+
+			if (bPlayerHit)
 			{
-				//			float AttackDamage = MonsterAttackSkills[SkillIndex].Damage;
 				float AttackDamage = MonsterAttackSkills[skillActionIdx].Damage;
 
 				UGameplayStatics::ApplyDamage(HitActor, AttackDamage, GetController(), this, nullptr);
+
+				RS_LOG_F("[%s] 몬스터가 [%s] 에게 %f 데미지를 주었습니다!",
+					*GetName(),
+					HitActor ? *HitActor->GetName() : TEXT("Unknown"),
+					AttackDamage
+				);
 			}
+			else
+			{
+				RS_LOG("플레이어가 아닌 대상이 공격에 맞았습니다!");
+			}
+
+			DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, bPlayerHit ? FColor::Red : FColor::Green, false, 5.0f);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("bHit False"));
+			DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, FColor::Green, false, 5.0f);
+			RS_LOG("몬스터의 공격에 아무도 맞지 않았습니다!");
 		}
-
-		DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, bHit ? FColor::Red : FColor::Green, false, 5.0f);
-		RS_LOG("몬스터 공격이 성공해서 공격 트레이스 디버그 박스를 그립니다.");
 	}
-	else if (actionData.skillType == ESkillType::Range)//원거리 공격인 경우
+	else if (actionData.skillType == ESkillType::Range) // 원거리 공격인 경우
 	{
-
+		// TODO: 원거리 공격 로직 작성
 	}
-	else if(actionData.skillType == ESkillType::Utillity)//공격이 아닌 경우
+	else if (actionData.skillType == ESkillType::Utillity) // 공격이 아닌 경우
 	{
-
+		// TODO: 유틸리티 스킬 로직 작성
 	}
-
-	
-
 }
 
 void ARSDunMonsterCharacter::JumpTo(FVector destination)

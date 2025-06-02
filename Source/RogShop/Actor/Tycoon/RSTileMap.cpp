@@ -9,13 +9,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 #include "RogShop/UtilDefine.h"
-#include "RogShop/SaveGame/RSTycoonSaveGame.h"
+#include "RogShop/SaveGame/Tycoon/RSTycoonTileMapSaveGame.h"
 #include "Tile/RSBaseTile.h"
-#include "Tile/RSCookingTile.h"
-#include "Tile/RSDoorTile.h"
-#include "Tile/RSFoodLaboratoryTile.h"
-#include "Tile/RSIceBoxTile.h"
-#include "Tile/RSTableTile.h"
 #include "Tycoon/NPC/RSTycoonChefCharacter.h"
 #include "Tycoon/NPC/RSTycoonNPC.h"
 #include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
@@ -29,7 +24,6 @@ ARSTileMap::ARSTileMap()
 	TileParent = CreateDefaultSubobject<USceneComponent>("TileMap");
 	RootComponent = TileParent;
 }
-
 
 void ARSTileMap::ChangeTile(int32 Index, FName TileKey)
 {
@@ -52,8 +46,8 @@ void ARSTileMap::ChangeTile(int32 Index, FName TileKey)
 void ARSTileMap::SaveTileMap()
 {
 	// SaveGame 오브젝트 생성
-	URSTycoonSaveGame* SaveGameInstance = Cast<URSTycoonSaveGame>(
-		UGameplayStatics::CreateSaveGameObject(URSTycoonSaveGame::StaticClass()));
+	URSTycoonTileMapSaveGame* SaveGameInstance = Cast<URSTycoonTileMapSaveGame>(
+		UGameplayStatics::CreateSaveGameObject(URSTycoonTileMapSaveGame::StaticClass()));
 
 	SaveGameInstance->Tile2DMap = TileName2DMap;
 	SaveGameInstance->Width = Width;
@@ -152,7 +146,7 @@ void ARSTileMap::BeginPlay()
 
 void ARSTileMap::LoadTileMap()
 {
-	URSTycoonSaveGame* LoadedGame = Cast<URSTycoonSaveGame>(
+	URSTycoonTileMapSaveGame* LoadedGame = Cast<URSTycoonTileMapSaveGame>(
 		UGameplayStatics::LoadGameFromSlot(TileMapSaveSlot, 0));
 
 	if (LoadedGame)

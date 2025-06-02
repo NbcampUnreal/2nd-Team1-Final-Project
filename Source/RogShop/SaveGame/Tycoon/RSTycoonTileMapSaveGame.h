@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
-#include "RSTycoonSaveGame.generated.h"
+#include "RSTycoonTileMapSaveGame.generated.h"
 
 USTRUCT(BlueprintType)
 struct FTileRow
@@ -17,7 +17,7 @@ public:
 };
 
 UCLASS()
-class ROGSHOP_API URSTycoonSaveGame : public USaveGame
+class ROGSHOP_API URSTycoonTileMapSaveGame : public USaveGame
 {
 	GENERATED_BODY()
 
