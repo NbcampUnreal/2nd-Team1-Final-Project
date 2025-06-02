@@ -66,7 +66,14 @@ void URSPlayerStatusWidget::UpdateWeaponSlot(uint8 SlotIndex, FName WeaponKey)
             }
             else
             {
-                UE_LOG(LogTemp, Warning, TEXT("Not FoundData"));
+                if (SlotIndex == 0 || SlotIndex == 1)
+                {
+                    WeaponSlot1->SetBrushFromTexture(nullptr);
+                }
+                else
+                {
+                    WeaponSlot2->SetBrushFromTexture(nullptr);
+                }
             }
         }
     }
