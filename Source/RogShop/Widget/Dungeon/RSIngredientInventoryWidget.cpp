@@ -8,85 +8,91 @@
 #include "RSDataSubsystem.h"
 #include "CookFoodData.h"
 #include "ItemSlot.h"
+#include "RSTycoonPlayerController.h"
 
 void URSIngredientInventoryWidget::NativeConstruct()
 {
-    Super::NativeConstruct();
+	Super::NativeConstruct();
 
-    ARSDunPlayerController* RSDunPlayerController = GetOwningPlayer<ARSDunPlayerController>();
+	ARSDunPlayerController* RSDunPlayerController = GetOwningPlayer<ARSDunPlayerController>();
+	if (RSDunPlayerController)
+	{
+		RSDunPlayerController->OnIngredientChange.AddDynamic(this, &URSIngredientInventoryWidget::UpdateSlots);
+		
+		// 24개 슬롯, 4열 기준 생성
+		CreateSlots(24, 4);
+	}
 
-    if (RSDunPlayerController)
-    {
-        RSDunPlayerController->OnIngredientChange.AddDynamic(this, &URSIngredientInventoryWidget::UpdateSlots);
-    }
-
-    // 24개 슬롯, 4열 기준 생성
-    CreateSlots(24, 4);
+	ARSTycoonPlayerController* RSTycoonPlayerController = GetOwningPlayer<ARSTycoonPlayerController>();
+	if (RSTycoonPlayerController)
+	{
+		CreateSlots(24, 2);
+	}
 }
 
 void URSIngredientInventoryWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
 {
-    if (!IngredientSlots || !InvecntorySlotWidgetClass)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("SlotImageWidgetClass Null"));
-        return;
-    }
+	if (!IngredientSlots || !InvecntorySlotWidgetClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SlotImageWidgetClass Null"));
+		return;
+	}
 
-    IngredientSlots->ClearChildren();
-    InvecntorySlots.Empty();
+	IngredientSlots->ClearChildren();
+	InvecntorySlots.Empty();
 
-    for (int32 i = 0; i < NumSlots; ++i)
-    {
-        URSInventorySlotWidget* NewSlotImage = CreateWidget<URSInventorySlotWidget>(GetWorld(), InvecntorySlotWidgetClass);
+	for (int32 i = 0; i < NumSlots; ++i)
+	{
+		URSInventorySlotWidget* NewSlotImage = CreateWidget<URSInventorySlotWidget>(GetWorld(), InvecntorySlotWidgetClass);
 
-        if (NewSlotImage)
-        {
-            int32 Row = i / NumColumns;
-            int32 Col = i % NumColumns;
+		if (NewSlotImage)
+		{
+			int32 Row = i / NumColumns;
+			int32 Col = i % NumColumns;
 
-            // 슬롯 인덱스 설정
-            NewSlotImage->SetIsPressable(true);
+			// 슬롯 인덱스 설정
+			NewSlotImage->SetIsPressable(true);
 
-            IngredientSlots->AddChildToUniformGrid(NewSlotImage, Row, Col);
-            InvecntorySlots.Add(NewSlotImage);
-        }
-    }
+			IngredientSlots->AddChildToUniformGrid(NewSlotImage, Row, Col);
+			InvecntorySlots.Add(NewSlotImage);
+		}
+	}
 }
 
 void URSIngredientInventoryWidget::UpdateSlots(int32 IngredientSlotIndex, FItemSlot IngredientItemSlot)
 {
-    UWorld* CurrentWorld = GetWorld();
-    if (!CurrentWorld)
-    {
-        return;
-    }
+	UWorld* CurrentWorld = GetWorld();
+	if (!CurrentWorld)
+	{
+		return;
+	}
 
-    UGameInstance* CurrentGameInstance = CurrentWorld->GetGameInstance();
-    if (!CurrentGameInstance)
-    {
-        return;
-    }
+	UGameInstance* CurrentGameInstance = CurrentWorld->GetGameInstance();
+	if (!CurrentGameInstance)
+	{
+		return;
+	}
 
-    URSDataSubsystem* DataSubsystem = CurrentGameInstance->GetSubsystem<URSDataSubsystem>();
-    if (!DataSubsystem)
-    {
-        return;
-    }
+	URSDataSubsystem* DataSubsystem = CurrentGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
 
-    UDataTable* IngredientDataTable = DataSubsystem->Ingredient;
-    if (!IngredientDataTable)
-    {
-        return;
-    }
+	UDataTable* IngredientDataTable = DataSubsystem->Ingredient;
+	if (!IngredientDataTable)
+	{
+		return;
+	}
 
-    FName IngredientKey = IngredientItemSlot.ItemKey;
-    int32 ItemCount = IngredientItemSlot.Quantity;
+	FName IngredientKey = IngredientItemSlot.ItemKey;
+	int32 ItemCount = IngredientItemSlot.Quantity;
 
-    FIngredientData* Data = IngredientDataTable->FindRow<FIngredientData>(IngredientKey, TEXT("Get Ingredient"));
-    if (Data)
-    {
-        // TODO : 현재 데이터에 대한 텍스처 정보를 가져온다.
-        // nullptr 대신에 텍스처 정보를 넘겨야한다.
-        InvecntorySlots[IngredientSlotIndex]->SetSlotItemInfo(IngredientKey, nullptr, FString::FromInt(ItemCount));
-    }
+	FIngredientData* Data = IngredientDataTable->FindRow<FIngredientData>(IngredientKey, TEXT("Get Ingredient"));
+	if (Data)
+	{
+		// TODO : 현재 데이터에 대한 텍스처 정보를 가져온다.
+		// nullptr 대신에 텍스처 정보를 넘겨야한다.
+		InvecntorySlots[IngredientSlotIndex]->SetSlotItemInfo(IngredientKey, Data->Image, FString::FromInt(ItemCount));
+	}
 }
