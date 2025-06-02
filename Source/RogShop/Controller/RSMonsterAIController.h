@@ -49,6 +49,9 @@ public://Function
 	UFUNCTION(BlueprintCallable)
 	void AISkill_4(FVector interrestedPos);
 
+	UFUNCTION(BlueprintCallable)
+	void AIAtkSkill();
+
 	//Patrol
 	UFUNCTION(BlueprintCallable)
 	void MoveToCurrentPatrolPoint();

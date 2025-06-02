@@ -166,6 +166,24 @@ void ARSDunMonsterCharacter::PlaySkill_3()
 	GetWorld()->SpawnActor<AActor>(servant, interrestedPos, spawnRot);
 }*/
 
+void ARSDunMonsterCharacter::AIAction(int32 actionIdx)
+{
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+
+	if (MonsterAttackSkills.Num() > actionIdx)
+	{
+		UAnimMontage* action = MonsterAttackSkills[actionIdx].SkillMontage;
+		if (animInstance && action)
+		{
+			if (animInstance->Montage_IsPlaying(action) == false)
+			{
+				animInstance->Montage_Play(action);
+				skillActionIdx = actionIdx;
+			}
+		}
+	}
+}
+
 void ARSDunMonsterCharacter::OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted)
 {
 	if (montage == DeathMontage)
