@@ -179,7 +179,9 @@ void ARSDunMonsterCharacter::AIAction(int32 actionIdx)
 
 void ARSDunMonsterCharacter::OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted)
 {
-	if (montage == DeathMontage)
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (montage == DeathMontage && !AnimInstance->Montage_IsPlaying(montage))
 	{
 		//GetWorld()->GetTimerManager().SetTimer(animPlayDelayTimer, this, &ARSDunMonsterCharacter::AIDestroy, 5.0f, false);
 		Destroy();
