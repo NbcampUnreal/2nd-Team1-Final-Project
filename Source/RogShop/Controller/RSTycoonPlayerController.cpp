@@ -134,6 +134,15 @@ void ARSTycoonPlayerController::OnTileClick()
 					break;
 				}
 			}
+
+			if (ManagementWidget)
+			{
+				ManagementWidget->BuyTileBorderSlide();
+			}
+			else
+			{
+				RS_LOG("ManagementWidget is Null")
+			}
 		}
 	}
 }
