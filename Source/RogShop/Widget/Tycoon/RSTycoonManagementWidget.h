@@ -4,15 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "RSTycoonBuyTileWidget.h"
 #include "RSTycoonManagementWidget.generated.h"
 
 class USpinBox;
 class UVerticalBox;
-class URSTycoonBuyTileWidget;
 class ARSBaseTile;
 class UTextBlock;
 class UButton;
 class UBorder;
+
+//class URSTycoonBuyNPCWidget;
 
 UCLASS()
 class ROGSHOP_API URSTycoonManagementWidget : public UUserWidget
@@ -21,7 +23,10 @@ class ROGSHOP_API URSTycoonManagementWidget : public UUserWidget
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void PlayBuyTileParentBorderSlideIn();
+	void PlayBuyTileParentBorderSlide();
+
+	UFUNCTION(BlueprintCallable)
+	void PlayBuyNPCParentBorderSlide();
 
 protected:
 	virtual void NativeConstruct() override;
@@ -49,11 +54,38 @@ protected:
 
 	TArray<URSTycoonBuyTileWidget> BuyTileWidgets;
 
+	UFUNCTION()
+	void HandleWaiterClick();
+
+	UFUNCTION()
+	void HandleChefClick();
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UButton> CreateNPCButton;
+
+	//UPROPERTY(meta = (BindWidget))
+	//TObjectPtr<URSTycoonBuyNPCWidget> BuyNPCWidget_Waiter;
+
+	//UPROPERTY(meta = (BindWidget))
+	//TObjectPtr<URSTycoonBuyNPCWidget> BuyNPCWidget_Chef;
+
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UBorder> BuyTileParentBorder;
 
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
-	UWidgetAnimation* SlideIn;
+	UWidgetAnimation* BuyTileParentBorderSlide;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UWidgetAnimation* BuyTileParentBorderClose;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UBorder> BuyNPCBorder;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UWidgetAnimation* BuyNPCParentBorderSlide;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UWidgetAnimation* BuyNPCParentBorderClose;
 
 private:
 	UFUNCTION()
@@ -63,4 +95,5 @@ private:
 	void OnClickWaitMode();
 
 	bool bIsBuyTileParentBorderValid = false;
+	bool bIsBuyNPCParentBorderValid = false;
 };

@@ -3,9 +3,9 @@
 
 #include "RSTycoonManagementWidget.h"
 
-#include "RSTycoonBuyTileWidget.h"
 #include "RSTycoonGameModeBase.h"
 #include "RSTycoonPlayerController.h"
+
 #include "Components/Button.h"
 #include "Components/SpinBox.h"
 #include "Components/TextBlock.h"
@@ -17,27 +17,7 @@
 #include "RogShop/Actor/Tycoon/RSTileMap.h"
 #include "RogShop/Actor/Tycoon/Tile/RSBaseTile.h"
 
-void URSTycoonManagementWidget::PlayBuyTileParentBorderSlideIn()
-{
-	if (SlideIn)
-	{
-		if (bIsBuyTileParentBorderValid == false)
-		{
-			PlayAnimation(SlideIn);
-
-			// 이 창을 다시 닫으려면 해당값 false로 변환 후 닫는 애니메이션 및 닫는 함수 필요
-			bIsBuyTileParentBorderValid = true;
-		}
-		else
-		{
-			// UE_LOG(LogTemp, Warning, TEXT("Exist BuyTileParentBorder !"));
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("SlidIn Null"));
-	}
-}
+// #include "RSTycoonBuyNPCWidget.h"
 
 void URSTycoonManagementWidget::NativeConstruct()
 {
@@ -70,6 +50,27 @@ void URSTycoonManagementWidget::NativeConstruct()
 	{
 		BuyTileParentBorder->SetRenderTranslation(FVector2D(0.f, 0.f));
 	}
+
+	if (BuyNPCBorder)
+	{
+		BuyNPCBorder->SetRenderTranslation(FVector2D(0.f, 0.f));
+	}
+
+	// NPC 버튼 입력 세팅 (WBP의 OnClicked 라는 브로드캐스트를 받으면 밑에 함수를 실행)
+	//if (BuyNPCWidget_Waiter)
+	//{
+	//	BuyNPCWidget_Waiter->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::HandleWaiterClick);
+	//}
+
+	//if (BuyNPCWidget_Chef)
+	//{
+	//	BuyNPCWidget_Chef->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::HandleChefClick);
+	//}
+
+	if (CreateNPCButton)
+	{
+		CreateNPCButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::PlayBuyNPCParentBorderSlide);
+	}
 }
 
 void URSTycoonManagementWidget::OnClickExpandTile()
@@ -92,4 +93,68 @@ void URSTycoonManagementWidget::OnClickWaitMode()
 	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
 	check(TileMap)
 	TileMap->SaveTileMap();
+}
+
+void URSTycoonManagementWidget::PlayBuyTileParentBorderSlide()
+{
+	if (BuyTileParentBorderSlide)
+	{
+		if (bIsBuyTileParentBorderValid == false)
+		{
+			if (bIsBuyNPCParentBorderValid)
+			{
+				PlayAnimation(BuyNPCParentBorderClose);
+				bIsBuyNPCParentBorderValid = false;
+			}
+
+			PlayAnimation(BuyTileParentBorderSlide);
+			bIsBuyTileParentBorderValid = true;
+		}
+		else
+		{
+			PlayAnimation(BuyTileParentBorderClose);
+			bIsBuyTileParentBorderValid = false;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BuyTileParentBorderSlide Null"));
+	}
+}
+
+void URSTycoonManagementWidget::PlayBuyNPCParentBorderSlide()
+{
+	if (BuyNPCParentBorderSlide)
+	{
+		if (bIsBuyNPCParentBorderValid == false)
+		{
+			if (bIsBuyTileParentBorderValid)
+			{
+				PlayAnimation(BuyTileParentBorderClose);
+				bIsBuyTileParentBorderValid = false;
+			}
+
+			PlayAnimation(BuyNPCParentBorderSlide);
+			bIsBuyNPCParentBorderValid = true;
+		}
+		else
+		{
+			PlayAnimation(BuyNPCParentBorderClose);
+			bIsBuyNPCParentBorderValid = false;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BuyNPCParentBorderSlide Null"));
+	}
+}
+
+void URSTycoonManagementWidget::HandleWaiterClick()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Waiter Clicked!"));
+}
+
+void URSTycoonManagementWidget::HandleChefClick()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Chef Clicked!"));
 }
