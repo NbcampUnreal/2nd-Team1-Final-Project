@@ -159,6 +159,24 @@ void ARSDunMonsterCharacter::PlaySkill_3()
 	GetWorld()->SpawnActor<AActor>(servant, interrestedPos, spawnRot);
 }*/
 
+void ARSDunMonsterCharacter::AIAction(int32 actionIdx)
+{
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+
+	if (MonsterAttackSkills.Num() > actionIdx)
+	{
+		UAnimMontage* action = MonsterAttackSkills[actionIdx].SkillMontage;
+		if (animInstance && action)
+		{
+			if (animInstance->Montage_IsPlaying(action) == false)
+			{
+				animInstance->Montage_Play(action);
+				skillActionIdx = actionIdx;
+			}
+		}
+	}
+}
+
 void ARSDunMonsterCharacter::OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -199,54 +217,70 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 	return Damage;
 }
 
-void ARSDunMonsterCharacter::PerformAttackTrace(int32 SkillIndex)
+void ARSDunMonsterCharacter::PerformAttackTrace()
 {
 	// 미리 캐싱해둔 몬스터 데이터 중 공격 트레이스 배열 데이터를 가져와서 인덱스에 따라 트레이스가 변경되도록 설정
-	const FMonsterAttackTraceData& TraceData = CachedAttackTraceDataArray[SkillIndex];
+//	const FMonsterAttackTraceData& TraceData = CachedAttackTraceDataArray[SkillIndex];	
+	const FMonsterAttackSkillData& actionData = MonsterAttackSkills[skillActionIdx];
 
-	FVector Start = GetMesh()->GetSocketLocation(TraceData.SocketLocation);
-	Start += GetActorForwardVector() * TraceData.TraceForwardOffset;
-	Start += GetActorRightVector() * TraceData.TraceRightOffset;
-	Start += GetActorUpVector() * TraceData.TraceUpOffset;
-
-	FVector End = Start + GetActorForwardVector() * TraceData.TraceLength;
-	FVector Center = (Start + End) * 0.5f;
-	FQuat Rotation = GetActorRotation().Quaternion();
-	FVector LocalTraceBoxHalfSize = TraceData.TraceBoxHalfSize;
-
-	FHitResult HitResult;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-
-	// 몬스터 공격이 플레이어에게 적용되게 하려는 Trace입니다. 저희 게임은 플레이어가 1명이니 SweepSingleByChannel을 사용했습니다.
-	bool bHit = GetWorld()->SweepSingleByChannel(
-		HitResult,
-		Start,
-		End,
-		Rotation,
-		ECC_MonsterAttackTrace,
-		FCollisionShape::MakeBox(LocalTraceBoxHalfSize),
-		Params
-	);
-
-	if (bHit)
+	if (actionData.skillType == ESkillType::Melee)//근접 공격인 경우
 	{
-		UE_LOG(LogTemp, Warning, TEXT("bHit True"));
-		AActor* HitActor = HitResult.GetActor();
-		if (IsValid(HitActor))
+		const FMonsterAttackTraceData& TraceData = CachedAttackTraceDataArray[skillActionIdx];
+		FVector Start = GetMesh()->GetSocketLocation(TraceData.SocketLocation);
+		Start += GetActorForwardVector() * TraceData.TraceForwardOffset;
+		Start += GetActorRightVector() * TraceData.TraceRightOffset;
+		Start += GetActorUpVector() * TraceData.TraceUpOffset;
+
+		FVector End = Start + GetActorForwardVector() * TraceData.TraceLength;
+		FVector Center = (Start + End) * 0.5f;
+		FQuat Rotation = GetActorRotation().Quaternion();
+		FVector LocalTraceBoxHalfSize = TraceData.TraceBoxHalfSize;
+
+		FHitResult HitResult;
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+
+		// 몬스터 공격이 플레이어에게 적용되게 하려는 Trace입니다. 저희 게임은 플레이어가 1명이니 SweepSingleByChannel을 사용했습니다.
+		bool bHit = GetWorld()->SweepSingleByChannel(
+			HitResult,
+			Start,
+			End,
+			Rotation,
+			ECC_MonsterAttackTrace,
+			FCollisionShape::MakeBox(LocalTraceBoxHalfSize),
+			Params
+		);
+
+		if (bHit)
 		{
-			float AttackDamage = MonsterAttackSkills[SkillIndex].Damage;
+			UE_LOG(LogTemp, Warning, TEXT("bHit True"));
+			AActor* HitActor = HitResult.GetActor();
+			if (IsValid(HitActor))
+			{
+				//			float AttackDamage = MonsterAttackSkills[SkillIndex].Damage;
+				float AttackDamage = MonsterAttackSkills[skillActionIdx].Damage;
 
-			UGameplayStatics::ApplyDamage(HitActor, AttackDamage, GetController(), this, nullptr);
+				UGameplayStatics::ApplyDamage(HitActor, AttackDamage, GetController(), this, nullptr);
+			}
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("bHit False"));
+		}
+
+		DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, bHit ? FColor::Red : FColor::Green, false, 5.0f);
+		RS_LOG("몬스터 공격이 성공해서 공격 트레이스 디버그 박스를 그립니다.");
 	}
-	else
+	else if (actionData.skillType == ESkillType::Range)//원거리 공격인 경우
 	{
-		UE_LOG(LogTemp, Warning, TEXT("bHit False"));
+
+	}
+	else if(actionData.skillType == ESkillType::Utillity)//공격이 아닌 경우
+	{
+
 	}
 
-	DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, bHit ? FColor::Red : FColor::Green, false, 5.0f);
-	RS_LOG("몬스터 공격이 성공해서 공격 트레이스 디버그 박스를 그립니다.");
+	
 
 }
 
