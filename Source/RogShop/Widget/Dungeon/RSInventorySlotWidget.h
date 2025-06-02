@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "RSInventorySlotImageWidget.generated.h"
+#include "RSInventorySlotWidget.generated.h"
 
 class UImage;
 class UTextBlock;
 
 UCLASS()
-class ROGSHOP_API URSInventorySlotImageWidget : public UUserWidget
+class ROGSHOP_API URSInventorySlotWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	

@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "RSInventorySlotImageWidget.h"
+#include "RSInventorySlotWidget.h"
 #include "RogShop/UtilDefine.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "RSDunPlayerCharacter.h"
 #include "RSDungeonIngredientInventoryComponent.h"
 
-void URSInventorySlotImageWidget::NativeConstruct()
+void URSInventorySlotWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
@@ -16,19 +16,19 @@ void URSInventorySlotImageWidget::NativeConstruct()
     HoldThreshold = 0.5f;
 }
 
-FReply URSInventorySlotImageWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+FReply URSInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
     // 좌클릭 키다운
     if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
     {
-        GetWorld()->GetTimerManager().SetTimer(HoldTimerHandle, this, &URSInventorySlotImageWidget::HandleLongPress, HoldThreshold, false);
+        GetWorld()->GetTimerManager().SetTimer(HoldTimerHandle, this, &URSInventorySlotWidget::HandleLongPress, HoldThreshold, false);
         return FReply::Handled();
     }
 
     return FReply::Unhandled();
 }
 
-FReply URSInventorySlotImageWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+FReply URSInventorySlotWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
     if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
     {
@@ -39,7 +39,7 @@ FReply URSInventorySlotImageWidget::NativeOnMouseButtonUp(const FGeometry& InGeo
     return FReply::Unhandled();
 }
 
-void URSInventorySlotImageWidget::HandleLongPress()
+void URSInventorySlotWidget::HandleLongPress()
 {
     // 유물 슬롯이 아닐때만 처리
     if (bIsPressable)
@@ -63,7 +63,7 @@ void URSInventorySlotImageWidget::HandleLongPress()
     }
 }
 
-void URSInventorySlotImageWidget::SetSlotItemInfo(FName NewItemDataTableKey, UTexture2D* NewItemImage, FString NewItemCount)
+void URSInventorySlotWidget::SetSlotItemInfo(FName NewItemDataTableKey, UTexture2D* NewItemImage, FString NewItemCount)
 {
     if (NewItemDataTableKey != NAME_None)
     {

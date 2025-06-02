@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "RSInventoryWeaponSlotWidget.h"
+#include "RSWeaponInventoryWidget.h"
 
 #include "RSDunPlayerController.h"
 #include "RSDunPlayerCharacter.h"
@@ -11,7 +11,7 @@
 
 #include "Components/Image.h"
 
-void URSInventoryWeaponSlotWidget::NativeConstruct()
+void URSWeaponInventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
@@ -19,11 +19,11 @@ void URSInventoryWeaponSlotWidget::NativeConstruct()
 
     if (RSDunPlayerController)
     {
-        RSDunPlayerController->OnWeaponSlotChange.AddDynamic(this, &URSInventoryWeaponSlotWidget::UpdateWeaponSlot);
+        RSDunPlayerController->OnWeaponSlotChange.AddDynamic(this, &URSWeaponInventoryWidget::UpdateWeaponSlot);
     }
 }
 
-FReply URSInventoryWeaponSlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+FReply URSWeaponInventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
     // 좌클릭 키다운
     if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
@@ -42,7 +42,7 @@ FReply URSInventoryWeaponSlotWidget::NativeOnMouseButtonDown(const FGeometry& In
             return FReply::Unhandled();
         }
 
-        GetWorld()->GetTimerManager().SetTimer(HoldTimerHandle, this, &URSInventoryWeaponSlotWidget::HandleLongPress, HoldThreshold, false);
+        GetWorld()->GetTimerManager().SetTimer(HoldTimerHandle, this, &URSWeaponInventoryWidget::HandleLongPress, HoldThreshold, false);
 
         return FReply::Handled();
     }
@@ -50,7 +50,7 @@ FReply URSInventoryWeaponSlotWidget::NativeOnMouseButtonDown(const FGeometry& In
     return FReply::Unhandled();
 }
 
-FReply URSInventoryWeaponSlotWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+FReply URSWeaponInventoryWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
     if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
     {
@@ -63,9 +63,9 @@ FReply URSInventoryWeaponSlotWidget::NativeOnMouseButtonUp(const FGeometry& InGe
     return FReply::Unhandled();
 }
 
-void URSInventoryWeaponSlotWidget::HandleLongPress()
+void URSWeaponInventoryWidget::HandleLongPress()
 {
-    UE_LOG(LogTemp, Warning, TEXT("Long Press Detected on URSInventoryWeaponSlotWidget Index: %d"), (int32)HeldSlotType);
+    UE_LOG(LogTemp, Warning, TEXT("Long Press Detected on URSWeaponInventoryWidget Index: %d"), (int32)HeldSlotType);
 
     // 추가 작업 필요
     ARSDunPlayerCharacter* DunPlayerChar = GetOwningPlayerPawn<ARSDunPlayerCharacter>();
@@ -81,7 +81,7 @@ void URSInventoryWeaponSlotWidget::HandleLongPress()
     }
 }
 
-void URSInventoryWeaponSlotWidget::UpdateWeaponSlot(int8 WeaponSlotIndex, FName WeaponKey)
+void URSWeaponInventoryWidget::UpdateWeaponSlot(int8 WeaponSlotIndex, FName WeaponKey)
 {
     if (URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>())
     {

@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "RSInventoryRelicSlotWidget.h"
+#include "RSRelicInventoryWidget.h"
 #include "Components/UniformGridPanel.h"
-#include "RSInventorySlotImageWidget.h"
+#include "RSInventorySlotWidget.h"
 
-void URSInventoryRelicSlotWidget::NativeConstruct()
+void URSRelicInventoryWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
@@ -13,7 +13,7 @@ void URSInventoryRelicSlotWidget::NativeConstruct()
     CreateSlots(24, 4);
 }
 
-void URSInventoryRelicSlotWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
+void URSRelicInventoryWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
 {
     if (!UniformGridPanel_RelicSlots || !SlotImageWidgetClass)
     {
@@ -26,7 +26,7 @@ void URSInventoryRelicSlotWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
 
     for (int32 i = 0; i < NumSlots; ++i)
     {
-        URSInventorySlotImageWidget* NewSlotImage = CreateWidget<URSInventorySlotImageWidget>(GetWorld(), SlotImageWidgetClass);
+        URSInventorySlotWidget* NewSlotImage = CreateWidget<URSInventorySlotWidget>(GetWorld(), SlotImageWidgetClass);
 
         if (NewSlotImage)
         {

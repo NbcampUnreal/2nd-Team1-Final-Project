@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "RSInventoryIngredientSlotWidget.generated.h"
+#include "RSIngredientInventoryWidget.generated.h"
 
 class UUniformGridPanel;
-class URSInventorySlotImageWidget;
+class URSInventorySlotWidget;
 
 struct FItemSlot;
 
 UCLASS()
-class ROGSHOP_API URSInventoryIngredientSlotWidget : public UUserWidget
+class ROGSHOP_API URSIngredientInventoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -30,8 +30,8 @@ private:
     TObjectPtr<UUniformGridPanel> IngredientSlots;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
-    TSubclassOf<URSInventorySlotImageWidget> InvecntorySlotWidgetClass;
+    TSubclassOf<URSInventorySlotWidget> InvecntorySlotWidgetClass;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
-    TArray<URSInventorySlotImageWidget*> InvecntorySlots;
+    TArray<URSInventorySlotWidget*> InvecntorySlots;
 };

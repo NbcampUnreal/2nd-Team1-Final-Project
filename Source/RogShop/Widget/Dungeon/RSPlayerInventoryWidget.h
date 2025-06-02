@@ -6,9 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "RSPlayerInventoryWidget.generated.h"
 
-class URSInventoryWeaponSlotWidget;
-class URSInventoryRelicSlotWidget;
-class URSInventoryIngredientSlotWidget;
+class URSWeaponInventoryWidget;
+class URSRelicInventoryWidget;
+class URSIngredientInventoryWidget;
 class UButton;
 
 UCLASS()
@@ -16,18 +16,18 @@ class ROGSHOP_API URSPlayerInventoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
-public:
-	UPROPERTY(meta = (BindWidget))
-	URSInventoryWeaponSlotWidget* WeaponSlotWidget;
-
-	UPROPERTY(meta = (BindWidget))
-	URSInventoryRelicSlotWidget* RelicSlotWidget;
-
-	UPROPERTY(meta = (BindWidget))
-	URSInventoryIngredientSlotWidget* IngredientSlotWidget;
-
 protected:
 	virtual void NativeConstruct() override;
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (BindWidget, AllowPrivateAccess = "true"))
+	TObjectPtr<URSWeaponInventoryWidget> WeaponInventoryWidget;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (BindWidget, AllowPrivateAccess = "true"))
+	TObjectPtr<URSIngredientInventoryWidget> IngredientInventoryWidget;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (BindWidget, AllowPrivateAccess = "true"))
+	TObjectPtr<URSRelicInventoryWidget> RelicInventoryWidget;
 
 private:
 	UFUNCTION()
@@ -36,5 +36,5 @@ private:
 	void SetMouseMode(bool bEnable);
 
 	UPROPERTY(meta = (BindWidget))
-	UButton* ExitBtn;
+	TObjectPtr<UButton> ExitBtn;
 };

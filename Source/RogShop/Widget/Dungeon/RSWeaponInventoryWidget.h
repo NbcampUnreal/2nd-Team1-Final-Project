@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "RSInventoryWeaponSlotWidget.generated.h"
+#include "RSWeaponInventoryWidget.generated.h"
 
 UENUM()
 enum class EWeaponSlotType : uint8
@@ -15,7 +15,7 @@ enum class EWeaponSlotType : uint8
 };
 
 UCLASS()
-class ROGSHOP_API URSInventoryWeaponSlotWidget : public UUserWidget
+class ROGSHOP_API URSWeaponInventoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	

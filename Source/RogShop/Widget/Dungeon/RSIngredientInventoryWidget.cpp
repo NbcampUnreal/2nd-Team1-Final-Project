@@ -1,15 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "RSInventoryIngredientSlotWidget.h"
+#include "RSIngredientInventoryWidget.h"
 #include "RSDunPlayerController.h"
 #include "Components/UniformGridPanel.h"
-#include "RSInventorySlotImageWidget.h"
+#include "RSInventorySlotWidget.h"
 #include "RSDataSubsystem.h"
 #include "CookFoodData.h"
 #include "ItemSlot.h"
 
-void URSInventoryIngredientSlotWidget::NativeConstruct()
+void URSIngredientInventoryWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
@@ -17,14 +17,14 @@ void URSInventoryIngredientSlotWidget::NativeConstruct()
 
     if (RSDunPlayerController)
     {
-        RSDunPlayerController->OnIngredientChange.AddDynamic(this, &URSInventoryIngredientSlotWidget::UpdateSlots);
+        RSDunPlayerController->OnIngredientChange.AddDynamic(this, &URSIngredientInventoryWidget::UpdateSlots);
     }
 
     // 24개 슬롯, 4열 기준 생성
     CreateSlots(24, 4);
 }
 
-void URSInventoryIngredientSlotWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
+void URSIngredientInventoryWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
 {
     if (!IngredientSlots || !InvecntorySlotWidgetClass)
     {
@@ -37,7 +37,7 @@ void URSInventoryIngredientSlotWidget::CreateSlots(int32 NumSlots, int32 NumColu
 
     for (int32 i = 0; i < NumSlots; ++i)
     {
-        URSInventorySlotImageWidget* NewSlotImage = CreateWidget<URSInventorySlotImageWidget>(GetWorld(), InvecntorySlotWidgetClass);
+        URSInventorySlotWidget* NewSlotImage = CreateWidget<URSInventorySlotWidget>(GetWorld(), InvecntorySlotWidgetClass);
 
         if (NewSlotImage)
         {
@@ -53,7 +53,7 @@ void URSInventoryIngredientSlotWidget::CreateSlots(int32 NumSlots, int32 NumColu
     }
 }
 
-void URSInventoryIngredientSlotWidget::UpdateSlots(int32 IngredientSlotIndex, FItemSlot IngredientItemSlot)
+void URSIngredientInventoryWidget::UpdateSlots(int32 IngredientSlotIndex, FItemSlot IngredientItemSlot)
 {
     UWorld* CurrentWorld = GetWorld();
     if (!CurrentWorld)
