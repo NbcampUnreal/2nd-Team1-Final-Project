@@ -50,7 +50,7 @@ public://Function
 	void AISkill_4(FVector interrestedPos);
 
 	UFUNCTION(BlueprintCallable)
-	void AIAtkSkill();
+	void AISkillAction(int32 actionIdx);
 
 	//Patrol
 	UFUNCTION(BlueprintCallable)

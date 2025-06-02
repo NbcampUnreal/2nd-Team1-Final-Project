@@ -15,7 +15,6 @@
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
-
 UCLASS()
 class ROGSHOP_API ARSDunMonsterCharacter : public ARSDunBaseCharacter
 {
@@ -48,7 +47,7 @@ public:
 	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Trace")
-	void PerformAttackTrace(int32 SkillIndex);
+	void PerformAttackTrace();
 
 	//NavLink jump function
 	UFUNCTION(BlueprintCallable)
