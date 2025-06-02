@@ -231,23 +231,38 @@ void ARSDunMonsterCharacter::PerformAttackTrace(int32 SkillIndex)
 
 	if (bHit)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("bHit True"));
+		RS_LOG("bHit True! 무언가 공격에 맞았습니다!");
 		AActor* HitActor = HitResult.GetActor();
-		if (IsValid(HitActor))
+		bool bPlayerHit = IsValid(HitActor) && HitActor->IsA(ARSDunMonsterCharacter::StaticClass());
+		//bool bPlayerHit = IsValid(HitActor); TODO : 만약 콜리전 프리셋 MonsterPawn 블록->무시로 변경가능하면 < 이 코드 쓰기
+
+		if (bPlayerHit)
 		{
 			float AttackDamage = MonsterAttackSkills[SkillIndex].Damage;
 
 			UGameplayStatics::ApplyDamage(HitActor, AttackDamage, GetController(), this, nullptr);
+
+			// 데미지를 주면 데미지를 맞은 오브젝트의 로그 띄우기
+			RS_LOG_F("[%s] 몬스터가 [%s] 에게 %f 데미지를 주었습니다!",
+				*GetName(),
+				HitActor ? *HitActor->GetName() : TEXT("Unknown"),
+				AttackDamage
+			);
 		}
+		else
+		{
+			RS_LOG("플레이어가 아닌 대상이 공격에 맞았습니다!");
+		}
+
+		DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, bPlayerHit ? FColor::Red : FColor::Green, false, 5.0f);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("bHit False"));
+		DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, FColor::Green, false, 5.0f);
+		RS_LOG("몬스터의 공격에 아무도 맞지 않았습니다!");
 	}
 
-	DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, bHit ? FColor::Red : FColor::Green, false, 5.0f);
-	RS_LOG("몬스터 공격이 성공해서 공격 트레이스 디버그 박스를 그립니다.");
-
+	RS_LOG("PerformAttackTrace 함수로 몬스터 공격 성공!");
 }
 
 void ARSDunMonsterCharacter::JumpTo(FVector destination)
