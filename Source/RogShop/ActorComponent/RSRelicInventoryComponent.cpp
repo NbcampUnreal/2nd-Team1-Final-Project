@@ -4,7 +4,7 @@
 #include "RSRelicInventoryComponent.h"
 #include "RogShop/UtilDefine.h"
 #include "RSDataSubsystem.h"
-#include "DungeonItemData.h"
+#include "ItemInfoData.h"
 
 URSRelicInventoryComponent::URSRelicInventoryComponent()
 {
@@ -38,7 +38,7 @@ bool URSRelicInventoryComponent::CheckValidRelicKey(const FName& RelicKey)
 {
 	URSDataSubsystem* Data = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>();
 
-	if (FDungeonItemData* Row = Data->Relic->FindRow<FDungeonItemData>(RelicKey, TEXT("Contains DungeonItemData")))
+	if (FItemInfoData* Row = Data->Relic->FindRow<FItemInfoData>(RelicKey, TEXT("Contains DungeonItemData")))
 	{
 		return true;
 	}
