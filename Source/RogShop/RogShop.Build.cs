@@ -17,7 +17,7 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "Widget", "DunShop"),
             Path.Combine(ModuleDirectory, "Widget", "Mainmenu"),
             Path.Combine(ModuleDirectory, "Widget", "Dungeon"),
-            Path.Combine(ModuleDirectory, "Widget", "InGameMenu"),
+            Path.Combine(ModuleDirectory, "Widget", "InGame"),
             Path.Combine(ModuleDirectory, "AnimInstances"),
             Path.Combine(ModuleDirectory, "AnimNotifyState"),
             Path.Combine(ModuleDirectory, "AnimNotify"),
