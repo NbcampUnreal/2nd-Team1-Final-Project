@@ -17,7 +17,7 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "Widget", "DunShop"),
             Path.Combine(ModuleDirectory, "Widget", "Mainmenu"),
             Path.Combine(ModuleDirectory, "Widget", "Dungeon"),
-            Path.Combine(ModuleDirectory, "Widget", "InGameMenu"),
+            Path.Combine(ModuleDirectory, "Widget", "InGame"),
             Path.Combine(ModuleDirectory, "AnimInstances"),
             Path.Combine(ModuleDirectory, "AnimNotifyState"),
             Path.Combine(ModuleDirectory, "AnimNotify"),
@@ -36,6 +36,7 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "GameInstanceSubsystem"),
             Path.Combine(ModuleDirectory, "SaveGame"),
             Path.Combine(ModuleDirectory, "SaveGame", "Dungeon"),
+            Path.Combine(ModuleDirectory, "Struct"),
         });
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule", "NavigationSystem", "DeveloperSettings", "SkeletalMerging", "UMG" });

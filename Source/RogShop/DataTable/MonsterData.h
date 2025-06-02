@@ -14,6 +14,14 @@ enum class EMonsterType : uint8
 	Boss,
 };
 
+UENUM(BlueprintType)
+enum class ESkillType : uint8
+{
+	Melee,
+	Range,
+	Utillity,
+};
+
 USTRUCT(BlueprintType)
 struct FMonsterAttackTraceData
 {
@@ -60,6 +68,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FMonsterAttackTraceData AttackTrace;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	ESkillType skillType;
 };
 
 USTRUCT(BlueprintType)

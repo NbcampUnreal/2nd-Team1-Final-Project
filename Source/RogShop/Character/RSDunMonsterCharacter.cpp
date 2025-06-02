@@ -159,6 +159,24 @@ void ARSDunMonsterCharacter::PlaySkill_3()
 	GetWorld()->SpawnActor<AActor>(servant, interrestedPos, spawnRot);
 }*/
 
+void ARSDunMonsterCharacter::AIAction(int32 actionIdx)
+{
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+
+	if (MonsterAttackSkills.Num() > actionIdx)
+	{
+		UAnimMontage* action = MonsterAttackSkills[actionIdx].SkillMontage;
+		if (animInstance && action)
+		{
+			if (animInstance->Montage_IsPlaying(action) == false)
+			{
+				animInstance->Montage_Play(action);
+				skillActionIdx = actionIdx;
+			}
+		}
+	}
+}
+
 void ARSDunMonsterCharacter::OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -199,70 +217,78 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 	return Damage;
 }
 
-void ARSDunMonsterCharacter::PerformAttackTrace(int32 SkillIndex)
+void ARSDunMonsterCharacter::PerformAttackTrace()
 {
 	// 미리 캐싱해둔 몬스터 데이터 중 공격 트레이스 배열 데이터를 가져와서 인덱스에 따라 트레이스가 변경되도록 설정
-	const FMonsterAttackTraceData& TraceData = CachedAttackTraceDataArray[SkillIndex];
+	const FMonsterAttackSkillData& actionData = MonsterAttackSkills[skillActionIdx];
 
-	FVector Start = GetMesh()->GetSocketLocation(TraceData.SocketLocation);
-	Start += GetActorForwardVector() * TraceData.TraceForwardOffset;
-	Start += GetActorRightVector() * TraceData.TraceRightOffset;
-	Start += GetActorUpVector() * TraceData.TraceUpOffset;
-
-	FVector End = Start + GetActorForwardVector() * TraceData.TraceLength;
-	FVector Center = (Start + End) * 0.5f;
-	FQuat Rotation = GetActorRotation().Quaternion();
-	FVector LocalTraceBoxHalfSize = TraceData.TraceBoxHalfSize;
-
-	FHitResult HitResult;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-
-	// 몬스터 공격이 플레이어에게 적용되게 하려는 Trace입니다. 저희 게임은 플레이어가 1명이니 SweepSingleByChannel을 사용했습니다.
-	bool bHit = GetWorld()->SweepSingleByChannel(
-		HitResult,
-		Start,
-		End,
-		Rotation,
-		ECC_MonsterAttackTrace,
-		FCollisionShape::MakeBox(LocalTraceBoxHalfSize),
-		Params
-	);
-
-	if (bHit)
+	if (actionData.skillType == ESkillType::Melee) // 근접 공격인 경우
 	{
-		RS_LOG("bHit True! 무언가 공격에 맞았습니다!");
-		AActor* HitActor = HitResult.GetActor();
-		bool bPlayerHit = IsValid(HitActor) && HitActor->IsA(ARSDunMonsterCharacter::StaticClass());
-		//bool bPlayerHit = IsValid(HitActor); TODO : 만약 콜리전 프리셋 MonsterPawn 블록->무시로 변경가능하면 < 이 코드 쓰기
+		const FMonsterAttackTraceData& TraceData = CachedAttackTraceDataArray[skillActionIdx];
+		FVector Start = GetMesh()->GetSocketLocation(TraceData.SocketLocation);
+		Start += GetActorForwardVector() * TraceData.TraceForwardOffset;
+		Start += GetActorRightVector() * TraceData.TraceRightOffset;
+		Start += GetActorUpVector() * TraceData.TraceUpOffset;
 
-		if (bPlayerHit)
+		FVector End = Start + GetActorForwardVector() * TraceData.TraceLength;
+		FVector Center = (Start + End) * 0.5f;
+		FQuat Rotation = GetActorRotation().Quaternion();
+		FVector LocalTraceBoxHalfSize = TraceData.TraceBoxHalfSize;
+
+		FHitResult HitResult;
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+
+		bool bHit = GetWorld()->SweepSingleByChannel(
+			HitResult,
+			Start,
+			End,
+			Rotation,
+			ECC_MonsterAttackTrace,
+			FCollisionShape::MakeBox(LocalTraceBoxHalfSize),
+			Params
+		);
+
+		if (bHit)
 		{
-			float AttackDamage = MonsterAttackSkills[SkillIndex].Damage;
+			RS_LOG("bHit True! 무언가 공격에 맞았습니다!");
+			AActor* HitActor = HitResult.GetActor();
+			bool bPlayerHit = IsValid(HitActor) && HitActor->IsA(ARSDunMonsterCharacter::StaticClass());
+			// bool bPlayerHit = IsValid(HitActor); // TODO: MonsterPawn Block->Ignore 설정 가능하면 이 코드로 변경
 
-			UGameplayStatics::ApplyDamage(HitActor, AttackDamage, GetController(), this, nullptr);
+			if (bPlayerHit)
+			{
+				float AttackDamage = MonsterAttackSkills[skillActionIdx].Damage;
 
-			// 데미지를 주면 데미지를 맞은 오브젝트의 로그 띄우기
-			RS_LOG_F("[%s] 몬스터가 [%s] 에게 %f 데미지를 주었습니다!",
-				*GetName(),
-				HitActor ? *HitActor->GetName() : TEXT("Unknown"),
-				AttackDamage
-			);
+				UGameplayStatics::ApplyDamage(HitActor, AttackDamage, GetController(), this, nullptr);
+
+				RS_LOG_F("[%s] 몬스터가 [%s] 에게 %f 데미지를 주었습니다!",
+					*GetName(),
+					HitActor ? *HitActor->GetName() : TEXT("Unknown"),
+					AttackDamage
+				);
+			}
+			else
+			{
+				RS_LOG("플레이어가 아닌 대상이 공격에 맞았습니다!");
+			}
+
+			DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, bPlayerHit ? FColor::Red : FColor::Green, false, 5.0f);
 		}
 		else
 		{
-			RS_LOG("플레이어가 아닌 대상이 공격에 맞았습니다!");
+			DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, FColor::Green, false, 5.0f);
+			RS_LOG("몬스터의 공격에 아무도 맞지 않았습니다!");
 		}
-
-		DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, bPlayerHit ? FColor::Red : FColor::Green, false, 5.0f);
 	}
-	else
+	else if (actionData.skillType == ESkillType::Range) // 원거리 공격인 경우
 	{
-		DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, FColor::Green, false, 5.0f);
-		RS_LOG("몬스터의 공격에 아무도 맞지 않았습니다!");
+		// TODO: 원거리 공격 로직 작성
 	}
-
-	RS_LOG("PerformAttackTrace 함수로 몬스터 공격 성공!");
+	else if (actionData.skillType == ESkillType::Utillity) // 공격이 아닌 경우
+	{
+		// TODO: 유틸리티 스킬 로직 작성
+	}
 }
 
 void ARSDunMonsterCharacter::JumpTo(FVector destination)

@@ -31,7 +31,7 @@ void URSPlayerStatusWidget::NativeConstruct()
 	UpdateMaxHP();
 }
 
-void URSPlayerStatusWidget::UpdateWeaponSlot(uint8 SlotIndex, FName WeaponKey)
+void URSPlayerStatusWidget::UpdateWeaponSlot(int8 WeaponSlotIndex, FName WeaponKey)
 {
     if (URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>())
     {
@@ -54,7 +54,7 @@ void URSPlayerStatusWidget::UpdateWeaponSlot(uint8 SlotIndex, FName WeaponKey)
                 }
                 else
                 {
-                    if (SlotIndex == 0 || SlotIndex == 1)
+                    if (WeaponSlotIndex == 0 || WeaponSlotIndex == 1)
                     {
                         WeaponSlot1->SetBrushFromTexture(FoundData->ItemIcon);
                     }
@@ -66,7 +66,7 @@ void URSPlayerStatusWidget::UpdateWeaponSlot(uint8 SlotIndex, FName WeaponKey)
             }
             else
             {
-                if (SlotIndex == 0 || SlotIndex == 1)
+                if (WeaponSlotIndex == 0 || WeaponSlotIndex == 1)
                 {
                     WeaponSlot1->SetBrushFromTexture(nullptr);
                 }
