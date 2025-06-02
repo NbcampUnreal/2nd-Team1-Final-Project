@@ -148,9 +148,8 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 		WeaponActors.SetNum(WeaponSlotSize);
 	}
 
-	// 슬롯에 포함할 액터를 숨김처리 및 충돌을 끈다.
+	// 슬롯에 포함할 액터를 숨김처리
 	NewWeaponActor->SetActorHiddenInGame(true);
-	NewWeaponActor->SetActorEnableCollision(false);
 
 	// 캐릭터의 손에 무기를 부착한다.
 	ACharacter* CurCharacter = GetOwner<ACharacter>();
@@ -322,9 +321,8 @@ void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSl
 		ARSBaseWeapon* TargetEquipWeapon = WeaponActors[TargetIndex];
 		if (TargetEquipWeapon)
 		{
-			// 새로 착용할 무기의 숨김 처리를 끄고, 충돌을 켠다.
+			// 새로 착용할 무기의 숨김 처리를 끈다.
 			TargetEquipWeapon->SetActorHiddenInGame(false);
-			TargetEquipWeapon->SetActorEnableCollision(true);
 			
 			// 오버랩 이벤트 바인딩
 			UBoxComponent* CurWeaponBoxComp = TargetEquipWeapon->GetBoxComp();
@@ -362,12 +360,12 @@ void URSPlayerWeaponComponent::UnEquipWeaponToCharacter()
 
 	int8 CurrentIndex = static_cast<int8>(WeaponSlot) - 1;
 
-	// 현재 착용 중인 무기가 있는 경우 숨김 처리 및 충돌을 끈다.
+	// 현재 착용 중인 무기가 있는 경우
 	ARSBaseWeapon* CurEquipWeapon = WeaponActors[CurrentIndex];
 	if (CurEquipWeapon)
 	{
+		// 숨김 처리
 		CurEquipWeapon->SetActorHiddenInGame(true);
-		CurEquipWeapon->SetActorEnableCollision(false);
 
 		// 오버랩 이벤트 바인딩 해제
 		WeaponActors[CurrentIndex]->GetBoxComp()->OnComponentBeginOverlap.RemoveDynamic(this, &URSPlayerWeaponComponent::OnBeginOverlap);
