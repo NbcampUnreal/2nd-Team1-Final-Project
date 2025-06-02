@@ -35,33 +35,41 @@ public:
 
 	void ResetCombo();
 
+	// ìŠ¬ë¡¯ì— ë¬´ê¸°ë¥¼ ì¶”ê°€í•œë‹¤.
 	UFUNCTION(BlueprintCallable)
 	void EquipWeaponToSlot(ARSBaseWeapon* WeaponActor);
 
+	// íŠ¹ì • ìŠ¬ë¡¯ì˜ ë¬´ê¸°ë¥¼ ë²„ë¦°ë‹¤.
+	void DropWeaponToSlot(EWeaponSlot TargetWeaponSlot);
+
+	// íŠ¹ì • ìŠ¬ë¡¯ì˜ ë¬´ê¸°ë¥¼ ì¥ì°©í•œë‹¤.
 	void EquipWeaponToCharacter(EWeaponSlot TargetWeaponSlot);
 
+	// ì¥ì°© ì¤‘ì¸ ë¬´ê¸°ë¥¼ ì¥ì°© í•´ì œí•œë‹¤.
+	void UnEquipWeaponToCharacter();
+
 private:
-	// ¹«±â
+	// ë¬´ê¸°
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
-	TArray<TObjectPtr<ARSBaseWeapon>> WeaponActors; // ¹«±â ¾×ÅÍ
+	TArray<TObjectPtr<ARSBaseWeapon>> WeaponActors; // ë¬´ê¸° ì•¡í„°
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
-	EWeaponSlot WeaponSlot;	// 1-based, ÇöÀç ÀåÂøÁßÀÎ ¹«±â ½½·ÔÀ» ÀÇ¹ÌÇÑ´Ù.
+	EWeaponSlot WeaponSlot;	// 1-based, í˜„ì¬ ì¥ì°©ì¤‘ì¸ ë¬´ê¸° ìŠ¬ë¡¯ì„ ì˜ë¯¸í•œë‹¤.
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
-	int32 WeaponSlotSize;	// ÃÖ´ë ½½·Ô ¼ö
+	int32 WeaponSlotSize;	// ìµœëŒ€ ìŠ¬ë¡¯ ìˆ˜
 
-	// ¾Ö´Ï¸ŞÀÌ¼ÇÀ» À§ÇÑ »óÅÂ
+	// ì• ë‹ˆë©”ì´ì…˜ì„ ìœ„í•œ ìƒíƒœ
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
-	bool bIsAttack;	// °ø°İ ÁßÀÎ »óÅÂ
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
-	bool bComboInputBuffered;	// °ø°İ ÁßÀÏ ¶§ µé¾î¿Â ÀÔ·Â ¹öÆÛ
+	bool bIsAttack;	// ê³µê²© ì¤‘ì¸ ìƒíƒœ
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
-	int32 ComboIndex;	// ÄŞº¸ °ø°İÀ» À§ÇÑ ÀÎµ¦½º °ª
+	bool bComboInputBuffered;	// ê³µê²© ì¤‘ì¼ ë•Œ ë“¤ì–´ì˜¨ ì…ë ¥ ë²„í¼
 
-// Ãæµ¹ ·ÎÁ÷ °ü¸®
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
+	int32 ComboIndex;	// ì½¤ë³´ ê³µê²©ì„ ìœ„í•œ ì¸ë±ìŠ¤ ê°’
+
+// ì¶©ëŒ ë¡œì§ ê´€ë¦¬
 public:
 	void StartAttackOverlap();
 	void EndAttackOverlap();
@@ -72,9 +80,9 @@ protected:
 
 private:
 	UPROPERTY()
-	TSet<AActor*> DamagedActors;	// µ¥¹ÌÁö ÀÔÀº ¾×ÅÍ ÀúÀå
+	TSet<AActor*> DamagedActors;	// ë°ë¯¸ì§€ ì…ì€ ì•¡í„° ì €ì¥
 
-// ¼¼ÀÌºê/·Îµå
+// ì„¸ì´ë¸Œ/ë¡œë“œ
 private:
 	UFUNCTION()
 	void SaveRequested();

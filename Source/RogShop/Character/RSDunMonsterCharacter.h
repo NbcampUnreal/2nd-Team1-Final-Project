@@ -11,57 +11,10 @@
 #include "Engine/OverlapResult.h"
 #include "TimerManager.h"
 #include "Animation/AnimInstance.h"
+#include "MonsterData.h"
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
-
-USTRUCT(BlueprintType)
-struct FMonsterAttackTraceData
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
-	FVector TraceBoxHalfSize;	// 트레이스 반경 (옆으로 얼마만큼 쏠지)
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
-	float TraceLength;			// 트레이스 길이 (앞으로 얼마만큼 쏠지)
-
-	UPROPERTY(EditAnywhere, Category = "AttackTrace")
-	float TraceForwardOffset;	// 소켓 시작점 앞뒤 보정
-
-	UPROPERTY(EditAnywhere, Category = "AttackTrace")
-	float TraceRightOffset;     // 소켓 시작점 좌우 보정
-
-	UPROPERTY(EditAnywhere, Category = "AttackTrace")
-	float TraceUpOffset;        // 소켓 시작점 높이 보정
-
-	UPROPERTY(EditAnywhere, Category = "AttackTrace")
-	FName SocketLocation;		// 트레이스가 쏴질 소켓의 시작점
-
-};
-
-USTRUCT(BlueprintType)
-struct FMonsterSkillData
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FName SkillName;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> SkillMontage;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int32 PlayRate;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float Damage;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FMonsterAttackTraceData AttackTrace;
-};
 
 UCLASS()
 class ROGSHOP_API ARSDunMonsterCharacter : public ARSDunBaseCharacter
@@ -74,14 +27,14 @@ public:
 	virtual void BeginPlay()override;
 
 	// 애니메이션 실행 함수
-	virtual void PlayBaseAttackAnim();
-	virtual void PlayDeathAnim();
+	void PlayAttackAnim();
+	void PlayDeathAnim();
 	UFUNCTION(BlueprintCallable)
-	virtual void PlaySkill_1();
+	void PlaySkill_1();
 	UFUNCTION(BlueprintCallable)
-	virtual void PlaySkill_2();
+	void PlaySkill_2();
 	UFUNCTION(BlueprintCallable)
-	virtual void PlaySkill_3();
+	void PlaySkill_3();
 
 	UFUNCTION()
 	void OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted);  //사망 모션이 끝난 경우
@@ -90,10 +43,10 @@ public:
 	FORCEINLINE class UNavigationInvokerComponent* GetNavInvoker() const { return navInvoker; };
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy")
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Trace")
-	virtual void PerformAttackTrace();
+	void PerformAttackTrace(int32 SkillIndex);
 
 	//NavLink jump function
 	UFUNCTION(BlueprintCallable)
@@ -110,15 +63,12 @@ public:
 	void OnDeath();
 
 protected:
-	// 애니메이션 몽타주
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FMonsterSkillData> MonsterSkill;
+	void InitMonsterData();
 
+protected:
+	// 애니메이션 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> DeathMontage;
-
-	/*UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> BaseAttackMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> SkillMontage_1;
@@ -127,7 +77,7 @@ protected:
 	TObjectPtr<UAnimMontage> SkillMontage_2;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> SkillMontage_3;*/
+	TObjectPtr<UAnimMontage> SkillMontage_3;
 
 	//NavInvoker
 	UPROPERTY(BlueprintReadWrite, Category = Navigation, meta = (AllowPrivateAccess = "true"))//Navigation Invoker Setting
@@ -150,26 +100,15 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Patrol")
 	float maxDetectPatrolRoute;
 
-	// 트레이스 설정
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
-	FVector TraceBoxHalfSize;	// 트레이스 반경 (옆으로 얼마만큼 쏠지)
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackTrace")
-	float TraceLength;			// 트레이스 길이 (앞으로 얼마만큼 쏠지)
-
-	UPROPERTY(EditAnywhere, Category = "AttackTrace")
-	float TraceForwardOffset;	// 소켓 시작점 앞뒤 보정
-
-	UPROPERTY(EditAnywhere, Category = "AttackTrace")
-	float TraceRightOffset;     // 소켓 시작점 좌우 보정
-
-	UPROPERTY(EditAnywhere, Category = "AttackTrace")
-	float TraceUpOffset;        // 소켓 시작점 높이 보정
-
-	UPROPERTY(EditAnywhere, Category = "AttackTrace")
-	FName SocketLocation;		// 트레이스가 쏴질 소켓의 시작점
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName MonsterRowName;			 // 이 몬스터가 참조하는 RowName
 
 	FTimerHandle detectDelayTimer;
+
+	// 데이터 테이블 관련
+	UDataTable* MonsterDataTable;	 // 연결된 데이터 테이블
+	TArray<FMonsterAttackSkillData> MonsterAttackSkills;	// 몬스터 공격 스킬을 모아놓은 구조체를 배열로 저장
+	TArray<FMonsterAttackTraceData> CachedAttackTraceDataArray;	// 공격 트레이스를 캐싱해두고 다른 스킬 사용시 인덱스에서 꺼내 쓰는 용도
 
 private:
 	TObjectPtr<ARSMonsterAIController> AIController;  // TODO : 혹시나 캐싱해서 쓸 일 생길까봐 미리 만들어둠.

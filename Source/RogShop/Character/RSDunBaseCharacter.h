@@ -17,16 +17,18 @@ class ROGSHOP_API ARSDunBaseCharacter : public ACharacter
 public:
 	ARSDunBaseCharacter();
 
-// ½ºÅÈ °ü·Ã
+// ìŠ¤íƒ¯ ê´€ë ¨
 public:
 	float GetMoveSpeed() const;
 	void ChangeMoveSpeed(float Amount);
 
 	float GetMaxHP() const;
+	virtual void ChangeMaxHP(float Amount);
 	virtual void IncreaseMaxHP(float Amount);
 	virtual void DecreaseMaxHP(float Amount);
 
 	float GetHP() const;
+	virtual void ChangeHP(float Amount);
 	virtual void IncreaseHP(float Amount);
 	virtual void DecreaseHP(float Amount);
 
@@ -38,7 +40,7 @@ private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
 	float HP;
 
-// »óÅÂ °ü·Ã
+// ìƒíƒœ ê´€ë ¨
 public:
 	bool GetIsDead();
 	virtual void OnDeath();
