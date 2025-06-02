@@ -12,6 +12,7 @@
 #include "RogShop/DataTable/CookFoodData.h"
 #include "RogShop/GameInstanceSubsystem/RSDataSubsystem.h"
 #include "Tycoon/NPC/RSTycoonCustomerCharacter.h"
+#include "ItemSlot.h"
 
 
 ARSTycoonGameModeBase::ARSTycoonGameModeBase()
@@ -133,7 +134,7 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 	URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
 
 	//1. 이미 들어와있는 손님들이 시키는 음식들이 사용하는 재료를 남은 재료 목록에서 제외 시켜야함
-	TMap<FName, int32> Ingredients = Inventory->GetItems(); //재료 있는 것들 복사
+	TArray<FItemSlot> Ingredients = Inventory->GetItems(); //재료 있는 것들 복사
 	for (auto& Customer : Customers)
 	{
 		FCookFoodData const* Data = DataSubsystem->Food->FindRow<FCookFoodData>(Customer->WantFoodKey, TEXT("Get FoodData"));
@@ -141,9 +142,12 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 		{
 			//손님이 바라는 음식인데 이미 요리가 나와서 재료가 없는 상황엔 재료를 차감하지 않음
 			//어차피 아래쪽에서 만들 수 있는지 검사하기 때문에 여기서 차감만
-			if (Ingredients.Contains(Need.Key))
+			for (FItemSlot e : Ingredients)
 			{
-				Ingredients[Need.Key] -= Need.Value;
+				if (e.ItemKey == Need.Key)
+				{
+					e.Quantity -= Need.Value;
+				}
 			}
 		}
 	}

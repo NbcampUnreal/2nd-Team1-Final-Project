@@ -21,7 +21,7 @@ class ROGSHOP_API URSInventoryWeaponSlotWidget : public UUserWidget
 	
 public:
 	UFUNCTION()
-	void UpdateWeaponSlot(uint8 SlotIndex, FName WeaponKey);
+	void UpdateWeaponSlot(int8 WeaponSlotIndex, FName WeaponKey);
 
 protected:
 	virtual void NativeConstruct() override;

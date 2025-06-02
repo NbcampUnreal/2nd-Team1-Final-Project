@@ -8,48 +8,67 @@
 #include "GameFramework/Character.h"
 #include "RSDataSubsystem.h"
 #include "DungeonItemData.h"
+#include "ItemSlot.h"
 
-void URSDungeonIngredientInventoryComponent::AddItem(FName ItemKey, int32 Amount)
+int32 URSDungeonIngredientInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 {
-	Super::AddItem(ItemKey, Amount);
+	int32 ItemIndex = Super::AddItem(ItemKey, Amount);
+
+	if (ItemIndex < 0)
+	{
+		RS_LOG_C("아이템 슬롯의 인덱스가 유효하지 않습니다.", FColor::Red);
+		return -1;
+	}
 
 	ACharacter* CurCharacter = GetOwner<ACharacter>();
 	if (!CurCharacter)
 	{
-		return;
+		return -1;
 	}
 
 	// UI 갱신되도록 이벤트 디스패처 호출
 	ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
-	if (PC)
+	if (!PC)
 	{
-		//PC->OnIngredientChange.Broadcast();
+		return -1;
 	}
+
+	PC->OnIngredientChange.Broadcast(ItemIndex, ItemList[ItemIndex]);
+
+	return ItemIndex;
 }
 
-void URSDungeonIngredientInventoryComponent::RemoveItem(FName ItemKey, int32 Amount)
+int32 URSDungeonIngredientInventoryComponent::RemoveItem(FName ItemKey, int32 Amount)
 {
-	Super::RemoveItem(ItemKey, Amount);
+	int32 ItemIndex = Super::RemoveItem(ItemKey, Amount);
+
+	if (ItemIndex < 0)
+	{
+		RS_LOG_C("아이템 슬롯의 인덱스가 유효하지 않습니다.", FColor::Red);
+		return -1;
+	}
 
 	ACharacter* CurCharacter = GetOwner<ACharacter>();
 	if (!CurCharacter)
 	{
-		return;
+		return -1;
 	}
 
 	// UI 갱신되도록 이벤트 디스패처 호출
 	ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
-	if (PC)
+	if (!PC)
 	{
-		//PC->OnIngredientChange.Broadcast();
+		return -1;
 	}
+
+	PC->OnIngredientChange.Broadcast(ItemIndex, ItemList[ItemIndex]);
+
+	return ItemIndex;
 }
 
 void URSDungeonIngredientInventoryComponent::DropItem(FName ItemKey)
 {
-	// TODO : 인벤토리에 있는 아이템이 땅에 버려지도록 구현해야한다.
-
-	if (!CheckValidItem(ItemKey) || !ItemMap.Contains(ItemKey))
+	if (!CheckValidItem(ItemKey) || GetQuantity(ItemKey) == 0)
 	{
 		RS_LOG_C("아이템 드랍에 실패했습니다.", FColor::Red);
 		return;
@@ -75,7 +94,7 @@ void URSDungeonIngredientInventoryComponent::DropItem(FName ItemKey)
 		{
 			DungeonGroundItem->InitItemInfo(ItemKey, ItemStaticMesh);
 
-			RemoveItem(ItemKey, ItemMap[ItemKey]);
+			RemoveItem(ItemKey, INT32_MAX);
 		}
 	}
 }

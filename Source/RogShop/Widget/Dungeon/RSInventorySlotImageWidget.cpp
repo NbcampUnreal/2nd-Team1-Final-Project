@@ -2,6 +2,19 @@
 
 
 #include "RSInventorySlotImageWidget.h"
+#include "RogShop/UtilDefine.h"
+#include "Components/TextBlock.h"
+#include "Components/Image.h"
+#include "RSDunPlayerCharacter.h"
+#include "RSDungeonIngredientInventoryComponent.h"
+
+void URSInventorySlotImageWidget::NativeConstruct()
+{
+    Super::NativeConstruct();
+
+    bIsPressable = false;
+    HoldThreshold = 0.5f;
+}
 
 FReply URSInventorySlotImageWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
@@ -29,10 +42,41 @@ FReply URSInventorySlotImageWidget::NativeOnMouseButtonUp(const FGeometry& InGeo
 void URSInventorySlotImageWidget::HandleLongPress()
 {
     // 유물 슬롯이 아닐때만 처리
-    if (SlotIndex != -1)
+    if (bIsPressable)
     {
-        UE_LOG(LogTemp, Warning, TEXT("Long Press Detected on URSInventorySlotImageWidget Index: %d"), SlotIndex);
-
         // 추가 작업 필요
+        ARSDunPlayerCharacter* CurCharacter = GetOwningPlayerPawn<ARSDunPlayerCharacter>();
+        if (!CurCharacter)
+        {
+            return;
+        }
+
+        URSDungeonIngredientInventoryComponent* IngredientInventoryComp = CurCharacter->GetRSDungeonIngredientInventoryComponent();
+        if (!IngredientInventoryComp)
+        {
+            return;
+        }
+
+        IngredientInventoryComp->DropItem(ItemDataTableKey);
+
+        RS_LOG("UI 클릭")
+    }
+}
+
+void URSInventorySlotImageWidget::SetSlotItemInfo(FName NewItemDataTableKey, UTexture2D* NewItemImage, FString NewItemCount)
+{
+    if (NewItemDataTableKey != NAME_None)
+    {
+        ItemDataTableKey = NewItemDataTableKey;
+    }
+
+    if (ItemImage)
+    {
+        ItemImage->SetBrushFromTexture(NewItemImage);
+    }
+
+    if (ItemCount)
+    {
+        ItemCount->SetText(FText::FromString(NewItemCount));
     }
 }

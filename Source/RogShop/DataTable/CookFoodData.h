@@ -6,6 +6,8 @@
 
 class ARSBaseFood;
 
+struct FItemSlot;
+
 UENUM(BlueprintType)
 enum class EIngredientType : uint8
 {
@@ -20,7 +22,7 @@ struct ROGSHOP_API FCookFoodData : public FTableRowBase
 	GENERATED_BODY()
 
 public:
-	bool CanMake(const TMap<FName, int32>& Ingredients) const; 
+	bool CanMake(const TArray<FItemSlot>& Ingredients) const;
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -40,6 +42,7 @@ public:
 };
 
 
+// TODO : 텍스처 데이터 추가 및 데이터 테이블 분리
 USTRUCT(BlueprintType)
 struct ROGSHOP_API FIngredientData : public FTableRowBase
 {

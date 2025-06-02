@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "ItemSlot.h"
 #include "RSDunPlayerController.generated.h"
 
 class UInputMappingContext;
@@ -11,8 +12,8 @@ class UInputAction;
 class URSDunMainHUDWidget;
 class URSPlayerInventoryWidget;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotChange, uint8, SlotIndex, FName, WeaponKey);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnIngredientChange, uint8, SlotIndex, FName, IngredientKey);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotChange, int8, WeaponSlotIndex, FName, WeaponKey);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnIngredientChange, int32, IngredientSlotIndex, FItemSlot, IngredientItemSlot);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHPChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMaxHPChange);
 

@@ -2,12 +2,23 @@
 
 
 #include "RSInventoryIngredientSlotWidget.h"
+#include "RSDunPlayerController.h"
 #include "Components/UniformGridPanel.h"
 #include "RSInventorySlotImageWidget.h"
+#include "RSDataSubsystem.h"
+#include "CookFoodData.h"
+#include "ItemSlot.h"
 
 void URSInventoryIngredientSlotWidget::NativeConstruct()
 {
     Super::NativeConstruct();
+
+    ARSDunPlayerController* RSDunPlayerController = GetOwningPlayer<ARSDunPlayerController>();
+
+    if (RSDunPlayerController)
+    {
+        RSDunPlayerController->OnIngredientChange.AddDynamic(this, &URSInventoryIngredientSlotWidget::UpdateSlots);
+    }
 
     // 24개 슬롯, 4열 기준 생성
     CreateSlots(24, 4);
@@ -15,18 +26,18 @@ void URSInventoryIngredientSlotWidget::NativeConstruct()
 
 void URSInventoryIngredientSlotWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
 {
-    if (!UniformGridPanel_RelicSlots || !SlotImageWidgetClass)
+    if (!IngredientSlots || !InvecntorySlotWidgetClass)
     {
         UE_LOG(LogTemp, Warning, TEXT("SlotImageWidgetClass Null"));
         return;
     }
 
-    UniformGridPanel_RelicSlots->ClearChildren();
-    SlotImages.Empty();
+    IngredientSlots->ClearChildren();
+    InvecntorySlots.Empty();
 
     for (int32 i = 0; i < NumSlots; ++i)
     {
-        URSInventorySlotImageWidget* NewSlotImage = CreateWidget<URSInventorySlotImageWidget>(GetWorld(), SlotImageWidgetClass);
+        URSInventorySlotImageWidget* NewSlotImage = CreateWidget<URSInventorySlotImageWidget>(GetWorld(), InvecntorySlotWidgetClass);
 
         if (NewSlotImage)
         {
@@ -34,10 +45,48 @@ void URSInventoryIngredientSlotWidget::CreateSlots(int32 NumSlots, int32 NumColu
             int32 Col = i % NumColumns;
 
             // 슬롯 인덱스 설정
-            NewSlotImage->SetSlotIndex(i);
+            NewSlotImage->SetIsPressable(true);
 
-            UniformGridPanel_RelicSlots->AddChildToUniformGrid(NewSlotImage, Row, Col);
-            SlotImages.Add(NewSlotImage);
+            IngredientSlots->AddChildToUniformGrid(NewSlotImage, Row, Col);
+            InvecntorySlots.Add(NewSlotImage);
         }
+    }
+}
+
+void URSInventoryIngredientSlotWidget::UpdateSlots(int32 IngredientSlotIndex, FItemSlot IngredientItemSlot)
+{
+    UWorld* CurrentWorld = GetWorld();
+    if (!CurrentWorld)
+    {
+        return;
+    }
+
+    UGameInstance* CurrentGameInstance = CurrentWorld->GetGameInstance();
+    if (!CurrentGameInstance)
+    {
+        return;
+    }
+
+    URSDataSubsystem* DataSubsystem = CurrentGameInstance->GetSubsystem<URSDataSubsystem>();
+    if (!DataSubsystem)
+    {
+        return;
+    }
+
+    UDataTable* IngredientDataTable = DataSubsystem->Ingredient;
+    if (!IngredientDataTable)
+    {
+        return;
+    }
+
+    FName IngredientKey = IngredientItemSlot.ItemKey;
+    int32 ItemCount = IngredientItemSlot.Quantity;
+
+    FIngredientData* Data = IngredientDataTable->FindRow<FIngredientData>(IngredientKey, TEXT("Get Ingredient"));
+    if (Data)
+    {
+        // TODO : 현재 데이터에 대한 텍스처 정보를 가져온다.
+        // nullptr 대신에 텍스처 정보를 넘겨야한다.
+        InvecntorySlots[IngredientSlotIndex]->SetSlotItemInfo(IngredientKey, nullptr, FString::FromInt(ItemCount));
     }
 }

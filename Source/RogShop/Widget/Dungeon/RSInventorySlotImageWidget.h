@@ -6,30 +6,50 @@
 #include "Blueprint/UserWidget.h"
 #include "RSInventorySlotImageWidget.generated.h"
 
-/**
- * 
- */
+class UImage;
+class UTextBlock;
+
 UCLASS()
 class ROGSHOP_API URSInventorySlotImageWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
 public:
-    void SetSlotIndex(int32 InIndex) { SlotIndex = InIndex; }
-    int32 GetSlotIndex() const { return SlotIndex; }
+    virtual void NativeConstruct() override;
 
+
+// 위젯 클릭
 protected:
     virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
     virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
-    FTimerHandle HoldTimerHandle;
+public:
+    void SetIsPressable(bool bNewIsPressable) { bIsPressable = bNewIsPressable; }
 
-    // 마우스 좌클릭 키다운 시간
-    float HoldThreshold = 0.5f;
-
+private:
     void HandleLongPress();
 
-    // 슬롯 기본값, 유물 슬롯은 이 값을 할당받지 않아서 유물 및 재료 슬롯 구분을 위해서 사용
+private:
+    FTimerHandle HoldTimerHandle;
+
+    // 해강 값이 true인 경우 버튼 입력을 받습니다.
     UPROPERTY()
-    int32 SlotIndex = -1;
+    bool bIsPressable;
+
+    // 마우스 좌클릭 키다운 시간
+    float HoldThreshold;
+
+// 현재 슬롯에 대한 아이템 정보
+public:
+    void SetSlotItemInfo(FName NewItemDataTableKey, UTexture2D* NewItemImage, FString NewItemCount);
+
+private:
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemInfo", meta = (BindWidget, AllowPrivateAccess = "true"))
+    FName ItemDataTableKey;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemInfo", meta = (BindWidget, AllowPrivateAccess = "true"))
+    TObjectPtr<UImage> ItemImage;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemInfo", meta = (BindWidget, AllowPrivateAccess = "true"))
+    TObjectPtr<UTextBlock> ItemCount;
 };

@@ -81,7 +81,7 @@ void URSInventoryWeaponSlotWidget::HandleLongPress()
     }
 }
 
-void URSInventoryWeaponSlotWidget::UpdateWeaponSlot(uint8 SlotIndex, FName WeaponKey)
+void URSInventoryWeaponSlotWidget::UpdateWeaponSlot(int8 WeaponSlotIndex, FName WeaponKey)
 {
     if (URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>())
     {
@@ -104,7 +104,7 @@ void URSInventoryWeaponSlotWidget::UpdateWeaponSlot(uint8 SlotIndex, FName Weapo
                 }
                 else
                 {
-                    if (SlotIndex == 0 || SlotIndex == 1)
+                    if (WeaponSlotIndex == 0 || WeaponSlotIndex == 1)
                     {
                         WeaponSlot1->SetBrushFromTexture(FoundData->ItemIcon);
                     }
@@ -116,11 +116,11 @@ void URSInventoryWeaponSlotWidget::UpdateWeaponSlot(uint8 SlotIndex, FName Weapo
             }
             else
             {
-                if (SlotIndex == 1)
+                if (WeaponSlotIndex == 1)
                 {
                     WeaponSlot1->SetBrushFromTexture(nullptr);
                 }
-                else if (SlotIndex == 2)
+                else if (WeaponSlotIndex == 2)
                 {
                     WeaponSlot2->SetBrushFromTexture(nullptr);
                 }
