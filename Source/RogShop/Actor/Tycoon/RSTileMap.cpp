@@ -30,7 +30,6 @@ ARSTileMap::ARSTileMap()
 	RootComponent = TileParent;
 }
 
-
 void ARSTileMap::ChangeTile(int32 Index, FName TileKey)
 {
 	if (Index < 0)
@@ -52,8 +51,8 @@ void ARSTileMap::ChangeTile(int32 Index, FName TileKey)
 void ARSTileMap::SaveTileMap()
 {
 	// SaveGame 오브젝트 생성
-	URSTycoonSaveGame* SaveGameInstance = Cast<URSTycoonSaveGame>(
-		UGameplayStatics::CreateSaveGameObject(URSTycoonSaveGame::StaticClass()));
+	URSTycoonTileMapSaveGame* SaveGameInstance = Cast<URSTycoonTileMapSaveGame>(
+		UGameplayStatics::CreateSaveGameObject(URSTycoonTileMapSaveGame::StaticClass()));
 
 	SaveGameInstance->Tile2DMap = TileName2DMap;
 	SaveGameInstance->Width = Width;
@@ -152,7 +151,7 @@ void ARSTileMap::BeginPlay()
 
 void ARSTileMap::LoadTileMap()
 {
-	URSTycoonSaveGame* LoadedGame = Cast<URSTycoonSaveGame>(
+	URSTycoonTileMapSaveGame* LoadedGame = Cast<URSTycoonTileMapSaveGame>(
 		UGameplayStatics::LoadGameFromSlot(TileMapSaveSlot, 0));
 
 	if (LoadedGame)
