@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "RSInventoryIngredientSlotWidget.h"
+#include "RSRelicInventoryWidget.h"
 #include "Components/UniformGridPanel.h"
-#include "RSInventorySlotImageWidget.h"
+#include "RSInventorySlotWidget.h"
 
-void URSInventoryIngredientSlotWidget::NativeConstruct()
+void URSRelicInventoryWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
@@ -13,7 +13,7 @@ void URSInventoryIngredientSlotWidget::NativeConstruct()
     CreateSlots(24, 4);
 }
 
-void URSInventoryIngredientSlotWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
+void URSRelicInventoryWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
 {
     if (!UniformGridPanel_RelicSlots || !SlotImageWidgetClass)
     {
@@ -26,15 +26,12 @@ void URSInventoryIngredientSlotWidget::CreateSlots(int32 NumSlots, int32 NumColu
 
     for (int32 i = 0; i < NumSlots; ++i)
     {
-        URSInventorySlotImageWidget* NewSlotImage = CreateWidget<URSInventorySlotImageWidget>(GetWorld(), SlotImageWidgetClass);
+        URSInventorySlotWidget* NewSlotImage = CreateWidget<URSInventorySlotWidget>(GetWorld(), SlotImageWidgetClass);
 
         if (NewSlotImage)
         {
             int32 Row = i / NumColumns;
             int32 Col = i % NumColumns;
-
-            // 슬롯 인덱스 설정
-            NewSlotImage->SetSlotIndex(i);
 
             UniformGridPanel_RelicSlots->AddChildToUniformGrid(NewSlotImage, Row, Col);
             SlotImages.Add(NewSlotImage);

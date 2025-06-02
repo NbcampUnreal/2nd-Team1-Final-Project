@@ -15,7 +15,6 @@
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
-
 UCLASS()
 class ROGSHOP_API ARSDunMonsterCharacter : public ARSDunBaseCharacter
 {
@@ -35,6 +34,8 @@ public:
 	void PlaySkill_2();
 	UFUNCTION(BlueprintCallable)
 	void PlaySkill_3();
+	UFUNCTION(BlueprintCallable)
+	void AIAction(int32 actionIdx);
 
 	UFUNCTION()
 	void OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted);  //사망 모션이 끝난 경우
@@ -46,7 +47,7 @@ public:
 	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Trace")
-	void PerformAttackTrace(int32 SkillIndex);
+	void PerformAttackTrace();
 
 	//NavLink jump function
 	UFUNCTION(BlueprintCallable)
@@ -78,6 +79,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> SkillMontage_3;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int32 skillActionIdx;//어떤 스킬을 시전하는 중인지 저장, PerformActionTrace 에서 해당 변수를 참조해 행동하도록 함
 
 	//NavInvoker
 	UPROPERTY(BlueprintReadWrite, Category = Navigation, meta = (AllowPrivateAccess = "true"))//Navigation Invoker Setting

@@ -5,6 +5,7 @@
 #include "RogShop/UtilDefine.h"
 #include "RogShop/GameInstanceSubsystem/RSDataSubsystem.h"
 #include "RogShop/DataTable/CookFoodData.h"
+#include "ItemSlot.h"
 
 URSBaseInventoryComponent::URSBaseInventoryComponent()
 {
@@ -19,64 +20,125 @@ void URSBaseInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 	LoadItemData();
-	
+
 }
 
-void URSBaseInventoryComponent::AddItem(FName ItemKey, int32 Amount)
+int32 URSBaseInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 {
-	if (GetFilledSize() >= GetSlotMaxSize() && !ItemMap.Contains(ItemKey))
-	{
-		RS_LOG_C("Inventory is full", FColor::Red)
-		return;
-	}
-
 	if (CheckValidItem(ItemKey))
 	{
-		ItemMap.Add(ItemKey, Amount);
-	}
-	else
-	{
-		RS_LOG_C("Failed to add item", FColor::Red);
-	}
-}
-
-void URSBaseInventoryComponent::RemoveItem(FName ItemKey, int32 Amount)
-{
-	// Ű�� ��ȿ���� Ȯ��
-	if (CheckValidItem(ItemKey))
-	{
-		// �κ��丮�� ����ִ� ���
-		if (ItemMap.Contains(ItemKey))
+		// 인벤토리 순회
+		for (size_t i = 0; i < ItemList.Num(); ++i)
 		{
-			// ������ ������ŭ ����
-			ItemMap[ItemKey] -= Amount;
+			FItemSlot& ItemSlot = ItemList[i];
 
-			// ������ 0 ������ ��� �ʿ��� ������ ����
-			if (ItemMap[ItemKey] <= 0)
+			// 인벤토리에 해당 아이템이 존재하는 경우 아이템 추가
+			if (ItemSlot.ItemKey == ItemKey)
 			{
-				ItemMap.Remove(ItemKey);
+				ItemSlot.Quantity += Amount;
+				return i;
+			}
+
+			// 인벤토리에 해당 슬롯이 비어있는 경우 아이템 추가
+			if (ItemSlot.ItemKey == NAME_None)
+			{
+				ItemSlot.ItemKey = ItemKey;
+				ItemSlot.Quantity = Amount;
+				return i;
 			}
 		}
 	}
 	else
 	{
-		RS_LOG_C("Failed to remove item", FColor::Red);
+		RS_LOG_C("키가 유효하지 않아 아이템을 추가할 수 없습니다.", FColor::Red);
 	}
+
+	if (GetFilledSize() >= GetSlotMaxSize())
+	{
+		RS_LOG_C("인벤토리가 가득 찼습니다.", FColor::Red)
+			return -1;
+	}
+
+	return -1;
 }
 
-int32 URSBaseInventoryComponent::GetAmount(const FName& ItemKey)
+int32 URSBaseInventoryComponent::RemoveItem(FName ItemKey, int32 Amount)
 {
-	return ItemMap.Contains(ItemKey) ? ItemMap[ItemKey] : INDEX_NONE;
+	// 키가 유효한지 확인
+	if (CheckValidItem(ItemKey))
+	{
+		// 인벤토리 순회
+		for (size_t i = 0; i < ItemList.Num(); ++i)
+		{
+			FItemSlot& ItemSlot = ItemList[i];
+
+			// 인벤토리에 들어있는 경우
+			if (ItemSlot.ItemKey == ItemKey)
+			{
+				// 아이템 개수만큼 제거
+				ItemSlot.Quantity -= Amount;
+
+				// 개수가 0 이하인 경우 해당 인덱스의 값을 기본 값으로 변경
+				if (ItemSlot.Quantity <= 0)
+				{
+					ItemSlot.ItemKey = NAME_None;
+					ItemSlot.Quantity = 0;
+				}
+
+				return i;
+			}
+		}
+	}
+	else
+	{
+		RS_LOG_C("키가 유효하지 않아 아이템을 제거할 수 없습니다.", FColor::Red);
+	}
+
+	return -1;
+}
+
+int32 URSBaseInventoryComponent::GetQuantity(const FName& ItemKey)
+{
+	int32 Quantity = 0;
+	// 인벤토리 순회
+	for (FItemSlot& ItemSlot : ItemList)
+	{
+		// 인벤토리에 들어있는 경우
+		if (ItemSlot.ItemKey == ItemKey)
+		{
+			Quantity = ItemSlot.Quantity;
+		}
+	}
+
+	return Quantity;
+}
+
+int32 URSBaseInventoryComponent::GetFilledSize() const
+{
+	// 현재 인벤토리에서 아이템이 들어있는 슬롯의 수를 세어 반환합니다.
+	int32 FilledCount = 0;
+
+	for (size_t i = 0; i < ItemList.Num(); ++i)
+	{
+		FItemSlot CurItemSlot = ItemList[i];
+
+		if (CurItemSlot.ItemKey != NAME_None)
+		{
+			++FilledCount;
+		}
+	}
+
+	return FilledCount;
 }
 
 void URSBaseInventoryComponent::SaveItemData()
 {
-	// TODO : ������ �ִ� ���� ���� ���̺�
+	// TODO : 가지고 있는 음식 파일 세이브
 }
 
 void URSBaseInventoryComponent::LoadItemData()
 {
-	// TODO : ������ �ִ� ���� ���� �ε�
+	// TODO : 가지고 있는 음식 파일 로드
 }
 
 bool URSBaseInventoryComponent::CheckValidItem(const FName& ItemKey)

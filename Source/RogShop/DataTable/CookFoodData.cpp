@@ -5,8 +5,9 @@
 
 #include "RogShop/UtilDefine.h"
 #include "RogShop/Actor/Tycoon/Food/RSBaseFood.h"
+#include "ItemSlot.h"
 
-bool FCookFoodData::CanMake(const TMap<FName, int32>& Ingredients) const
+bool FCookFoodData::CanMake(const TArray<FItemSlot>& Ingredients) const
 {
 	if (NeedIngredients.Num() == 0)
 	{
@@ -17,10 +18,13 @@ bool FCookFoodData::CanMake(const TMap<FName, int32>& Ingredients) const
 	for (auto& NeedIngredient : NeedIngredients)
 	{
 		FName FindIngredientName = NeedIngredient.Key;
-		if (!Ingredients.Contains(FindIngredientName) ||
-			Ingredients[FindIngredientName] < NeedIngredient.Value)
+
+		for (FItemSlot e : Ingredients)
 		{
-			return false;
+			if (NeedIngredient.Key == e.ItemKey && NeedIngredient.Value > e.Quantity)
+			{
+				return false;
+			}
 		}
 	}
 

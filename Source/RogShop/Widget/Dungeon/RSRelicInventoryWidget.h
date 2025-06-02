@@ -4,19 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "RSInventoryRelicSlotWidget.generated.h"
+#include "RSRelicInventoryWidget.generated.h"
 
 class UUniformGridPanel;
-class URSInventorySlotImageWidget;
+class URSInventorySlotWidget;
 
 UCLASS()
-class ROGSHOP_API URSInventoryRelicSlotWidget : public UUserWidget
+class ROGSHOP_API URSRelicInventoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
 public:
     UPROPERTY(EditAnywhere, Category = "Relic Slots")
-    TSubclassOf<URSInventorySlotImageWidget> SlotImageWidgetClass;
+    TSubclassOf<URSInventorySlotWidget> SlotImageWidgetClass;
 
 protected:
     virtual void NativeConstruct() override;
@@ -26,7 +26,7 @@ private:
     UUniformGridPanel* UniformGridPanel_RelicSlots;
 
     UPROPERTY()
-    TArray<URSInventorySlotImageWidget*> SlotImages;
+    TArray<URSInventorySlotWidget*> SlotImages;
 
     void CreateSlots(int32 NumSlots, int32 NumColumns);
 };

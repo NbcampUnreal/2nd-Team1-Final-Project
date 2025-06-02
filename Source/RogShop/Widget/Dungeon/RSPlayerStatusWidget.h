@@ -20,13 +20,13 @@ public:
 	virtual void NativeConstruct() override;
 
 public:
-    UFUNCTION(BlueprintCallable)
-    void UpdateWeaponSlot(uint8 SlotIndex, FName WeaponKey);
+    UFUNCTION()
+    void UpdateWeaponSlot(int8 SlotIndex, FName WeaponKey);
 
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION()
     void UpdateHP();
 
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION()
     void UpdateMaxHP();
 
 private:
