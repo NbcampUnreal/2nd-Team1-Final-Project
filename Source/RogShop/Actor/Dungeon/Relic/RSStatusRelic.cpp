@@ -14,21 +14,26 @@ void URSStatusRelic::ApplyEffect(ARSDunPlayerCharacter* OwnerCharacter)
 	if (TargetStatus == EStatus::HP)
 	{
 		// TODO : 플레이어 캐릭터의 현재 HP 증가
+		OwnerCharacter->IncreaseHP(Amount);
 	}
 	else if (TargetStatus == EStatus::MaxHP)
 	{
 		// TODO : 플레이어 캐릭터의 최대 HP 증가
+		OwnerCharacter->IncreaseMaxHP(Amount);
 	}
 	else if (TargetStatus == EStatus::MoveSpeed)
 	{
 		// TODO : 플레이어 캐릭터의 이동속도 증가
+		OwnerCharacter->ChangeMoveSpeed(Amount);
 	}
 	else if (TargetStatus == EStatus::AttackPower)
 	{
 		// TODO : 플레이어 캐릭터의 공격력 증가
+		OwnerCharacter->IncreaseAttackPower(Amount);
 	}
 	else if (TargetStatus == EStatus::AttackSpeed)
 	{
 		// TODO : 플레이어 캐릭터의 공격속도 증가
+		OwnerCharacter->DecreaseAttackPower(Amount);
 	}
 }
