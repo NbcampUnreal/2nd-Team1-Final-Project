@@ -34,15 +34,21 @@ public:
 	void PlaySkill_2();
 	UFUNCTION(BlueprintCallable)
 	void PlaySkill_3();
-	UFUNCTION(BlueprintCallable)
-	virtual void PlayAction(int32 actionIdx, FVector interestedPos);
-	UFUNCTION(BlueprintCallable)
-	virtual void UtillitySkill(FVector interestedPos);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void PlayAction(int32 actionIdx, FVector interestedPos);
+	void PlayAction_Implementation(int32 actionIdx, FVector interestedPos);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void UtillitySkill(int32 actionIdx, FVector interestedPos);
+	void UtillitySkill_Implementation(int32 actionIdx, FVector interestedPos);
+
 	UFUNCTION(BlueprintCallable)
 	int GetActionLength();//컨트롤러에 캐릭터가 몇가지의 액션을 가지고 있는지 반환
 
-	UFUNCTION(BlueprintCallable)
-	virtual void OnEveryMontageEnded(UAnimMontage* montage, bool bInterrupted);  //모든 몽타주에 대해 검사함
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void OnEveryMontageEnded(UAnimMontage* montage, bool bInterrupted);  //모든 몽타주에 대해 검사함
+	void OnEveryMontageEnded_Implementation(UAnimMontage* montage, bool bInterrupted);
 
 	//Navigation Invoker function
 	FORCEINLINE class UNavigationInvokerComponent* GetNavInvoker() const { return navInvoker; };

@@ -160,7 +160,7 @@ void ARSDunMonsterCharacter::PlaySkill_3()
 	GetWorld()->SpawnActor<AActor>(servant, interrestedPos, spawnRot);
 }*/
 
-void ARSDunMonsterCharacter::PlayAction(int32 actionIdx, FVector interestedPos)
+void ARSDunMonsterCharacter::PlayAction_Implementation(int32 actionIdx, FVector interestedPos)
 {
 	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
 
@@ -180,16 +180,16 @@ void ARSDunMonsterCharacter::PlayAction(int32 actionIdx, FVector interestedPos)
 	
 	if (actionData.skillType == ESkillType::Utillity) // 공격이 아닌 경우
 	{
-		UtillitySkill(interestedPos);
+		UtillitySkill(actionIdx, interestedPos);
 	}
 }
 
-void ARSDunMonsterCharacter::UtillitySkill(FVector interestedPos)
+void ARSDunMonsterCharacter::UtillitySkill_Implementation(int32 actionIdx, FVector interestedPos)
 {
 
 }
 
-void ARSDunMonsterCharacter::OnEveryMontageEnded(UAnimMontage* montage, bool bInterrupted)
+void ARSDunMonsterCharacter::OnEveryMontageEnded_Implementation(UAnimMontage* montage, bool bInterrupted)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
