@@ -21,6 +21,9 @@ ARSBaseWeapon::ARSBaseWeapon()
 	BoxComp->SetupAttachment(SceneComp);
 	BoxComp->SetCollisionProfileName("PlayerAttackHitBox");
 	BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	BoxComp->SetGenerateOverlapEvents(false);
+
+	SetActorEnableCollision(false);
 
 	WeaponDamage = 0.f;
 }
@@ -59,14 +62,18 @@ const TArray<UAnimMontage*>& ARSBaseWeapon::GetNormalAttacks() const
 
 void ARSBaseWeapon::StartOverlap()
 {
-	// ÄÝ¸®ÀüÀ» ÄÒ´Ù.
+	// ì½œë¦¬ì „ê³¼ ì˜¤ë²„ëž© ì´ë²¤íŠ¸ë¥¼ ì¼ ë‹¤.
+	SetActorEnableCollision(true);
 	BoxComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	BoxComp->SetGenerateOverlapEvents(true);
 }
 
 void ARSBaseWeapon::EndOverlap()
 {
-	// ÄÝ¸®ÀüÀ» ²ö´Ù.
+	// ì½œë¦¬ì „ê³¼ ì˜¤ë²„ëž© ì´ë²¤íŠ¸ë¥¼ ëˆë‹¤.
+	SetActorEnableCollision(false);
 	BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	BoxComp->SetGenerateOverlapEvents(false);
 }
 
 float ARSBaseWeapon::GetWeaponDamage() const

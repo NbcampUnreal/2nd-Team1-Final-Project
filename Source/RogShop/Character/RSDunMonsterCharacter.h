@@ -35,7 +35,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void PlaySkill_3();
 	UFUNCTION(BlueprintCallable)
-	void AIAction(int32 actionIdx);
+	void AIAction(int32 actionIdx, FVector interestedPos);
+	UFUNCTION(BlueprintCallable)
+	int GetActionLength();//컨트롤러에 캐릭터가 몇가지의 액션을 가지고 있는지 반환
 
 	UFUNCTION()
 	void OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted);  //사망 모션이 끝난 경우

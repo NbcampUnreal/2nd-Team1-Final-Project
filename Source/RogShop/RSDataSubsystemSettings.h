@@ -25,7 +25,13 @@ public:
 	TSoftObjectPtr<UDataTable> WeaponDataTable;
 
 	UPROPERTY(Config, EditAnywhere)
+	TSoftObjectPtr<UDataTable> WeaponClassDataTable;
+
+	UPROPERTY(Config, EditAnywhere)
 	TSoftObjectPtr<UDataTable> RelicDataTable;
+
+	UPROPERTY(Config, EditAnywhere)
+	TSoftObjectPtr<UDataTable> RelicClassDataTable;
 
 	UPROPERTY(Config, EditAnywhere)
 	TSoftObjectPtr<UDataTable> ForestMonsterSpawnGroupDataTable;

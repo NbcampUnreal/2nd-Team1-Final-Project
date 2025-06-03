@@ -8,7 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/BoxComponent.h"
 #include "RSDataSubsystem.h"
-#include "DungeonItemData.h"
+#include "ItemInfoData.h"
 #include "RSDungeonGroundWeapon.h"
 #include "RSDunPlayerController.h"
 #include "RSDungeonWeaponSaveGame.h"
@@ -148,9 +148,8 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 		WeaponActors.SetNum(WeaponSlotSize);
 	}
 
-	// 슬롯에 포함할 액터를 숨김처리 및 충돌을 끈다.
+	// 슬롯에 포함할 액터를 숨김처리
 	NewWeaponActor->SetActorHiddenInGame(true);
-	NewWeaponActor->SetActorEnableCollision(false);
 
 	// 캐릭터의 손에 무기를 부착한다.
 	ACharacter* CurCharacter = GetOwner<ACharacter>();
@@ -257,15 +256,16 @@ void URSPlayerWeaponComponent::DropWeaponToSlot(EWeaponSlot TargetWeaponSlot)
 	// 땅에 버려질 액터에 세팅할 값을 데이터 테이블에 가져와 세팅한다.
 	FName WeaponKey = WeaponActors[TargetIndex]->GetDataTableKey();
 
-	FDungeonItemData* Data = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Weapon->FindRow<FDungeonItemData>(WeaponKey, TEXT("Get WeaponData"));
-	if (Data)
+	FItemInfoData* ItemInfoData = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Weapon->FindRow<FItemInfoData>(WeaponKey, TEXT("Get WeaponData"));
+	FDungeonWeaponData* WeaponData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponClass->FindRow<FDungeonWeaponData>(WeaponKey, TEXT("Get WeaponData"));
+	if (ItemInfoData && WeaponData)
 	{
-		UStaticMesh* ItemStaticMesh = Data->ItemStaticMesh;
-		TSubclassOf<ARSDungeonItemBase> ItemClass = Data->ItemClass;
+		UStaticMesh* ItemStaticMesh = ItemInfoData->ItemStaticMesh;
+		TSubclassOf<ARSDungeonItemBase> WeaponClass = WeaponData->WeaponClass;
 
-		if (GroundWeapon && ItemStaticMesh && ItemClass)
+		if (GroundWeapon && ItemStaticMesh && WeaponClass)
 		{
-			GroundWeapon->InitInteractableWeapon(WeaponKey, ItemStaticMesh, ItemClass);
+			GroundWeapon->InitInteractableWeapon(WeaponKey, ItemStaticMesh, WeaponClass);
 		}
 	}
 
@@ -322,9 +322,8 @@ void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSl
 		ARSBaseWeapon* TargetEquipWeapon = WeaponActors[TargetIndex];
 		if (TargetEquipWeapon)
 		{
-			// 새로 착용할 무기의 숨김 처리를 끄고, 충돌을 켠다.
+			// 새로 착용할 무기의 숨김 처리를 끈다.
 			TargetEquipWeapon->SetActorHiddenInGame(false);
-			TargetEquipWeapon->SetActorEnableCollision(true);
 			
 			// 오버랩 이벤트 바인딩
 			UBoxComponent* CurWeaponBoxComp = TargetEquipWeapon->GetBoxComp();
@@ -362,12 +361,12 @@ void URSPlayerWeaponComponent::UnEquipWeaponToCharacter()
 
 	int8 CurrentIndex = static_cast<int8>(WeaponSlot) - 1;
 
-	// 현재 착용 중인 무기가 있는 경우 숨김 처리 및 충돌을 끈다.
+	// 현재 착용 중인 무기가 있는 경우
 	ARSBaseWeapon* CurEquipWeapon = WeaponActors[CurrentIndex];
 	if (CurEquipWeapon)
 	{
+		// 숨김 처리
 		CurEquipWeapon->SetActorHiddenInGame(true);
-		CurEquipWeapon->SetActorEnableCollision(false);
 
 		// 오버랩 이벤트 바인딩 해제
 		WeaponActors[CurrentIndex]->GetBoxComp()->OnComponentBeginOverlap.RemoveDynamic(this, &URSPlayerWeaponComponent::OnBeginOverlap);
@@ -493,6 +492,7 @@ void URSPlayerWeaponComponent::LoadRequested()
 	}
 
 	UDataTable* WeaponDataTable = DataSubsystem->Weapon;
+	UDataTable* WeaponClassDataTable = DataSubsystem->WeaponClass;
 	if (!WeaponDataTable)
 	{
 		return;
@@ -511,15 +511,16 @@ void URSPlayerWeaponComponent::LoadRequested()
 
 		FName CurWeaponName = WeaponLoadGame->WeaponActors[i];
 
-		FDungeonItemData* Data = WeaponDataTable->FindRow<FDungeonItemData>(CurWeaponName, TEXT("Get WeaponData"));
+		FItemInfoData* Data = WeaponDataTable->FindRow<FItemInfoData>(CurWeaponName, TEXT("Get WeaponData"));
+		FDungeonWeaponData* WeaponData = WeaponClassDataTable->FindRow<FDungeonWeaponData>(CurWeaponName, TEXT("Get WeaponData"));
 
-		if (Data && Data->ItemClass)
+		if (Data && WeaponData && WeaponData->WeaponClass)
 		{
 			FActorSpawnParameters SpawnParameters;
 			SpawnParameters.Owner = OwnerCharacter;
 			SpawnParameters.Instigator = OwnerCharacter;
 
-			ARSBaseWeapon* SpawnWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(Data->ItemClass, SpawnParameters);
+			ARSBaseWeapon* SpawnWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(WeaponData->WeaponClass, SpawnParameters);
 
 			if (SpawnWeapon)
 			{

@@ -7,7 +7,7 @@
 #include "RSDunPlayerCharacter.h"
 #include "RSPlayerWeaponComponent.h"
 #include "RSDataSubsystem.h"
-#include "DungeonItemData.h"
+#include "ItemInfoData.h"
 
 #include "Components/Image.h"
 
@@ -87,7 +87,7 @@ void URSWeaponInventoryWidget::UpdateWeaponSlot(int8 WeaponSlotIndex, FName Weap
     {
         if (DataSubsystem->Weapon)
         {
-            const FDungeonItemData* FoundData = DataSubsystem->Weapon->FindRow<FDungeonItemData>(
+            const FItemInfoData* FoundData = DataSubsystem->Weapon->FindRow<FItemInfoData>(
                 WeaponKey,
                 TEXT("Weapon Data Lookup") // 디버깅용 Context
             );

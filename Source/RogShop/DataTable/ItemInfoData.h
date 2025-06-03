@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "RSDungeonItemBase.h"
-#include "DungeonItemData.generated.h"
+#include "ItemInfoData.generated.h"
+
+class URSBaseRelic;
 
 UENUM(BlueprintType)
 enum class EItemRarity : uint8
@@ -23,10 +25,12 @@ enum class EItemType : uint8
 	NONE,
 	Weapon,
 	Relic,
+	CookFood,
+	Ingredient,
 };
 
 USTRUCT(BlueprintType)
-struct ROGSHOP_API FDungeonItemData : public FTableRowBase
+struct ROGSHOP_API FItemInfoData : public FTableRowBase
 {
 	GENERATED_BODY()
 	
@@ -51,7 +55,25 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UStaticMesh> ItemStaticMesh;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<ARSDungeonItemBase> ItemClass;
 };
+
+USTRUCT(BlueprintType)
+struct ROGSHOP_API FDungeonWeaponData : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<ARSDungeonItemBase> WeaponClass;
+};
+
+USTRUCT(BlueprintType)
+struct ROGSHOP_API FDungeonRelicData : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<URSBaseRelic> RelicClass;
+};
+
