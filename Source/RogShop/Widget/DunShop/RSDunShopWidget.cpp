@@ -58,22 +58,22 @@ EItemRarity URSDunShopWidget::GetRandomRarity()
     }
 }
 
-TPair<FName, FDungeonItemData*> URSDunShopWidget::GetRandomItemFromDataTable(UDataTable* WeaponDataTable, UDataTable* RelicDataTable)
+TPair<FName, FItemInfoData*> URSDunShopWidget::GetRandomItemFromDataTable(UDataTable* WeaponDataTable, UDataTable* RelicDataTable)
 {
     if (!WeaponDataTable || !RelicDataTable)
     {
-        return TPair<FName, FDungeonItemData*>(FName("Invalid"), nullptr);
+        return TPair<FName, FItemInfoData*>(FName("Invalid"), nullptr);
     }
 
     // 추출할 아이템 등급 선정
     EItemRarity SelectedRarity = GetRandomRarity();
-    TArray<TPair<FName, FDungeonItemData*>> AllItems;
+    TArray<TPair<FName, FItemInfoData*>> AllItems;
 
     // 무기 데이터 테이블 값 추출
     const TMap<FName, uint8*>& WeaponMapRaw = WeaponDataTable->GetRowMap();
     for (const auto& Elem : WeaponMapRaw)
     {
-        FDungeonItemData* ItemData = reinterpret_cast<FDungeonItemData*>(Elem.Value);
+        FItemInfoData* ItemData = reinterpret_cast<FItemInfoData*>(Elem.Value);
         if (ItemData && ItemData->ItemRarity == SelectedRarity)
         {
             AllItems.Add({ Elem.Key, ItemData });
@@ -84,7 +84,7 @@ TPair<FName, FDungeonItemData*> URSDunShopWidget::GetRandomItemFromDataTable(UDa
     const TMap<FName, uint8*>& RelicMapRaw = RelicDataTable->GetRowMap();
     for (const auto& Elem : RelicMapRaw)
     {
-        FDungeonItemData* ItemData = reinterpret_cast<FDungeonItemData*>(Elem.Value);
+        FItemInfoData* ItemData = reinterpret_cast<FItemInfoData*>(Elem.Value);
         if (ItemData && ItemData->ItemRarity == SelectedRarity)
         {
             AllItems.Add({ Elem.Key, ItemData });
@@ -98,7 +98,7 @@ TPair<FName, FDungeonItemData*> URSDunShopWidget::GetRandomItemFromDataTable(UDa
         return AllItems[RandomIndex];
     }
 
-    return TPair<FName, FDungeonItemData*>(FName("Invalid"), nullptr);
+    return TPair<FName, FItemInfoData*>(FName("Invalid"), nullptr);
 }
 
 void URSDunShopWidget::PopulateShopItems()
@@ -116,10 +116,10 @@ void URSDunShopWidget::PopulateShopItems()
 
     for (int32 i = 0; i < AddItemCount; ++i)
     {
-        TPair<FName, FDungeonItemData*> RandomItem = GetRandomItemFromDataTable(DataSubsystem->Weapon, DataSubsystem->Relic);
+        TPair<FName, FItemInfoData*> RandomItem = GetRandomItemFromDataTable(DataSubsystem->Weapon, DataSubsystem->Relic);
 
         FName FoundRowName = RandomItem.Key;
-        FDungeonItemData* ItemData = RandomItem.Value;
+        FItemInfoData* ItemData = RandomItem.Value;
 
         if (!ItemData)
         {

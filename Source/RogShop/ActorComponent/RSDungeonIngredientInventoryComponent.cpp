@@ -7,7 +7,7 @@
 #include "RSDunPlayerController.h"
 #include "GameFramework/Character.h"
 #include "RSDataSubsystem.h"
-#include "DungeonItemData.h"
+#include "ItemInfoData.h"
 #include "ItemSlot.h"
 
 int32 URSDungeonIngredientInventoryComponent::AddItem(FName ItemKey, int32 Amount)
@@ -84,7 +84,7 @@ void URSDungeonIngredientInventoryComponent::DropItem(FName ItemKey)
 
 	ARSDungeonGroundIngredient* DungeonGroundItem = World->SpawnActor<ARSDungeonGroundIngredient>(ARSDungeonGroundIngredient::StaticClass(), CurCharacter->GetActorTransform());
 
-	FDungeonItemData* Data = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Ingredient->FindRow<FDungeonItemData>(ItemKey, TEXT("Get Ingredient"));
+	FItemInfoData* Data = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Ingredient->FindRow<FItemInfoData>(ItemKey, TEXT("Get Ingredient"));
 
 	if (Data)
 	{

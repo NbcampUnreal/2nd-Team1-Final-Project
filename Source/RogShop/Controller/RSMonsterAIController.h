@@ -50,7 +50,7 @@ public://Function
 	void AISkill_4(FVector interrestedPos);
 
 	UFUNCTION(BlueprintCallable)
-	void AISkillAction(int32 actionIdx);
+	void AISkillAction(int32 actionIdx, FVector interestedPos);
 
 	//Patrol
 	UFUNCTION(BlueprintCallable)

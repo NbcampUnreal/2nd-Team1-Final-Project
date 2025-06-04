@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "RSWeaponSpawnPadActor.h"
-#include "DungeonItemData.h"
+#include "RSDataSubsystem.h"
+#include "ItemInfoData.h"
 #include "RSDungeonGroundWeapon.h"
 
 // Sets default values
@@ -25,14 +26,14 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
 {
     if (!WeaponDataTable) return;
 
-    // µ¥ÀÌÅÍ Å×ÀÌºí¿¡¼­ ¸ğµç Row °¡Á®¿À±â
-    TArray<FDungeonItemData*> AllWeapons;
+    // ë°ì´í„° í…Œì´ë¸”ì—ì„œ ëª¨ë“  Row ê°€ì ¸ì˜¤ê¸°
+    TArray<FItemInfoData*> AllWeapons;
     WeaponDataTable->GetAllRows(TEXT("WeaponSpawn"), AllWeapons);
     
-    // µ¥ÀÌÅÍ Å×ÀÌºí¿¡¼­ ¸ğµç Row¿¡ ´ëÇÑ Row NameÀ» °¡Á®¿À±â
+    // ë°ì´í„° í…Œì´ë¸”ì—ì„œ ëª¨ë“  Rowì— ëŒ€í•œ Row Nameì„ ê°€ì ¸ì˜¤ê¸°
     TArray<FName> AllRowNames = WeaponDataTable->GetRowNames();
 
-    TArray<FDungeonItemData*> FilteredWeapons;
+    TArray<FItemInfoData*> FilteredWeapons;
     TArray<FName> FilteredRowNames;
     
     for (int i = 0; i < AllWeapons.Num(); ++i)
@@ -44,41 +45,41 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
         }
     }
 
-    // ¼±ÅÃµÈ ¹«±â ÀúÀå¿ë ¹è¿­
-    TArray<FDungeonItemData*> SelectedWeapons;
+    // ì„ íƒëœ ë¬´ê¸° ì €ì¥ìš© ë°°ì—´
+    TArray<FItemInfoData*> SelectedWeapons;
     TArray<FName> SelectedRowNames;
 
-    // Áßº¹ ¹æÁö¸¦ À§ÇØ ·£´ı ¼±ÅÃ ÈÄ Á¦°Å
+    // ì¤‘ë³µ ë°©ì§€ë¥¼ ìœ„í•´ ëœë¤ ì„ íƒ í›„ ì œê±°
     while (SelectedWeapons.Num() < NumberOfWeapons && FilteredWeapons.Num() > 0)
     {
         int32 Index = FMath::RandRange(0, FilteredWeapons.Num() - 1);
         SelectedWeapons.Add(FilteredWeapons[Index]);
         SelectedRowNames.Add(FilteredRowNames[Index]);
-        FilteredWeapons.RemoveAt(Index); // ÀÌ ÁÙÀÌ "Áßº¹ Á¦°Å" ÇÙ½É!
-        FilteredRowNames.RemoveAt(Index); // ÀÌ ÁÙÀÌ "Áßº¹ Á¦°Å" ÇÙ½É!
+        FilteredWeapons.RemoveAt(Index); // ì´ ì¤„ì´ "ì¤‘ë³µ ì œê±°" í•µì‹¬!
+        FilteredRowNames.RemoveAt(Index); // ì´ ì¤„ì´ "ì¤‘ë³µ ì œê±°" í•µì‹¬!
     }
 
     FVector Origin;
     FVector BoxExtent;
     GetActorBounds(true, Origin, BoxExtent);
 
-    // ¹ßÆÇÀÇ ¸Ç À§, Á¤Áß¾Ó À§Ä¡
+    // ë°œíŒì˜ ë§¨ ìœ„, ì •ì¤‘ì•™ ìœ„ì¹˜
     FVector BaseLocation = Origin + FVector(0, 0, BoxExtent.Z + 50);
 
-    // ¹ßÆÇÀÇ Y ±æÀÌ
+    // ë°œíŒì˜ Y ê¸¸ì´
     float PlatformLengthY = BoxExtent.Y * 2;
 
-    // ¹«±â °³¼ö
+    // ë¬´ê¸° ê°œìˆ˜
     int32 WeaponCount = SelectedWeapons.Num();
-    if (WeaponCount <= 1) return; // 1°³¸é °£°İ ³ª´­ ÇÊ¿ä ¾øÀ½
+    if (WeaponCount <= 1) return; // 1ê°œë©´ ê°„ê²© ë‚˜ëˆŒ í•„ìš” ì—†ìŒ
 
-    // ¹«±â °£ °£°İ °è»ê (¹ßÆÇ ±æÀÌ ³»¿¡¼­ ±ÕµîÇÏ°Ô)
+    // ë¬´ê¸° ê°„ ê°„ê²© ê³„ì‚° (ë°œíŒ ê¸¸ì´ ë‚´ì—ì„œ ê· ë“±í•˜ê²Œ)
     float ActualSpacing = PlatformLengthY / (WeaponCount - 1);
 
-    // ½ÃÀÛ À§Ä¡ (¿ŞÂÊ ³¡ºÎÅÍ ½ÃÀÛ)
+    // ì‹œì‘ ìœ„ì¹˜ (ì™¼ìª½ ëë¶€í„° ì‹œì‘)
     FVector StartLocation = BaseLocation - FVector(0, BoxExtent.Y, 0);
 
-    // ¼±ÅÃÇÑ ¹«±âµé ½ºÆù
+    // ì„ íƒí•œ ë¬´ê¸°ë“¤ ìŠ¤í°
     for (int32 i = 0; i < SelectedWeapons.Num(); ++i)
     {
         FVector SpawnLoc = StartLocation + FVector(0, i * ActualSpacing, 0);
@@ -91,10 +92,13 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
 
         FName CurDataTableKey = SelectedRowNames[i];
         UStaticMesh* ItemStaticMesh = SelectedWeapons[i]->ItemStaticMesh;
-        TSubclassOf<ARSDungeonItemBase> ItemClass = SelectedWeapons[i]->ItemClass;
-        if (GroundWeapon && ItemStaticMesh && ItemClass)
+
+        FDungeonWeaponData* Data = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponClass->FindRow<FDungeonWeaponData>(CurDataTableKey, TEXT("Get WeaponData"));
+        
+        TSubclassOf<ARSDungeonItemBase> WeaponClass = Data->WeaponClass;
+        if (GroundWeapon && ItemStaticMesh && WeaponClass)
         {
-            GroundWeapon->InitInteractableWeapon(CurDataTableKey, ItemStaticMesh, ItemClass);
+            GroundWeapon->InitInteractableWeapon(CurDataTableKey, ItemStaticMesh, WeaponClass);
         }
 
         // UE_LOG(LogTemp, Warning, TEXT("SelectedWeapon ID: %s"), *SelectedWeapons[i]->ItemID.ToString());

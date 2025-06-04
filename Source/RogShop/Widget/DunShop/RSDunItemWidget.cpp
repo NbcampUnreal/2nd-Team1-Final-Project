@@ -12,6 +12,8 @@
 #include "Components/Image.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "RSDataSubsystem.h"
+#include "ItemInfoData.h"
 
 void URSDunItemWidget::NativeConstruct()
 {
@@ -23,7 +25,7 @@ void URSDunItemWidget::NativeConstruct()
     }
 }
 
-void URSDunItemWidget::SetItemData(const FDungeonItemData& InItemData)
+void URSDunItemWidget::SetItemData(const FItemInfoData& InItemData)
 {
     ItemData = InItemData;
 
@@ -130,13 +132,17 @@ bool URSDunItemWidget::BuyItem()
         }
         case EItemType::Weapon:
         {
+            // TODO : 해당 데이터 테이블을 사용하기
+            FDungeonWeaponData* WeaponData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Weapon->FindRow<FDungeonWeaponData>(NAME_None, TEXT("Get WeaponData"));
+            FDungeonWeaponData* WeaponClassData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponClass->FindRow<FDungeonWeaponData>(NAME_None, TEXT("Get WeaponData"));
+
             FActorSpawnParameters SpawnParams;
             SpawnParams.Owner = PlayerChar;
             SpawnParams.Instigator = PlayerChar;
 
             // 월드에 무기 액터 생성을 해야만 데이터를 넘길 수 있음
             ARSBaseWeapon* SpawnedWeapon = GetWorld()->SpawnActor<ARSBaseWeapon>(
-                ItemData.ItemClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+                WeaponClassData->WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 
             URSPlayerWeaponComponent* WeaponComp = PlayerChar->GetRSPlayerWeaponComponent();
 

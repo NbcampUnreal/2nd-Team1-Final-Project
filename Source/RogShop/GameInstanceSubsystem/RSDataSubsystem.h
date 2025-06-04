@@ -28,7 +28,13 @@ public:
 	TObjectPtr<UDataTable> Weapon;
 
 	UPROPERTY()
+	TObjectPtr<UDataTable> WeaponClass;
+
+	UPROPERTY()
 	TObjectPtr<UDataTable> Relic;
+
+	UPROPERTY()
+	TObjectPtr<UDataTable> RelicClass;
 
 	UPROPERTY()
 	TObjectPtr<UDataTable> ForestMonsterSpawnGroup;

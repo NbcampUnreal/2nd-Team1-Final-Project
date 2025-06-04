@@ -34,11 +34,21 @@ public:
 	void PlaySkill_2();
 	UFUNCTION(BlueprintCallable)
 	void PlaySkill_3();
-	UFUNCTION(BlueprintCallable)
-	void AIAction(int32 actionIdx);
 
-	UFUNCTION()
-	void OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted);  //사망 모션이 끝난 경우
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void PlayAction(int32 actionIdx, FVector interestedPos);
+	void PlayAction_Implementation(int32 actionIdx, FVector interestedPos);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void UtillitySkill(int32 actionIdx, FVector interestedPos);
+	void UtillitySkill_Implementation(int32 actionIdx, FVector interestedPos);
+
+	UFUNCTION(BlueprintCallable)
+	int GetActionLength();//컨트롤러에 캐릭터가 몇가지의 액션을 가지고 있는지 반환
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void OnEveryMontageEnded(UAnimMontage* montage, bool bInterrupted);  //모든 몽타주에 대해 검사함
+	void OnEveryMontageEnded_Implementation(UAnimMontage* montage, bool bInterrupted);
 
 	//Navigation Invoker function
 	FORCEINLINE class UNavigationInvokerComponent* GetNavInvoker() const { return navInvoker; };
@@ -107,10 +117,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName MonsterRowName;			 // 이 몬스터가 참조하는 RowName
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float DrawDebugLineSeconds;		 // 디버그 라인 나타낼 시간
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float DrawDebugLineThickness;	 // 디버그 라인의 두께
+
 	FTimerHandle detectDelayTimer;
 
 	// 데이터 테이블 관련
 	UDataTable* MonsterDataTable;	 // 연결된 데이터 테이블
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ActionData")
 	TArray<FMonsterAttackSkillData> MonsterAttackSkills;	// 몬스터 공격 스킬을 모아놓은 구조체를 배열로 저장
 	TArray<FMonsterAttackTraceData> CachedAttackTraceDataArray;	// 공격 트레이스를 캐싱해두고 다른 스킬 사용시 인덱스에서 꺼내 쓰는 용도
 
