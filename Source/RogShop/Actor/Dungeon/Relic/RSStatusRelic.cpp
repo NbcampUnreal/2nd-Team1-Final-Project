@@ -26,7 +26,7 @@ void URSStatusRelic::ApplyEffect(ARSDunPlayerCharacter* OwnerCharacter)
 		if (MovementComp)
 		{
 			float CurrentSpeed = MovementComp->GetMaxSpeed();
-			CurrentSpeed + Amount;
+			CurrentSpeed += Amount;
 			OwnerCharacter->ChangeMoveSpeed(CurrentSpeed);
 		}
 	}
