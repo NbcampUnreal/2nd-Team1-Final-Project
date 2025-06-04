@@ -1,3 +1,3 @@
 #pragma once
 
-#define ECC_MonsterAttackTrace ECC_GameTraceChannel3
+#define ECC_MonsterAttackTrace ECC_GameTraceChannel7

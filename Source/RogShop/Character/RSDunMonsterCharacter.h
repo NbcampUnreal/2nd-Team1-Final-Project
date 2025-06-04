@@ -109,6 +109,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName MonsterRowName;			 // 이 몬스터가 참조하는 RowName
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float DrawDebugLineSeconds;		 // 디버그 라인 나타낼 시간
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float DrawDebugLineThickness;	 // 디버그 라인의 두께
+
 	FTimerHandle detectDelayTimer;
 
 	// 데이터 테이블 관련
