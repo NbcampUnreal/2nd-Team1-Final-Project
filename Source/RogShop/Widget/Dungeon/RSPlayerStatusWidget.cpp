@@ -7,7 +7,7 @@
 #include "RSDunPlayerController.h"
 #include "RSDunPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
-#include "DungeonItemData.h"
+#include "ItemInfoData.h"
 #include "RSDataSubsystem.h"
 
 void URSPlayerStatusWidget::NativeOnInitialized()
@@ -37,7 +37,7 @@ void URSPlayerStatusWidget::UpdateWeaponSlot(int8 WeaponSlotIndex, FName WeaponK
     {
         if (DataSubsystem->Weapon)
         {
-            const FDungeonItemData* FoundData = DataSubsystem->Weapon->FindRow<FDungeonItemData>(
+            const FItemInfoData* FoundData = DataSubsystem->Weapon->FindRow<FItemInfoData>(
                 WeaponKey,
                 TEXT("Weapon Data Lookup") // 디버깅용 Context
             );
