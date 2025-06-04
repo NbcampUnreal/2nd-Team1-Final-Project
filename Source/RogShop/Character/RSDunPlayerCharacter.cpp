@@ -9,6 +9,7 @@
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "RSPlayerWeaponComponent.h"
 #include "RSRelicInventoryComponent.h"
@@ -18,6 +19,7 @@
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
 #include "Engine/OverlapResult.h"
+#include "RSDungeonStatusSaveGame.h"
 
 // Sets default values
 ARSDunPlayerCharacter::ARSDunPlayerCharacter()
@@ -82,6 +84,10 @@ void ARSDunPlayerCharacter::BeginPlay()
     // 스켈레탈 메시
     USkeletalMesh* MergeSkeletalMesh = USkeletalMergingLibrary::MergeMeshes(SkeletalMeshMergeParams);
     GetMesh()->SetSkeletalMeshAsset(MergeSkeletalMesh);
+
+    OnSaveRequested.AddDynamic(this, &ARSDunPlayerCharacter::SaveStatus);
+
+    LoadStatus();
 }
 
 // Called every frame
@@ -403,21 +409,21 @@ void ARSDunPlayerCharacter::ToggleInGameMenuUI(const FInputActionValue& value)
     }
 }
 
-void ARSDunPlayerCharacter::SetLifeEssence(float Amount)
+void ARSDunPlayerCharacter::SetLifeEssence(int32 Amount)
 {
-    float NewLifeEssence = FMath::Max(Amount, 0.0f);
+    int32 NewLifeEssence = FMath::Max(Amount, 0.0f);
     LifeEssence = NewLifeEssence;
 }
 
-void ARSDunPlayerCharacter::IncreaseLifeEssence(float Amount)
+void ARSDunPlayerCharacter::IncreaseLifeEssence(int32 Amount)
 {
-    float NewLifeEssence = LifeEssence + Amount;
+    int32 NewLifeEssence = LifeEssence + Amount;
     LifeEssence = NewLifeEssence;
 }
 
-void ARSDunPlayerCharacter::DecreaseLifeEssence(float Amount)
+void ARSDunPlayerCharacter::DecreaseLifeEssence(int32 Amount)
 {
-    float NewLifeEssence = FMath::Max(LifeEssence - Amount, 0.0f);
+    int32 NewLifeEssence = FMath::Max(LifeEssence - Amount, 0.0f);
     LifeEssence = NewLifeEssence;
 }
 
@@ -559,4 +565,34 @@ void ARSDunPlayerCharacter::DecreaseAttackSpeed(float Amount)
     // 애니메이션의 재생 속도가 음수값이 된다면 애니메이션이 역재생 되므로, 예외처리
     float NewAttackSpeed = FMath::Max(AttackSpeed - Amount, 0.0f);
     AttackSpeed = NewAttackSpeed;
+}
+
+void ARSDunPlayerCharacter::SaveStatus()
+{
+    // SaveGame 오브젝트 생성
+    URSDungeonStatusSaveGame* StatusSaveGame = Cast<URSDungeonStatusSaveGame>(UGameplayStatics::CreateSaveGameObject(URSDungeonStatusSaveGame::StaticClass()));
+    if (!StatusSaveGame)
+    {
+        return;
+    }
+
+    StatusSaveGame->HP = GetHP();
+    StatusSaveGame->LifeEssence = LifeEssence;
+
+    // 저장
+    UGameplayStatics::SaveGameToSlot(StatusSaveGame, StatusSaveSlotName, 0);
+}
+
+void ARSDunPlayerCharacter::LoadStatus()
+{
+    // SaveGame 오브젝트 생성
+    URSDungeonStatusSaveGame* StatusLoadGame = Cast<URSDungeonStatusSaveGame>(UGameplayStatics::LoadGameFromSlot(StatusSaveSlotName, 0));
+    if (!StatusLoadGame)
+    {
+        return;
+    }
+    
+    // 로드
+    ChangeHP(StatusLoadGame->HP);
+    LifeEssence = StatusLoadGame->LifeEssence;
 }
