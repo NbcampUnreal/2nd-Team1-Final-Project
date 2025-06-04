@@ -7,23 +7,21 @@
 #include "Engine/LevelStreamingDynamic.h"
 #include "GameFramework/Character.h"
 #include "Engine/TargetPoint.h"
-
 #include "Kismet/GameplayStatics.h"
 #include "RSMapGenerator.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMapFullyLoaded);
 
 UENUM()
-enum class EDir : uint8 //방향표시 열거형(Bitmask형태)
+enum class EDir : uint8
 {
-	None = 0,        // 방향 없음
-	Up = 1 << 0,   // 위쪽
-	Down = 1 << 1,   // 아래쪽
-	Left = 1 << 2,   // 왼쪽
-	Right = 1 << 3    // 오른쪽
+	None = 0,
+	Up = 1 << 0,
+	Down = 1 << 1,
+	Left = 1 << 2,
+	Right = 1 << 3
 };
 
-// 여러 방향을 동시에 사용할 수 있도록 플래그로 지정 | 연산
 ENUM_CLASS_FLAGS(EDir)
 
 USTRUCT()
@@ -31,99 +29,101 @@ struct FTileData
 {
 	GENERATED_BODY()
 
-	FVector2D GridPos;                // 그리드 상의 좌표
-	EDir Connections = EDir::None;  // 이 타일이 연결된 방향 정보 (ex) 위+아래 → ㅣ)
-	bool bIsMainPath = false;         // 메인 경로(시작점~보스방)에 포함되는 타일인지 여부
+	FVector2D GridPos;
+	EDir Connections = EDir::None;
+	bool bIsMainPath = false;
 };
-
-
 
 UCLASS()
 class ROGSHOP_API ARSMapGenerator : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	ARSMapGenerator();
-
-	void SetSeed(int32 RandomSeed);
-	UFUNCTION()
-	void OnSubLevelLoaded();
-	bool IsMapFullyLoaded() const;
-	void CheckAllTilesLoaded();
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	void SpawnTiles();         // 실제 타일을 액터로 스폰
-	void GenerateMainPath();   // 시작점부터 보스방까지 연결된 주 경로 생성
-	void ExpandPathToCoverMinTiles(float MinRatio);  // 타일이 전체의 일정 비율 이상 되도록 확장
-	void FindBossRoom();                             // 가장 먼 방을 보스방으로 설정
-	ULevelStreamingDynamic* StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector& Location, const FRotator& Rotation, const FString& UniqueName);
-	void ChooseShopTile();
-
-	int32 GetConnectedNeighborCount(FVector2D Pos);
-	int32 GetAvailableNeighborCount(FVector2D Pos);
-	bool IsValidPos(FVector2D Pos) const;                // 좌표가 그리드 안에 있는지 확인
-	FVector2D GetNextDirection(FVector2D Current, TArray<FVector2D>& Visited); // 다음 경로 선택
-	FVector SpawnBossArenaLevel();
 
 public:
-	FVector2D ShopTilePos;
-	// 타일 간 간격
-	UPROPERTY(EditAnywhere, Category="Room Status")
+	ARSMapGenerator();
+
+	// 외부함수에서 시드 설정 함수
+	void SetSeed(int32 RandomSeed);
+
+#pragma region 타일로딩상태 검증함수
+	UFUNCTION()
+	void OnSubLevelLoaded(); // 서브 레벨이 로드되었을 때 호출되는 함수
+	bool IsMapFullyLoaded() const; // 맵이 완전히 로드되었는지 확인하는 함수
+	void CheckAllTilesLoaded(); // 모든 타일이 로드되었는지 확인하는 함수
+#pragma endregion
+
+protected:
+	virtual void BeginPlay() override;
+
+#pragma region 맵생성 관련 함수
+	void GenerateMainPath(); // 메인 경로 생성함수
+	void ExpandPathToCoverMinTiles(float MinRatio); // 최소 타일 비율을 만족하도록 경로 확장 함수
+	void FindBossRoom(); // 보스방 위치 찾는 함수
+	FVector2D GetNextDirection(FVector2D Current, TArray<FVector2D>& Visited); // 현재 위치에서 이동할 수 있는 다음 위치 선택																																																	
+	void ChooseShopTile(); // 상점 타일 위치 선택 함수
+	void SpawnTiles(); // 타일 스폰 함수
+	FVector SpawnBossArenaLevel(); // 보스 아레나 레벨 스폰함수
+#pragma endregion
+
+#pragma region 유틸리티 함수
+	bool IsValidPos(FVector2D Pos) const; // 선택된 위치가 그리드 안에 있는 유효한 위치인지 확인하는 함수
+	int32 GetConnectedNeighborCount(FVector2D Pos); // 현재 위치에서 연결된 이웃 타일의 개수를 반환하는 함수
+	int32 GetAvailableNeighborCount(FVector2D Pos); // 현재 위치에서 이동 가능한 이웃 타일의 개수를 반환하는 함수													
+	ULevelStreamingDynamic* StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector& Location, const FRotator& Rotation, const FString& UniqueName); // 타일 레벨 스트리밍 함수
+#pragma endregion
+
+#pragma region 공개 변수
+public:
+
+	// 타일 크기, 시드 , 그리드 크기
+	UPROPERTY(EditAnywhere, Category = "Room Status") // 타일 크기
 	float TileSize;
-	// 랜덤 시드
-	UPROPERTY(EditAnywhere, Category = "Room Status")
+
+	UPROPERTY(EditAnywhere, Category = "Room Status") // 시드
 	int32 Seed;
-	// 그리드 크기
-	UPROPERTY(EditAnywhere, Category = "Room Status")
+
+	UPROPERTY(EditAnywhere, Category = "Room Status") // 그리드 크기
 	int32 GridSize;
 
-	// ㅣ모양 타일
-	UPROPERTY(EditAnywhere, Category = "Room Spawning")
+	// 타일 레벨들
+	UPROPERTY(EditAnywhere, Category = "Room Spawning") // 직선 모양 타일
 	TSoftObjectPtr<UWorld> LineTileLevel;
 
-	// ㄴ 모양 타일
-	UPROPERTY(EditAnywhere, Category = "Room Spawning")
+	UPROPERTY(EditAnywhere, Category = "Room Spawning") // 코너 모양 타일
 	TSoftObjectPtr<UWorld> CornerTileLevel;
 
-	// + 모양 타일
-	UPROPERTY(EditAnywhere, Category = "Room Spawning")
+	UPROPERTY(EditAnywhere, Category = "Room Spawning") // 교차로 모양 타일
 	TSoftObjectPtr<UWorld> CrossTileLevel;
 
-	// T 모양 타일
-	UPROPERTY(EditAnywhere, Category = "Room Spawning")
+	UPROPERTY(EditAnywhere, Category = "Room Spawning") // T모양 타일
 	TSoftObjectPtr<UWorld> TTileLevel;
 
-	// 막다른길 모양 타일
-	UPROPERTY(EditAnywhere, Category = "Room Spawning")
+	UPROPERTY(EditAnywhere, Category = "Room Spawning") // 막다른길 타일
 	TSoftObjectPtr<UWorld> DeadEndTileLevel;
 
-	UPROPERTY(EditAnywhere, Category = "Room Spawning")
-	TSoftObjectPtr<UWorld> BossRoomTileLevel; // 보스방 전용 타일
-	UPROPERTY(EditAnywhere, Category = "Room Spawning")
-	TSoftObjectPtr<UWorld> BossArenaLevel; // 보스방 전용 타일
-	UPROPERTY(BlueprintAssignable, Category = "Map")
-	FOnMapFullyLoaded OnMapFullyLoaded;
+	UPROPERTY(EditAnywhere, Category = "Room Spawning") // 보스방 타일
+	TSoftObjectPtr<UWorld> BossRoomTileLevel;
 
-	bool bIsMapLoaded = false;
+	UPROPERTY(EditAnywhere, Category = "Room Spawning") // 보스 아레나 타일
+	TSoftObjectPtr<UWorld> BossArenaLevel;
+
 
 	UPROPERTY()
-	TArray<ULevelStreamingDynamic*> SpawnedLevels;
+	FVector2D ShopTilePos; // 상점 타일 위치
 
+	UPROPERTY()
+	TArray<ULevelStreamingDynamic*> SpawnedLevels; // 스트리밍된 레벨 목록
+	UPROPERTY(BlueprintAssignable, Category = "Map")
+	FOnMapFullyLoaded OnMapFullyLoaded; // 맵이 완전히 로드되었을 때 호출되는 델리게이트
+#pragma endregion
 
-
+#pragma region 비공개 변수
 private:
-	// 그리드 상에 생성된 타일 정보를 저장하는 Map
-	TMap<FVector2D, FTileData> TileMap;
-	bool bMapGenerationComplete;
-	// 랜덤 스트림 객체 (시드 기반)
-	FRandomStream RandomStream;
-	// 보스방 위치
-	FVector2D BossRoomPos;
+	TMap<FVector2D, FTileData> TileMap;// 타일 맵 데이터
+	FRandomStream RandomStream; // 랜덤 스트림
+	FVector2D BossRoomPos; // 보스방 위치
 
-
+	bool bMapGenerationComplete; // 맵 생성 완료 여부
+	bool bIsMapLoaded = false; // 맵이 완전히 로드되었는지 여우
+#pragma endregion
 };

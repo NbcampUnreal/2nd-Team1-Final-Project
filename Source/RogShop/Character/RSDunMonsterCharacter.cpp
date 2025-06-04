@@ -27,12 +27,13 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	// 몬스터 캡슐 컴포넌트에 몬스터 공격을 받지 않도록 무시하는 함수
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_MonsterAttackTrace, ECR_Ignore);
 
-	// 캡슐 컴포넌트의 오버랩 이벤트는 끄고 스켈레탈 메시의 오버랩 이벤트는 켜기
+	// 캡슐 컴포넌트의 오버랩 이벤트는 끄고 스켈레탈 메시의 오버랩 이벤트는 켜기  << 플레이어의 공격 판정 처리
 	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
 	GetMesh()->SetGenerateOverlapEvents(true);
 
 	MonsterDataTable = nullptr;
-
+	DrawDebugLineSeconds = 5.0f;
+	DrawDebugLineThickness = 5.0f;
 }
 
 void ARSDunMonsterCharacter::BeginPlay()
@@ -42,7 +43,7 @@ void ARSDunMonsterCharacter::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(detectDelayTimer, this, &ARSDunMonsterCharacter::FindNearPatrolPoint, 0.5f, false);	
 	if (UAnimInstance* animInstance = GetMesh()->GetAnimInstance())
 	{
-		animInstance->OnMontageEnded.AddDynamic(this, &ARSDunMonsterCharacter::OnDeathMontageEnded);
+		animInstance->OnMontageEnded.AddDynamic(this, &ARSDunMonsterCharacter::OnEveryMontageEnded);
 	}
 
 	InitMonsterData();
@@ -160,7 +161,7 @@ void ARSDunMonsterCharacter::PlaySkill_3()
 	GetWorld()->SpawnActor<AActor>(servant, interrestedPos, spawnRot);
 }*/
 
-void ARSDunMonsterCharacter::AIAction(int32 actionIdx, FVector interestedPos)
+void ARSDunMonsterCharacter::PlayAction_Implementation(int32 actionIdx, FVector interestedPos)
 {
 	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
 
@@ -176,15 +177,25 @@ void ARSDunMonsterCharacter::AIAction(int32 actionIdx, FVector interestedPos)
 			}
 		}
 	}
+	const FMonsterAttackSkillData& actionData = MonsterAttackSkills[actionIdx];
+	
+	if (actionData.skillType == ESkillType::Utillity) // 공격이 아닌 경우
+	{
+		UtillitySkill(actionIdx, interestedPos);
+	}
 }
 
-void ARSDunMonsterCharacter::OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted)
+void ARSDunMonsterCharacter::UtillitySkill_Implementation(int32 actionIdx, FVector interestedPos)
+{
+
+}
+
+void ARSDunMonsterCharacter::OnEveryMontageEnded_Implementation(UAnimMontage* montage, bool bInterrupted)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-	if (montage == DeathMontage && !AnimInstance->Montage_IsPlaying(montage))
+	if (montage == DeathMontage && !AnimInstance->Montage_IsPlaying(montage))//사망 하는 경우
 	{
-		//GetWorld()->GetTimerManager().SetTimer(animPlayDelayTimer, this, &ARSDunMonsterCharacter::AIDestroy, 5.0f, false);
 		Destroy();
 	}
 }
@@ -220,11 +231,10 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 
 void ARSDunMonsterCharacter::PerformAttackTrace()
 {
-	// 미리 캐싱해둔 몬스터 데이터 중 공격 트레이스 배열 데이터를 가져와서 인덱스에 따라 트레이스가 변경되도록 설정
 	const FMonsterAttackSkillData& actionData = MonsterAttackSkills[skillActionIdx];
-
 	if (actionData.skillType == ESkillType::Melee) // 근접 공격인 경우
 	{
+		// 미리 캐싱해둔 몬스터 데이터 중 공격 트레이스 배열 데이터를 가져와서 인덱스에 따라 트레이스가 변경되도록 설정	
 		const FMonsterAttackTraceData& TraceData = CachedAttackTraceDataArray[skillActionIdx];
 		FVector Start = GetMesh()->GetSocketLocation(TraceData.SocketLocation);
 		Start += GetActorForwardVector() * TraceData.TraceForwardOffset;
@@ -232,9 +242,13 @@ void ARSDunMonsterCharacter::PerformAttackTrace()
 		Start += GetActorUpVector() * TraceData.TraceUpOffset;
 
 		FVector End = Start + GetActorForwardVector() * TraceData.TraceLength;
+		//FVector End = Start + GetActorForwardVector() * 500.0f;
 		FVector Center = (Start + End) * 0.5f;
 		FQuat Rotation = GetActorRotation().Quaternion();
+
 		FVector LocalTraceBoxHalfSize = TraceData.TraceBoxHalfSize;
+		FVector StartTraceBoxHalfSize = LocalTraceBoxHalfSize * 0.9f;
+		LocalTraceBoxHalfSize.X += TraceData.TraceLength * 0.5f;
 
 		FHitResult HitResult;
 		FCollisionQueryParams Params;
@@ -271,25 +285,26 @@ void ARSDunMonsterCharacter::PerformAttackTrace()
 			}
 			else
 			{
-				RS_LOG("플레이어가 아닌 대상이 공격에 맞았습니다!");
+				RS_LOG("플레이어가 아닌 Pawn(몬스터, 가짜 Pawn 등)이 공격에 맞았습니다!");
 			}
 
-			DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, bPlayerHit ? FColor::Red : FColor::Green, false, 5.0f);
+			DrawDebugBox(GetWorld(), Start, StartTraceBoxHalfSize, Rotation, bPlayerHit ? FColor::Red : FColor::Green, false, DrawDebugLineSeconds);
+			DrawDebugLine(GetWorld(), Start, End, bPlayerHit ? FColor::Red : FColor::Yellow, false, DrawDebugLineSeconds, 2, DrawDebugLineThickness);
+			DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, bPlayerHit ? FColor::Red : FColor::Green, false, DrawDebugLineSeconds);
+
 		}
 		else
 		{
-			DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, FColor::Green, false, 5.0f);
-			RS_LOG("몬스터의 공격에 아무도 맞지 않았습니다!");
+			DrawDebugBox(GetWorld(), Start, StartTraceBoxHalfSize, Rotation, FColor::Green, false, DrawDebugLineSeconds);
+			DrawDebugLine(GetWorld(), Start, End, FColor::Yellow, false, DrawDebugLineSeconds, 2, DrawDebugLineThickness);
+			DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, FColor::Green, false, DrawDebugLineSeconds);
+			RS_LOG("몬스터의 공격에 Pawn이 아닌 물체가 맞았거나 아무도 맞지 않았습니다!");
 		}
 	}
 	else if (actionData.skillType == ESkillType::Range) // 원거리 공격인 경우
 	{
 		// TODO: 원거리 공격 로직 작성
-	}
-	else if (actionData.skillType == ESkillType::Utillity) // 공격이 아닌 경우
-	{
-		// TODO: 유틸리티 스킬 로직 작성
-	}
+	}	
 }
 
 void ARSDunMonsterCharacter::JumpTo(FVector destination)
