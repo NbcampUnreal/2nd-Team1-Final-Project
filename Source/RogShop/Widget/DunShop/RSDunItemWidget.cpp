@@ -113,7 +113,7 @@ bool URSDunItemWidget::BuyItem()
         {
             FDungeonRelicData* RelicClassData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->RelicClass->FindRow<FDungeonRelicData>(CurrentRowName, TEXT("Get RelicData"));
 
-            if (RelicClassData->RelicClass)
+            if (RelicClassData && RelicClassData->RelicClass)
             {
                 URSBaseRelic* RelicInstance = NewObject<URSBaseRelic>(GetTransientPackage(), RelicClassData->RelicClass);
 
@@ -121,7 +121,7 @@ bool URSDunItemWidget::BuyItem()
             }
             else
             {
-                UE_LOG(LogTemp, Warning, TEXT("RelicClass is Null"));
+                UE_LOG(LogTemp, Warning, TEXT("RelicClassData is Null"));
                 bIsBuy = false;
             }
 
