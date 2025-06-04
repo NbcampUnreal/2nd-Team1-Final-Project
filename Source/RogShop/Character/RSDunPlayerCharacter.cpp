@@ -48,6 +48,9 @@ ARSDunPlayerCharacter::ARSDunPlayerCharacter()
     DodgeMontage = nullptr;
     DeathMontage = nullptr;
 
+    // 던전 재화
+    LifeEssence = 0.f;
+
     // 무기 컴포넌트
     WeaponComp = CreateDefaultSubobject<URSPlayerWeaponComponent>(TEXT("RSPlayerWeapon"));
 
@@ -398,6 +401,24 @@ void ARSDunPlayerCharacter::ToggleInGameMenuUI(const FInputActionValue& value)
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("ToggleInGameMenuUI Activated"));
     }
+}
+
+void ARSDunPlayerCharacter::SetLifeEssence(float Amount)
+{
+    float NewLifeEssence = FMath::Max(Amount, 0.0f);
+    LifeEssence = NewLifeEssence;
+}
+
+void ARSDunPlayerCharacter::IncreaseLifeEssence(float Amount)
+{
+    float NewLifeEssence = LifeEssence + Amount;
+    LifeEssence = NewLifeEssence;
+}
+
+void ARSDunPlayerCharacter::DecreaseLifeEssence(float Amount)
+{
+    float NewLifeEssence = FMath::Max(LifeEssence - Amount, 0.0f);
+    LifeEssence = NewLifeEssence;
 }
 
 URSPlayerWeaponComponent* ARSDunPlayerCharacter::GetRSPlayerWeaponComponent()
