@@ -17,6 +17,8 @@ enum class EMapType : uint8
 	Cave       UMETA(DisplayName = "동굴")
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBossDead);
+
 // 던전 게임모드 클래스 정의
 UCLASS()
 class ROGSHOP_API ARSDungeonGameModeBase : public AGameModeBase
@@ -72,4 +74,21 @@ public:
 
 private:
 	FTimerHandle WaitForMapHandle; // 맵 로딩 후 딜레이 핸들
+
+#pragma region StageClear
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnBossDead OnBossDead;
+
+private:
+	UFUNCTION()
+	void SpawnDunNextStagePortal();
+
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StageClear", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AActor> DunNextStagePortalClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StageClear", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<AActor> DunNextStagePortalInstance;
+#pragma endregion
 };
