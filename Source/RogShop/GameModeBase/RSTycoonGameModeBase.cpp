@@ -13,6 +13,8 @@
 #include "RogShop/GameInstanceSubsystem/RSDataSubsystem.h"
 #include "Tycoon/NPC/RSTycoonCustomerCharacter.h"
 #include "ItemSlot.h"
+#include "RSIngredientInventoryWidget.h"
+#include "RogShop/Actor/Tycoon/Tile/RSIceBoxTile.h"
 
 
 ARSTycoonGameModeBase::ARSTycoonGameModeBase()
@@ -20,13 +22,25 @@ ARSTycoonGameModeBase::ARSTycoonGameModeBase()
 	//어차피 1개라 성능을 많이 안 잡아 먹을거 같아서 true
 	PrimaryActorTick.bCanEverTick = true;
 
-	Inventory = CreateDefaultSubobject<URSTycoonInventoryComponent>(TEXT("Inventory"));
 }
 
 void ARSTycoonGameModeBase::StartSale()
 {
 	State = ETycoonGameMode::Sales;
 
+	SettingGame();
+
+	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	check(Controller)
+	Controller->StartSaleMode();
+	
+	GetWorldTimerManager().SetTimer(CustomerTimerHandle, this, &ARSTycoonGameModeBase::CreateCustomer, 5.f, true);
+	GetWorldTimerManager().SetTimer(GameTimerHandle, this, &ARSTycoonGameModeBase::EndSale, SalePlayMinute * 60, false);
+}
+
+void ARSTycoonGameModeBase::SettingGame()
+{
+	//들어올 수 있는 최대 손님 갯수 설정 
 	TArray<AActor*> TableTiles;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSTableTile::StaticClass(), TableTiles);
 
@@ -37,23 +51,39 @@ void ARSTycoonGameModeBase::StartSale()
 		MaxCustomerCount += Tile->GetMaxPlace();
 	}
 
+	//인벤 크기 설정
+	TArray<AActor*> IceBoxTiles;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSIceBoxTile::StaticClass(), IceBoxTiles);
+	
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(Controller)
-	
-	Controller->StartSaleMode();
-	
-	GetWorldTimerManager().SetTimer(CustomerTimerHandle, this, &ARSTycoonGameModeBase::CreateCustomer, 5.f, true);
-	GetWorldTimerManager().SetTimer(GameTimerHandle, this, &ARSTycoonGameModeBase::EndSale, SalePlayMinute * 60, false);
+	Controller->GetInventoryComponent()->SetInventorySlot(ARSIceBoxTile::AddInventorySlot * (IceBoxTiles.Num() + 1));
 }
 
 void ARSTycoonGameModeBase::AddOrder(FFoodOrder Order)
 {
 	FoodOrders.Add(Order);
+	
+	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	check(Controller)
+	Controller->AddOrderSlot(Order);
 }
 
 void ARSTycoonGameModeBase::RemoveOrder(FFoodOrder Order)
 {
 	FoodOrders.RemoveSingle(Order);
+}
+
+void ARSTycoonGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	GetWorldTimerManager().SetTimerForNextTick([&]()
+	{
+		//최초 한번 게임 세팅을 해줌
+		SettingGame();
+		StartWait();
+	});
 }
 
 void ARSTycoonGameModeBase::CreateCustomer()
@@ -122,19 +152,16 @@ void ARSTycoonGameModeBase::AddNPC(ARSTycoonNPC* NPC)
 	NPCs.Add(NPC);
 }
 
-float ARSTycoonGameModeBase::GetGameTime() const
-{
-	return GetWorldTimerManager().GetTimerElapsed(GameTimerHandle);
-}
-
 //남은 재료중에 요리가 가능한지 반환
 //OutOrderFood : true로 통과된다면 해야할 요리
 bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 {
 	URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
-
+	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	check(Controller)
+	
 	//1. 이미 들어와있는 손님들이 시키는 음식들이 사용하는 재료를 남은 재료 목록에서 제외 시켜야함
-	TArray<FItemSlot> Ingredients = Inventory->GetItems(); //재료 있는 것들 복사
+	TArray<FItemSlot> Ingredients = Controller->GetInventoryComponent()->GetItems(); //재료 있는 것들 복사
 	for (auto& Customer : Customers)
 	{
 		FCookFoodData const* Data = DataSubsystem->Food->FindRow<FCookFoodData>(Customer->WantFoodKey, TEXT("Get FoodData"));
@@ -142,7 +169,7 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 		{
 			//손님이 바라는 음식인데 이미 요리가 나와서 재료가 없는 상황엔 재료를 차감하지 않음
 			//어차피 아래쪽에서 만들 수 있는지 검사하기 때문에 여기서 차감만
-			for (FItemSlot e : Ingredients)
+			for (FItemSlot& e : Ingredients)
 			{
 				if (e.ItemKey == Need.Key)
 				{
@@ -197,7 +224,7 @@ void ARSTycoonGameModeBase::EndSale()
 void ARSTycoonGameModeBase::StartWait()
 {
 	State = ETycoonGameMode::Wait;
-
+	
 	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->StartWaitMode();
 }
 
@@ -206,4 +233,9 @@ void ARSTycoonGameModeBase::StartManagement()
 	State = ETycoonGameMode::Management;
 
 	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->StartManagementMode();
+}
+
+float ARSTycoonGameModeBase::GetGameTime() const
+{
+	return GetWorldTimerManager().GetTimerElapsed(GameTimerHandle);
 }

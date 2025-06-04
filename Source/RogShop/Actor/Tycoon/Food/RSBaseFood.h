@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TycoonDatas.h"
 #include "GameFramework/Actor.h"
 #include "RSBaseFood.generated.h"
 
@@ -20,8 +21,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	FString FoodName;
 
-	UPROPERTY()
-	TWeakObjectPtr<ARSTycoonCustomerCharacter> WantCustomer;
+	FFoodOrder Order;
 	
 private:
 	UPROPERTY(EditDefaultsOnly)

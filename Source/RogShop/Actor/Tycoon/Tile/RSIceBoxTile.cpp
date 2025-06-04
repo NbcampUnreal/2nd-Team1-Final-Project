@@ -3,6 +3,11 @@
 
 #include "RSIceBoxTile.h"
 
+#include "RSTycoonInventoryComponent.h"
+#include "RSTycoonPlayerController.h"
+#include "Tycoon/RSTycoonPlayerCharacter.h"
+
+const int32 ARSIceBoxTile::AddInventorySlot = 5;
 
 ARSIceBoxTile::ARSIceBoxTile()
 {
@@ -13,5 +18,21 @@ void ARSIceBoxTile::Interact(ACharacter* InteractCharacter)
 {
 	Super::Interact(InteractCharacter);
 
-	//걍 재료 상자칸 + 될거같음
+	ARSTycoonPlayerCharacter* Player = Cast<ARSTycoonPlayerCharacter>(InteractCharacter);
+	if (Player == nullptr)
+	{
+		return;
+	}
+
+	ARSTycoonPlayerController* PlayerController = Cast<ARSTycoonPlayerController>(Player->GetController());
+	check(PlayerController)
+
+	if (PlayerController->GetInventoryComponent()->IsOpen())
+	{
+		PlayerController->GetInventoryComponent()->Close();
+	}
+	else
+	{
+		PlayerController->GetInventoryComponent()->Open();
+	}
 }

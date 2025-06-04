@@ -22,12 +22,6 @@ void URSIngredientInventoryWidget::NativeConstruct()
 		// 24개 슬롯, 4열 기준 생성
 		CreateSlots(24, 4);
 	}
-
-	ARSTycoonPlayerController* RSTycoonPlayerController = GetOwningPlayer<ARSTycoonPlayerController>();
-	if (RSTycoonPlayerController)
-	{
-		CreateSlots(24, 2);
-	}
 }
 
 void URSIngredientInventoryWidget::CreateSlots(int32 NumSlots, int32 NumColumns)

@@ -6,6 +6,10 @@
 #include "GameFramework/PlayerController.h"
 #include "RSTycoonPlayerController.generated.h"
 
+struct FFoodOrder;
+struct FItemSlot;
+class URSTycoonInventoryComponent;
+class URSIngredientInventoryWidget;
 class ARSTycoonCamera;
 class URSTycoonManagementWidget;
 class URSTycoonSaleWidget;
@@ -21,6 +25,9 @@ class ROGSHOP_API ARSTycoonPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+private:
+	ARSTycoonPlayerController();
+
 #pragma region Mode
 
 public:
@@ -33,10 +40,18 @@ public:
 
 private:
 	int32 SelectTileIndex = INDEX_NONE;
-	
+
 #pragma endregion
 
 #pragma region Widget
+
+public:
+	void AddOrderSlot(FFoodOrder Order);
+	void RemoveOrderSlot(FFoodOrder Order);
+	void ActiveOrderSlot(FFoodOrder Order, FTimerHandle CookTimer);
+	void FinishOrderSlot(FFoodOrder Order);
+	
+	URSIngredientInventoryWidget* GetInventoryWidget() const { return InventoryWidget; }
 
 private:
 	void ChangeMainWidget(UUserWidget* ActiveWidget);
@@ -44,17 +59,20 @@ private:
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<URSTycoonWaitWidget> WaitWidgetType;
+	TSubclassOf<URSTycoonWaitWidget> WaitWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<URSTycoonSaleWidget> SaleWidgetType;
+	TSubclassOf<URSTycoonSaleWidget> SaleWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<URSTycoonSaleResultWidget> SaleResultWidgetType;
+	TSubclassOf<URSTycoonSaleResultWidget> SaleResultWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<URSTycoonManagementWidget> ManagementWidgetType;
+	TSubclassOf<URSTycoonManagementWidget> ManagementWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<URSIngredientInventoryWidget> InventoryWidgetClass;
+	
 	UPROPERTY()
 	TObjectPtr<URSTycoonWaitWidget> WaitWidget;
 
@@ -66,6 +84,9 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<URSTycoonManagementWidget> ManagementWidget;
+
+	UPROPERTY()
+	TObjectPtr<URSIngredientInventoryWidget> InventoryWidget;
 #pragma endregion
 
 #pragma region Input
@@ -102,12 +123,17 @@ public:
 
 	int32 GetGold() const { return Gold; }
 	int32 GetCustomerCount() const { return CustomerCount; }
+	URSTycoonInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
 	void SettingCamera();
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<URSTycoonInventoryComponent> InventoryComponent; //인벤토리
 
 private:
 	UPROPERTY()
