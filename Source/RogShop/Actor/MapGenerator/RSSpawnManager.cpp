@@ -21,7 +21,7 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, T
 {
 	World = InWorld;
 	ShopNPCClass = ShopNPC;
-
+	
 	if (!GameInstance) return;
 
 	URSDataSubsystem* DataSubsystem = GameInstance->GetSubsystem<URSDataSubsystem>();
