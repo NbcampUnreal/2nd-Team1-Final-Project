@@ -102,7 +102,7 @@ void ARSTableTile::Serving(ACharacter* InteractCharacter)
 	ARSTycoonCustomerCharacter* OrderedCustomer = nullptr;
 	for (auto Customer : SittingCustomers)
 	{
-		if (Customer == Food->WantCustomer)
+		if (Customer == Food->Order.Customer)
 		{
 			OrderedCustomer = Customer;
 			break;

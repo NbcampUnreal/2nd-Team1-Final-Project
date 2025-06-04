@@ -35,8 +35,12 @@ void ARSTycoonCustomerCharacter::WaitFood()
 {
 	State = ETycoonCustomerState::FoodWaiting;
 
+	FFoodOrder Order;
+	Order.FoodKey = WantFoodKey;
+	Order.Customer = this;
+	
 	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
-	GameMode->AddOrder({WantFoodKey, this});
+	GameMode->AddOrder(Order);
 }
 
 void ARSTycoonCustomerCharacter::Eat()

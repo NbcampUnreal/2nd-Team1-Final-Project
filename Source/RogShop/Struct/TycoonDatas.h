@@ -11,9 +11,13 @@ struct ROGSHOP_API FFoodOrder
 	GENERATED_BODY()
 	
 public:
+	bool Empty();
+	
 	bool operator==(const FFoodOrder& Other) const;
 	
 public:
-	FName FoodKey;
+	UPROPERTY()
 	TWeakObjectPtr<ARSTycoonCustomerCharacter> Customer;
+	
+	FName FoodKey;
 };

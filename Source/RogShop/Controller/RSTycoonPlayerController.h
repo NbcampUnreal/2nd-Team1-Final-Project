@@ -46,8 +46,10 @@ private:
 #pragma region Widget
 
 public:
-	void AddOrderSlot(const FFoodOrder* Order);
-	void RemoveOrderSlot(const FFoodOrder* Order);
+	void AddOrderSlot(FFoodOrder Order);
+	void RemoveOrderSlot(FFoodOrder Order);
+	void ActiveOrderSlot(FFoodOrder Order, FTimerHandle CookTimer);
+	void FinishOrderSlot(FFoodOrder Order);
 	
 	URSIngredientInventoryWidget* GetInventoryWidget() const { return InventoryWidget; }
 

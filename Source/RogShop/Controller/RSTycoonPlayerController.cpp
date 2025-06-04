@@ -64,14 +64,24 @@ void ARSTycoonPlayerController::StartManagementMode()
 #pragma endregion
 
 #pragma region Widget
-void ARSTycoonPlayerController::AddOrderSlot(const FFoodOrder* Order)
+void ARSTycoonPlayerController::AddOrderSlot(FFoodOrder Order)
 {
 	SaleWidget->AddOrderSlot(Order);
 }
 
-void ARSTycoonPlayerController::RemoveOrderSlot(const FFoodOrder* Order)
+void ARSTycoonPlayerController::RemoveOrderSlot(FFoodOrder Order)
 {
 	SaleWidget->RemoveOrderSlot(Order);
+}
+
+void ARSTycoonPlayerController::ActiveOrderSlot(FFoodOrder Order, FTimerHandle CookTimer)
+{
+	SaleWidget->StartOrderSlotAnimation(Order, CookTimer);
+}
+
+void ARSTycoonPlayerController::FinishOrderSlot(FFoodOrder Order)
+{
+	SaleWidget->StopOrderSlotAnimation(Order);
 }
 
 void ARSTycoonPlayerController::ChangeMainWidget(UUserWidget* ActiveWidget)

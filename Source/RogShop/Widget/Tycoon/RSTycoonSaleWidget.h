@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TycoonDatas.h"
 #include "Blueprint/UserWidget.h"
 #include "RSTycoonSaleWidget.generated.h"
 
 class URSTycoonOrderSlotWidget;
-struct FFoodOrder;
 class UVerticalBox;
 class UProgressBar;
 class ARSTycoonWaiterCharacter;
@@ -26,18 +26,22 @@ class ROGSHOP_API URSTycoonSaleWidget : public UUserWidget
 public:
 	void SetGold(int32 Value);
 	void SetCustomerCount(int32 Value);
-	void AddOrderSlot(const FFoodOrder* Order);
-	void RemoveOrderSlot(const FFoodOrder* Order);
+	void AddOrderSlot(FFoodOrder Order);
+	void RemoveOrderSlot(FFoodOrder Order);
+	void StartOrderSlotAnimation(FFoodOrder Order, FTimerHandle CookTimer);
+	void StopOrderSlotAnimation(FFoodOrder Order);
 
 protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 	
 private:
-	void UpdateTimeUI();
-
 	UFUNCTION()
 	void OnClickStopSales();
+	
+	void UpdateTimeUI();
+
+	URSTycoonOrderSlotWidget* GetOrderSlotWidget(FFoodOrder Order);
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))

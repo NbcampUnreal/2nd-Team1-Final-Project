@@ -10,13 +10,25 @@
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "RogShop/UtilDefine.h"
 
-void URSTycoonOrderSlotWidget::SetOrder(const FFoodOrder* Order)
+void URSTycoonOrderSlotWidget::SetOrder(FFoodOrder Order)
 {
 	CurrentOrder = Order;
-	const FIngredientData* CurrentData = GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Ingredient->
-	                                                        FindRow<FIngredientData>(Order->FoodKey, TEXT("Get Order In Slot"));
+	if (Order == FFoodOrder())
+	{
+		return;
+	}
+	
+	const FCookFoodData* CurrentData = GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Food->
+	                                                        FindRow<FCookFoodData>(Order.FoodKey, TEXT("Get Order In Slot"));
 
+	if (CurrentData == nullptr)
+	{
+		RS_LOG_C("데이터 접근 실패!! : URSTycoonOrderSlotWidget", FColor::Red)
+		return;
+	}
+	
 	FoodImage->SetBrushFromTexture(CurrentData->Image);
 	FoodNameText->SetText(FText::FromString(CurrentData->Name));
 	FoodTimeText->SetText(FText::FromString(TEXT("대기 중")));
@@ -34,16 +46,22 @@ void URSTycoonOrderSlotWidget::StartProgress(FTimerHandle CookHandle)
 	ProgressHandle = CookHandle;
 }
 
+void URSTycoonOrderSlotWidget::FinishProgress()
+{
+	FoodTimeText->SetText(FText::FromString(TEXT("완료")));
+	FoodTimeText->SetColorAndOpacity(FSlateColor(FColor::Orange));
+}
+
 void URSTycoonOrderSlotWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
-	if (CurrentOrder.Get() && ProgressHandle.IsValid())
+	if (!CurrentOrder.Empty() && ProgressHandle.IsValid() && GetWorld()->GetTimerManager().IsTimerActive(ProgressHandle))
 	{
 		float Time = GetWorld()->GetTimerManager().GetTimerElapsed(ProgressHandle);
-		float MaxTime = GetWorld()->GetTimerManager().GetTimerRemaining(ProgressHandle);
+		float RemainTime = GetWorld()->GetTimerManager().GetTimerRemaining(ProgressHandle);
 
-		FoodTimeText->SetText(FText::FromString(FString::Printf("%02f : %.02f", MaxTime - Time,  MaxTime - Time)));
-		FoodProgressBar->SetPercent(Time / MaxTime);
+		FoodTimeText->SetText(FText::FromString(FString::Printf(TEXT("%02.02f"), RemainTime)));
+		FoodProgressBar->SetPercent(Time / (Time + RemainTime));
 	}
 }

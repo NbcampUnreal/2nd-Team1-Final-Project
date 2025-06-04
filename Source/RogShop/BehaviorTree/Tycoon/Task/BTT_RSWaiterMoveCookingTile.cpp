@@ -55,7 +55,7 @@ void UBTT_RSWaiterMoveCookingTile::TickTask(UBehaviorTreeComponent& OwnerComp, u
 		check(Food)
 		
 		const FName CustomerKey = TEXT("TargetCustomer");
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(CustomerKey, Food->WantCustomer.Get());
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject(CustomerKey, Food->Order.Customer.Get());
 		
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}

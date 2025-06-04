@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TycoonDatas.h"
 #include "Blueprint/UserWidget.h"
 #include "RSTycoonOrderSlotWidget.generated.h"
 
-struct FFoodOrder;
 struct FIngredientData;
 class UProgressBar;
 class UTextBlock;
@@ -20,12 +20,13 @@ class ROGSHOP_API URSTycoonOrderSlotWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void SetOrder(const FFoodOrder* Order);
+	void SetOrder(FFoodOrder Order);
 	void StartProgress(FTimerHandle CookHandle);
+	void FinishProgress();
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
-	TWeakPtr<const FFoodOrder> GetOrder() const { return CurrentOrder; }
+	FFoodOrder GetOrder() const { return CurrentOrder; }
 	
 private:
 	UPROPERTY(EditAnywhere, meta=(BindWidget))
@@ -40,6 +41,6 @@ private:
 	UPROPERTY(EditAnywhere, meta=(BindWidget))
 	TObjectPtr<UProgressBar> FoodProgressBar;
 
-	TWeakPtr<const FFoodOrder> CurrentOrder;
+	FFoodOrder CurrentOrder;
 	FTimerHandle ProgressHandle;
 };

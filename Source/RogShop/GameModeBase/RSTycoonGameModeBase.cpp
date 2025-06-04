@@ -62,21 +62,15 @@ void ARSTycoonGameModeBase::SettingGame()
 
 void ARSTycoonGameModeBase::AddOrder(FFoodOrder Order)
 {
-	int32 Index = FoodOrders.Add(Order);
-
+	FoodOrders.Add(Order);
+	
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(Controller)
-	Controller->AddOrderSlot(&FoodOrders[Index]);
+	Controller->AddOrderSlot(Order);
 }
 
 void ARSTycoonGameModeBase::RemoveOrder(FFoodOrder Order)
 {
-	int32 Index = FoodOrders.Find(Order);
-	
-	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
-	check(Controller)
-	Controller->RemoveOrderSlot(&FoodOrders[Index]);
-	
 	FoodOrders.RemoveSingle(Order);
 }
 
