@@ -17,7 +17,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnIngredientChange, int32, Ingredi
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLifeEssenceChange, float, NewLifeEssence);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHPChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMaxHPChange);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFirstWeaponPickUp, ARSDungeonGroundWeapon*, PickUpWeapon);
 
 UCLASS()
 class ROGSHOP_API ARSDunPlayerController : public APlayerController
@@ -90,7 +89,4 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnMaxHPChange OnMaxHPChange;
-
-	UPROPERTY()
-	FOnFirstWeaponPickUp OnFirstWeaponPickUp;
 };
