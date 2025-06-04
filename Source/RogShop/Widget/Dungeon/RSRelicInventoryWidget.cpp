@@ -15,26 +15,26 @@ void URSRelicInventoryWidget::NativeConstruct()
 
 void URSRelicInventoryWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
 {
-    if (!UniformGridPanel_RelicSlots || !SlotImageWidgetClass)
+    if (!RelicSlots || !InvecntorySlotWidgetClass)
     {
         UE_LOG(LogTemp, Warning, TEXT("SlotImageWidgetClass Null"));
         return;
     }
 
-    UniformGridPanel_RelicSlots->ClearChildren();
-    SlotImages.Empty();
+    RelicSlots->ClearChildren();
+    InvecntorySlots.Empty();
 
     for (int32 i = 0; i < NumSlots; ++i)
     {
-        URSInventorySlotWidget* NewSlotImage = CreateWidget<URSInventorySlotWidget>(GetWorld(), SlotImageWidgetClass);
+        URSInventorySlotWidget* NewSlotImage = CreateWidget<URSInventorySlotWidget>(GetWorld(), InvecntorySlotWidgetClass);
 
         if (NewSlotImage)
         {
             int32 Row = i / NumColumns;
             int32 Col = i % NumColumns;
 
-            UniformGridPanel_RelicSlots->AddChildToUniformGrid(NewSlotImage, Row, Col);
-            SlotImages.Add(NewSlotImage);
+            RelicSlots->AddChildToUniformGrid(NewSlotImage, Row, Col);
+            InvecntorySlots.Add(NewSlotImage);
         }
     }
 }
