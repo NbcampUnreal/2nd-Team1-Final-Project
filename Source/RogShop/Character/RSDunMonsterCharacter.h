@@ -15,6 +15,7 @@
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
+
 UCLASS()
 class ROGSHOP_API ARSDunMonsterCharacter : public ARSDunBaseCharacter
 {
@@ -116,6 +117,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName MonsterRowName;			 // 이 몬스터가 참조하는 RowName
 
+	// 공격 트레이스 디버그 박스
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float DrawDebugLineSeconds;		 // 디버그 라인 나타낼 시간
 

@@ -17,7 +17,8 @@ class ROGSHOP_API URSDunItemWidget : public UUserWidget
 public:
     // 부모 위젯에서 넣어주는 값
     void SetItemData(const FItemInfoData& InItemData);
-    void SetParentShop(URSDunShopWidget* InShop);
+
+    // 해당 아이템 키 값 세팅
     void SetItemRowName(FName RowName);
 
 protected:
@@ -43,9 +44,6 @@ private:
 
     UPROPERTY(meta = (BindWidget))
     class UButton* BuyBtn;
-
-    UPROPERTY()
-    URSDunShopWidget* ParentShop;
 
     UPROPERTY()
     FItemInfoData ItemData;

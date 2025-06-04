@@ -8,10 +8,12 @@
 #include "RSDunPlayerCharacter.h"
 #include "RSPlayerWeaponComponent.h"
 
+#include "RSDunPlayerController.h"
+#include "Kismet/GameplayStatics.h"
+
 ARSDungeonGroundWeapon::ARSDungeonGroundWeapon()
 {
 	PrimaryActorTick.bCanEverTick = false;
-
 }
 
 void ARSDungeonGroundWeapon::InitInteractableWeapon(FName NewDataTableKey, UStaticMesh* NewMesh, const TSubclassOf<ARSDungeonItemBase> NewWeaponClass)
@@ -51,6 +53,14 @@ void ARSDungeonGroundWeapon::Interact(ARSDunPlayerCharacter* Interactor)
 	{
 		SpawnWeapon->SetDataTableKey(DataTableKey);
 		RSPlayerWeaponComponent->EquipWeaponToSlot(SpawnWeapon);
+
+		ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(Interactor->GetController());
+
+		if (PC)
+		{
+			// 맨 처음에 던전 입장전 3개의 무기중 1개를 먹었을때를 알림
+			PC->OnFirstWeaponPickUp.Broadcast(this);
+		}
 
 		Destroy();
 	}
