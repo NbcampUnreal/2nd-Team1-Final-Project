@@ -5,37 +5,58 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Engine/DataTable.h"
-#include "Engine/TargetPoint.h"
-#include "RSDunPlayerCharacter.h"
 #include "GameFramework/Character.h"
-#include "MonsterSpawnGroupData.h"
 
-#include "Engine/Level.h"
 #include "RSSpawnManager.generated.h"
 
+// 몬스터 데이터 전방 선언
+class UGameInstance;
+class ATargetPoint;
+class AActor;
+
 /**
- * 
+ * URSSpawnManager
+ * 레벨 내 플레이어, 몬스터, 상점 NPC 스폰을 담당하는 매니저
  */
+
 UCLASS()
 class ROGSHOP_API URSSpawnManager : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	// 외부에서 월드와 DataTable을 초기화할 함수
+
+#pragma region 공개 함수
+
+	// 월드와 데이터테이블 초기화
 	void Initialize(UWorld* InWorld, UGameInstance* GameInstance, TSubclassOf<AActor> ShopNPC);
-	// 주어진 Level에 있는 TargetPoint들을 찾아 몬스터 스폰
+
+	// 몬스터들을 타겟포인트 위치에 스폰
 	void SpawnMonstersInLevel();
-	// 상점NPC스폰을 위한 함수
+
+	// 상점 NPC를 스폰
 	void SpawnShopNPCInLevel();
-	// Player스폰을 위한 함수
+
+	// 플레이어를 시작 위치에 스폰 또는 이동
 	void SpawnPlayerAtStartPoint(TSubclassOf<ACharacter> PlayerClass);
 
+#pragma endregion
+
 private:
+
+#pragma region 내부 변수
+
+	// 현재 게임 월드 참조
 	UWorld* World;
-	// 몬스터 정보가 담긴 에디터용 데이터 테이블
+
+	// 몬스터 그룹 스폰 데이터 테이블
 	UDataTable* MonsterRawTable;
+
+	// 몬스터 상태 데이터 테이블
 	UDataTable* MonsterStateTable;
+
 	// 상점 NPC 클래스
 	TSubclassOf<AActor> ShopNPCClass;
+
+#pragma endregion
 };

@@ -43,7 +43,7 @@ void ARSDunMonsterCharacter::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(detectDelayTimer, this, &ARSDunMonsterCharacter::FindNearPatrolPoint, 0.5f, false);	
 	if (UAnimInstance* animInstance = GetMesh()->GetAnimInstance())
 	{
-		animInstance->OnMontageEnded.AddDynamic(this, &ARSDunMonsterCharacter::OnDeathMontageEnded);
+		animInstance->OnMontageEnded.AddDynamic(this, &ARSDunMonsterCharacter::OnEveryMontageEnded);
 	}
 
 	InitMonsterData();
@@ -161,7 +161,7 @@ void ARSDunMonsterCharacter::PlaySkill_3()
 	GetWorld()->SpawnActor<AActor>(servant, interrestedPos, spawnRot);
 }*/
 
-void ARSDunMonsterCharacter::AIAction(int32 actionIdx, FVector interestedPos)
+void ARSDunMonsterCharacter::PlayAction_Implementation(int32 actionIdx, FVector interestedPos)
 {
 	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
 
@@ -177,15 +177,25 @@ void ARSDunMonsterCharacter::AIAction(int32 actionIdx, FVector interestedPos)
 			}
 		}
 	}
+	const FMonsterAttackSkillData& actionData = MonsterAttackSkills[actionIdx];
+	
+	if (actionData.skillType == ESkillType::Utillity) // 공격이 아닌 경우
+	{
+		UtillitySkill(actionIdx, interestedPos);
+	}
 }
 
-void ARSDunMonsterCharacter::OnDeathMontageEnded(UAnimMontage* montage, bool bInterrupted)
+void ARSDunMonsterCharacter::UtillitySkill_Implementation(int32 actionIdx, FVector interestedPos)
+{
+
+}
+
+void ARSDunMonsterCharacter::OnEveryMontageEnded_Implementation(UAnimMontage* montage, bool bInterrupted)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-	if (montage == DeathMontage && !AnimInstance->Montage_IsPlaying(montage))
+	if (montage == DeathMontage && !AnimInstance->Montage_IsPlaying(montage))//사망 하는 경우
 	{
-		//GetWorld()->GetTimerManager().SetTimer(animPlayDelayTimer, this, &ARSDunMonsterCharacter::AIDestroy, 5.0f, false);
 		Destroy();
 	}
 }
@@ -221,11 +231,10 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 
 void ARSDunMonsterCharacter::PerformAttackTrace()
 {
-	// 미리 캐싱해둔 몬스터 데이터 중 공격 트레이스 배열 데이터를 가져와서 인덱스에 따라 트레이스가 변경되도록 설정
 	const FMonsterAttackSkillData& actionData = MonsterAttackSkills[skillActionIdx];
-
 	if (actionData.skillType == ESkillType::Melee) // 근접 공격인 경우
 	{
+		// 미리 캐싱해둔 몬스터 데이터 중 공격 트레이스 배열 데이터를 가져와서 인덱스에 따라 트레이스가 변경되도록 설정	
 		const FMonsterAttackTraceData& TraceData = CachedAttackTraceDataArray[skillActionIdx];
 		FVector Start = GetMesh()->GetSocketLocation(TraceData.SocketLocation);
 		Start += GetActorForwardVector() * TraceData.TraceForwardOffset;
@@ -295,11 +304,7 @@ void ARSDunMonsterCharacter::PerformAttackTrace()
 	else if (actionData.skillType == ESkillType::Range) // 원거리 공격인 경우
 	{
 		// TODO: 원거리 공격 로직 작성
-	}
-	else if (actionData.skillType == ESkillType::Utillity) // 공격이 아닌 경우
-	{
-		// TODO: 유틸리티 스킬 로직 작성
-	}
+	}	
 }
 
 void ARSDunMonsterCharacter::JumpTo(FVector destination)
