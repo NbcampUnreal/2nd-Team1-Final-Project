@@ -149,7 +149,6 @@ void URSDunShopWidget::PopulateShopItems()
             if (NewRSDunItemWidget)
             {
                 NewRSDunItemWidget->SetItemData(*ItemData);
-                NewRSDunItemWidget->SetParentShop(this);
                 NewRSDunItemWidget->SetItemRowName(FoundRowName);
 
                 ItemHorizontalBox->AddChild(NewRSDunItemWidget);
