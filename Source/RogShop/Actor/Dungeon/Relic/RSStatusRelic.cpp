@@ -3,6 +3,7 @@
 
 #include "RSStatusRelic.h"
 #include "RSDunPlayerCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 void URSStatusRelic::ApplyEffect(ARSDunPlayerCharacter* OwnerCharacter)
 {
@@ -21,8 +22,13 @@ void URSStatusRelic::ApplyEffect(ARSDunPlayerCharacter* OwnerCharacter)
 	}
 	else if (TargetStatus == EStatus::MoveSpeed)
 	{
-		// 해당 이동속도로 고정됨
-		OwnerCharacter->ChangeMoveSpeed(Amount);
+		UCharacterMovementComponent* MovementComp = OwnerCharacter->GetCharacterMovement();
+		if (MovementComp)
+		{
+			float CurrentSpeed = MovementComp->GetMaxSpeed();
+			CurrentSpeed + Amount;
+			OwnerCharacter->ChangeMoveSpeed(CurrentSpeed);
+		}
 	}
 	else if (TargetStatus == EStatus::AttackPower)
 	{
