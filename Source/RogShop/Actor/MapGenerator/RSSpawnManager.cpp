@@ -40,6 +40,8 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, T
 		UE_LOG(LogTemp, Warning, TEXT("Failed Update MonsterStateGroup"));
 		return;
 	}
+	
+	// OnBossDead.AddDynamic(this, &URSSpawnManager::SpawnDunNextStagePortal);
 }
 #pragma endregion
 
