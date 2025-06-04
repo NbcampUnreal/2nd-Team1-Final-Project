@@ -44,7 +44,7 @@ public:
 	void UtillitySkill_Implementation(int32 actionIdx, FVector interestedPos);
 
 	UFUNCTION(BlueprintCallable)
-	int GetActionLength();//컨트롤러에 캐릭터가 몇가지의 액션을 가지고 있는지 반환
+	int32 GetActionLength();//컨트롤러에 캐릭터가 몇가지의 액션을 가지고 있는지 반환
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnEveryMontageEnded(UAnimMontage* montage, bool bInterrupted);  //모든 몽타주에 대해 검사함
@@ -72,8 +72,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Status")
 	void OnDeath();
-
-protected:
+	UFUNCTION(BlueprintCallable)
 	void InitMonsterData();
 
 protected:
