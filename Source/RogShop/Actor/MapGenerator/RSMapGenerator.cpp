@@ -8,11 +8,13 @@
 #include "Engine/World.h"
 #include "Containers/Queue.h"
 
-// Sets default values
+
+#pragma region 생성자 및 초기화
+//생성자 : 기본값 초기화
 ARSMapGenerator::ARSMapGenerator()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+    // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+    PrimaryActorTick.bCanEverTick = false;
     ShopTilePos = FVector2D::ZeroVector;
     bMapGenerationComplete = false;
     TileSize = 4000.0f;
@@ -20,26 +22,23 @@ ARSMapGenerator::ARSMapGenerator()
     GridSize = 3;
 }
 
-// Called when the game starts or when spawned
+// 맵 생성 프로세스 시작
 void ARSMapGenerator::BeginPlay()
 {
-	Super::BeginPlay();
-	
+    Super::BeginPlay();
+
     RandomStream.Initialize(Seed);
 
-    GenerateMainPath(); 
+    GenerateMainPath();
     ChooseShopTile();
     ExpandPathToCoverMinTiles(0.5f);
     FindBossRoom(); // 경로 중 가장 먼 타일을 보스방으로 설정
     SpawnTiles();
     SpawnBossArenaLevel();
 }
-// 유효한 위치인지 확인 (그리드 안에 있는지)
-bool ARSMapGenerator::IsValidPos(FVector2D Pos) const
-{
-    return Pos.X >= 0 && Pos.X < GridSize && Pos.Y >= 0 && Pos.Y < GridSize;
-}
+#pragma endregion
 
+#pragma region 메인 경로 생성 관련
 //현재 위치에서 이동할 수 있는 다음 위치 선택
 FVector2D ARSMapGenerator::GetNextDirection(FVector2D Current, TArray<FVector2D>& Visited)
 {
@@ -82,19 +81,19 @@ void ARSMapGenerator::GenerateMainPath()
 
         // 현재→다음 방향 계산
         EDir From, To;
-        if (Next.X > Current.X) 
-        { 
+        if (Next.X > Current.X)
+        {
             From = EDir::Right; To = EDir::Left;
         }
-        else if (Next.X < Current.X) 
-        { 
+        else if (Next.X < Current.X)
+        {
             From = EDir::Left; To = EDir::Right;
         }
-        else if (Next.Y > Current.Y) 
+        else if (Next.Y > Current.Y)
         {
-            From = EDir::Up; To = EDir::Down; 
+            From = EDir::Up; To = EDir::Down;
         }
-        else 
+        else
         {
             From = EDir::Down; To = EDir::Up;
         }
@@ -108,7 +107,51 @@ void ARSMapGenerator::GenerateMainPath()
         Path.Add(Current);
     }
 }
+#pragma endregion
 
+#pragma region 유틸리티 함수
+// 외부에서 시드를 설정할 함수
+void ARSMapGenerator::SetSeed(int32 RandomSeed)
+{
+    Seed = RandomSeed;
+}
+
+// 유효한 위치인지 확인 (그리드 안에 있는지)
+bool ARSMapGenerator::IsValidPos(FVector2D Pos) const
+{
+    return Pos.X >= 0 && Pos.X < GridSize && Pos.Y >= 0 && Pos.Y < GridSize;
+}
+// 연결된 이웃 타일개수 반환
+int32 ARSMapGenerator::GetConnectedNeighborCount(FVector2D Pos)
+{
+    int32 Count = 0;
+    for (FVector2D Offset : { FVector2D(0, 1), FVector2D(0, -1), FVector2D(1, 0), FVector2D(-1, 0) })
+    {
+        if (TileMap.Contains(Pos + Offset))
+        {
+            Count++;
+        }
+    }
+    return Count;
+}
+// 주변에서 아직 생성되지 않은 타일 개수 반환
+int32 ARSMapGenerator::GetAvailableNeighborCount(FVector2D Pos)
+{
+    int32 Count = 0;
+    for (FVector2D Offset : { FVector2D(0, 1), FVector2D(0, -1), FVector2D(1, 0), FVector2D(-1, 0) })
+    {
+        FVector2D Check = Pos + Offset;
+        if (IsValidPos(Check) && !TileMap.Contains(Check))
+        {
+            Count++;
+        }
+    }
+    return Count;
+}
+
+#pragma endregion
+
+#pragma region  경로 확장 및 보스방 결정
 //보스방 위치 찾기 (BFS로 가장 먼 타일 탐색)
 void ARSMapGenerator::FindBossRoom()
 {
@@ -212,28 +255,28 @@ void ARSMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
             {
                 FVector2D Neighbor = Next + Dir2;
 
-                if (!IsValidPos(Neighbor) || !TileMap.Contains(Neighbor)) 
+                if (!IsValidPos(Neighbor) || !TileMap.Contains(Neighbor))
                 {
                     continue;
                 }
 
                 // 방향 계산
                 EDir From2, To2;
-                if (Dir2 == FVector2D(1, 0)) 
-                { 
-                    From2 = EDir::Right; To2 = EDir::Left; 
+                if (Dir2 == FVector2D(1, 0))
+                {
+                    From2 = EDir::Right; To2 = EDir::Left;
                 }
-                else if (Dir2 == FVector2D(-1, 0)) 
+                else if (Dir2 == FVector2D(-1, 0))
                 {
                     From2 = EDir::Left; To2 = EDir::Right;
                 }
-                else if (Dir2 == FVector2D(0, 1)) 
+                else if (Dir2 == FVector2D(0, 1))
                 {
-                    From2 = EDir::Up; To2 = EDir::Down; 
+                    From2 = EDir::Up; To2 = EDir::Down;
                 }
-                else 
+                else
                 {
-                    From2 = EDir::Down; To2 = EDir::Up; 
+                    From2 = EDir::Down; To2 = EDir::Up;
                 }
 
                 TileMap[Next].Connections |= From2;
@@ -252,32 +295,10 @@ void ARSMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
         }
     }
 }
-int32 ARSMapGenerator::GetConnectedNeighborCount(FVector2D Pos)
-{
-    int32 Count = 0;
-    for (FVector2D Offset : { FVector2D(0, 1), FVector2D(0, -1), FVector2D(1, 0), FVector2D(-1, 0) })
-    {
-        if (TileMap.Contains(Pos + Offset)) 
-        {
-            Count++;
-        }
-    }
-    return Count;
-}
-int32 ARSMapGenerator::GetAvailableNeighborCount(FVector2D Pos)
-{
-    int32 Count = 0;
-    for (FVector2D Offset : { FVector2D(0, 1), FVector2D(0, -1), FVector2D(1, 0), FVector2D(-1, 0) })
-    {
-        FVector2D Check = Pos + Offset;
-        if (IsValidPos(Check) && !TileMap.Contains(Check))
-        {
-            Count++;
-        }
-    }
-    return Count;
-}
 
+#pragma endregion
+
+#pragma region 타일 스폰 관련 함수
 //타일 스폰 (연결 방향에 따라 회전 설정)
 void ARSMapGenerator::SpawnTiles()
 {
@@ -288,7 +309,7 @@ void ARSMapGenerator::SpawnTiles()
             FVector2D Pos(X, Y);
             FVector WorldLoc = GetActorLocation() + FVector(X * TileSize, Y * TileSize, 0);
 
-            if (!TileMap.Contains(Pos)) 
+            if (!TileMap.Contains(Pos))
             {
                 continue;
             }
@@ -451,8 +472,7 @@ void ARSMapGenerator::SpawnTiles()
     }
 }
 
-
-ULevelStreamingDynamic* ARSMapGenerator::StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector & Location, const FRotator & Rotation, const FString & UniqueName)
+ULevelStreamingDynamic* ARSMapGenerator::StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector& Location, const FRotator& Rotation, const FString& UniqueName) //동적으로 UWorld 타일을 로딩 및 배치
 {
     if (!LevelToStream.IsValid()) return nullptr;
 
@@ -467,8 +487,8 @@ ULevelStreamingDynamic* ARSMapGenerator::StreamTile(TSoftObjectPtr<UWorld> Level
     //동적으로 레벨 생성
     ULevelStreamingDynamic* StreamingLevel = ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(
         GetWorld(),
-        LevelToStream, 
-        LevelTransform, 
+        LevelToStream,
+        LevelTransform,
         bLoadSuccess,
         UniqueName);
     if (StreamingLevel)
@@ -488,7 +508,35 @@ ULevelStreamingDynamic* ARSMapGenerator::StreamTile(TSoftObjectPtr<UWorld> Level
     return StreamingLevel;
 }
 
-void ARSMapGenerator::ChooseShopTile() 
+// 보스 아레나 레벨 스폰 (맵 외곽)
+FVector ARSMapGenerator::SpawnBossArenaLevel()
+{
+    if (!BossArenaLevel.IsValid())
+    {
+        BossArenaLevel.LoadSynchronous();
+    }
+
+    FVector ArenaOffset = FVector(TileSize * GridSize * 2, TileSize * GridSize * 2, 0.0f); // 현재 맵과 떨어진 좌표
+    FString ArenaUniqueName = TEXT("BossArena");
+
+    bool bSuccess = false;
+    FTransform ArenaTransform;
+    ArenaTransform.SetLocation(ArenaOffset);
+    ArenaTransform.SetRotation(FQuat::Identity);
+
+    ULevelStreamingDynamic* StreamingLevel = ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(
+        GetWorld(),
+        BossArenaLevel,
+        ArenaTransform,
+        bSuccess,
+        ArenaUniqueName
+    );
+
+    return ArenaOffset;
+}
+
+// 상점 타일 위치 선택 (보스방을 제외한 타일 중에서 무작위로 선택)
+void ARSMapGenerator::ChooseShopTile()
 {
 
     TArray<FVector2D> Candidates;
@@ -510,37 +558,13 @@ void ARSMapGenerator::ChooseShopTile()
     }
 }
 
-FVector ARSMapGenerator::SpawnBossArenaLevel()
-{
-    if (!BossArenaLevel.IsValid())
-    {
-        BossArenaLevel.LoadSynchronous();
-    }
 
-    FVector ArenaOffset = FVector(TileSize*GridSize*2, TileSize * GridSize * 2, 0.0f); // 현재 맵과 떨어진 좌표
-    FString ArenaUniqueName = TEXT("BossArena");
+#pragma endregion
 
-    bool bSuccess = false;
-    FTransform ArenaTransform;
-    ArenaTransform.SetLocation(ArenaOffset);
-    ArenaTransform.SetRotation(FQuat::Identity);
 
-    ULevelStreamingDynamic* StreamingLevel = ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(
-        GetWorld(),
-        BossArenaLevel,
-        ArenaTransform,
-        bSuccess,
-        ArenaUniqueName
-    );
+#pragma region 맵 로딩 상태 체크
 
-    return ArenaOffset;
-}
-
-void ARSMapGenerator::SetSeed(int32 RandomSeed)
-{
-    Seed = RandomSeed;
-}
-
+// 스트리밍 타일 로딩 완료 시 호출
 void ARSMapGenerator::OnSubLevelLoaded()
 {
     UE_LOG(LogTemp, Warning, TEXT("서브 레벨 로딩 완료됨"));
@@ -551,11 +575,7 @@ void ARSMapGenerator::OnSubLevelLoaded()
     GetWorld()->GetTimerManager().SetTimer(TempHandle, this, &ARSMapGenerator::CheckAllTilesLoaded, 0.2f, false);
 }
 
-bool ARSMapGenerator::IsMapFullyLoaded() const
-{
-    return bIsMapLoaded;
-}
-
+// 전체 타일이 로드되었는지 확인
 void ARSMapGenerator::CheckAllTilesLoaded()
 {
     // 모든 LevelStreamingDynamic이 로드되었는지 확인
@@ -582,4 +602,28 @@ void ARSMapGenerator::CheckAllTilesLoaded()
         GetWorld()->GetTimerManager().SetTimer(RetryHandle, this, &ARSMapGenerator::CheckAllTilesLoaded, 0.3f, false);
     }
 }
+
+// 로딩 완료 상태 반환
+bool ARSMapGenerator::IsMapFullyLoaded() const
+{
+    return bIsMapLoaded;
+}
+
+#pragma endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
