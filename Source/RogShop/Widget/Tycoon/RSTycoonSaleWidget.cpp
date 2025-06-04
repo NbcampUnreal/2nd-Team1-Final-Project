@@ -4,9 +4,11 @@
 #include "RSTycoonSaleWidget.h"
 
 #include "RSTycoonGameModeBase.h"
+#include "RSTycoonOrderSlotWidget.h"
 #include "Components/Button.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
 #include "RogShop/UtilDefine.h"
 #include "Tycoon/NPC/RSTycoonChefCharacter.h"
 #include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
@@ -19,6 +21,29 @@ void URSTycoonSaleWidget::SetGold(int32 Value)
 void URSTycoonSaleWidget::SetCustomerCount(int32 Value)
 {
 	CustomerCountText->SetText(FText::AsNumber(Value));
+}
+
+void URSTycoonSaleWidget::AddOrderSlot(const FFoodOrder* Order)
+{
+	URSTycoonOrderSlotWidget* Widget = CreateWidget<URSTycoonOrderSlotWidget>(GetOwningPlayer(), OrderSlotWidgetClass.Get());
+	Widget->SetOrder(Order);
+	
+	OrderSlotParentBox->AddChildToVerticalBox(Widget);
+}
+
+void URSTycoonSaleWidget::RemoveOrderSlot(const FFoodOrder* Order)
+{
+	for (auto& Widget : OrderSlotParentBox->GetAllChildren())
+	{
+		if (URSTycoonOrderSlotWidget* OrderSlot = Cast<URSTycoonOrderSlotWidget>(Widget))
+		{
+			if (OrderSlot->GetOrder().Get() && OrderSlot->GetOrder().Get() == Order)
+			{
+				OrderSlotParentBox->RemoveChild(Widget);
+				return;
+			}
+		}
+	}
 }
 
 void URSTycoonSaleWidget::NativeConstruct()

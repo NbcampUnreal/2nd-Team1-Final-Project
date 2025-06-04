@@ -6,6 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "RSTycoonSaleWidget.generated.h"
 
+class URSTycoonOrderSlotWidget;
+struct FFoodOrder;
+class UVerticalBox;
 class UProgressBar;
 class ARSTycoonWaiterCharacter;
 class ARSTycoonChefCharacter;
@@ -23,6 +26,8 @@ class ROGSHOP_API URSTycoonSaleWidget : public UUserWidget
 public:
 	void SetGold(int32 Value);
 	void SetCustomerCount(int32 Value);
+	void AddOrderSlot(const FFoodOrder* Order);
+	void RemoveOrderSlot(const FFoodOrder* Order);
 
 protected:
 	virtual void NativeConstruct() override;
@@ -50,6 +55,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UButton* StopSalesButton;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UVerticalBox* OrderSlotParentBox;
+	
 private:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<URSTycoonOrderSlotWidget> OrderSlotWidgetClass;
+	
 	FTimerHandle TimeUIHandle;
 };

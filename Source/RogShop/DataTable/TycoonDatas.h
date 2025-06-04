@@ -6,7 +6,7 @@
 class ARSTycoonCustomerCharacter;
 
 USTRUCT()
-struct ROGSHOP_API  FFoodOrder
+struct ROGSHOP_API FFoodOrder
 {
 	GENERATED_BODY()
 	

@@ -11,7 +11,7 @@ URSBaseInventoryComponent::URSBaseInventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
-	SlotMaxSize = 5;
+	SetMaxSlot(5);
 }
 
 
@@ -20,11 +20,16 @@ void URSBaseInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 	LoadItemData();
-
 }
 
 int32 URSBaseInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 {
+	if (GetFilledSize() >= GetSlotMaxSize())
+	{
+		RS_LOG_C("인벤토리가 가득 찼습니다.", FColor::Red)
+		return -1;
+	}
+
 	if (CheckValidItem(ItemKey))
 	{
 		// 인벤토리 순회
@@ -39,7 +44,7 @@ int32 URSBaseInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 				return i;
 			}
 
-			// 인벤토리에 해당 슬롯이 비어있는 경우 아이템 추가
+			// 인벤토리에 해당 슬롯이 비어있는 경우 아이템 추가			
 			if (ItemSlot.ItemKey == NAME_None)
 			{
 				ItemSlot.ItemKey = ItemKey;
@@ -48,17 +53,8 @@ int32 URSBaseInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 			}
 		}
 	}
-	else
-	{
-		RS_LOG_C("키가 유효하지 않아 아이템을 추가할 수 없습니다.", FColor::Red);
-	}
-
-	if (GetFilledSize() >= GetSlotMaxSize())
-	{
-		RS_LOG_C("인벤토리가 가득 찼습니다.", FColor::Red)
-			return -1;
-	}
-
+	
+	RS_LOG_C("아이템을 추가하지 못했습니다.", FColor::Red);
 	return -1;
 }
 
@@ -89,11 +85,8 @@ int32 URSBaseInventoryComponent::RemoveItem(FName ItemKey, int32 Amount)
 			}
 		}
 	}
-	else
-	{
-		RS_LOG_C("키가 유효하지 않아 아이템을 제거할 수 없습니다.", FColor::Red);
-	}
-
+	
+	RS_LOG_C("아이템을 삭제하지 못했습니다.", FColor::Red);
 	return -1;
 }
 
@@ -141,6 +134,11 @@ void URSBaseInventoryComponent::LoadItemData()
 	// TODO : 가지고 있는 음식 파일 로드
 }
 
+void URSBaseInventoryComponent::SetMaxSlot(int32 Size)
+{
+	ItemList.SetNum(Size);
+}
+
 bool URSBaseInventoryComponent::CheckValidItem(const FName& ItemKey)
 {
 	URSDataSubsystem* Data = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>();
@@ -150,5 +148,6 @@ bool URSBaseInventoryComponent::CheckValidItem(const FName& ItemKey)
 		return true;
 	}
 
+	RS_LOG_C("Key가 유효하지 않습니다.", FColor::Red);
 	return false;
 }

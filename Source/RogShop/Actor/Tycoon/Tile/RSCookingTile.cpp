@@ -4,6 +4,7 @@
 #include "RSCookingTile.h"
 
 #include "RSTycoonInventoryComponent.h"
+#include "RSTycoonPlayerController.h"
 #include "RogShop/UtilDefine.h"
 #include "RogShop/Actor/Tycoon/Food/RSBaseFood.h"
 #include "RogShop/DataTable/CookFoodData.h"
@@ -76,7 +77,8 @@ void ARSCookingTile::Cook(FFoodOrder Order)
 	//사용한 재료 제거
 	for (auto& Need : Data->NeedIngredients)
 	{
-		GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->Inventory->RemoveItem(Need.Key, Need.Value);
+		GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->GetComponentByClass<URSBaseInventoryComponent>()
+		          ->RemoveItem(Need.Key, Need.Value);
 	}
 
 	//5초 후 완성
