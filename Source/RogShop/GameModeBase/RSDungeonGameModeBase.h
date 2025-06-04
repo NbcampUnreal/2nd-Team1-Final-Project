@@ -17,6 +17,8 @@ enum class EMapType : uint8
 	Cave       UMETA(DisplayName = "동굴")
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBossDead);
+
 // 던전 게임모드 클래스 정의
 UCLASS()
 class ROGSHOP_API ARSDungeonGameModeBase : public AGameModeBase
@@ -30,6 +32,12 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override; // 게임 종료 시 호출
 	UFUNCTION()
 	void OnMapReady(); // 맵이 완전히 로드되었을 때 실행되는 콜백
+#pragma endregion
+
+#pragma region Delegate
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnBossDead OnBossDead;
 #pragma endregion
 
 private:
