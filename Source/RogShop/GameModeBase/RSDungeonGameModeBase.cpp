@@ -24,12 +24,12 @@ void ARSDungeonGameModeBase::BeginPlay()// 게임이 시작될 때 호출됨
 
     SpawnMap(CurrentMapType);
 
-
-
     if (MapGeneratorInstance)
     {
         MapGeneratorInstance->OnMapFullyLoaded.AddDynamic(this, &ARSDungeonGameModeBase::OnMapReady);// 맵 로딩 완료 시 콜백 등록
     }
+
+    OnBossDead.AddDynamic(this, &ARSDungeonGameModeBase::SpawnDunNextStagePortal);
 }
 
 
@@ -74,6 +74,19 @@ void ARSDungeonGameModeBase::SpawnMap(EMapType MapType)// 선택된 맵 타입�
             MapGeneratorInstance = GetWorld()->SpawnActor<ARSMapGenerator>(CaveMapGeneratorClass, Location, Rotation, SpawnParams);// 해당 맵 생성기 액터를 월드에 스폰
         }
         break;
+    }
+}
+
+void ARSDungeonGameModeBase::SpawnDunNextStagePortal()
+{
+    if (DunNextStagePortalClass)
+    {
+        FActorSpawnParameters SpawnParameters;
+        SpawnParameters.Owner = this;
+        SpawnParameters.Instigator = nullptr;
+
+        // TODO : 보스 맵의 특정 위치에 생성
+        DunNextStagePortalInstance = GetWorld()->SpawnActor<AActor>(DunNextStagePortalClass, FTransform(), SpawnParameters);
     }
 }
 
