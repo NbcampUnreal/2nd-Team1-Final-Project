@@ -11,8 +11,11 @@ ARSWeaponSpawnPadActor::ARSWeaponSpawnPadActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	PadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PadMesh"));
-	RootComponent = PadMesh;
+    SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
+    SetRootComponent(SceneComp);
+
+    MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+    MeshComp->SetupAttachment(SceneComp);
 }
 
 void ARSWeaponSpawnPadActor::BeginPlay()
@@ -106,7 +109,6 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
         if (GroundWeapon)
         {
             GroundWeapon->InitInteractableWeapon(RandomRowName, WeaponData->ItemStaticMesh, WeaponClassData->WeaponClass);
-            GameMode->AddSpawnedWeapon(GroundWeapon);
         }
         else
         {

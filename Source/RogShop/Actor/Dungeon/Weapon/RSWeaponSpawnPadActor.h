@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "RSWeaponSpawnPadActor.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponPickUp);
+
 UCLASS()
 class ROGSHOP_API ARSWeaponSpawnPadActor : public AActor
 {
@@ -17,10 +19,14 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+private:
+	void SpawnWeapons();
+
 // 컴포넌트
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
-	UStaticMeshComponent* PadMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USceneComponent> SceneComp;
 
-	void SpawnWeapons();
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> MeshComp;
 };
