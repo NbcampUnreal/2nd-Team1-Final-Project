@@ -2,4 +2,21 @@
 
 
 #include "RSBaseAreaGameModeBase.h"
+#include "RSDungeonGroundWeapon.h"
+#include "RSDunPlayerController.h"
 
+void ARSBaseAreaGameModeBase::BeginPlay()
+{
+    Super::BeginPlay();
+
+}
+
+const TArray<FName>& ARSBaseAreaGameModeBase::GetSpawnedWeaponRowNames() const
+{
+    return SpawnedWeaponRowNames;
+}
+
+void ARSBaseAreaGameModeBase::AddSpawnedWeaponRowName(const FName& RowName)
+{
+    SpawnedWeaponRowNames.Add(RowName);
+}

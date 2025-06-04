@@ -24,12 +24,12 @@ void ARSDungeonGameModeBase::BeginPlay()// 게임이 시작될 때 호출됨
 
     SpawnMap(CurrentMapType);
 
-
-
     if (MapGeneratorInstance)
     {
         MapGeneratorInstance->OnMapFullyLoaded.AddDynamic(this, &ARSDungeonGameModeBase::OnMapReady);// 맵 로딩 완료 시 콜백 등록
     }
+
+
 }
 
 

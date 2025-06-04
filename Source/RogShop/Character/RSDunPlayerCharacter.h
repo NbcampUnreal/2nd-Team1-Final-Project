@@ -90,6 +90,17 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> DeathMontage; // 사망
 
+// 던전 재화 관련
+public:
+	float GetLifeEssence() const { return LifeEssence; }
+	void SetLifeEssence(float Amount);
+	void IncreaseLifeEssence(float Amount);
+	void DecreaseLifeEssence(float Amount);
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Money", meta = (AllowPrivateAccess = "true"))
+	float LifeEssence;
+
 // 무기 관련
 public:
 	URSPlayerWeaponComponent* GetRSPlayerWeaponComponent();

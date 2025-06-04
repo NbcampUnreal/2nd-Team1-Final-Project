@@ -11,7 +11,6 @@
 ARSDungeonGroundWeapon::ARSDungeonGroundWeapon()
 {
 	PrimaryActorTick.bCanEverTick = false;
-
 }
 
 void ARSDungeonGroundWeapon::InitInteractableWeapon(FName NewDataTableKey, UStaticMesh* NewMesh, const TSubclassOf<ARSDungeonItemBase> NewWeaponClass)

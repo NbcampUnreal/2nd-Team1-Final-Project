@@ -14,6 +14,7 @@ class URSPlayerInventoryWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotChange, int8, WeaponSlotIndex, FName, WeaponKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnIngredientChange, int32, IngredientSlotIndex, FItemSlot, IngredientItemSlot);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLifeEssenceChange, float, NewLifeEssence);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHPChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMaxHPChange);
 
@@ -79,6 +80,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnIngredientChange OnIngredientChange;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnLifeEssenceChange OnLifeEssenceChange;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnHPChange OnHPChange;
