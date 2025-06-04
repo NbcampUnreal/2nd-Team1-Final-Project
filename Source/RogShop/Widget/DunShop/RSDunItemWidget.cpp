@@ -6,6 +6,8 @@
 #include "RSDunPlayerCharacter.h"
 #include "RSPlayerWeaponComponent.h"
 #include "RSBaseWeapon.h"
+#include "RSGameInstance.h"
+#include "RSBaseRelic.h"
 
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
@@ -50,11 +52,6 @@ void URSDunItemWidget::SetItemData(const FItemInfoData& InItemData)
     }
 }
 
-void URSDunItemWidget::SetParentShop(URSDunShopWidget* InShop)
-{
-    ParentShop = InShop;
-}
-
 void URSDunItemWidget::SetItemRowName(FName RowName)
 {
     CurrentRowName = RowName;
@@ -76,13 +73,11 @@ void URSDunItemWidget::OnBuyClicked()
             BuyBtn->SetIsEnabled(false);
         }
 
-        if (ParentShop)
+        URSGameInstance* GI = Cast<URSGameInstance>(GetGameInstance());
+
+        if (GI)
         {
-            ParentShop->HandleItemPurchase(CurrentRowName);
-        }
-        else
-        {
-            UE_LOG(LogTemp, Warning, TEXT("ParentShop is nullptr"));
+            GI->PurchasedItemIDs.Add(CurrentRowName);  // 아이템 구매 후 중복 생성 방지를 위한 해당 아이디 저장
         }
     }
     else
@@ -116,25 +111,25 @@ bool URSDunItemWidget::BuyItem()
     {
         case EItemType::Relic:
         {
-            // Relic Item Class 적용 로직 필요 . .
+            FDungeonRelicData* RelicClassData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->RelicClass->FindRow<FDungeonRelicData>(CurrentRowName, TEXT("Get RelicData"));
 
-            //switch (ItemData.Rarity)
-            //{
-            //    case ERarity::Common: FinalValue = 10.0f; break;
-            //    case ERarity::Rare: FinalValue = 20.0f; break;
-            //    case ERarity::Epic: FinalValue = 30.0f; break;
-            //    case ERarity::Legendary: FinalValue = 40.0f; break;
-            //}
+            if (RelicClassData->RelicClass)
+            {
+                URSBaseRelic* RelicInstance = NewObject<URSBaseRelic>(GetTransientPackage(), RelicClassData->RelicClass);
 
-            //PlayerChar->IncreaseHP(FinalValue);
+                RelicInstance->ApplyEffect(PlayerChar);
+            }
+            else
+            {
+                UE_LOG(LogTemp, Warning, TEXT("RelicClass is Null"));
+                bIsBuy = false;
+            }
 
             break;
         }
         case EItemType::Weapon:
         {
-            // TODO : 해당 데이터 테이블을 사용하기
-            FDungeonWeaponData* WeaponData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Weapon->FindRow<FDungeonWeaponData>(NAME_None, TEXT("Get WeaponData"));
-            FDungeonWeaponData* WeaponClassData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponClass->FindRow<FDungeonWeaponData>(NAME_None, TEXT("Get WeaponData"));
+            FDungeonWeaponData* WeaponClassData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponClass->FindRow<FDungeonWeaponData>(CurrentRowName, TEXT("Get WeaponData"));
 
             FActorSpawnParameters SpawnParams;
             SpawnParams.Owner = PlayerChar;
