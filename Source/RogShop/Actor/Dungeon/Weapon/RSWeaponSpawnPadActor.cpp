@@ -3,18 +3,18 @@
 #include "RSDataSubsystem.h"
 #include "ItemInfoData.h"
 #include "RSDungeonGroundWeapon.h"
+#include "RSBaseAreaGameModeBase.h"
 
-// Sets default values
+#include "Kismet/GameplayStatics.h"
+
 ARSWeaponSpawnPadActor::ARSWeaponSpawnPadActor()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	PadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PadMesh"));
 	RootComponent = PadMesh;
 }
 
-// Called when the game starts or when spawned
 void ARSWeaponSpawnPadActor::BeginPlay()
 {
 	Super::BeginPlay();
@@ -24,91 +24,97 @@ void ARSWeaponSpawnPadActor::BeginPlay()
 
 void ARSWeaponSpawnPadActor::SpawnWeapons()
 {
-    if (!WeaponDataTable) return;
+    URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
 
-    // 데이터 테이블에서 모든 Row 가져오기
+    if (!DataSubsystem || !DataSubsystem->Weapon || !DataSubsystem->WeaponClass)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("DataSubsystem or DataTables are null"));
+        return;
+    }
+
+    // 데이터 테이블에서 모든 무기 Row 가져오기
     TArray<FItemInfoData*> AllWeapons;
-    WeaponDataTable->GetAllRows(TEXT("WeaponSpawn"), AllWeapons);
+    DataSubsystem->Weapon->GetAllRows(TEXT("WeaponSpawn"), AllWeapons);
     
-    // 데이터 테이블에서 모든 Row에 대한 Row Name을 가져오기
-    TArray<FName> AllRowNames = WeaponDataTable->GetRowNames();
+    // 데이터 테이블에서 모든 무기 Row에 대한 Row Name을 가져오기
+    TArray<FName> AllRowNames = DataSubsystem->Weapon->GetRowNames();
 
-    TArray<FItemInfoData*> FilteredWeapons;
     TArray<FName> FilteredRowNames;
     
+    // 등급이 Common인 무기의 키만 저장
     for (int i = 0; i < AllWeapons.Num(); ++i)
     {
-        if (AllWeapons[i] && AllWeapons[i]->ItemRarity == EItemRarity::Common && AllWeapons[i]->ItemType == EItemType::Weapon)
+        if (AllWeapons[i] && AllWeapons[i]->ItemRarity == EItemRarity::Common)
         {
-            FilteredWeapons.Add(AllWeapons[i]);
             FilteredRowNames.Add(AllRowNames[i]);
         }
     }
 
-    // 선택된 무기 저장용 배열
-    TArray<FItemInfoData*> SelectedWeapons;
-    TArray<FName> SelectedRowNames;
+    FName RandomRowName;
 
-    // 중복 방지를 위해 랜덤 선택 후 제거
-    while (SelectedWeapons.Num() < NumberOfWeapons && FilteredWeapons.Num() > 0)
+    // 게임 모드에서 이미 스폰된 무기 키 목록을 가져오기 위해서 사용
+    ARSBaseAreaGameModeBase* GameMode = Cast<ARSBaseAreaGameModeBase>(UGameplayStatics::GetGameMode(this));
+
+    if (!GameMode)
     {
-        int32 Index = FMath::RandRange(0, FilteredWeapons.Num() - 1);
-        SelectedWeapons.Add(FilteredWeapons[Index]);
-        SelectedRowNames.Add(FilteredRowNames[Index]);
-        FilteredWeapons.RemoveAt(Index); // 이 줄이 "중복 제거" 핵심!
-        FilteredRowNames.RemoveAt(Index); // 이 줄이 "중복 제거" 핵심!
+        UE_LOG(LogTemp, Warning, TEXT("GameMode null"));
+        return;
     }
 
+    // 이미 생성된 RowName은 제외한 후보 목록 만들기
+    TArray<FName> AvailableRowNames;
+    for (const FName& RowName : FilteredRowNames)
+    {
+        if (!GameMode->GetSpawnedWeaponRowNames().Contains(RowName))
+        {
+            AvailableRowNames.Add(RowName);
+        }
+    }
+
+    // 후보 목록에서 랜덤 선택
+    if (AvailableRowNames.Num() > 0)
+    {
+        int32 RandomIndex = FMath::RandRange(0, AvailableRowNames.Num() - 1);
+        RandomRowName = AvailableRowNames[RandomIndex];
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("All Common Weapon Already Spawn"));
+        return;
+    }
+
+    // 선택된 무기 키 기록
+    GameMode->AddSpawnedWeaponRowName(RandomRowName);
+
+    // 선택한 키에 해당하는 무기 스폰
     FVector Origin;
     FVector BoxExtent;
     GetActorBounds(true, Origin, BoxExtent);
+    FVector SpawnLocation = Origin + FVector(0, 0, BoxExtent.Z + 50);
 
-    // 발판의 맨 위, 정중앙 위치
-    FVector BaseLocation = Origin + FVector(0, 0, BoxExtent.Z + 50);
+    FItemInfoData* WeaponData = DataSubsystem->Weapon->FindRow<FItemInfoData>(RandomRowName, TEXT("SpawnWeapon"));
+    FDungeonWeaponData* WeaponClassData = DataSubsystem->WeaponClass->FindRow<FDungeonWeaponData>(RandomRowName, TEXT("SpawnWeapon"));
 
-    // 발판의 Y 길이
-    float PlatformLengthY = BoxExtent.Y * 2;
-
-    // 무기 개수
-    int32 WeaponCount = SelectedWeapons.Num();
-    if (WeaponCount <= 1) return; // 1개면 간격 나눌 필요 없음
-
-    // 무기 간 간격 계산 (발판 길이 내에서 균등하게)
-    float ActualSpacing = PlatformLengthY / (WeaponCount - 1);
-
-    // 시작 위치 (왼쪽 끝부터 시작)
-    FVector StartLocation = BaseLocation - FVector(0, BoxExtent.Y, 0);
-
-    // 선택한 무기들 스폰
-    for (int32 i = 0; i < SelectedWeapons.Num(); ++i)
+    if (WeaponData && WeaponClassData && WeaponData->ItemStaticMesh && WeaponClassData->WeaponClass)
     {
-        FVector SpawnLoc = StartLocation + FVector(0, i * ActualSpacing, 0);
-
         ARSDungeonGroundWeapon* GroundWeapon = GetWorld()->SpawnActor<ARSDungeonGroundWeapon>(
             ARSDungeonGroundWeapon::StaticClass(),
-            SpawnLoc,
+            SpawnLocation,
             FRotator::ZeroRotator
         );
 
-        FName CurDataTableKey = SelectedRowNames[i];
-        UStaticMesh* ItemStaticMesh = SelectedWeapons[i]->ItemStaticMesh;
-
-        FDungeonWeaponData* Data = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponClass->FindRow<FDungeonWeaponData>(CurDataTableKey, TEXT("Get WeaponData"));
-        
-        TSubclassOf<ARSDungeonItemBase> WeaponClass = Data->WeaponClass;
-        if (GroundWeapon && ItemStaticMesh && WeaponClass)
+        if (GroundWeapon)
         {
-            GroundWeapon->InitInteractableWeapon(CurDataTableKey, ItemStaticMesh, WeaponClass);
+            GroundWeapon->InitInteractableWeapon(RandomRowName, WeaponData->ItemStaticMesh, WeaponClassData->WeaponClass);
+            GameMode->AddSpawnedWeapon(GroundWeapon);
         }
-
-        // UE_LOG(LogTemp, Warning, TEXT("SelectedWeapon ID: %s"), *SelectedWeapons[i]->ItemID.ToString());
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("GroundWeapon null"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("GroundWeapon Create Fail"));
     }
 }
-
-// Called every frame
-void ARSWeaponSpawnPadActor::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-

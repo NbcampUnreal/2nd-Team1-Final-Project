@@ -12,27 +12,15 @@ class ROGSHOP_API ARSWeaponSpawnPadActor : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ARSWeaponSpawnPadActor();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, Category = "Weapon")
-	UDataTable* WeaponDataTable;
-
-	UPROPERTY(EditAnywhere, Category = "Weapon")
-	int32 NumberOfWeapons = 3;
-
-	void SpawnWeapons();
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-// ƒƒ∆˜≥Õ∆Æ
+// Ïª¥Ìè¨ÎÑåÌä∏
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
 	UStaticMeshComponent* PadMesh;
+
+	void SpawnWeapons();
 };
