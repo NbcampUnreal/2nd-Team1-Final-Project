@@ -2,6 +2,9 @@
 
 
 #include "RSRelicInventoryWidget.h"
+#include "RSDunPlayerController.h"
+#include "RSDataSubsystem.h"
+#include "ItemInfoData.h"
 #include "Components/UniformGridPanel.h"
 #include "RSInventorySlotWidget.h"
 
@@ -9,8 +12,14 @@ void URSRelicInventoryWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    // 24개 슬롯, 4열 기준 생성
-    CreateSlots(24, 4);
+    ARSDunPlayerController* RSDunPlayerController = GetOwningPlayer<ARSDunPlayerController>();
+    if (RSDunPlayerController)
+    {
+        RSDunPlayerController->OnRelicAdded.AddDynamic(this, &URSRelicInventoryWidget::UpdateSlots);
+
+        // 24개 슬롯, 4열 기준 생성
+        CreateSlots(24, 4);
+    }
 }
 
 void URSRelicInventoryWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
@@ -36,5 +45,49 @@ void URSRelicInventoryWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
             RelicSlots->AddChildToUniformGrid(NewSlotImage, Row, Col);
             InvecntorySlots.Add(NewSlotImage);
         }
+    }
+}
+
+void URSRelicInventoryWidget::UpdateSlots(FName RelicDataTableKey)
+{
+    UWorld* CurrentWorld = GetWorld();
+    if (!CurrentWorld)
+    {
+        return;
+    }
+
+    UGameInstance* CurrentGameInstance = CurrentWorld->GetGameInstance();
+    if (!CurrentGameInstance)
+    {
+        return;
+    }
+
+    URSDataSubsystem* DataSubsystem = CurrentGameInstance->GetSubsystem<URSDataSubsystem>();
+    if (!DataSubsystem)
+    {
+        return;
+    }
+
+    UDataTable* RelicDataTable = DataSubsystem->Relic;
+    if (!RelicDataTable)
+    {
+        return;
+    }
+
+    FItemInfoData* Data = RelicDataTable->FindRow<FItemInfoData>(RelicDataTableKey, TEXT("Get Relic"));
+    if (Data)
+    {
+        for (size_t i = 0; i < InvecntorySlots.Num(); ++i)
+        {
+            FName ItemDataTableKey = InvecntorySlots[i]->GetItemDataTableKey();
+            if (ItemDataTableKey == NAME_None)
+            {
+                InvecntorySlots[i]->SetSlotItemInfo(RelicDataTableKey, Data->ItemIcon, FString(""));
+                return;
+            }
+        }
+
+        // TODO : 비어있는 슬롯이 없는 경우에 대한 처리
+
     }
 }

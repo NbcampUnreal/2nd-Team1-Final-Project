@@ -20,6 +20,9 @@ protected:
 public:
     void CreateSlots(int32 NumSlots, int32 NumColumns);
 
+    UFUNCTION()
+    void UpdateSlots(FName RelicDataTableKey);
+
 private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<UUniformGridPanel> RelicSlots;
@@ -28,5 +31,5 @@ private:
     TSubclassOf<URSInventorySlotWidget> InvecntorySlotWidgetClass;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
-    TArray<URSInventorySlotWidget*> InvecntorySlots;
+    TArray<TObjectPtr<URSInventorySlotWidget>> InvecntorySlots;
 };
