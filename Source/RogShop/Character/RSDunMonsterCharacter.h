@@ -116,8 +116,7 @@ protected:
 	FTimerHandle detectDelayTimer;
 
 	// 데이터 테이블 관련
-	UDataTable* MonsterDataTable_Legacy;	 // 연결된 데이터 테이블
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ActionData")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ActionData")
 	TArray<FMonsterAttackSkillData> MonsterAttackSkills;	// 몬스터 공격 스킬을 모아놓은 구조체를 배열로 저장
 	TArray<FMonsterAttackTraceData> CachedAttackTraceDataArray;	// 공격 트레이스를 캐싱해두고 다른 스킬 사용시 인덱스에서 꺼내 쓰는 용도
 
