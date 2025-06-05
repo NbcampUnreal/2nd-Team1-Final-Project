@@ -14,7 +14,9 @@
 #include "RSDataSubsystem.h"
 #include "Engine/World.h"
 #include "Components/CapsuleComponent.h"
-
+#include "CookFoodData.h"
+#include "RSDungeonGroundIngredient.h"
+#include "RogShop/UtilDefine.h"
 
 // 외부에서 전달받은 월드 및 테이블 초기화
 void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, TSubclassOf<AActor> ShopNPC, TSubclassOf<AActor> DunNextStagePortal)
@@ -367,5 +369,45 @@ void URSSpawnManager::SpawnDunNextStagePortal() // 다음 스테이지 포탈 �
 	if (DunNextStagePortalInstance)
 	{
 		UE_LOG(LogTemp, Log, TEXT("다음 스테이지 포탈 생성 완료"));
+	}
+}
+
+void URSSpawnManager::SpawnMonsterItemDrop(ARSDunMonsterCharacter* SourceMonster, FName MonsterRowName)
+{
+	UWorld* MonsterFromWorld = SourceMonster->GetWorld();
+
+	URSDataSubsystem* DataSubsystem = MonsterFromWorld->GetGameInstance()->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	const FMonsterData* MonsterData = DataSubsystem->Monster->FindRow<FMonsterData>(MonsterRowName, TEXT(""));
+	if (!MonsterData || MonsterData->Ingredients.Num() <= 0)
+	{
+		return;
+	}
+
+	// TODO : 일단 임의로 재료가 하나 떨어뜨릴거라 인덱스값을 0으로 설정! << 나중에 바꿔야할수도 있음
+	// 몬스터 데이터테이블에서 재료 배열의 특정 인덱스로 그 몬스터의 재료 이름에 접근
+	FName IngredientRowName = MonsterData->Ingredients[0].IngredientName;
+	RS_LOG_F("IngredientRowName이 잘 적용 되었습니다! IngredientRowName : %s", *IngredientRowName.ToString());
+
+	// 위에서 찾은 재료 이름으로 재료 데이터 테이블에 접근
+	const FIngredientData* IngredientData = DataSubsystem->Ingredient->FindRow<FIngredientData>(IngredientRowName, TEXT(""));
+	if (!IngredientData)
+	{
+		return;
+	}
+
+	// 먼저 몬스터 아이템 기본형을 스폰시킴(지금은 공중에 위치) << 나중에 바닥으로 위치바꾸거나 중력 활성화 하는식으로 처리
+	ARSDungeonGroundIngredient* DungeonIngredient = MonsterFromWorld->SpawnActor<ARSDungeonGroundIngredient>(
+		ARSDungeonGroundIngredient::StaticClass(), SourceMonster->GetActorTransform());
+
+	// 스폰된 기본형 아이템에 위에서 찾은 해당 몬스터의 재료 데이터 행의 Mesh 속성을 찾아 적용
+	if (DungeonIngredient)
+	{
+		DungeonIngredient->InitItemInfo(IngredientRowName, IngredientData->Mesh);
+		RS_LOG("IngredientData의 Mesh가 잘 적용 되었습니다!");
 	}
 }

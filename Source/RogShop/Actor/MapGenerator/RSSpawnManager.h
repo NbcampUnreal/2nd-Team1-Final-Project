@@ -14,6 +14,7 @@
 class UGameInstance;
 class ATargetPoint;
 class AActor;
+class ARSDunMonsterCharacter;
 
 /**
  * URSSpawnManager
@@ -49,6 +50,8 @@ public:
 	FVector GetNextStageLocation() const;
 	UFUNCTION()
 	void SpawnDunNextStagePortal(); // 던전 다음 스테이지로 가는 포탈을 소환하는 함수
+
+	void SpawnMonsterItemDrop(ARSDunMonsterCharacter* SourceMonster, FName MonsterRowName);	// 몬스터 잡으면 아이템 스폰(드롭)하는 함수
 
 #pragma endregion
 

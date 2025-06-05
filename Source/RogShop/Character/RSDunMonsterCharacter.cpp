@@ -148,10 +148,11 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 		GetMaxHP()
 	);
 	
-	if (GetHP() <= 0)
+	// TODO : 이미 BaseCharacter에서 OnDeath에 대한 처리를 하고 있어서 죽음이 2번처리 되는것이었다. << 나중에 어떤걸 살릴지 선국님께 묻기
+	/*if (GetHP() <= 0)
 	{
 		OnDeath();
-	}
+	}*/
 
 	return Damage;
 }
@@ -328,24 +329,14 @@ void ARSDunMonsterCharacter::OnDeath()
 				DungeonGameMode->OnBossDead.Broadcast();
 			}
 		}
+
+		URSSpawnManager* SpawnManager = NewObject<URSSpawnManager>(CurGameInstance);
+		SpawnManager->SpawnMonsterItemDrop(this, MonsterRowName);
 	}
 }
 
 void ARSDunMonsterCharacter::InitMonsterData()
 {
-	// TODO : 아래 방법의 초기화가 맘에 안들면 다시 주석 풀거나 삭제할 코드
-	/*static const FString DataTablePath = TEXT("/Game/Datas/MonsterDataTable.MonsterDataTable");
-
-	UDataTable* LoadedTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath));
-
-	if (LoadedTable)
-	{
-		MonsterDataTable = LoadedTable;
-	}
-	else
-
-	}*/
-
 	UGameInstance* CurGameInstance = GetGameInstance();
 	if (!CurGameInstance)
 	{
