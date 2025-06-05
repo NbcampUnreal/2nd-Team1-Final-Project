@@ -5,10 +5,25 @@
 #include "RogShop/UtilDefine.h"
 #include "RSDungeonGroundIngredient.h"
 #include "RSDunPlayerController.h"
-#include "GameFramework/Character.h"
+#include "RSDunPlayerCharacter.h"
 #include "RSDataSubsystem.h"
 #include "ItemInfoData.h"
 #include "ItemSlot.h"
+#include "RSDungeonIngredientSaveGame.h"
+#include "Kismet/GameplayStatics.h"
+
+void URSDungeonIngredientInventoryComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	LoadItemData();
+
+	ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
+	if (OwnerCharacter)
+	{
+		OwnerCharacter->OnSaveRequested.AddDynamic(this, &URSDungeonIngredientInventoryComponent::SaveItemData);
+	}
+}
 
 int32 URSDungeonIngredientInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 {
@@ -96,5 +111,35 @@ void URSDungeonIngredientInventoryComponent::DropItem(FName ItemKey)
 
 			RemoveItem(ItemKey, INT32_MAX);
 		}
+	}
+}
+
+void URSDungeonIngredientInventoryComponent::SaveItemData()
+{
+	// SaveGame 오브젝트 생성
+	URSDungeonIngredientSaveGame* IngredientSaveGame = Cast<URSDungeonIngredientSaveGame>(UGameplayStatics::CreateSaveGameObject(URSDungeonIngredientSaveGame::StaticClass()));
+	if (!IngredientSaveGame)
+	{
+		return;
+	}
+
+	// 세이브
+	IngredientSaveGame->ItemList = ItemList;
+}
+
+void URSDungeonIngredientInventoryComponent::LoadItemData()
+{
+	// SaveGame 오브젝트 생성
+	URSDungeonIngredientSaveGame* IngredientSaveGame = Cast<URSDungeonIngredientSaveGame>(UGameplayStatics::CreateSaveGameObject(URSDungeonIngredientSaveGame::StaticClass()));
+	if (!IngredientSaveGame)
+	{
+		return;
+	}
+
+	// 로드
+	TArray<FItemSlot> LoadItemList = IngredientSaveGame->ItemList;
+	for (size_t i = 0; i < LoadItemList.Num(); ++i)
+	{
+		AddItem(LoadItemList[i].ItemKey, LoadItemList[i].Quantity);
 	}
 }
