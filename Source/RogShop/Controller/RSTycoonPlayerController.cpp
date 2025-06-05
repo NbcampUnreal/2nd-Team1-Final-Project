@@ -209,8 +209,10 @@ void ARSTycoonPlayerController::SettingCamera()
 	TopCamera = Cast<ARSTycoonCamera>(TycoonCameras[1 - MainCameraIndex]);
 	SetViewTarget(MainCamera);
 
+	// MaxMainCameraFov = MainCamera->GetTileMapCameraFov();
+	
 	MainCamera->GetCameraComponent()->SetFieldOfView(MaxMainCameraFov);
-	TopCamera->GetCameraComponent()->SetFieldOfView(MaxTopCameraFov);
+	TopCamera->GetCameraComponent()->SetOrthoWidth(MaxTopCameraOrthoWidth);
 	
 	GetWorldTimerManager().SetTimerForNextTick([&]()
 	{
@@ -220,53 +222,61 @@ void ARSTycoonPlayerController::SettingCamera()
 
 void ARSTycoonPlayerController::OnZoomIn()
 {
-	ARSTycoonCamera* Camera;
-	float MaxFov;
 	if (GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->GetState() == ETycoonGameMode::Management)
 	{
-		Camera = TopCamera;
-		MaxFov = MaxTopCameraFov;
+		//탑 카메라
+		float OrthoWidth = TopCamera->GetCameraComponent()->OrthoWidth;
+		if (OrthoWidth >= MaxTopCameraOrthoWidth)
+		{
+			OrthoWidth = MaxTopCameraOrthoWidth;
+			TopCamera->AttachPlayer();
+		}
+
+		OrthoWidth -= OrthoWidthSensitivity;
+		TopCamera->GetCameraComponent()->SetOrthoWidth(OrthoWidth);
 	}
 	else
 	{
-		Camera = MainCamera;
-		MaxFov = MaxMainCameraFov;
+		//메인 카메라
+		float PerspectiveFov = MainCamera->GetCameraComponent()->FieldOfView;
+		if (PerspectiveFov >= MaxMainCameraFov)
+		{
+			PerspectiveFov = MaxMainCameraFov;
+			MainCamera->AttachPlayer();
+		}
+
+		PerspectiveFov -= FovSensitivity;
+		MainCamera->GetCameraComponent()->SetFieldOfView(PerspectiveFov);
 	}
 	
-	float SetFov = Camera->GetCameraComponent()->FieldOfView;
-	if (SetFov >= MaxFov)
-	{
-		SetFov = MaxFov;
-		Camera->AttachPlayer();
-	}
-
-	SetFov -= FovSensitivity;
-	Camera->GetCameraComponent()->SetFieldOfView(SetFov);
 }
 
 void ARSTycoonPlayerController::OnZoomOut()
 {
-	ARSTycoonCamera* Camera;
-	float MaxFov;
 	if (GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->GetState() == ETycoonGameMode::Management)
 	{
-		Camera = TopCamera;
-		MaxFov = MaxTopCameraFov;
+		//탑 카메라
+		float OrthoWidth = TopCamera->GetCameraComponent()->OrthoWidth + OrthoWidthSensitivity;
+		if (OrthoWidth >= MaxTopCameraOrthoWidth)
+		{
+			OrthoWidth = MaxTopCameraOrthoWidth;
+			TopCamera->SetLocationToCenter();
+		}
+	
+		TopCamera->GetCameraComponent()->SetOrthoWidth(OrthoWidth);
 	}
 	else
 	{
-		Camera = MainCamera;
-		MaxFov = MaxMainCameraFov;
-	}
-
-	float SetFov = Camera->GetCameraComponent()->FieldOfView + FovSensitivity;
-	if (SetFov >= MaxFov)
-	{
-		SetFov = MaxFov;
-		Camera->SetLocationToCenter();
-	}
+		//메인 카메라
+		float PerspectiveFov = MainCamera->GetCameraComponent()->FieldOfView + FovSensitivity;
+		if (PerspectiveFov >= MaxMainCameraFov)
+		{
+			PerspectiveFov = MaxMainCameraFov;
+			MainCamera->SetLocationToCenter();
+		}
 	
-	Camera->GetCameraComponent()->SetFieldOfView(SetFov);
+		MainCamera->GetCameraComponent()->SetFieldOfView(PerspectiveFov);
+	}
 }
 #pragma endregion
 

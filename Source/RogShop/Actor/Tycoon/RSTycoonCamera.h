@@ -16,12 +16,16 @@ class ROGSHOP_API ARSTycoonCamera : public AActor
 
 public:
 	ARSTycoonCamera();
-
+	
 	void AttachPlayer();
 	void SetLocationToCenter();
 
+	float GetTileMapCameraFov();
+	float GetCameraOrthoWidth();
 	TObjectPtr<UCameraComponent> GetCameraComponent() const { return Camera; }
-
+	
+	virtual void Tick(float DeltaTime) override;
+	
 private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USceneComponent> Root;
@@ -31,4 +35,13 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UCameraComponent> Camera;
+
+	UPROPERTY(EditAnywhere)
+	float AttachPlusZ = 20;
+
+	UPROPERTY()
+	TWeakObjectPtr<AActor> Target;
+
+	FVector PlusVec;
+
 };
