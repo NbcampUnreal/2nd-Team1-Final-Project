@@ -190,8 +190,8 @@ void ARSMapGenerator::FindBossRoom()
             }
         }
     }
-
     BossRoomPos = Farthest; // 가장 먼 방 = 보스방
+    BossWorldLocation = FVector(BossRoomPos.X * TileSize, BossRoomPos.Y * TileSize, 0.f);
 }
 
 //전체 타일 수가 최소 비율 이상이 되도록 경로 확장

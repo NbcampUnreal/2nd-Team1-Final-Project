@@ -80,6 +80,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<ACharacter> PlayerClass; // 플레이어 캐릭터 클래스
+	UPROPERTY(EditDefaultsOnly, Category = "Potal")
+	TSubclassOf<AActor> BossPortal; // 보스룸 이동 포탈
 #pragma endregion
 
 private:

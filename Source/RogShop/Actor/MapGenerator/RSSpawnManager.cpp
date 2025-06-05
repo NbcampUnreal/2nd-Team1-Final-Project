@@ -269,3 +269,53 @@ FVector URSSpawnManager::GetBossArenaLocation() const
 	UE_LOG(LogTemp, Warning, TEXT("BossArena 태그가 있는 타겟포인트를 찾지 못했습니다."));
 	return FVector::ZeroVector;
 }
+
+AActor* URSSpawnManager::SpawnBossPortal(const FVector& BossWorldLocation, TSubclassOf<AActor> PortalClass)
+{
+	if (!World)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("World가 유효하지 않아 BossPortalTarget 검색 실패"));
+		return nullptr;
+	}
+
+	const float TileHalfSize = 2000.f; // 타일 크기 4000이라 반지름 기준
+
+	for (TActorIterator<ATargetPoint> It(World); It; ++It)
+	{
+		ATargetPoint* Target = *It;
+		if (Target->Tags.Contains(FName("BossPotal")))
+		{
+			FVector TargetLocation = Target->GetActorLocation();
+
+			// 타겟 위치가 보스룸 범위 내인지 확인
+			if (FMath::Abs(TargetLocation.X - BossWorldLocation.X) <= TileHalfSize &&
+				FMath::Abs(TargetLocation.Y - BossWorldLocation.Y) <= TileHalfSize)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("보스 포탈 타겟 발견: %s"), *Target->GetName());
+				FActorSpawnParameters Params;
+				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+				FTransform SpawnTransform;
+				SpawnTransform.SetLocation(BossWorldLocation);
+				SpawnTransform.SetRotation(FQuat::Identity);
+				ARSDunBossRoomPortal* SpawnedPortal = World->SpawnActor<ARSDunBossRoomPortal>(PortalClass, SpawnTransform, Params);
+				UE_LOG(LogTemp, Warning, TEXT("보스포탈 생성 완료"));
+
+
+				if (SpawnedPortal)
+				{
+					FTransform BossArenaTransform;
+					BossArenaTransform.SetLocation(GetBossArenaLocation());
+					BossArenaTransform.SetRotation(FQuat::Identity);
+					SpawnedPortal->SetTargetTransform(BossArenaTransform);
+					UE_LOG(LogTemp, Warning, TEXT("보스 아레나 위치 지정 완료"));
+				}
+
+				return Target;
+			}
+		}
+	}
+
+
+	UE_LOG(LogTemp, Warning, TEXT("보스 타일 범위 내에서 BossArena 타겟을 찾지 못했습니다."));
+	return nullptr;
+}
