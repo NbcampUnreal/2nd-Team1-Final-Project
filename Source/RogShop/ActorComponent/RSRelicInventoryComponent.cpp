@@ -5,6 +5,8 @@
 #include "RogShop/UtilDefine.h"
 #include "RSDataSubsystem.h"
 #include "ItemInfoData.h"
+#include "RSDunPlayerController.h"
+#include "GameFramework/Character.h"
 
 URSRelicInventoryComponent::URSRelicInventoryComponent()
 {
@@ -32,6 +34,21 @@ void URSRelicInventoryComponent::AddRelic(FName RelicKey)
 	{
 		RS_LOG_C("Failed to add item", FColor::Red);
 	}
+
+	ACharacter* CurCharacter = GetOwner<ACharacter>();
+	if (!CurCharacter)
+	{
+		return;
+	}
+
+	// UI 갱신되도록 이벤트 디스패처 호출
+	ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
+	if (!PC)
+	{
+		return;
+	}
+
+	PC->OnRelicAdded.Broadcast(RelicKey);
 }
 
 bool URSRelicInventoryComponent::CheckValidRelicKey(const FName& RelicKey)

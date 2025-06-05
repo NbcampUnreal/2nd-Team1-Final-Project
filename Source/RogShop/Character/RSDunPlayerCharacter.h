@@ -92,14 +92,14 @@ private:
 
 // 던전 재화 관련
 public:
-	float GetLifeEssence() const { return LifeEssence; }
-	void SetLifeEssence(float Amount);
-	void IncreaseLifeEssence(float Amount);
-	void DecreaseLifeEssence(float Amount);
+	int32 GetLifeEssence() const { return LifeEssence; }
+	void SetLifeEssence(int32 Amount);
+	void IncreaseLifeEssence(int32 Amount);
+	void DecreaseLifeEssence(int32 Amount);
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Money", meta = (AllowPrivateAccess = "true"))
-	float LifeEssence;
+	int32 LifeEssence;
 
 // 무기 관련
 public:
@@ -160,4 +160,12 @@ private:
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnSaveRequested OnSaveRequested;	// 저장 요청을 의미하는 이벤트 디스패처
+
+	UFUNCTION()
+	void SaveStatus();
+
+	void LoadStatus();
+
+private:
+	const FString StatusSaveSlotName = TEXT("StatusSaveSlot");
 };

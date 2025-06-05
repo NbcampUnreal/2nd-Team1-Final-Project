@@ -30,25 +30,25 @@ private:
     void HandleLongPress();
 
 private:
-    FTimerHandle HoldTimerHandle;
-
-    // 해강 값이 true인 경우 버튼 입력을 받습니다.
     UPROPERTY()
-    bool bIsPressable;
+    bool bIsPressable;  // 해당 값이 true인 경우 버튼 입력을 받습니다.
 
-    // 마우스 좌클릭 키다운 시간
-    float HoldThreshold;
+    float HoldThreshold;    // 마우스 좌클릭 키다운 시간
+
+    FTimerHandle HoldTimerHandle;
 
 // 현재 슬롯에 대한 아이템 정보
 public:
     void SetSlotItemInfo(FName NewItemDataTableKey, UTexture2D* NewItemImage, FString NewItemCount);
+
+    FName GetItemDataTableKey() const;
 
 private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemInfo", meta = (BindWidget, AllowPrivateAccess = "true"))
     FName ItemDataTableKey;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemInfo", meta = (BindWidget, AllowPrivateAccess = "true"))
-    TObjectPtr<UImage> ItemImage;
+    TObjectPtr<UImage> ItemIcon;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemInfo", meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<UTextBlock> ItemCount;
