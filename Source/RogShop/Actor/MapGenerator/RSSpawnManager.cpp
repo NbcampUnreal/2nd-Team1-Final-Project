@@ -8,6 +8,7 @@
 #include "MonsterSpawnGroupData.h"
 #include "MonsterData.h"
 #include "Algo/RandomShuffle.h"
+#include "RSDungeonGameModeBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "RSDunMonsterCharacter.h"
 #include "RSDataSubsystem.h"
@@ -16,11 +17,12 @@
 
 
 // 외부에서 전달받은 월드 및 테이블 초기화
-void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, TSubclassOf<AActor> ShopNPC)
+void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, TSubclassOf<AActor> ShopNPC, TSubclassOf<AActor> DunNextStagePortal)
 {
 	World = InWorld;
 	ShopNPCClass = ShopNPC;
-	
+	DunNextStagePortalClass = DunNextStagePortal;
+
 	if (!GameInstance) return;
 
 	URSDataSubsystem* DataSubsystem = GameInstance->GetSubsystem<URSDataSubsystem>();
@@ -40,7 +42,13 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, T
 		return;
 	}
 	
-	// OnBossDead.AddDynamic(this, &URSSpawnManager::SpawnDunNextStagePortal);
+	if (AGameModeBase* GM = UGameplayStatics::GetGameMode(World))
+	{
+		if (ARSDungeonGameModeBase* DungeonGM = Cast<ARSDungeonGameModeBase>(GM))
+		{
+			DungeonGM->OnBossDead.AddDynamic(this, &URSSpawnManager::SpawnDunNextStagePortal);
+		}
+	}
 }
 
 // 레벨 내 Monster 태그가 있는 TargetPoint 위치에 몬스터 스폰
@@ -185,9 +193,9 @@ void URSSpawnManager::SpawnShopNPCInLevel()
 }
 
 // Player 태그가 있는 TargetPoint에 플레이어 이동 또는 스폰
-void URSSpawnManager::SpawnPlayerAtStartPoint(TSubclassOf<ACharacter> PlayerClass)
+void URSSpawnManager::SpawnPlayerAtStartPoint()
 {
-	if (!World || !PlayerClass)
+	if (!World)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed CreatePlayerCharacter"));
 		return;
@@ -318,4 +326,46 @@ AActor* URSSpawnManager::SpawnBossPortal(const FVector& BossWorldLocation, TSubc
 
 	UE_LOG(LogTemp, Warning, TEXT("보스 타일 범위 내에서 BossArena 타겟을 찾지 못했습니다."));
 	return nullptr;
+}
+
+FVector URSSpawnManager::GetNextStageLocation() const
+{
+	if (!World)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("월드가 유효하지 않습니다."));
+		return FVector::ZeroVector;
+	}
+
+	for (TActorIterator<ATargetPoint> It(World); It; ++It)
+	{
+		if (It->Tags.Contains(FName("NextPotal")))
+		{
+			UE_LOG(LogTemp, Log, TEXT("NextPotal 타겟포인트 발견: %s"), *It->GetName());
+			return It->GetActorLocation();
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("NextPotal 태그가 있는 타겟포인트를 찾지 못했습니다."));
+	return FVector::ZeroVector;
+}
+
+
+
+void URSSpawnManager::SpawnDunNextStagePortal() // 다음 스테이지 포탈 생성 함수
+{
+	if (!World || !DunNextStagePortalClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("다음 스테이지 포탈 생성 실패: World 또는 PortalClass 누락"));
+		return;
+	}
+
+	FTransform PortalTransform;
+	PortalTransform.SetLocation(GetNextStageLocation()); 
+
+	DunNextStagePortalInstance = World->SpawnActor<AActor>(DunNextStagePortalClass, PortalTransform);
+
+	if (DunNextStagePortalInstance)
+	{
+		UE_LOG(LogTemp, Log, TEXT("다음 스테이지 포탈 생성 완료"));
+	}
 }

@@ -30,7 +30,7 @@ public:
 #pragma region 공개 함수
 
 	// 월드와 데이터테이블 초기화
-	void Initialize(UWorld* InWorld, UGameInstance* GameInstance, TSubclassOf<AActor> ShopNPC);
+	void Initialize(UWorld* InWorld, UGameInstance* GameInstance, TSubclassOf<AActor> ShopNPC, TSubclassOf<AActor> DunNextStagePortal);
 
 	// 몬스터들을 타겟포인트 위치에 스폰
 	void SpawnMonstersInLevel();
@@ -39,13 +39,16 @@ public:
 	void SpawnShopNPCInLevel();
 
 	// 플레이어를 시작 위치에 스폰 또는 이동
-	void SpawnPlayerAtStartPoint(TSubclassOf<ACharacter> PlayerClass);
+	void SpawnPlayerAtStartPoint();
 
 	AActor* SpawnBossPortal(const FVector& BossWorldLocation, TSubclassOf<AActor> PortalClass); // 보스 아레나로 가는 포탈을 소환하는 함수
 
 	// 보스 아레나 위치를 반환하는 함수
 	UFUNCTION(BlueprintCallable)
 	FVector GetBossArenaLocation() const;
+	FVector GetNextStageLocation() const;
+	UFUNCTION()
+	void SpawnDunNextStagePortal(); // 던전 다음 스테이지로 가는 포탈을 소환하는 함수
 
 #pragma endregion
 
