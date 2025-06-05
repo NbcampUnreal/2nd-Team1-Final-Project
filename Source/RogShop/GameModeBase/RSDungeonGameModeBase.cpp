@@ -36,7 +36,7 @@ void ARSDungeonGameModeBase::BeginPlay()// 게임이 시작될 때 호출됨
     CurrentMapType = EMapType::Forest;// 현재 맵 타입을 Forest로 설정
 
     SpawnMap(CurrentMapType);
-    OnBossDead.AddDynamic(this, &ARSDungeonGameModeBase::SpawnDunNextStagePortal);
+
 }
 
 
@@ -82,18 +82,7 @@ void ARSDungeonGameModeBase::SpawnMap(EMapType MapType)// 선택된 맵 타입�
         break;
     }
 }
-void ARSDungeonGameModeBase::SpawnDunNextStagePortal()
-{
-    if (DunNextStagePortalClass)
-    {
-        FActorSpawnParameters SpawnParameters;
-        SpawnParameters.Owner = this;
-        SpawnParameters.Instigator = nullptr;
 
-        // TODO : 보스 맵의 특정 위치에 생성
-        DunNextStagePortalInstance = GetWorld()->SpawnActor<AActor>(DunNextStagePortalClass, FTransform(), SpawnParameters);
-    }
-}
 void ARSDungeonGameModeBase::OnMapReady()// 맵 로딩이 완료되었을 때 호출되는 함수
 {
     UE_LOG(LogTemp, Warning, TEXT("맵 로딩 완료, 캐릭터 생성 시작"));
