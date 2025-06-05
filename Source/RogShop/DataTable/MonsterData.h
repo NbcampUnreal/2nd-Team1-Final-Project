@@ -23,27 +23,40 @@ enum class ESkillType : uint8
 };
 
 USTRUCT(BlueprintType)
+struct FMonsterIngredientsData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	FName IngredientName;
+
+	UPROPERTY(EditDefaultsOnly)
+	float DropRate;  // 드랍 확률 (0~1)
+};
+
+USTRUCT(BlueprintType)
 struct FMonsterAttackTraceData
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	FVector TraceBoxHalfSize;	// 트레이스 반경 (옆으로 얼마만큼 쏠지)
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	float TraceLength;			// 트레이스 길이 (앞으로 얼마만큼 쏠지)
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	float TraceForwardOffset;	// 소켓 시작점 앞뒤 보정
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	float TraceRightOffset;     // 소켓 시작점 좌우 보정
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	float TraceUpOffset;        // 소켓 시작점 높이 보정
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	FName SocketLocation;		// 트레이스가 쏴질 소켓의 시작점
 
 };
@@ -79,22 +92,25 @@ struct ROGSHOP_API FMonsterData : public FTableRowBase
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	EMonsterType MonsterType;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FText Description;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FMonsterAttackSkillData> MonsterAttackSkills;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TArray<FMonsterIngredientsData> Ingredients;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float MaxHP;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float MoveSpeed;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<ARSDunMonsterCharacter> MonsterClass;
 
 };

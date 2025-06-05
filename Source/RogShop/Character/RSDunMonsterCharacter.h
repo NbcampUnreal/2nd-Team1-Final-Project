@@ -28,13 +28,7 @@ public:
 
 	// 애니메이션 실행 함수
 	void PlayAttackAnim();
-	void PlayDeathAnim();
-	UFUNCTION(BlueprintCallable)
-	void PlaySkill_1();
-	UFUNCTION(BlueprintCallable)
-	void PlaySkill_2();
-	UFUNCTION(BlueprintCallable)
-	void PlaySkill_3();
+	void PlaySpawnAnim();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void PlayAction(int32 actionIdx, FVector interestedPos);
@@ -46,6 +40,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetActionLength();//컨트롤러에 캐릭터가 몇가지의 액션을 가지고 있는지 반환
+
+	UFUNCTION(BlueprintCallable)
+	bool GetIsMeleeSkill(int32 actionIdx);//근접공격 여부 판별, 컨트롤러 전달
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnEveryMontageEnded(UAnimMontage* montage, bool bInterrupted);  //모든 몽타주에 대해 검사함
@@ -72,23 +69,15 @@ public:
 	TArray<AActor*> GetPatrolPoint();
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Status")
-	void OnDeath();
+	virtual void OnDeath() override;
+
 	UFUNCTION(BlueprintCallable)
 	void InitMonsterData();
 
 protected:
 	// 애니메이션 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> DeathMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> SkillMontage_1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> SkillMontage_2;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> SkillMontage_3;
+	TObjectPtr<UAnimMontage> SpawnMontage;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int32 skillActionIdx;//어떤 스킬을 시전하는 중인지 저장, PerformActionTrace 에서 해당 변수를 참조해 행동하도록 함
@@ -127,8 +116,7 @@ protected:
 	FTimerHandle detectDelayTimer;
 
 	// 데이터 테이블 관련
-	UDataTable* MonsterDataTable;	 // 연결된 데이터 테이블
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ActionData")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ActionData")
 	TArray<FMonsterAttackSkillData> MonsterAttackSkills;	// 몬스터 공격 스킬을 모아놓은 구조체를 배열로 저장
 	TArray<FMonsterAttackTraceData> CachedAttackTraceDataArray;	// 공격 트레이스를 캐싱해두고 다른 스킬 사용시 인덱스에서 꺼내 쓰는 용도
 
