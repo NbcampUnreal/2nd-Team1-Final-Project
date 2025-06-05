@@ -46,7 +46,7 @@ void ARSDunMonsterCharacter::BeginPlay()
 		animInstance->OnMontageEnded.AddDynamic(this, &ARSDunMonsterCharacter::OnEveryMontageEnded);
 	}
 
-	InitMonsterData();
+	//InitMonsterData();
 }
 
 void ARSDunMonsterCharacter::PlayAttackAnim()
@@ -403,7 +403,7 @@ void ARSDunMonsterCharacter::InitMonsterData()
 				CachedAttackTraceDataArray.Add(Skill.AttackTrace);
 			}
 
-			RS_LOG_F("MaxHP가 잘 적용 되었습니다! MoveSpeed : %f", Row->MaxHP);
+			RS_LOG_F("MaxHP가 잘 적용 되었습니다! MaxHP : %f", Row->MaxHP);
 			RS_LOG_F("MoveSpeed가 잘 적용 되었습니다! MoveSpeed : %f", Row->MoveSpeed);
 		}
 		else
@@ -414,7 +414,7 @@ void ARSDunMonsterCharacter::InitMonsterData()
 	}
 }
 
-int ARSDunMonsterCharacter::GetActionLength()
+int32 ARSDunMonsterCharacter::GetActionLength()
 {
 	return MonsterAttackSkills.Num();
 }

@@ -4,6 +4,7 @@
 #include "RSCookingTile.h"
 
 #include "RSTycoonInventoryComponent.h"
+#include "RSTycoonPlayerController.h"
 #include "RogShop/UtilDefine.h"
 #include "RogShop/Actor/Tycoon/Food/RSBaseFood.h"
 #include "RogShop/DataTable/CookFoodData.h"
@@ -73,15 +74,20 @@ void ARSCookingTile::Cook(FFoodOrder Order)
 	FCookFoodData* Data = GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Food
 	                                       ->FindRow<FCookFoodData>(Order.FoodKey, TEXT("Get FoodData"));
 
+	
+	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	check(Controller)
 	//사용한 재료 제거
 	for (auto& Need : Data->NeedIngredients)
 	{
-		GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->Inventory->RemoveItem(Need.Key, Need.Value);
+		Controller->GetInventoryComponent()->RemoveItem(Need.Key, Need.Value);
 	}
-
+	
 	//5초 후 완성
 	FTimerHandle Timer;
 	GetWorldTimerManager().SetTimer(Timer, this, &ARSCookingTile::FinishCook, 5.f, false);
+	
+	Controller->ActiveOrderSlot(Order, Timer);
 }
 
 void ARSCookingTile::FinishCook()
@@ -93,25 +99,27 @@ void ARSCookingTile::FinishCook()
 
 	ARSBaseFood* Food = GetWorld()->SpawnActor<ARSBaseFood>(Data->ActorType);
 	Food->SetActorLocation(FoodLocation->GetComponentLocation());
-	Food->WantCustomer = CookingFoodOrder.Customer;
-
-	//오더 제거
-
-	CookingFoodOrder.FoodKey = FName();
-	CookingFoodOrder.Customer = nullptr;
-
+	Food->Order = CookingFoodOrder;
+	
+	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	check(Controller)
+	Controller->FinishOrderSlot(CookingFoodOrder);
+	
 	CookedFood = Food;
+	CookingFoodOrder = FFoodOrder();	//초기화
 }
 
 void ARSCookingTile::TakeFood(ACharacter* InteractCharacter)
 {
 	if (CookedFood)
 	{
+		//오더 슬롯 제거
+		GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->RemoveOrderSlot(CookedFood->Order);
+		
 		IRSCanPickup* CanPickupCharacter = Cast<IRSCanPickup>(InteractCharacter);
 		check(CanPickupCharacter)
-
 		CanPickupCharacter->Pickup(CookedFood);
-
+		
 		CookedFood = nullptr;
 		State = ECookingState::None;
 	}

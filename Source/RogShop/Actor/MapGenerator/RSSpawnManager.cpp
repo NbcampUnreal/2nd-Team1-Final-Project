@@ -39,6 +39,8 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, T
 		UE_LOG(LogTemp, Warning, TEXT("Failed Update MonsterStateGroup"));
 		return;
 	}
+	
+	// OnBossDead.AddDynamic(this, &URSSpawnManager::SpawnDunNextStagePortal);
 }
 
 // 레벨 내 Monster 태그가 있는 TargetPoint 위치에 몬스터 스폰

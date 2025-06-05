@@ -15,7 +15,21 @@ class ROGSHOP_API URSTycoonInventoryComponent : public URSBaseInventoryComponent
 public:
 	URSTycoonInventoryComponent();
 
-protected:
-	virtual void BeginPlay() override;
+	UFUNCTION(BlueprintCallable)
+	void Open();
+	UFUNCTION(BlueprintCallable)
+	void Close();
+	UFUNCTION(BlueprintCallable, CallInEditor)
+	virtual void SaveItemData() override;
+	
+	virtual void LoadItemData() override;
+	
+	void SetInventorySlot(int32 Value);
+	
+	bool IsOpen() const { return bIsOpen; };
 
+private:
+	const FString SaveSlotName = "TycoonGame";
+
+	bool bIsOpen;
 };

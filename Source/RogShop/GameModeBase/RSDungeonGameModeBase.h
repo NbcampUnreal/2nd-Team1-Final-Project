@@ -36,6 +36,12 @@ public:
 	void NotifyMapReady(); //MapGenerator가 호출하는 함수
 #pragma endregion
 
+#pragma region Delegate
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnBossDead OnBossDead;
+#pragma endregion
+
 private:
 #pragma region 비공개 함수
 	void SpawnMap(EMapType MapType); // 선택된 맵 타입에 따라 맵 생성
@@ -76,6 +82,7 @@ public:
 
 private:
 	FTimerHandle WaitForMapHandle; // 맵 로딩 후 딜레이 핸들
+<<<<<<< HEAD
 
 #pragma region StageClear
 public:
@@ -96,4 +103,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StageClear", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<AActor> DunNextStagePortalInstance;
 #pragma endregion
+=======
+>>>>>>> dev
 };

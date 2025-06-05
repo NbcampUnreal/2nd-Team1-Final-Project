@@ -28,15 +28,16 @@ public:
 	ARSTycoonGameModeBase();
 
 	void StartSale();
+	void SettingGame();
 	void AddOrder(FFoodOrder Order);
 	void RemoveOrder(FFoodOrder Order);
 	void RemoveCustomer(ARSTycoonCustomerCharacter* Customer);
 	void AddNPC(ARSTycoonNPC* NPC);
-	float GetGameTime() const; //게임 경과 시간을 반환해줌
 	void EndSale();
 	void StartWait();
 	void StartManagement();
 
+	float GetGameTime() const; //게임 경과 시간을 반환해줌
 	const TArray<FFoodOrder>& GetOrders() const { return FoodOrders; }
 	const TArray<TWeakObjectPtr<ARSTycoonCustomerCharacter>>& GetCustomers() const { return Customers; }
 	const TArray<ARSTycoonNPC*>& GetNPCs() const { return NPCs; }
@@ -45,15 +46,14 @@ public:
 	float GetSaleRealPlayMinute() const { return SalePlayMinute; }
 	ETycoonGameMode GetState() const { return State; }
 
+protected:
+	virtual void BeginPlay() override;
+
 private:
 	void CreateCustomer();
 	bool CanOrder(FName& OutOrderFood);
 
 	int32 GetCurrentCustomerCount() const { return Customers.Num(); }
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<URSTycoonInventoryComponent> Inventory; //인벤토리
 
 private:
 	//오더 들어온 음식의 Key들

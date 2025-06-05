@@ -5,7 +5,9 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "RSIngredientInventoryWidget.h"
 #include "RSTycoonGameModeBase.h"
+#include "RSTycoonInventoryComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -20,6 +22,11 @@
 
 
 #pragma region Mode
+ARSTycoonPlayerController::ARSTycoonPlayerController()
+{
+	InventoryComponent = CreateDefaultSubobject<URSTycoonInventoryComponent>(TEXT("Inventory"));
+}
+
 void ARSTycoonPlayerController::StartWaitMode()
 {
 	FInputModeGameAndUI InputMode;
@@ -57,6 +64,26 @@ void ARSTycoonPlayerController::StartManagementMode()
 #pragma endregion
 
 #pragma region Widget
+void ARSTycoonPlayerController::AddOrderSlot(FFoodOrder Order)
+{
+	SaleWidget->AddOrderSlot(Order);
+}
+
+void ARSTycoonPlayerController::RemoveOrderSlot(FFoodOrder Order)
+{
+	SaleWidget->RemoveOrderSlot(Order);
+}
+
+void ARSTycoonPlayerController::ActiveOrderSlot(FFoodOrder Order, FTimerHandle CookTimer)
+{
+	SaleWidget->StartOrderSlotAnimation(Order, CookTimer);
+}
+
+void ARSTycoonPlayerController::FinishOrderSlot(FFoodOrder Order)
+{
+	SaleWidget->StopOrderSlotAnimation(Order);
+}
+
 void ARSTycoonPlayerController::ChangeMainWidget(UUserWidget* ActiveWidget)
 {
 	WaitWidget->RemoveFromParent();
@@ -69,12 +96,14 @@ void ARSTycoonPlayerController::ChangeMainWidget(UUserWidget* ActiveWidget)
 
 void ARSTycoonPlayerController::SettingWidget()
 {
-	WaitWidget = CreateWidget<URSTycoonWaitWidget>(this, WaitWidgetType.Get());
-	SaleWidget = CreateWidget<URSTycoonSaleWidget>(this, SaleWidgetType.Get());
-	SaleResultWidget = CreateWidget<URSTycoonSaleResultWidget>(this, SaleResultWidgetType.Get());
-	ManagementWidget = CreateWidget<URSTycoonManagementWidget>(this, ManagementWidgetType.Get());
+	//MainWidget
+	WaitWidget = CreateWidget<URSTycoonWaitWidget>(this, WaitWidgetClass.Get());
+	SaleWidget = CreateWidget<URSTycoonSaleWidget>(this, SaleWidgetClass.Get());
+	SaleResultWidget = CreateWidget<URSTycoonSaleResultWidget>(this, SaleResultWidgetClass.Get());
+	ManagementWidget = CreateWidget<URSTycoonManagementWidget>(this, ManagementWidgetClass.Get());
 
-	StartWaitMode();
+	//SubWidget
+	InventoryWidget = CreateWidget<URSIngredientInventoryWidget>(this, InventoryWidgetClass.Get());
 }
 #pragma endregion
 

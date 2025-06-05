@@ -17,4 +17,7 @@ public:
 	GENERATED_TILE()
 	
 	virtual void Interact(ACharacter* InteractCharacter) override;
+
+public:
+	static const int32 AddInventorySlot;
 };

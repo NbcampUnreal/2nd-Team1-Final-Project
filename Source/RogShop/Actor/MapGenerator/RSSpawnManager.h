@@ -71,4 +71,13 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "BossRoomPortal", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<AActor> DunBossRoomPortalInstance;
 #pragma endregion
+
+#pragma region StageClear
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StageClear", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AActor> DunNextStagePortalClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StageClear", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<AActor> DunNextStagePortalInstance;
+#pragma endregion
 };

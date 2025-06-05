@@ -33,5 +33,5 @@ private:
     TSubclassOf<URSInventorySlotWidget> InvecntorySlotWidgetClass;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
-    TArray<URSInventorySlotWidget*> InvecntorySlots;
+    TArray<TObjectPtr<URSInventorySlotWidget>> InvecntorySlots;
 };

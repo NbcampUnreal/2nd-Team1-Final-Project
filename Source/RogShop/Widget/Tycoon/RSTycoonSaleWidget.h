@@ -3,9 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TycoonDatas.h"
 #include "Blueprint/UserWidget.h"
 #include "RSTycoonSaleWidget.generated.h"
 
+class URSTycoonOrderSlotWidget;
+class UVerticalBox;
 class UProgressBar;
 class ARSTycoonWaiterCharacter;
 class ARSTycoonChefCharacter;
@@ -23,16 +26,22 @@ class ROGSHOP_API URSTycoonSaleWidget : public UUserWidget
 public:
 	void SetGold(int32 Value);
 	void SetCustomerCount(int32 Value);
+	void AddOrderSlot(FFoodOrder Order);
+	void RemoveOrderSlot(FFoodOrder Order);
+	void StartOrderSlotAnimation(FFoodOrder Order, FTimerHandle CookTimer);
+	void StopOrderSlotAnimation(FFoodOrder Order);
 
 protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 	
 private:
-	void UpdateTimeUI();
-
 	UFUNCTION()
 	void OnClickStopSales();
+	
+	void UpdateTimeUI();
+
+	URSTycoonOrderSlotWidget* GetOrderSlotWidget(FFoodOrder Order);
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
@@ -50,6 +59,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UButton* StopSalesButton;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UVerticalBox* OrderSlotParentBox;
+	
 private:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<URSTycoonOrderSlotWidget> OrderSlotWidgetClass;
+	
 	FTimerHandle TimeUIHandle;
 };
