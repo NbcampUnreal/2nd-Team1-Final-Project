@@ -33,6 +33,7 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
 	GetMesh()->SetGenerateOverlapEvents(true);
 
+	MonsterDataTable_Legacy = nullptr;
 	DrawDebugLineSeconds = 5.0f;
 	DrawDebugLineThickness = 5.0f;
 }
@@ -358,14 +359,14 @@ void ARSDunMonsterCharacter::InitMonsterData()
 		return;
 	}
 
-	UDataTable* MonsterDataTable = DataSubsystem->Monster;
-	if (!MonsterDataTable)
+	MonsterDataTable_Legacy = DataSubsystem->Monster;
+	if (!MonsterDataTable_Legacy)
 	{
 		RS_LOG("몬스터 데이터테이블 로딩 실패");
 		return;
 	}
 	
-	FMonsterData* Row = MonsterDataTable->FindRow<FMonsterData>(MonsterRowName, TEXT("Set MonsterRowName"));
+	FMonsterData* Row = MonsterDataTable_Legacy->FindRow<FMonsterData>(MonsterRowName, TEXT("Set MonsterRowName"));
 
 	if (Row)
 	{

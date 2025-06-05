@@ -18,7 +18,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-// Îç∞Ïù¥ÌÑ∞ Í¥ÄÎ¶¨
+// µ•¿Ã≈Õ ∞¸∏Æ
 public:	
 	void AddRelic(FName RelicKey);
 
@@ -31,9 +31,8 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Relic", meta = (AllowPrivateAccess = true))
 	TArray<FName> RelicList;
 
-// ÏÑ∏Ïù¥Î∏å/Î°úÎìú
+// ºº¿Ã∫Í/∑ŒµÂ
 public:
-	UFUNCTION()
 	void SaveRelicData();
 
 private:

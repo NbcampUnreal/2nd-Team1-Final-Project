@@ -26,7 +26,6 @@ public:
 
 // 세이브/로드
 public:
-	UFUNCTION()
 	virtual void SaveItemData() override;
 	virtual void LoadItemData() override;
 };
