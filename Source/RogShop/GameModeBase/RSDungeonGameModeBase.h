@@ -18,6 +18,7 @@ enum class EMapType : uint8
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBossDead);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMapFullyLoaded);
 
 // 던전 게임모드 클래스 정의
 UCLASS()
@@ -29,9 +30,10 @@ public:
 #pragma region 공개 함수
 	ARSDungeonGameModeBase(); // 생성자
 	virtual void BeginPlay() override; // 게임 시작 시 호출
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override; // 게임 종료 시 호출
 	UFUNCTION()
 	void OnMapReady(); // 맵이 완전히 로드되었을 때 실행되는 콜백
+	UFUNCTION()
+	void NotifyMapReady(); //MapGenerator가 호출하는 함수
 #pragma endregion
 
 private:
@@ -79,6 +81,9 @@ private:
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnBossDead OnBossDead;
+	UPROPERTY(BlueprintAssignable)
+	FOnMapFullyLoaded OnMapFullyLoaded; 
+
 
 private:
 	UFUNCTION()

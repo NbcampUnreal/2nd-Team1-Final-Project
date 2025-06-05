@@ -40,6 +40,9 @@ public:
 	// 플레이어를 시작 위치에 스폰 또는 이동
 	void SpawnPlayerAtStartPoint(TSubclassOf<ACharacter> PlayerClass);
 
+	UFUNCTION(BlueprintCallable)
+	FVector GetBossArenaLocation() const;
+
 #pragma endregion
 
 private:
