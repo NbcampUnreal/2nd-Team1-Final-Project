@@ -81,81 +81,22 @@ void ARSDunMonsterCharacter::PlayAttackAnim()
 	}
 }
 
-void ARSDunMonsterCharacter::PlaySkill_1()
+void ARSDunMonsterCharacter::PlayDeathAnim()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-	if (MonsterAttackSkills.Num() > 0)
+	if (DeathMontage)
 	{
-		UAnimMontage* AttackMontage01 = MonsterAttackSkills[1].SkillMontage;
-
-		if (IsValid(AnimInstance) == true && IsValid(AttackMontage01) == true)
-		{
-			if (AnimInstance->Montage_IsPlaying(AttackMontage01) == false)
-			{
-				AnimInstance->Montage_Play(AttackMontage01);
-				RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다");
-			}
-		}
-	}
-	else
-	{
-		RS_LOG("해당 몬스터의 스킬 구조체가 비어있습니다.");
+		PlayAnimMontage(DeathMontage);
+		RS_LOG("몬스터가 죽는 애니메이션이 실행되었습니다");
 	}
 }
 
-void ARSDunMonsterCharacter::PlaySkill_2()
+void ARSDunMonsterCharacter::PlaySpawnAnim()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-	if (MonsterAttackSkills.Num() > 0)
+	if (SpawnMontage)
 	{
-		UAnimMontage* AttackMontage01 = MonsterAttackSkills[1].SkillMontage;
-
-		if (IsValid(AnimInstance) == true && IsValid(AttackMontage01) == true)
-		{
-			if (AnimInstance->Montage_IsPlaying(AttackMontage01) == false)
-			{
-				AnimInstance->Montage_Play(AttackMontage01);
-				RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다");
-			}
-		}
-	}
-	else
-	{
-		RS_LOG("해당 몬스터의 스킬 구조체가 비어있습니다.");
+		PlayAnimMontage(SpawnMontage);
 	}
 }
-
-void ARSDunMonsterCharacter::PlaySkill_3()
-{
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-	if (MonsterAttackSkills.Num() > 0)
-	{
-		UAnimMontage* AttackMontage01 = MonsterAttackSkills[1].SkillMontage;
-
-		if (IsValid(AnimInstance) == true && IsValid(AttackMontage01) == true)
-		{
-			if (AnimInstance->Montage_IsPlaying(AttackMontage01) == false)
-			{
-				AnimInstance->Montage_Play(AttackMontage01);
-				RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다");
-			}
-		}
-	}
-	else
-	{
-		RS_LOG("해당 몬스터의 스킬 구조체가 비어있습니다.");
-	}
-}
-
-/*void ARSDunMonsterCharacter::PlaySkill_4(FVector interrestedPos)
-{
-	FRotator spawnRot = FRotator::ZeroRotator;
-	//GetWorld()->SpawnActor<ARSDunMonsterCharacter>(ARSDunMonsterCharacter::StaticClass(), interrestedPos, spawnRot);
-	GetWorld()->SpawnActor<AActor>(servant, interrestedPos, spawnRot);
-}*/
 
 void ARSDunMonsterCharacter::PlayAction_Implementation(int32 actionIdx, FVector interestedPos)
 {
@@ -462,4 +403,9 @@ void ARSDunMonsterCharacter::InitMonsterData()
 int32 ARSDunMonsterCharacter::GetActionLength()
 {
 	return MonsterAttackSkills.Num();
+}
+
+bool ARSDunMonsterCharacter::GetIsMeleeSkill(int32 actionIdx)
+{
+	return MonsterAttackSkills[actionIdx].skillType == ESkillType::Melee;
 }

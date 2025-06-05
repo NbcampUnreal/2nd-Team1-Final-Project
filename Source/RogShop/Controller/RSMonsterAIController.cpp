@@ -31,76 +31,6 @@ void ARSMonsterAIController::SetRVOAvoidanceEnabled(bool bEnable)//path find bot
 	}	
 }
 
-void ARSMonsterAIController::AIAttack()
-{
-	APawn* ctrlPawn = GetPawn();
-	if (ctrlPawn)
-	{
-		ARSDunMonsterCharacter* ctrlChr;
-		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
-		if (ctrlChr)
-		{
-			ctrlChr->PlayAttackAnim();
-		}
-	}
-}
-
-void ARSMonsterAIController::AISkill_1()
-{
-	APawn* ctrlPawn = GetPawn();
-	if (ctrlPawn)
-	{
-		ARSDunMonsterCharacter* ctrlChr;
-		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
-		if (ctrlChr)
-		{
-			ctrlChr->PlaySkill_1();
-		}
-	}
-}
-
-void ARSMonsterAIController::AISkill_2()
-{
-	APawn* ctrlPawn = GetPawn();
-	if (ctrlPawn)
-	{
-		ARSDunMonsterCharacter* ctrlChr;
-		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
-		if (ctrlChr)
-		{
-			ctrlChr->PlaySkill_2();
-		}
-	}
-}
-
-void ARSMonsterAIController::AISkill_3()
-{
-	APawn* ctrlPawn = GetPawn();
-	if (ctrlPawn)
-	{
-		ARSDunMonsterCharacter* ctrlChr;
-		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
-		if (ctrlChr)
-		{
-			ctrlChr->PlaySkill_3();
-		}
-	}
-}
-
-void ARSMonsterAIController::AISkill_4(FVector interrestedPos)
-{
-	APawn* ctrlPawn = GetPawn();
-	if (ctrlPawn)
-	{
-		ARSDunMonsterCharacter* ctrlChr;
-		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
-		if (ctrlChr)
-		{
-//			ctrlChr->PlaySkill_4(interrestedPos);
-		}
-	}
-}
-
 void ARSMonsterAIController::AISkillAction(int32 actionIdx, FVector interestedPos)
 {
 	APawn* ctrlPawn = GetPawn();
@@ -113,6 +43,36 @@ void ARSMonsterAIController::AISkillAction(int32 actionIdx, FVector interestedPo
 			ctrlChr->PlayAction(actionIdx, interestedPos);
 		}
 	}
+}
+
+void ARSMonsterAIController::CtrlPlaySpawnAnim()
+{
+	APawn* ctrlPawn = GetPawn();
+	if (ctrlPawn)
+	{
+		ARSDunMonsterCharacter* ctrlChr;
+		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
+		if (ctrlChr)
+		{
+			ctrlChr->PlaySpawnAnim();
+		}
+	}
+}
+
+bool ARSMonsterAIController::IsMeleeSkill(int32 actionIdx)
+{
+	APawn* ctrlPawn = GetPawn();
+	bool bIsMelee;
+	if (ctrlPawn)
+	{
+		ARSDunMonsterCharacter* ctrlChr;
+		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
+		if (ctrlChr)
+		{
+			bIsMelee = ctrlChr->GetIsMeleeSkill(actionIdx);
+		}
+	}
+	return bIsMelee;
 }
 
 void ARSMonsterAIController::MoveToCurrentPatrolPoint()
