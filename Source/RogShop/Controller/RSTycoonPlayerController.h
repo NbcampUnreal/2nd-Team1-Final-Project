@@ -98,8 +98,8 @@ private:
 	void SettingInput();
 
 	UFUNCTION()
-	void OnTileClick();
-
+	void OnClickTile();
+	
 public:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputAction> MoveAction;
@@ -110,16 +110,52 @@ public:
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputAction> TileClickAction;
-
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputAction> ZoomInAction;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputAction> ZoomOutAction;
+	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputMappingContext> IMC;
 
 #pragma endregion
 
+#pragma region Camera
+public:
+	void SetCameraLocationToCenter();
+	
+private:
+	void SettingCamera();
+	
+	UFUNCTION()
+	void OnZoomIn();
+	UFUNCTION()
+	void OnZoomOut();
+
+protected:
+	UPROPERTY(EditAnywhere)
+	float FovSensitivity = 4.f;
+	
+	UPROPERTY(EditAnywhere) // 임시
+	float MaxMainCameraFov = 90.f;
+
+	UPROPERTY(EditAnywhere) // 임시
+	float MaxTopCameraFov = 90.f;
+
+private:
+	UPROPERTY()
+	TObjectPtr<ARSTycoonCamera> MainCamera;
+
+	UPROPERTY()
+	TObjectPtr<ARSTycoonCamera> TopCamera;
+	
+#pragma endregion 
+
 public:
 	void AddGold(int32 Value);
 	void AddCustomerCount(int32 Value);
-	void SetCameraLocationToCenter();
 
 	int32 GetGold() const { return Gold; }
 	int32 GetCustomerCount() const { return CustomerCount; }
@@ -128,20 +164,11 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-private:
-	void SettingCamera();
-
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<URSTycoonInventoryComponent> InventoryComponent; //인벤토리
-
+	
 private:
-	UPROPERTY()
-	TObjectPtr<ARSTycoonCamera> MainCamera;
-
-	UPROPERTY()
-	TObjectPtr<ARSTycoonCamera> TopCamera;
-
 	int32 Gold;
 	int32 CustomerCount;
 };

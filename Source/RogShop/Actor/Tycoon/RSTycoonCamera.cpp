@@ -3,6 +3,7 @@
 
 #include "RSTycoonCamera.h"
 
+#include "RSTileMap.h"
 #include "RSTycoonPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -30,18 +31,19 @@ void ARSTycoonCamera::AttachPlayer()
 	check(Player)
 
 	AttachToActor(Player, FAttachmentTransformRules::KeepWorldTransform);
-	SetActorRelativeLocation(FVector::ZeroVector);
+	
+	FVector Lo = SpringArm->GetRelativeLocation();
+	Lo.Z *= -1;
+	SetActorRelativeLocation(-Lo);
 }
 
-void ARSTycoonCamera::ReturnToOrigin()
+void ARSTycoonCamera::SetLocationToCenter()
 {
+	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
+	check(TileMap)
+	
+	FVector Center = TileMap->GetMapCenter();
+
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	SetActorTransform(OriginTransform);
-}
-
-void ARSTycoonCamera::BeginPlay()
-{
-	Super::BeginPlay();
-
-	OriginTransform = GetActorTransform();
+	SetActorLocation(Center);
 }
