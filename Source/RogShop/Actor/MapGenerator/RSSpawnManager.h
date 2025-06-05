@@ -6,10 +6,11 @@
 #include "UObject/NoExportTypes.h"
 #include "Engine/DataTable.h"
 #include "GameFramework/Character.h"
+#include "RSDunBossRoomPortal.h" 
 
 #include "RSSpawnManager.generated.h"
 
-// 몬스터 데이터 전방 선언
+// 전방 선언
 class UGameInstance;
 class ATargetPoint;
 class AActor;
@@ -40,6 +41,12 @@ public:
 	// 플레이어를 시작 위치에 스폰 또는 이동
 	void SpawnPlayerAtStartPoint(TSubclassOf<ACharacter> PlayerClass);
 
+	AActor* SpawnBossPortal(const FVector& BossWorldLocation, TSubclassOf<AActor> PortalClass); // 보스 아레나로 가는 포탈을 소환하는 함수
+
+	// 보스 아레나 위치를 반환하는 함수
+	UFUNCTION(BlueprintCallable)
+	FVector GetBossArenaLocation() const;
+
 #pragma endregion
 
 private:
@@ -63,10 +70,7 @@ private:
 #pragma region BossRoomPortal
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "BossRoomPortal", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<AActor> DunBossRoomPortalClass;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "BossRoomPortal", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<AActor> DunBossRoomPortalInstance;
+	TSubclassOf<ARSDunBossRoomPortal> DunBossRoomPortalClass;
 #pragma endregion
 
 #pragma region StageClear

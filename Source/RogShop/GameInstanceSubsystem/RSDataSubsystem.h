@@ -38,6 +38,7 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UDataTable> ForestMonsterSpawnGroup;
+
 	UPROPERTY()
-	TObjectPtr<UDataTable> MonsterStateGroup;
+	TObjectPtr<UDataTable> Monster;
 };

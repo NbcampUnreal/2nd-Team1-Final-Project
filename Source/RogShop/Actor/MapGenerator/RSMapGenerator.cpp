@@ -5,11 +5,12 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine/LevelStreamingDynamic.h"
 #include "Kismet/GameplayStatics.h"
+#include "RSDungeonGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "Containers/Queue.h"
 
 
-#pragma region 생성자 및 초기화
 //생성자 : 기본값 초기화
 ARSMapGenerator::ARSMapGenerator()
 {
@@ -36,9 +37,7 @@ void ARSMapGenerator::BeginPlay()
     SpawnTiles();
     SpawnBossArenaLevel();
 }
-#pragma endregion
 
-#pragma region 메인 경로 생성 관련
 //현재 위치에서 이동할 수 있는 다음 위치 선택
 FVector2D ARSMapGenerator::GetNextDirection(FVector2D Current, TArray<FVector2D>& Visited)
 {
@@ -107,9 +106,7 @@ void ARSMapGenerator::GenerateMainPath()
         Path.Add(Current);
     }
 }
-#pragma endregion
 
-#pragma region 유틸리티 함수
 // 외부에서 시드를 설정할 함수
 void ARSMapGenerator::SetSeed(int32 RandomSeed)
 {
@@ -149,9 +146,6 @@ int32 ARSMapGenerator::GetAvailableNeighborCount(FVector2D Pos)
     return Count;
 }
 
-#pragma endregion
-
-#pragma region  경로 확장 및 보스방 결정
 //보스방 위치 찾기 (BFS로 가장 먼 타일 탐색)
 void ARSMapGenerator::FindBossRoom()
 {
@@ -196,8 +190,8 @@ void ARSMapGenerator::FindBossRoom()
             }
         }
     }
-
     BossRoomPos = Farthest; // 가장 먼 방 = 보스방
+    BossWorldLocation = FVector(BossRoomPos.X * TileSize, BossRoomPos.Y * TileSize, 0.f);
 }
 
 //전체 타일 수가 최소 비율 이상이 되도록 경로 확장
@@ -296,9 +290,6 @@ void ARSMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
     }
 }
 
-#pragma endregion
-
-#pragma region 타일 스폰 관련 함수
 //타일 스폰 (연결 방향에 따라 회전 설정)
 void ARSMapGenerator::SpawnTiles()
 {
@@ -559,11 +550,6 @@ void ARSMapGenerator::ChooseShopTile()
 }
 
 
-#pragma endregion
-
-
-#pragma region 맵 로딩 상태 체크
-
 // 스트리밍 타일 로딩 완료 시 호출
 void ARSMapGenerator::OnSubLevelLoaded()
 {
@@ -578,11 +564,10 @@ void ARSMapGenerator::OnSubLevelLoaded()
 // 전체 타일이 로드되었는지 확인
 void ARSMapGenerator::CheckAllTilesLoaded()
 {
-    // 모든 LevelStreamingDynamic이 로드되었는지 확인
     bool bAllLoaded = true;
     for (ULevelStreamingDynamic* Level : SpawnedLevels)
     {
-        if (!Level || !Level->IsLevelLoaded())
+        if (!Level || !Level->IsLevelLoaded() || !Level->IsLevelVisible())
         {
             bAllLoaded = false;
             break;
@@ -592,12 +577,21 @@ void ARSMapGenerator::CheckAllTilesLoaded()
     if (bAllLoaded && !bIsMapLoaded)
     {
         bIsMapLoaded = true;
-        OnMapFullyLoaded.Broadcast(); // GameMode에 알림
-        UE_LOG(LogTemp, Warning, TEXT("모든 타일 로딩 완료. Broadcast 실행"));
+
+        //GameMode에 직접 알림
+        if (AGameModeBase* GM = UGameplayStatics::GetGameMode(this))
+        {
+            if (ARSDungeonGameModeBase* MyGM = Cast<ARSDungeonGameModeBase>(GM))
+            {
+                MyGM->NotifyMapReady(); // 델리게이트 호출
+            }
+        }
+
+        UE_LOG(LogTemp, Warning, TEXT("모든 타일 로딩 완료. GameMode로 전달"));
     }
     else if (!bAllLoaded)
     {
-        // 다시 체크 예약
+        // 재시도 타이머
         FTimerHandle RetryHandle;
         GetWorld()->GetTimerManager().SetTimer(RetryHandle, this, &ARSMapGenerator::CheckAllTilesLoaded, 0.3f, false);
     }
@@ -608,8 +602,6 @@ bool ARSMapGenerator::IsMapFullyLoaded() const
 {
     return bIsMapLoaded;
 }
-
-#pragma endregion
 
 
 

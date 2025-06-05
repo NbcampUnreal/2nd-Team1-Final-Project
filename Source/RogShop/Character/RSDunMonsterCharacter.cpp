@@ -6,6 +6,8 @@
 #include "RogShop/RSMonsterAttackTraceDefine.h"
 #include "RogShop/UtilDefine.h"
 #include "Components/CapsuleComponent.h"
+#include "RSDataSubsystem.h"
+#include "RSDungeonGameModeBase.h"
 
 ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 {
@@ -296,6 +298,8 @@ TArray<AActor*> ARSDunMonsterCharacter::GetPatrolPoint()
 
 void ARSDunMonsterCharacter::OnDeath()
 {
+	Super::OnDeath();
+
 	AController* ctrl = GetController();
 	if (ctrl)
 	{
@@ -303,12 +307,44 @@ void ARSDunMonsterCharacter::OnDeath()
 		ctrl->Destroy();
 	}
 
-	PlayDeathAnim();
+	UGameInstance* CurGameInstance = GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	UDataTable* MonsterDataTable = DataSubsystem->Monster;
+	if (!MonsterDataTable)
+	{
+		return;
+	}
+
+	FMonsterData* Data = MonsterDataTable->FindRow<FMonsterData>(MonsterRowName, TEXT("Get MonsterData"));
+	if (Data)
+	{
+		// 몬스터의 타입이 보스인 경우 게임모드에 보스가 죽었다고 알린다.
+		EMonsterType CurMonsterType = Data->MonsterType;
+		if (CurMonsterType == EMonsterType::Boss)
+		{
+			ARSDungeonGameModeBase* DungeonGameMode = Cast<ARSDungeonGameModeBase>(GetWorld()->GetAuthGameMode());
+			if (DungeonGameMode)
+			{
+				DungeonGameMode->OnBossDead.Broadcast();
+			}
+		}
+	}
 }
 
 void ARSDunMonsterCharacter::InitMonsterData()
 {
-	static const FString DataTablePath = TEXT("/Game/Datas/MonsterDataTable.MonsterDataTable");
+	// TODO : 아래 방법의 초기화가 맘에 안들면 다시 주석 풀거나 삭제할 코드
+	/*static const FString DataTablePath = TEXT("/Game/Datas/MonsterDataTable.MonsterDataTable");
 
 	UDataTable* LoadedTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath));
 
@@ -317,35 +353,50 @@ void ARSDunMonsterCharacter::InitMonsterData()
 		MonsterDataTable = LoadedTable;
 	}
 	else
+
+	}*/
+
+	UGameInstance* CurGameInstance = GetGameInstance();
+	if (!CurGameInstance)
 	{
-		RS_LOG("몬스터 데이터테이블 로딩 실패");
+		return;
 	}
 
-	if (MonsterDataTable)
+	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
 	{
-		FMonsterData* Row = MonsterDataTable->FindRow<FMonsterData>(MonsterRowName, TEXT("Set MonsterRowName"));
+		return;
+	}
 
-		if (Row)
+	MonsterDataTable = DataSubsystem->MonsterStateGroup;
+	if (!MonsterDataTable)
+	{
+		RS_LOG("몬스터 데이터테이블 로딩 실패");
+		return;
+	}
+	
+	FMonsterData* Row = MonsterDataTable->FindRow<FMonsterData>(MonsterRowName, TEXT("Set MonsterRowName"));
+
+	if (Row)
+	{
+		MonsterAttackSkills = Row->MonsterAttackSkills;
+
+		ChangeMaxHP(Row->MaxHP);
+		ChangeHP(Row->MaxHP);	// TODO : 이거 뭔가 비효율적인데 InitMaxHP() 함수에 MaxHP랑 HP둘다 조정하는거 만들어주세용 선국님
+		ChangeMoveSpeed(Row->MoveSpeed);
+
+		for (const FMonsterAttackSkillData& Skill : MonsterAttackSkills)
 		{
-			MonsterAttackSkills = Row->MonsterAttackSkills;
-
-			ChangeMaxHP(Row->MaxHP);
-			ChangeHP(Row->MaxHP);	// TODO : 이거 뭔가 비효율적인데 InitMaxHP() 함수에 MaxHP랑 HP둘다 조정하는거 만들어주세용 선국님
-			ChangeMoveSpeed(Row->MoveSpeed);
-
-			for (const FMonsterAttackSkillData& Skill : MonsterAttackSkills)
-			{
-				CachedAttackTraceDataArray.Add(Skill.AttackTrace);
-			}
-
-			RS_LOG_F("MaxHP가 잘 적용 되었습니다! MaxHP : %f", Row->MaxHP);
-			RS_LOG_F("MoveSpeed가 잘 적용 되었습니다! MoveSpeed : %f", Row->MoveSpeed);
+			CachedAttackTraceDataArray.Add(Skill.AttackTrace);
 		}
-		else
-		{
-			RS_LOG_F("MaxHP 적용 실패: %s", *MonsterRowName.ToString());
-			RS_LOG_F("MoveSpeed 적용 실패: %s", *MonsterRowName.ToString());
-		}
+
+		RS_LOG_F("MaxHP가 잘 적용 되었습니다! MaxHP : %f", Row->MaxHP);
+		RS_LOG_F("MoveSpeed가 잘 적용 되었습니다! MoveSpeed : %f", Row->MoveSpeed);
+	}
+	else
+	{
+		RS_LOG_F("MaxHP 적용 실패: %s", *MonsterRowName.ToString());
+		RS_LOG_F("MoveSpeed 적용 실패: %s", *MonsterRowName.ToString());
 	}
 }
 

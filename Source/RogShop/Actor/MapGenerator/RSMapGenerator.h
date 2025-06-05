@@ -10,8 +10,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "RSMapGenerator.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMapFullyLoaded);
-
 UENUM()
 enum class EDir : uint8
 {
@@ -113,8 +111,9 @@ public:
 
 	UPROPERTY()
 	TArray<ULevelStreamingDynamic*> SpawnedLevels; // 스트리밍된 레벨 목록
-	UPROPERTY(BlueprintAssignable, Category = "Map")
-	FOnMapFullyLoaded OnMapFullyLoaded; // 맵이 완전히 로드되었을 때 호출되는 델리게이트
+	UPROPERTY()
+	FVector BossWorldLocation;
+
 #pragma endregion
 
 #pragma region 비공개 변수

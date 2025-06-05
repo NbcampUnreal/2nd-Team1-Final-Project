@@ -70,7 +70,8 @@ public:
 	TArray<AActor*> GetPatrolPoint();
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Status")
-	void OnDeath();
+	virtual void OnDeath() override;
+
 	UFUNCTION(BlueprintCallable)
 	void InitMonsterData();
 

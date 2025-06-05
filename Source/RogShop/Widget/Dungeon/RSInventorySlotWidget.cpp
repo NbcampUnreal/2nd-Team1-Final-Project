@@ -63,20 +63,25 @@ void URSInventorySlotWidget::HandleLongPress()
     }
 }
 
-void URSInventorySlotWidget::SetSlotItemInfo(FName NewItemDataTableKey, UTexture2D* NewItemImage, FString NewItemCount)
+void URSInventorySlotWidget::SetSlotItemInfo(FName NewItemDataTableKey, UTexture2D* NewItemIcon, FString NewItemCount)
 {
     if (NewItemDataTableKey != NAME_None)
     {
         ItemDataTableKey = NewItemDataTableKey;
     }
 
-    if (ItemImage)
+    if (ItemIcon)
     {
-        ItemImage->SetBrushFromTexture(NewItemImage);
+        ItemIcon->SetBrushFromTexture(NewItemIcon);
     }
 
     if (ItemCount)
     {
         ItemCount->SetText(FText::FromString(NewItemCount));
     }
+}
+
+FName URSInventorySlotWidget::GetItemDataTableKey() const
+{
+    return ItemDataTableKey;
 }
