@@ -36,7 +36,6 @@ void ARSDungeonGameModeBase::BeginPlay()// 게임이 시작될 때 호출됨
     CurrentMapType = EMapType::Forest;// 현재 맵 타입을 Forest로 설정
 
     SpawnMap(CurrentMapType);
-
 }
 
 
@@ -100,9 +99,9 @@ void ARSDungeonGameModeBase::OnMapReady()// 맵 로딩이 완료되었을 때 �
         {
             UE_LOG(LogTemp, Warning, TEXT("스폰 매니저 생성"));
             GameMode->SpawnManager = NewObject<URSSpawnManager>(GameMode, URSSpawnManager::StaticClass());
-            GameMode->SpawnManager->Initialize(GameMode->GetWorld(), GameMode->GetGameInstance(), GameMode->ShopNPCClass);
+            GameMode->SpawnManager->Initialize(GameMode->GetWorld(), GameMode->GetGameInstance(), GameMode->ShopNPCClass,GameMode->DunNextStagePortalClass);
 
-            GameMode->SpawnManager->SpawnPlayerAtStartPoint(GameMode->PlayerClass);
+            GameMode->SpawnManager->SpawnPlayerAtStartPoint();
             GameMode->SpawnManager->SpawnMonstersInLevel();
             GameMode->SpawnManager->SpawnShopNPCInLevel();
             GameMode->SpawnManager->SpawnBossPortal(GameMode->MapGeneratorInstance->BossWorldLocation, GameMode->BossPortal);
