@@ -111,6 +111,9 @@ public:
 
 	UPROPERTY()
 	TArray<ULevelStreamingDynamic*> SpawnedLevels; // 스트리밍된 레벨 목록
+	UPROPERTY()
+	FVector BossWorldLocation;
+
 #pragma endregion
 
 #pragma region 비공개 변수
