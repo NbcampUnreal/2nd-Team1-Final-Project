@@ -40,6 +40,7 @@ public:
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnBossDead OnBossDead;
+
 	UPROPERTY(BlueprintAssignable)
 	FOnMapFullyLoaded OnMapFullyLoaded;
 #pragma endregion
@@ -85,16 +86,4 @@ public:
 private:
 	FTimerHandle WaitForMapHandle; // 맵 로딩 후 딜레이 핸들
 
-
-private:
-	UFUNCTION()
-	void SpawnDunNextStagePortal();
-
-private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StageClear", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<AActor> DunNextStagePortalClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StageClear", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<AActor> DunNextStagePortalInstance;
-#pragma endregion
 };
