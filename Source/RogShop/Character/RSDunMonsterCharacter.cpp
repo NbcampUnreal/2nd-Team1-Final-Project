@@ -6,6 +6,8 @@
 #include "RogShop/RSMonsterAttackTraceDefine.h"
 #include "RogShop/UtilDefine.h"
 #include "Components/CapsuleComponent.h"
+#include "RSDataSubsystem.h"
+#include "RSDungeonGameModeBase.h"
 
 ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 {
@@ -77,12 +79,6 @@ void ARSDunMonsterCharacter::PlayAttackAnim()
 	{
 		RS_LOG("해당 몬스터의 스킬 구조체가 비어있습니다.");
 	}
-}
-
-void ARSDunMonsterCharacter::PlayDeathAnim()
-{
-	PlayAnimMontage(DeathMontage);
-	RS_LOG("몬스터가 죽는 애니메이션이 실행되었습니다");
 }
 
 void ARSDunMonsterCharacter::PlaySkill_1()
@@ -361,6 +357,8 @@ TArray<AActor*> ARSDunMonsterCharacter::GetPatrolPoint()
 
 void ARSDunMonsterCharacter::OnDeath()
 {
+	Super::OnDeath();
+
 	AController* ctrl = GetController();
 	if (ctrl)
 	{
@@ -368,7 +366,38 @@ void ARSDunMonsterCharacter::OnDeath()
 		ctrl->Destroy();
 	}
 
-	PlayDeathAnim();
+	UGameInstance* CurGameInstance = GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	UDataTable* MonsterDataTable = DataSubsystem->Monster;
+	if (!MonsterDataTable)
+	{
+		return;
+	}
+
+	FMonsterData* Data = MonsterDataTable->FindRow<FMonsterData>(MonsterRowName, TEXT("Get MonsterData"));
+	if (Data)
+	{
+		// 몬스터의 타입이 보스인 경우 게임모드에 보스가 죽었다고 알린다.
+		EMonsterType CurMonsterType = Data->MonsterType;
+		if (CurMonsterType == EMonsterType::Boss)
+		{
+			ARSDungeonGameModeBase* DungeonGameMode = Cast<ARSDungeonGameModeBase>(GetWorld()->GetAuthGameMode());
+			if (DungeonGameMode)
+			{
+				DungeonGameMode->OnBossDead.Broadcast();
+			}
+		}
+	}
 }
 
 void ARSDunMonsterCharacter::InitMonsterData()

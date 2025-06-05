@@ -10,7 +10,6 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "Components/CapsuleComponent.h"
 #include "RSPlayerWeaponComponent.h"
 #include "RSRelicInventoryComponent.h"
 #include "RSDungeonIngredientInventoryComponent.h"
@@ -184,16 +183,6 @@ float ARSDunPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& 
 void ARSDunPlayerCharacter::OnDeath()
 {
     Super::OnDeath();
-
-    // 레벨 오브젝트를 제외한 모든 오브젝트와 충돌하지 않도록 콜리전 설정 변경
-    GetCapsuleComponent()->SetCollisionProfileName(TEXT("DeadCharacter"));
-    GetMesh()->SetCollisionProfileName(TEXT("DeadCharacter"));
-
-    // 사망 애니메이션 재생
-    if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
-    {
-        AnimInstance->Montage_Play(DeathMontage);
-    }
 
     // 더이상 입력받지 못하도록 플레이어 컨트롤러의 입력 매핑 제거
     if (ARSDunPlayerController* PlayerController = Cast<ARSDunPlayerController>(GetController()))

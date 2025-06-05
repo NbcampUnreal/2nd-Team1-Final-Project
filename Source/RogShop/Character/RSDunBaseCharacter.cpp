@@ -3,6 +3,7 @@
 
 #include "RSDunBaseCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 
 ARSDunBaseCharacter::ARSDunBaseCharacter()
 {	
@@ -121,4 +122,14 @@ bool ARSDunBaseCharacter::GetIsDead()
 void ARSDunBaseCharacter::OnDeath()
 {
 	bIsDead = true;
+
+	// 레벨 오브젝트를 제외한 모든 오브젝트와 충돌하지 않도록 콜리전 설정 변경
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("DeadCharacter"));
+	GetMesh()->SetCollisionProfileName(TEXT("DeadCharacter"));
+
+	// 사망 애니메이션 재생
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		AnimInstance->Montage_Play(DeathMontage);
+	}
 }

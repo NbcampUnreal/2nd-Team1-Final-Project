@@ -28,7 +28,6 @@ public:
 
 	// 애니메이션 실행 함수
 	void PlayAttackAnim();
-	void PlayDeathAnim();
 	UFUNCTION(BlueprintCallable)
 	void PlaySkill_1();
 	UFUNCTION(BlueprintCallable)
@@ -72,15 +71,13 @@ public:
 	TArray<AActor*> GetPatrolPoint();
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy|Status")
-	void OnDeath();
+	virtual void OnDeath() override;
+
 	UFUNCTION(BlueprintCallable)
 	void InitMonsterData();
 
 protected:
 	// 애니메이션 몽타주
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> DeathMontage;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> SkillMontage_1;
 

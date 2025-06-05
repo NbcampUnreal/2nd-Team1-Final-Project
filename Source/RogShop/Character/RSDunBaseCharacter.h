@@ -42,9 +42,16 @@ private:
 
 // 상태 관련
 public:
-	bool GetIsDead();
 	virtual void OnDeath();
+
+	bool GetIsDead();
+
 private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, category = "State", meta = (AllowPrivateAccess = "true"))
 	bool bIsDead;
+
+// 애니메이션 몽타주 관련
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage")
+	TObjectPtr<UAnimMontage> DeathMontage; // 사망
 };
