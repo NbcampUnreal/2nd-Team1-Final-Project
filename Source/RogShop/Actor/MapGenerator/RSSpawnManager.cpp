@@ -130,7 +130,7 @@ void URSSpawnManager::SpawnMonstersInLevel()
 				FTransform SpawnTransform = Target->GetActorTransform(); // 위치 정보
 
 				FActorSpawnParameters Params;
-				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 				// 몬스터 생성
 				ARSDunMonsterCharacter* Monster = World->SpawnActor<ARSDunMonsterCharacter>(
