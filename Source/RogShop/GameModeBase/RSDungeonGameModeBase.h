@@ -88,4 +88,8 @@ public:
 private:
 	FTimerHandle WaitForMapHandle; // 맵 로딩 후 딜레이 핸들
 
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StageClear", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AActor> DunNextStagePortalClass;
+#pragma endregion
 };
