@@ -29,7 +29,7 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, T
 	if (!DataSubsystem) return;
 
 	MonsterRawTable = DataSubsystem->ForestMonsterSpawnGroup;
-	MonsterStateTable = DataSubsystem->MonsterStateGroup;
+	MonsterStateTable = DataSubsystem->Monster;
 
 	if (!MonsterRawTable)
 	{
@@ -38,7 +38,7 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, T
 	}
 	if (!MonsterStateTable)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed Update MonsterStateGroup"));
+		UE_LOG(LogTemp, Warning, TEXT("Failed Update Monster"));
 		return;
 	}
 	

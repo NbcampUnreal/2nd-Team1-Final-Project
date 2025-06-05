@@ -6,6 +6,8 @@
 #include "RogShop/RSMonsterAttackTraceDefine.h"
 #include "RogShop/UtilDefine.h"
 #include "Components/CapsuleComponent.h"
+#include "RSDataSubsystem.h"
+#include "RSDungeonGameModeBase.h"
 
 ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 {
@@ -31,7 +33,7 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
 	GetMesh()->SetGenerateOverlapEvents(true);
 
-	MonsterDataTable = nullptr;
+	MonsterDataTable_Legacy = nullptr;
 	DrawDebugLineSeconds = 5.0f;
 	DrawDebugLineThickness = 5.0f;
 }
@@ -79,87 +81,13 @@ void ARSDunMonsterCharacter::PlayAttackAnim()
 	}
 }
 
-void ARSDunMonsterCharacter::PlayDeathAnim()
+void ARSDunMonsterCharacter::PlaySpawnAnim()
 {
-	PlayAnimMontage(DeathMontage);
-	RS_LOG("몬스터가 죽는 애니메이션이 실행되었습니다");
-}
-
-void ARSDunMonsterCharacter::PlaySkill_1()
-{
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-	if (MonsterAttackSkills.Num() > 0)
+	if (SpawnMontage)
 	{
-		UAnimMontage* AttackMontage01 = MonsterAttackSkills[1].SkillMontage;
-
-		if (IsValid(AnimInstance) == true && IsValid(AttackMontage01) == true)
-		{
-			if (AnimInstance->Montage_IsPlaying(AttackMontage01) == false)
-			{
-				AnimInstance->Montage_Play(AttackMontage01);
-				RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다");
-			}
-		}
-	}
-	else
-	{
-		RS_LOG("해당 몬스터의 스킬 구조체가 비어있습니다.");
+		PlayAnimMontage(SpawnMontage);
 	}
 }
-
-void ARSDunMonsterCharacter::PlaySkill_2()
-{
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-	if (MonsterAttackSkills.Num() > 0)
-	{
-		UAnimMontage* AttackMontage01 = MonsterAttackSkills[1].SkillMontage;
-
-		if (IsValid(AnimInstance) == true && IsValid(AttackMontage01) == true)
-		{
-			if (AnimInstance->Montage_IsPlaying(AttackMontage01) == false)
-			{
-				AnimInstance->Montage_Play(AttackMontage01);
-				RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다");
-			}
-		}
-	}
-	else
-	{
-		RS_LOG("해당 몬스터의 스킬 구조체가 비어있습니다.");
-	}
-}
-
-void ARSDunMonsterCharacter::PlaySkill_3()
-{
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-	if (MonsterAttackSkills.Num() > 0)
-	{
-		UAnimMontage* AttackMontage01 = MonsterAttackSkills[1].SkillMontage;
-
-		if (IsValid(AnimInstance) == true && IsValid(AttackMontage01) == true)
-		{
-			if (AnimInstance->Montage_IsPlaying(AttackMontage01) == false)
-			{
-				AnimInstance->Montage_Play(AttackMontage01);
-				RS_LOG("몬스터가 공격하는 애니메이션이 잘 나왔습니다");
-			}
-		}
-	}
-	else
-	{
-		RS_LOG("해당 몬스터의 스킬 구조체가 비어있습니다.");
-	}
-}
-
-/*void ARSDunMonsterCharacter::PlaySkill_4(FVector interrestedPos)
-{
-	FRotator spawnRot = FRotator::ZeroRotator;
-	//GetWorld()->SpawnActor<ARSDunMonsterCharacter>(ARSDunMonsterCharacter::StaticClass(), interrestedPos, spawnRot);
-	GetWorld()->SpawnActor<AActor>(servant, interrestedPos, spawnRot);
-}*/
 
 void ARSDunMonsterCharacter::PlayAction_Implementation(int32 actionIdx, FVector interestedPos)
 {
@@ -361,6 +289,8 @@ TArray<AActor*> ARSDunMonsterCharacter::GetPatrolPoint()
 
 void ARSDunMonsterCharacter::OnDeath()
 {
+	Super::OnDeath();
+
 	AController* ctrl = GetController();
 	if (ctrl)
 	{
@@ -368,12 +298,44 @@ void ARSDunMonsterCharacter::OnDeath()
 		ctrl->Destroy();
 	}
 
-	PlayDeathAnim();
+	UGameInstance* CurGameInstance = GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	UDataTable* MonsterDataTable = DataSubsystem->Monster;
+	if (!MonsterDataTable)
+	{
+		return;
+	}
+
+	FMonsterData* Data = MonsterDataTable->FindRow<FMonsterData>(MonsterRowName, TEXT("Get MonsterData"));
+	if (Data)
+	{
+		// 몬스터의 타입이 보스인 경우 게임모드에 보스가 죽었다고 알린다.
+		EMonsterType CurMonsterType = Data->MonsterType;
+		if (CurMonsterType == EMonsterType::Boss)
+		{
+			ARSDungeonGameModeBase* DungeonGameMode = Cast<ARSDungeonGameModeBase>(GetWorld()->GetAuthGameMode());
+			if (DungeonGameMode)
+			{
+				DungeonGameMode->OnBossDead.Broadcast();
+			}
+		}
+	}
 }
 
 void ARSDunMonsterCharacter::InitMonsterData()
 {
-	static const FString DataTablePath = TEXT("/Game/Datas/MonsterDataTable.MonsterDataTable");
+	// TODO : 아래 방법의 초기화가 맘에 안들면 다시 주석 풀거나 삭제할 코드
+	/*static const FString DataTablePath = TEXT("/Game/Datas/MonsterDataTable.MonsterDataTable");
 
 	UDataTable* LoadedTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath));
 
@@ -382,39 +344,59 @@ void ARSDunMonsterCharacter::InitMonsterData()
 		MonsterDataTable = LoadedTable;
 	}
 	else
+
+	}*/
+
+	UGameInstance* CurGameInstance = GetGameInstance();
+	if (!CurGameInstance)
 	{
-		RS_LOG("몬스터 데이터테이블 로딩 실패");
+		return;
 	}
 
-	if (MonsterDataTable)
+	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
 	{
-		FMonsterData* Row = MonsterDataTable->FindRow<FMonsterData>(MonsterRowName, TEXT("Set MonsterRowName"));
+		return;
+	}
 
-		if (Row)
+	MonsterDataTable_Legacy = DataSubsystem->Monster;
+	if (!MonsterDataTable_Legacy)
+	{
+		RS_LOG("몬스터 데이터테이블 로딩 실패");
+		return;
+	}
+	
+	FMonsterData* Row = MonsterDataTable_Legacy->FindRow<FMonsterData>(MonsterRowName, TEXT("Set MonsterRowName"));
+
+	if (Row)
+	{
+		MonsterAttackSkills = Row->MonsterAttackSkills;
+
+		ChangeMaxHP(Row->MaxHP);
+		ChangeHP(Row->MaxHP);	// TODO : 이거 뭔가 비효율적인데 InitMaxHP() 함수에 MaxHP랑 HP둘다 조정하는거 만들어주세용 선국님
+		ChangeMoveSpeed(Row->MoveSpeed);
+
+		for (const FMonsterAttackSkillData& Skill : MonsterAttackSkills)
 		{
-			MonsterAttackSkills = Row->MonsterAttackSkills;
-
-			ChangeMaxHP(Row->MaxHP);
-			ChangeHP(Row->MaxHP);	// TODO : 이거 뭔가 비효율적인데 InitMaxHP() 함수에 MaxHP랑 HP둘다 조정하는거 만들어주세용 선국님
-			ChangeMoveSpeed(Row->MoveSpeed);
-
-			for (const FMonsterAttackSkillData& Skill : MonsterAttackSkills)
-			{
-				CachedAttackTraceDataArray.Add(Skill.AttackTrace);
-			}
-
-			RS_LOG_F("MaxHP가 잘 적용 되었습니다! MaxHP : %f", Row->MaxHP);
-			RS_LOG_F("MoveSpeed가 잘 적용 되었습니다! MoveSpeed : %f", Row->MoveSpeed);
+			CachedAttackTraceDataArray.Add(Skill.AttackTrace);
 		}
-		else
-		{
-			RS_LOG_F("MaxHP 적용 실패: %s", *MonsterRowName.ToString());
-			RS_LOG_F("MoveSpeed 적용 실패: %s", *MonsterRowName.ToString());
-		}
+
+		RS_LOG_F("MaxHP가 잘 적용 되었습니다! MaxHP : %f", Row->MaxHP);
+		RS_LOG_F("MoveSpeed가 잘 적용 되었습니다! MoveSpeed : %f", Row->MoveSpeed);
+	}
+	else
+	{
+		RS_LOG_F("MaxHP 적용 실패: %s", *MonsterRowName.ToString());
+		RS_LOG_F("MoveSpeed 적용 실패: %s", *MonsterRowName.ToString());
 	}
 }
 
 int32 ARSDunMonsterCharacter::GetActionLength()
 {
 	return MonsterAttackSkills.Num();
+}
+
+bool ARSDunMonsterCharacter::GetIsMeleeSkill(int32 actionIdx)
+{
+	return MonsterAttackSkills[actionIdx].skillType == ESkillType::Melee;
 }

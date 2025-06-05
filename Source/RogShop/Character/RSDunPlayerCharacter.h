@@ -87,9 +87,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> DodgeMontage; // 구르기
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = true))
-	TObjectPtr<UAnimMontage> DeathMontage; // 사망
-
 // 던전 재화 관련
 public:
 	int32 GetLifeEssence() const { return LifeEssence; }

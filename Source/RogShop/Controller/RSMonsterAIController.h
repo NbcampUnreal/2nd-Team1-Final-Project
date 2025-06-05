@@ -34,23 +34,15 @@ public://Function
 	void SetRVOAvoidanceEnabled(bool bEnable);
 
 	//Behavior
-	UFUNCTION(BlueprintCallable)
-	void AIAttack();
-
-	UFUNCTION(BlueprintCallable)
-	void AISkill_1();
-
-	UFUNCTION(BlueprintCallable)
-	void AISkill_2();
-
-	UFUNCTION(BlueprintCallable)
-	void AISkill_3();
-
-	UFUNCTION(BlueprintCallable)
-	void AISkill_4(FVector interrestedPos);
 
 	UFUNCTION(BlueprintCallable)
 	void AISkillAction(int32 actionIdx, FVector interestedPos);
+
+	UFUNCTION(BlueprintCallable)
+	void CtrlPlaySpawnAnim();
+
+	UFUNCTION(BlueprintCallable)
+	bool IsMeleeSkill(int32 actionIdx);
 
 	//Patrol
 	UFUNCTION(BlueprintCallable)
