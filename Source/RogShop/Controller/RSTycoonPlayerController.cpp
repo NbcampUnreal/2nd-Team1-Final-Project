@@ -118,7 +118,17 @@ void ARSTycoonPlayerController::SetupInputComponent()
 
 	if (TileClickAction)
 	{
-		EnhancedInput->BindAction(TileClickAction, ETriggerEvent::Triggered, this, &ARSTycoonPlayerController::OnTileClick);
+		EnhancedInput->BindAction(TileClickAction, ETriggerEvent::Triggered, this, &ARSTycoonPlayerController::OnClickTile);
+	}
+
+	if (ZoomInAction)
+	{
+		EnhancedInput->BindAction(ZoomInAction, ETriggerEvent::Triggered, this, &ARSTycoonPlayerController::OnZoomIn);
+	}
+
+	if (ZoomOutAction)
+	{
+		EnhancedInput->BindAction(ZoomOutAction, ETriggerEvent::Triggered, this, &ARSTycoonPlayerController::OnZoomOut);
 	}
 }
 
@@ -130,7 +140,7 @@ void ARSTycoonPlayerController::SettingInput()
 	InputSubsystem->AddMappingContext(IMC, 0);
 }
 
-void ARSTycoonPlayerController::OnTileClick()
+void ARSTycoonPlayerController::OnClickTile()
 {
 	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
 	check(GameMode)
@@ -176,39 +186,14 @@ void ARSTycoonPlayerController::OnTileClick()
 	}
 }
 
+
 #pragma endregion
 
-void ARSTycoonPlayerController::AddGold(int32 Value)
-{
-	Gold += Value;
-	SaleWidget->SetGold(Gold);
-}
-
-void ARSTycoonPlayerController::AddCustomerCount(int32 Value)
-{
-	CustomerCount += Value;
-	SaleWidget->SetCustomerCount(CustomerCount);
-}
-
+#pragma region Camera
 void ARSTycoonPlayerController::SetCameraLocationToCenter()
 {
-	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
-	check(TileMap)
-
-	FVector Center = TileMap->GetMapCenter();
-	MainCamera->SetActorLocation(Center);
-	TopCamera->SetActorLocation(Center);
-}
-
-void ARSTycoonPlayerController::BeginPlay()
-{
-	Super::BeginPlay();
-
-	SetShowMouseCursor(true);
-
-	SettingInput();
-	SettingCamera();
-	SettingWidget();
+	MainCamera->SetLocationToCenter();
+	TopCamera->SetLocationToCenter();
 }
 
 void ARSTycoonPlayerController::SettingCamera()
@@ -224,8 +209,86 @@ void ARSTycoonPlayerController::SettingCamera()
 	TopCamera = Cast<ARSTycoonCamera>(TycoonCameras[1 - MainCameraIndex]);
 	SetViewTarget(MainCamera);
 
+	MainCamera->GetCameraComponent()->SetFieldOfView(MaxMainCameraFov);
+	TopCamera->GetCameraComponent()->SetFieldOfView(MaxTopCameraFov);
+	
 	GetWorldTimerManager().SetTimerForNextTick([&]()
 	{
 		SetCameraLocationToCenter();
 	});
+}
+
+void ARSTycoonPlayerController::OnZoomIn()
+{
+	ARSTycoonCamera* Camera;
+	float MaxFov;
+	if (GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->GetState() == ETycoonGameMode::Management)
+	{
+		Camera = TopCamera;
+		MaxFov = MaxTopCameraFov;
+	}
+	else
+	{
+		Camera = MainCamera;
+		MaxFov = MaxMainCameraFov;
+	}
+	
+	float SetFov = Camera->GetCameraComponent()->FieldOfView;
+	if (SetFov >= MaxFov)
+	{
+		SetFov = MaxFov;
+		Camera->AttachPlayer();
+	}
+
+	SetFov -= FovSensitivity;
+	Camera->GetCameraComponent()->SetFieldOfView(SetFov);
+}
+
+void ARSTycoonPlayerController::OnZoomOut()
+{
+	ARSTycoonCamera* Camera;
+	float MaxFov;
+	if (GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->GetState() == ETycoonGameMode::Management)
+	{
+		Camera = TopCamera;
+		MaxFov = MaxTopCameraFov;
+	}
+	else
+	{
+		Camera = MainCamera;
+		MaxFov = MaxMainCameraFov;
+	}
+
+	float SetFov = Camera->GetCameraComponent()->FieldOfView + FovSensitivity;
+	if (SetFov >= MaxFov)
+	{
+		SetFov = MaxFov;
+		Camera->SetLocationToCenter();
+	}
+	
+	Camera->GetCameraComponent()->SetFieldOfView(SetFov);
+}
+#pragma endregion
+
+void ARSTycoonPlayerController::AddGold(int32 Value)
+{
+	Gold += Value;
+	SaleWidget->SetGold(Gold);
+}
+
+void ARSTycoonPlayerController::AddCustomerCount(int32 Value)
+{
+	CustomerCount += Value;
+	SaleWidget->SetCustomerCount(CustomerCount);
+}
+
+void ARSTycoonPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	SetShowMouseCursor(true);
+
+	SettingInput();
+	SettingCamera();
+	SettingWidget();
 }

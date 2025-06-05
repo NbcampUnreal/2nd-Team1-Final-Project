@@ -18,10 +18,9 @@ public:
 	ARSTycoonCamera();
 
 	void AttachPlayer();
-	void ReturnToOrigin();
+	void SetLocationToCenter();
 
-protected:
-	virtual void BeginPlay() override;
+	TObjectPtr<UCameraComponent> GetCameraComponent() const { return Camera; }
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -32,6 +31,4 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UCameraComponent> Camera;
-
-	FTransform OriginTransform;
 };
