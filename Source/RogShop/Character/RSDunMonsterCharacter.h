@@ -123,4 +123,8 @@ protected:
 private:
 	TObjectPtr<ARSMonsterAIController> AIController;  // TODO : 혹시나 캐싱해서 쓸 일 생길까봐 미리 만들어둠.
 
+// 사망시 아이템 드롭
+private:
+	UFUNCTION()
+	void MonsterItemDrop();
 };

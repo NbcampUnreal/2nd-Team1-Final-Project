@@ -6,9 +6,8 @@
 #include "GameFramework/Character.h"
 #include "RSDunBaseCharacter.generated.h"
 
-/**
- * 
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterDied);
+
 UCLASS()
 class ROGSHOP_API ARSDunBaseCharacter : public ACharacter
 {
@@ -16,6 +15,11 @@ class ROGSHOP_API ARSDunBaseCharacter : public ACharacter
 
 public:
 	ARSDunBaseCharacter();
+
+// 델리게이트
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnCharacterDied OnCharacterDied;	// 죽었을 때 호출
 
 // 스탯 관련
 public:
