@@ -28,7 +28,6 @@ public:
 
 	// 애니메이션 실행 함수
 	void PlayAttackAnim();
-	void PlayDeathAnim();
 	void PlaySpawnAnim();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -78,9 +77,6 @@ public:
 protected:
 	// 애니메이션 몽타주
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAnimMontage> DeathMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> SpawnMontage;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -120,7 +116,7 @@ protected:
 	FTimerHandle detectDelayTimer;
 
 	// 데이터 테이블 관련
-	UDataTable* MonsterDataTable;	 // 연결된 데이터 테이블
+	UDataTable* MonsterDataTable_Legacy;	 // 연결된 데이터 테이블
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ActionData")
 	TArray<FMonsterAttackSkillData> MonsterAttackSkills;	// 몬스터 공격 스킬을 모아놓은 구조체를 배열로 저장
 	TArray<FMonsterAttackTraceData> CachedAttackTraceDataArray;	// 공격 트레이스를 캐싱해두고 다른 스킬 사용시 인덱스에서 꺼내 쓰는 용도
