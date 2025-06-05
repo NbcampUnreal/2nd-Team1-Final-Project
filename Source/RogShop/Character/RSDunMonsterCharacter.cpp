@@ -7,7 +7,9 @@
 #include "RogShop/UtilDefine.h"
 #include "Components/CapsuleComponent.h"
 #include "RSDataSubsystem.h"
+#include "CookFoodData.h"
 #include "RSDungeonGameModeBase.h"
+#include "RSDungeonGroundIngredient.h"
 
 ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 {
@@ -46,6 +48,8 @@ void ARSDunMonsterCharacter::BeginPlay()
 	{
 		animInstance->OnMontageEnded.AddDynamic(this, &ARSDunMonsterCharacter::OnEveryMontageEnded);
 	}
+
+	OnCharacterDied.AddDynamic(this, &ARSDunMonsterCharacter::MonsterItemDrop);
 
 	//InitMonsterData();
 }
@@ -148,6 +152,8 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 		GetMaxHP()
 	);
 	
+	// TODO : 해당 로직으로 인해 사망이 2번 호출되므로 제거해야한다.
+	// 체력 감소 함수에서 체크하므로 해당 작업을 할 필요가 없다.
 	if (GetHP() <= 0)
 	{
 		OnDeath();
@@ -387,6 +393,49 @@ void ARSDunMonsterCharacter::InitMonsterData()
 	{
 		RS_LOG_F("MaxHP 적용 실패: %s", *MonsterRowName.ToString());
 		RS_LOG_F("MoveSpeed 적용 실패: %s", *MonsterRowName.ToString());
+	}
+}
+
+void ARSDunMonsterCharacter::MonsterItemDrop()
+{
+	UGameInstance* CurGameInstance = GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	UDataTable* MonsterDataTable = DataSubsystem->Monster;
+	UDataTable* IngredientDataTable = DataSubsystem->Ingredient;
+	if (!MonsterDataTable || !IngredientDataTable)
+	{
+		RS_LOG("몬스터 데이터테이블 혹은 재료 데이터테이블 로딩 실패");
+		return;
+	}
+
+	FMonsterData* MonsterDataRow = MonsterDataTable->FindRow<FMonsterData>(MonsterRowName, TEXT("Get MonsterDataRow"));
+	if (MonsterDataRow && MonsterDataRow->Ingredients.Num() >= 0)
+	{
+		for (const FMonsterIngredientsData& e : MonsterDataRow->Ingredients)
+		{
+			// TODO : 드랍 확률 적용하기
+
+			FIngredientData* IngredientDataRow = IngredientDataTable->FindRow<FIngredientData>(e.IngredientName, TEXT("Get IngredientDataRow"));
+			if (IngredientDataRow)
+			{
+				ARSDungeonGroundIngredient* DungeonIngredient = GetWorld()->SpawnActor<ARSDungeonGroundIngredient>(ARSDungeonGroundIngredient::StaticClass(), GetActorTransform());
+
+				if (DungeonIngredient && IngredientDataRow->Mesh)
+				{
+					DungeonIngredient->InitItemInfo(e.IngredientName, IngredientDataRow->Mesh);
+				}
+			}
+		}
 	}
 }
 

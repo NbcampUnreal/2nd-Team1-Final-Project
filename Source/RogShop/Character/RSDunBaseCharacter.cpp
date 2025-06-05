@@ -121,6 +121,8 @@ bool ARSDunBaseCharacter::GetIsDead()
 
 void ARSDunBaseCharacter::OnDeath()
 {
+	OnCharacterDied.Broadcast();
+
 	bIsDead = true;
 
 	// 레벨 오브젝트를 제외한 모든 오브젝트와 충돌하지 않도록 콜리전 설정 변경
