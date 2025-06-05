@@ -138,11 +138,14 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float FovSensitivity = 4.f;
 	
+	UPROPERTY(EditAnywhere)
+	float OrthoWidthSensitivity = 20.f;
+	
 	UPROPERTY(EditAnywhere) // 임시
 	float MaxMainCameraFov = 90.f;
 
 	UPROPERTY(EditAnywhere) // 임시
-	float MaxTopCameraFov = 90.f;
+	float MaxTopCameraOrthoWidth = 2000.f;
 
 private:
 	UPROPERTY()

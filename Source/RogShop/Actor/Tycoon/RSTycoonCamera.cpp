@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "RogShop/UtilDefine.h"
 #include "Tycoon/RSTycoonPlayerCharacter.h"
 
 
@@ -29,21 +30,48 @@ void ARSTycoonCamera::AttachPlayer()
 {
 	ARSTycoonPlayerCharacter* Player = Cast<ARSTycoonPlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	check(Player)
+	Target = Player;
 
-	AttachToActor(Player, FAttachmentTransformRules::KeepWorldTransform);
-	
-	FVector Lo = SpringArm->GetRelativeLocation();
-	Lo.Z *= -1;
-	SetActorRelativeLocation(-Lo);
+	PlusVec = -SpringArm->GetRelativeLocation();
+	PlusVec.Z += AttachPlusZ;
 }
 
 void ARSTycoonCamera::SetLocationToCenter()
 {
 	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
 	check(TileMap)
-	
+
+	Target = nullptr;
 	FVector Center = TileMap->GetMapCenter();
 
-	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	SetActorLocation(Center);
+}
+
+float ARSTycoonCamera::GetTileMapCameraFov()
+{
+	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
+	check(TileMap)
+
+	//아무래도 타일맵의 끝부분 4점을 정하고 그 점의 월드 위치를 뷰포트 위치로 투영한다음에 그 위치들이 화면안에 나올 때 까지
+	//1씩 줄여야할 것 같음
+	//그나마 매우 근접한 접근 방식일 것
+
+	return 0;
+}
+
+float ARSTycoonCamera::GetCameraOrthoWidth()
+{
+	return 0;
+}
+
+void ARSTycoonCamera::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (Target == nullptr)
+	{
+		return;
+	}
+
+	SetActorLocation(Target->GetActorLocation() + PlusVec);
 }
