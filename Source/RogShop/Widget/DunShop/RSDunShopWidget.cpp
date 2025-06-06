@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "RSDunShopWidget.h"
 
 #include "RSGameInstance.h"
@@ -11,6 +10,22 @@
 #include "Components/TextBlock.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
+#include "Kismet/GameplayStatics.h"
+
+#include "RSDunPlayerCharacter.h"
+#include "RSDunPlayerController.h"
+
+void URSDunShopWidget::NativeOnInitialized()
+{
+    Super::NativeOnInitialized();
+
+    ARSDunPlayerController* RSDunPlayerController = GetOwningPlayer<ARSDunPlayerController>();
+
+    if (RSDunPlayerController)
+    {
+        RSDunPlayerController->OnLifeEssenceChange.AddDynamic(this, &URSDunShopWidget::UpdateLifeEssence);
+    }
+}
 
 void URSDunShopWidget::NativeConstruct()
 {
@@ -26,13 +41,16 @@ void URSDunShopWidget::NativeConstruct()
     PopulateShopItems();
 }
 
-void URSDunShopWidget::HandleItemPurchase(FName PurchasedID)
+void URSDunShopWidget::UpdateLifeEssence(int NewLifeEssence)
 {
-    URSGameInstance* GI = Cast<URSGameInstance>(GetGameInstance());
-
-    if (GI)
+    if (LifeEssenceText)
     {
-        GI->PurchasedItemIDs.Add(PurchasedID);  // 아이템 구매 후 아이디 추가
+        FString LifeEssenceString = FString::Printf(TEXT("%d"), NewLifeEssence); // 정수 형태로 변환
+        LifeEssenceText->SetText(FText::FromString(LifeEssenceString));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("NewLifeEssence Null!"));
     }
 }
 
@@ -160,15 +178,6 @@ void URSDunShopWidget::PopulateShopItems()
 void URSDunShopWidget::OnExitClicked()
 {
     SetMouseMode(false);
-
-    // 걷는 캐릭터 정지 필요시
-    //if (APlayerController* PC = GetOwningPlayer())
-    //{
-    //    if (ARSDunPlayerCharacter* Player = Cast<ARSDunPlayerCharacter>(PC->GetPawn()))
-    //    {
-    //        Player->GetCharacterMovement()->MaxWalkSpeed = 600.f;
-    //    }
-    //}
 
     RemoveFromParent();
 }

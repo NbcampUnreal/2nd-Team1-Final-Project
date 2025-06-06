@@ -7,7 +7,9 @@
 #include "ItemInfoData.h"
 #include "RSDunItemWidget.generated.h"
 
-class URSDunShopWidget;
+class UImage;
+class UTextBlock;
+class UButton;
 
 UCLASS()
 class ROGSHOP_API URSDunItemWidget : public UUserWidget
@@ -31,19 +33,19 @@ private:
     bool BuyItem();
 
     UPROPERTY(meta = (BindWidget))
-    class UImage* ItemImage;
+    TObjectPtr<UImage> ItemImage;
 
     UPROPERTY(meta = (BindWidget))
-    class UTextBlock* ItemNameText;
+    TObjectPtr<UTextBlock> ItemNameText;
 
     UPROPERTY(meta = (BindWidget))
-    class UTextBlock* ItemDesText;
+    TObjectPtr<UTextBlock> ItemDesText;
 
     UPROPERTY(meta = (BindWidget))
-    class UTextBlock* ItemPriceText;
+    TObjectPtr<UTextBlock> ItemPriceText;
 
     UPROPERTY(meta = (BindWidget))
-    class UButton* BuyBtn;
+    TObjectPtr<UButton> BuyBtn;
 
     UPROPERTY()
     FItemInfoData ItemData;
