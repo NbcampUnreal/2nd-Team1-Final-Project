@@ -12,10 +12,6 @@
 #include "Tycoon/NPC/RSTycoonCustomerCharacter.h"
 #include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
 
-
-static const FName TileKey = TEXT("TargetTile");
-static const FName CustomerKey = TEXT("TargetCustomer");
-		
 UBTT_RSWaiterMoveCookingTile::UBTT_RSWaiterMoveCookingTile()
 {
 	bNotifyTick = true;
@@ -24,7 +20,10 @@ UBTT_RSWaiterMoveCookingTile::UBTT_RSWaiterMoveCookingTile()
 EBTNodeResult::Type UBTT_RSWaiterMoveCookingTile::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
+
 	
+
+	const FName TileKey = TEXT("TargetTile");
 	ARSCookingTile* Tile = Cast<ARSCookingTile>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TileKey));
 	if (Tile == nullptr)
 	{
@@ -46,7 +45,10 @@ EBTNodeResult::Type UBTT_RSWaiterMoveCookingTile::ExecuteTask(UBehaviorTreeCompo
 void UBTT_RSWaiterMoveCookingTile::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-
+	
+	const FName TileKey = TEXT("TargetTile");
+	const FName CustomerKey = TEXT("TargetCustomer");
+	
 	//움직임이 완료되면
 	ARSTycoonWaiterCharacter* Waiter = Cast<ARSTycoonWaiterCharacter>(OwnerComp.GetAIOwner()->GetCharacter());
 	if (!Waiter->IsMoving())

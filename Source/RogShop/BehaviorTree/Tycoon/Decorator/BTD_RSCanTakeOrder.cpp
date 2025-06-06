@@ -15,9 +15,9 @@ bool UBTD_RSCanTakeOrder::CalculateRawConditionValue(UBehaviorTreeComponent& Own
 {
 	Super::CalculateRawConditionValue(OwnerComp, NodeMemory);
 
-	const static FName TargetCustomerKey = TEXT("TargetCustomer");
 	UBlackboardComponent* BlackBoard = OwnerComp.GetBlackboardComponent();
-
+	const FName TargetCustomerKey = TEXT("TargetCustomer");
+	
 	if (BlackBoard->GetValueAsObject(TargetCustomerKey))
 	{
 		return false;
