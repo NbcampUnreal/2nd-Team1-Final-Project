@@ -192,6 +192,9 @@ void URSDunShopWidget::SetMouseMode(bool bEnable)
 
         if (PlayerController)
         {
+            // 받고있던 입력 초기화
+            PlayerController->FlushPressedKeys();
+
             if (bEnable)
             {
                 FInputModeUIOnly InputMode;
