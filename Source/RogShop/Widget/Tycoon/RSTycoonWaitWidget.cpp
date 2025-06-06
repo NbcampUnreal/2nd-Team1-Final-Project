@@ -18,12 +18,12 @@ void URSTycoonWaitWidget::NativeConstruct()
 
 void URSTycoonWaitWidget::OnClickSalesStartButton()
 {
-	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->StartSale();
+	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->StartSaleMode();
 }
 
 void URSTycoonWaitWidget::OnClickManagementButton()
 {
-	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->StartManagement();
+	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->StartManagementMode();
 }
 
 void URSTycoonWaitWidget::OnClickOutButton()

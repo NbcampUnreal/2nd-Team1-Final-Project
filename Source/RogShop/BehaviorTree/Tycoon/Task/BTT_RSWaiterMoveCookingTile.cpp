@@ -12,6 +12,10 @@
 #include "Tycoon/NPC/RSTycoonCustomerCharacter.h"
 #include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
 
+
+const FName TileKey = TEXT("TargetTile");
+const FName CustomerKey = TEXT("TargetCustomer");
+
 UBTT_RSWaiterMoveCookingTile::UBTT_RSWaiterMoveCookingTile()
 {
 	bNotifyTick = true;
@@ -21,7 +25,6 @@ EBTNodeResult::Type UBTT_RSWaiterMoveCookingTile::ExecuteTask(UBehaviorTreeCompo
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	const FName TileKey = TEXT("TargetTile");
 	ARSCookingTile* Tile = Cast<ARSCookingTile>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TileKey));
 	if (Tile == nullptr)
 	{
@@ -54,7 +57,7 @@ void UBTT_RSWaiterMoveCookingTile::TickTask(UBehaviorTreeComponent& OwnerComp, u
 		ARSBaseFood* Food = Cast<ARSBaseFood>(PickupActor);
 		check(Food)
 		
-		const FName CustomerKey = TEXT("TargetCustomer");
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TileKey, nullptr);
 		OwnerComp.GetBlackboardComponent()->SetValueAsObject(CustomerKey, Food->Order.Customer.Get());
 		
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

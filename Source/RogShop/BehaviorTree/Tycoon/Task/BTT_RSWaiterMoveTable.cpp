@@ -48,9 +48,8 @@ void UBTT_RSWaiterMoveTable::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* 
 	ARSTycoonWaiterCharacter* Waiter = Cast<ARSTycoonWaiterCharacter>(OwnerComp.GetAIOwner()->GetCharacter());
 	if (!Waiter->IsMoving())
 	{
-		//임시, 테이블 로직 수정해야함
-		// const FName CustomerKey = TEXT("TargetCustomer");
-		/// OwnerComp.GetBlackboardComponent()->SetValueAsObject(CustomerKey, nullptr);
+		const FName CustomerKey = TEXT("TargetCustomer");
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject(CustomerKey, nullptr);
 		
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}

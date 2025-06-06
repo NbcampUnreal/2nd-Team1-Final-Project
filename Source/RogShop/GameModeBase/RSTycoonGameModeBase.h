@@ -27,19 +27,19 @@ class ROGSHOP_API ARSTycoonGameModeBase : public AGameModeBase
 public:
 	ARSTycoonGameModeBase();
 
-	void StartSale();
+	void StartSaleMode();
 	void SettingGame();
 	void AddOrder(FFoodOrder Order);
 	void RemoveOrder(FFoodOrder Order);
 	void RemoveCustomer(ARSTycoonCustomerCharacter* Customer);
 	void AddNPC(ARSTycoonNPC* NPC);
 	void EndSale();
-	void StartWait();
-	void StartManagement();
+	void StartWaitMode();
+	void StartManagementMode();
 
 	float GetGameTime() const; //게임 경과 시간을 반환해줌
 	const TArray<FFoodOrder>& GetOrders() const { return FoodOrders; }
-	const TArray<TWeakObjectPtr<ARSTycoonCustomerCharacter>>& GetCustomers() const { return Customers; }
+	const TArray<TObjectPtr<ARSTycoonCustomerCharacter>>& GetCustomers() const { return Customers; }
 	const TArray<ARSTycoonNPC*>& GetNPCs() const { return NPCs; }
 	int32 GetSaleStartHour() const { return SaleStartHour; }
 	int32 GetSaleHourDuration() const { return SaleEndHour - SaleStartHour; }
@@ -62,7 +62,7 @@ private:
 
 	//가게 안에 있는 손님들
 	UPROPERTY()
-	TArray<TWeakObjectPtr<ARSTycoonCustomerCharacter>> Customers;
+	TArray<TObjectPtr<ARSTycoonCustomerCharacter>> Customers;
 
 	//최대 입장 가능한 손님, TableTile의 영향을 받음
 	UPROPERTY(VisibleAnywhere)

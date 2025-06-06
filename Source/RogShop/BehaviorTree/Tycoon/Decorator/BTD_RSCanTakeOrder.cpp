@@ -27,11 +27,8 @@ bool UBTD_RSCanTakeOrder::CalculateRawConditionValue(UBehaviorTreeComponent& Own
 	check(GameMode)
 
 	auto& Customers = GameMode->GetCustomers();
-	for (auto& CustomerPtr : Customers)
+	for (auto& Customer : Customers)
 	{
-		ARSTycoonCustomerCharacter* Customer = CustomerPtr.Get();
-		check(Customer)
-
 		if (Customer->GetState() == ETycoonCustomerState::OrderWaiting)
 		{
 			//다른 웨이터에게 이 손님이 할당 되어 있다면 제외

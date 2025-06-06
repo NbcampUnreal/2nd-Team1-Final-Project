@@ -19,5 +19,5 @@ public:
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 
 private:
-	bool CheckAssignOtherWaiter(const FName& Key, ARSCookingTile* Target) const;
+	bool CheckAssignOtherWaiter(ARSCookingTile* Target) const;
 };

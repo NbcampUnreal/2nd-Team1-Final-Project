@@ -5,6 +5,7 @@
 
 #include "AIController.h"
 #include "RSTycoonGameModeBase.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "RogShop/UtilDefine.h"
 #include "RogShop/Actor/Tycoon/RSTileMap.h"
@@ -128,6 +129,8 @@ void ARSTycoonChefCharacter::InteractTarget(AActor* TargetActor)
 		FTransform ChefTransform = PlacedCookingTile->GetChefTransform();
 		SetActorLocation(ChefTransform.GetLocation());
 		SetActorRotation(ChefTransform.GetRotation());
+		
+		InteractSphere->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 	}
 }
 

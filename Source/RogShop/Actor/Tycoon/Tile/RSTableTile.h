@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "RSBaseTile.h"
+#include "TycoonDatas.h"
 #include "RSTableTile.generated.h"
 
 class ARSTycoonCustomerCharacter;
@@ -17,28 +18,32 @@ public:
 	ARSTableTile();
 
 	GENERATED_TILE()
-	
+
 	virtual void Interact(ACharacter* InteractCharacter) override;
 	void Sit(ARSTycoonCustomerCharacter* Customer);
-
-	bool CanSit() const { return SittingCustomers.Num() < SittingLocations.Num(); }
-	bool Use() const { return SittingCustomers.Num() > 0; }
-	FVector GetFoodLocation() const { return FoodLocation->GetComponentLocation(); }
+	
+	int32 GetOrderWaitCustomerIndex();
+	int32 GetFoodWaitCustomerIndex(FFoodOrder Order);
+	int32 GetCanSitingLocationIndex() const;
+	bool CanSit() const;
 	int32 GetMaxPlace() const { return SittingLocations.Num(); }
-	FTransform GetSitTransform() const { return SittingLocations[SittingCustomers.Num()]->GetComponentTransform(); }
-	ARSTycoonCustomerCharacter* GetMainCustomer() const {return SittingCustomers[0];}
+	FTransform GetSitTransform(int32 Index) const { return SittingLocations[Index]->GetComponentTransform(); }
+	ARSTycoonCustomerCharacter* GetSittingCustomer(int32 Index) const { return SittingCustomers[Index]; }
+
+protected:
+	virtual void BeginPlay() override;
 	
 private:
-	void Order();
+	void Order(ARSTycoonCustomerCharacter* Customer);
 	void Serving(ACharacter* InteractCharacter);
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadonly)
-	TObjectPtr<USceneComponent> FoodLocation; //음식이 위치할 곳
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TArray<TObjectPtr<USceneComponent>> FoodLocations; //음식이 위치할 곳
 
 	UPROPERTY()
-	TObjectPtr<AActor> FoodActor; //배치된 음식
-	
+	TArray<TObjectPtr<AActor>> FoodActors; //배치된 음식
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<TObjectPtr<USceneComponent>> SittingLocations; //손님이 앉는 위치들
 

@@ -17,7 +17,7 @@
 ARSTycoonWaiterCharacter::ARSTycoonWaiterCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	PickupLocation = CreateDefaultSubobject<USceneComponent>("FoodLocation");
 	PickupLocation->SetupAttachment(RootComponent);
 }
@@ -26,7 +26,8 @@ void ARSTycoonWaiterCharacter::Pickup(AActor* Actor)
 {
 	if (PickupActor)
 	{
-		Drop(Actor->GetActorLocation());
+		RS_LOG_C("이미 음식을 들고 있습니다", FColor::Red)
+		return;
 	}
 
 	PickupActor = Actor;
@@ -85,24 +86,31 @@ void ARSTycoonWaiterCharacter::BeginPlay()
 
 void ARSTycoonWaiterCharacter::InteractTable(ARSTableTile* Table)
 {
-	//임시
-	//이거 그냥 전체적으로 수정해야됨
-	//대표 손님이 의미가 없음, 각자가 다 다른 오더를 내릴 수도 있음
-
-	if (!Table->Use())
+	int32 OrderWaitIndex = Table->GetOrderWaitCustomerIndex();
+	if (OrderWaitIndex != INDEX_NONE)
 	{
-		return;
-	}
-
-	//오더를 받음
-	if (Table->GetMainCustomer()->GetState() == ETycoonCustomerState::OrderWaiting)
-	{
+		//오더를 받음
 		AAIController* AIController = Cast<AAIController>(GetController());
 		check(AIController)
 
 		FName CustomerKey = TEXT("TargetCustomer");
 		AIController->GetBlackboardComponent()->SetValueAsObject(CustomerKey, nullptr);
-	}
 
-	Table->Interact(this);
+		Table->Interact(this);
+	}
+	else if (PickupActor)
+	{
+		if (ARSBaseFood* Food = Cast<ARSBaseFood>(PickupActor))
+		{
+			int32 FoodWaitIndex = Table->GetFoodWaitCustomerIndex(Food->Order);
+			if (FoodWaitIndex != INDEX_NONE)
+			{
+				Table->Interact(this);
+			}
+		}
+		else
+		{
+			RS_LOG_C("들고 있는 엑터가 음식이 아닙니다.", FColor::Red)
+		}
+	}
 }

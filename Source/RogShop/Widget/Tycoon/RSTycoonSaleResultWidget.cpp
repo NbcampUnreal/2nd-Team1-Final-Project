@@ -23,5 +23,5 @@ void URSTycoonSaleResultWidget::NativeConstruct()
 
 void URSTycoonSaleResultWidget::ReturnWaitMode()
 {
-	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->StartWait();
+	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->StartWaitMode();
 }
