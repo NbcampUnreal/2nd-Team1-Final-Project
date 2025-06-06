@@ -13,7 +13,7 @@
 #include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
 
 const static FName TileKey = TEXT("TargetTile");
-
+	
 bool UBTD_RSCanServing::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	Super::CalculateRawConditionValue(OwnerComp, NodeMemory);
