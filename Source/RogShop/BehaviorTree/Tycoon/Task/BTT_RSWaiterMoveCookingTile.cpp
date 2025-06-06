@@ -13,8 +13,8 @@
 #include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
 
 
-const static FName TileKey = TEXT("TargetTile");
-const static FName CustomerKey = TEXT("TargetCustomer");
+static const FName TileKey = TEXT("TargetTile");
+static const FName CustomerKey = TEXT("TargetCustomer");
 		
 UBTT_RSWaiterMoveCookingTile::UBTT_RSWaiterMoveCookingTile()
 {
