@@ -12,12 +12,10 @@
 #include "RogShop/Actor/Tycoon/Tile/RSCookingTile.h"
 #include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
 
-const static FName TileKey = TEXT("TargetTile");
-	
 bool UBTD_RSCanServing::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	Super::CalculateRawConditionValue(OwnerComp, NodeMemory);
-
+	
 	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
 	check(GameMode)
 
@@ -31,6 +29,7 @@ bool UBTD_RSCanServing::CalculateRawConditionValue(UBehaviorTreeComponent& Owner
 	// TArray<AActor*> Tiles;
 	// UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSCookingTile::StaticClass(), Tiles);
 
+	const FName TileKey = TEXT("TargetTile");
 	ARSTycoonWaiterCharacter* Waiter = Cast<ARSTycoonWaiterCharacter>(OwnerComp.GetAIOwner()->GetCharacter());
 	for (AActor* Tile : Tiles)
 	{
@@ -43,7 +42,7 @@ bool UBTD_RSCanServing::CalculateRawConditionValue(UBehaviorTreeComponent& Owner
 				{
 					continue;
 				}
-
+				
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(TileKey, CookingTile);
 				return true;
 			}
@@ -56,6 +55,7 @@ bool UBTD_RSCanServing::CalculateRawConditionValue(UBehaviorTreeComponent& Owner
 
 bool UBTD_RSCanServing::CheckAssignOtherWaiter(ARSCookingTile* Target) const
 {
+	const FName TileKey = TEXT("TargetTile");
 	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
 	for (ARSTycoonNPC* NPC : GameMode->GetNPCs())
 	{
