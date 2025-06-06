@@ -20,10 +20,10 @@ class ROGSHOP_API ARSMonsterAIController : public AAIController
 {
 	GENERATED_BODY()
 protected://Value	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RVO")//RVO radius
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "RVO")//RVO radius
 	float avoidanceRadius;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RVO")//RVO priority
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "RVO")//RVO priority
 	float avoidanceWeight;
 
 	int32 currentPatrolIdx;
