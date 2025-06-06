@@ -14,77 +14,130 @@
 ARSTableTile::ARSTableTile()
 {
 	TileDisplayName = TEXT("테이블");
-
-	FoodLocation = CreateDefaultSubobject<USceneComponent>("FoodLocation");
-	FoodLocation->SetupAttachment(RootComponent);
 }
 
 void ARSTableTile::Interact(ACharacter* InteractCharacter)
 {
 	Super::Interact(InteractCharacter);
 
-	if (!Use())
-	{
-		return;
-	}
-
-	TWeakObjectPtr<ARSTycoonCustomerCharacter> MainCustomer = SittingCustomers[0];
-	check(MainCustomer.IsValid())
-
-	if (MainCustomer->GetState() == ETycoonCustomerState::OrderWaiting)
+	int32 InteractIndex = GetOrderWaitCustomerIndex();
+	if (InteractIndex != INDEX_NONE)
 	{
 		//주문을 받음
-		Order();
+		Order(SittingCustomers[InteractIndex]);
 	}
-	else if (MainCustomer->GetState() == ETycoonCustomerState::FoodWaiting)
+	else if (InteractCharacter->Implements<URSCanPickup>())
 	{
 		//음식을 전달함
 		Serving(InteractCharacter);
 	}
 	else
 	{
-		RS_LOG_F_C("잘못된 접근, 현재 손님 State : %s", FColor::Red, *UEnum::GetValueAsString(MainCustomer->GetState()))
+		RS_LOG_C("상호작용이 불가능합니다.", FColor::Red)
 	}
 }
 
 void ARSTableTile::Sit(ARSTycoonCustomerCharacter* Customer)
 {
-	if (SittingCustomers.Num() >= GetMaxPlace())
+	int32 CanSitIndex = GetCanSitingLocationIndex();
+	if (CanSitIndex == INDEX_NONE)
 	{
-		RS_LOG_C("손님이 좌석수보다 많습니다", FColor::Red)
+		RS_LOG_C("테이블에 앉을 수 없습니다", FColor::Red)
 		return;
 	}
-
+	
 	RS_LOG("손님이 앉음")
+ 
+	SittingCustomers[CanSitIndex] = Customer;
 
-	int32 CustomerIndex = SittingCustomers.Num();
-	SittingCustomers.Add(Customer);
-
-	Customer->Sit(this, SittingLocations[CustomerIndex]->GetComponentTransform());
+	Customer->Sit(this, SittingLocations[CanSitIndex]->GetComponentTransform());
 	Customer->OnFinishEat.AddLambda([&](ARSTycoonCustomerCharacter* LeaveCustomer)
 	{
-		SittingCustomers.RemoveSingle(LeaveCustomer);
+		int32 Index = INDEX_NONE;
+		for (int32 i = 0; i < SittingCustomers.Num(); i++)
+		{
+			if (SittingCustomers[i] == LeaveCustomer)
+			{
+				Index = i;
+			}
+		}
+		
+		SittingCustomers[Index] = nullptr;
 
-		FoodActor->Destroy();
-		FoodActor = nullptr;
+		FoodActors[Index]->Destroy();
+		FoodActors[Index] = nullptr;
 	});
 }
 
-void ARSTableTile::Order()
+int32 ARSTableTile::GetOrderWaitCustomerIndex()
+{
+	for (int i = 0; i < SittingCustomers.Num(); i++)
+	{
+		if (SittingCustomers[i] != nullptr &&
+			SittingCustomers[i]->GetState() == ETycoonCustomerState::OrderWaiting)
+		{
+			return i;
+		}
+	}
+
+	return INDEX_NONE;
+}
+
+int32 ARSTableTile::GetFoodWaitCustomerIndex(FFoodOrder Order)
+{
+	for (int i = 0; i < SittingCustomers.Num(); i++)
+	{
+		if (SittingCustomers[i] != nullptr &&
+			SittingCustomers[i]->GetState() == ETycoonCustomerState::FoodWaiting &&
+			SittingCustomers[i]->WantFoodKey == Order.FoodKey &&
+			SittingCustomers[i] == Order.Customer)
+		{
+			return i;
+		}
+	}
+
+	return INDEX_NONE;
+}
+
+
+int32 ARSTableTile::GetCanSitingLocationIndex() const
+{
+	for (int i = 0; i < SittingCustomers.Num(); i++)
+	{
+		if (SittingCustomers[i] == nullptr)
+		{
+			return i;
+		}
+	}
+
+	return INDEX_NONE;
+}
+
+bool ARSTableTile::CanSit() const
+{
+	return GetCanSitingLocationIndex() != INDEX_NONE;
+}
+
+void ARSTableTile::BeginPlay()
+{
+	Super::BeginPlay();
+
+	FoodActors.SetNum(FoodLocations.Num());
+	SittingCustomers.SetNum(SittingLocations.Num());
+}
+
+void ARSTableTile::Order(ARSTycoonCustomerCharacter* Customer)
 {
 	RS_LOG("주문을 받음")
 
-	for (auto& Customer : SittingCustomers)
-	{
-		Customer->WaitFood();
-	}
+	Customer->WaitFood();
 }
 
 void ARSTableTile::Serving(ACharacter* InteractCharacter)
 {
 	IRSCanPickup* CanPickupCharacter = Cast<IRSCanPickup>(InteractCharacter);
 	check(CanPickupCharacter)
-	
+
 	AActor* PickupActor = CanPickupCharacter->GetPickupActor();
 	if (PickupActor == nullptr)
 	{
@@ -99,27 +152,28 @@ void ARSTableTile::Serving(ACharacter* InteractCharacter)
 		return;
 	}
 
-	ARSTycoonCustomerCharacter* OrderedCustomer = nullptr;
-	for (auto Customer : SittingCustomers)
+	int ServingCustomerIndex = INDEX_NONE;
+	for (int i = 0; i < SittingCustomers.Num(); i++)
 	{
-		if (Customer == Food->Order.Customer)
+		if (SittingCustomers[i] == Food->Order.Customer)
 		{
-			OrderedCustomer = Customer;
+			ServingCustomerIndex = i;
 			break;
 		}
 	}
-	
+
+	ARSTycoonCustomerCharacter* OrderedCustomer = SittingCustomers[ServingCustomerIndex];
 	if (OrderedCustomer)
 	{
 		RS_LOG("음식을 전달했습니다")
 
-		FoodActor = PickupActor;
-		
-		CanPickupCharacter->Drop(FoodLocation->GetComponentLocation());
+		FoodActors[ServingCustomerIndex] = PickupActor;
+
+		CanPickupCharacter->Drop(FoodLocations[ServingCustomerIndex]->GetComponentLocation());
 		OrderedCustomer->Eat();
 	}
 	else
 	{
-		RS_LOG_C("주문하신 손님이 아닙니다.", FColor::Red)
+		RS_LOG_C("주문하신 손님이 없습니다.", FColor::Red)
 	}
 }

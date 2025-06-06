@@ -24,7 +24,7 @@ ARSTycoonGameModeBase::ARSTycoonGameModeBase()
 
 }
 
-void ARSTycoonGameModeBase::StartSale()
+void ARSTycoonGameModeBase::StartSaleMode()
 {
 	State = ETycoonGameMode::Sales;
 
@@ -82,7 +82,7 @@ void ARSTycoonGameModeBase::BeginPlay()
 	{
 		//최초 한번 게임 세팅을 해줌
 		SettingGame();
-		StartWait();
+		StartWaitMode();
 	});
 }
 
@@ -221,14 +221,18 @@ void ARSTycoonGameModeBase::EndSale()
 	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->EndSaleMode();
 }
 
-void ARSTycoonGameModeBase::StartWait()
+void ARSTycoonGameModeBase::StartWaitMode()
 {
 	State = ETycoonGameMode::Wait;
 	
 	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->StartWaitMode();
+
+	//리셋 
+	
+	FoodOrders.Empty();
 }
 
-void ARSTycoonGameModeBase::StartManagement()
+void ARSTycoonGameModeBase::StartManagementMode()
 {
 	State = ETycoonGameMode::Management;
 

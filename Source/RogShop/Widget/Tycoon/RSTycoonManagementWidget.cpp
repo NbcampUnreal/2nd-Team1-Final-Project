@@ -88,7 +88,7 @@ void URSTycoonManagementWidget::OnClickExpandTile()
 
 void URSTycoonManagementWidget::OnClickWaitMode()
 {
-	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->StartWait();
+	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->StartWaitMode();
 	
 	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
 	check(TileMap)

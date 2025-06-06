@@ -7,7 +7,7 @@
 #include "RSCanPickup.generated.h"
 
 // This class does not need to be modified.
-UINTERFACE()
+UINTERFACE(MinimalAPI, Blueprintable)
 class URSCanPickup : public UInterface
 {
 	GENERATED_BODY()

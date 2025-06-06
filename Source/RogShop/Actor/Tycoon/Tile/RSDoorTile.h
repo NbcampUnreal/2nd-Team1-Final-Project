@@ -20,7 +20,7 @@ public:
 	
 	GENERATED_TILE()
 	
-	ARSTycoonCustomerCharacter* SpawnCustomer(const FName& FoodData, ARSTableTile* Target);
+	ARSTycoonCustomerCharacter* SpawnCustomer(const FName& FoodData, ARSTableTile* TargetTable);
 
 	FVector GetSpawnPoint() const { return CustomerSpawnPoint->GetComponentLocation(); }
 
