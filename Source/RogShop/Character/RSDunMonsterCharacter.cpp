@@ -37,6 +37,9 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 
 	DrawDebugLineSeconds = 5.0f;
 	DrawDebugLineThickness = 5.0f;
+
+	meleeAtkRange = 150.0f;
+	strafeRange = 500.0f;
 }
 
 void ARSDunMonsterCharacter::BeginPlay()
@@ -447,4 +450,14 @@ int32 ARSDunMonsterCharacter::GetActionLength()
 bool ARSDunMonsterCharacter::GetIsMeleeSkill(int32 actionIdx)
 {
 	return MonsterAttackSkills[actionIdx].skillType == ESkillType::Melee;
+}
+
+float ARSDunMonsterCharacter::GetAtkRange()
+{
+	return meleeAtkRange;
+}
+
+float ARSDunMonsterCharacter::GetStrafeRange()
+{
+	return strafeRange;
 }

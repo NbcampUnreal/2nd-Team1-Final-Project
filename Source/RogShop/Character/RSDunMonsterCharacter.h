@@ -44,6 +44,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool GetIsMeleeSkill(int32 actionIdx);//근접공격 여부 판별, 컨트롤러 전달
 
+	UFUNCTION(BlueprintCallable)
+	float GetAtkRange();
+	UFUNCTION(BlueprintCallable)
+	float GetStrafeRange();
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnEveryMontageEnded(UAnimMontage* montage, bool bInterrupted);  //모든 몽타주에 대해 검사함
 	void OnEveryMontageEnded_Implementation(UAnimMontage* montage, bool bInterrupted);
@@ -76,7 +81,7 @@ public:
 
 protected:
 	// 애니메이션 몽타주
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> SpawnMontage;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -114,6 +119,11 @@ protected:
 	float DrawDebugLineThickness;	 // 디버그 라인의 두께
 
 	FTimerHandle detectDelayTimer;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ActionData")
+	float meleeAtkRange;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ActionData")
+	float strafeRange;
 
 	// 데이터 테이블 관련
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ActionData")
