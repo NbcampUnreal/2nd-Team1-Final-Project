@@ -44,6 +44,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool GetIsMeleeSkill(int32 actionIdx);//근접공격 여부 판별, 컨트롤러 전달
 
+	UFUNCTION(BlueprintCallable)
+	float GetAtkRange();
+	UFUNCTION(BlueprintCallable)
+	float GetStrafeRange();
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnEveryMontageEnded(UAnimMontage* montage, bool bInterrupted);  //모든 몽타주에 대해 검사함
 	void OnEveryMontageEnded_Implementation(UAnimMontage* montage, bool bInterrupted);
@@ -76,7 +81,7 @@ public:
 
 protected:
 	// 애니메이션 몽타주
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> SpawnMontage;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -115,6 +120,11 @@ protected:
 
 	FTimerHandle detectDelayTimer;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ActionData")
+	float meleeAtkRange;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ActionData")
+	float strafeRange;
+
 	// 데이터 테이블 관련
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ActionData")
 	TArray<FMonsterAttackSkillData> MonsterAttackSkills;	// 몬스터 공격 스킬을 모아놓은 구조체를 배열로 저장
@@ -123,4 +133,8 @@ protected:
 private:
 	TObjectPtr<ARSMonsterAIController> AIController;  // TODO : 혹시나 캐싱해서 쓸 일 생길까봐 미리 만들어둠.
 
+// 사망시 아이템 드롭
+private:
+	UFUNCTION()
+	void MonsterItemDrop();
 };

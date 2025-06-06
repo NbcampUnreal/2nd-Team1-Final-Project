@@ -61,7 +61,10 @@ void URSDunItemWidget::OnBuyClicked()
 {
     if (BuyItem())
     {
-        // Character->DecreaseLifeEssence(ItemData.Price); // 플레이어 골드 수정 관련 함수 또는 public 변수 필요
+        ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+        ARSDunPlayerCharacter* PlayerChar = Cast<ARSDunPlayerCharacter>(PC->GetCharacter());
+
+        PlayerChar->DecreaseLifeEssence(ItemData.Price);
 
         if (ItemPriceText)
         {
@@ -97,15 +100,13 @@ bool URSDunItemWidget::BuyItem()
         return false;
     }
 
-    /*if (Character->GetLifeEssence() - ItemData.Price < 0) // 플레이어 재화 가져오기 관련 함수 또는 public 변수 필요
+    if (PlayerChar->GetLifeEssence() - ItemData.Price < 0)
     {
-        UE_LOG(LogTemp, Warning, TEXT("BuyItem - More LifeEssence Need"));
+        UE_LOG(LogTemp, Warning, TEXT("BuyItem - More LifeEssence Need %d"), ItemData.Price - PlayerChar->GetLifeEssence());
         return false;
-    }*/
+    }
 
     bool bIsBuy = true;
-
-    float FinalValue = 0.0f;
 
     switch (ItemData.ItemType)
     {

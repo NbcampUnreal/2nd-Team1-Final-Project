@@ -5,8 +5,8 @@
 
 ARSMonsterAIController::ARSMonsterAIController()
 {
-	avoidanceRadius = 0.0f;
-	avoidanceWeight = 0.0f;
+	avoidanceRadius = 100.0f;
+	avoidanceWeight = 100.0f;
 	currentPatrolIdx = 0;
 }
 

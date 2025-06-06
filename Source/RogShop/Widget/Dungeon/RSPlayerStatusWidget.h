@@ -6,18 +6,13 @@
 #include "Blueprint/UserWidget.h"
 #include "RSPlayerStatusWidget.generated.h"
 
-/**
- * 
- */
+class UTextBlock;
+class UImage;
+
 UCLASS()
 class ROGSHOP_API URSPlayerStatusWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
-public:
-    virtual void NativeOnInitialized() override;
-
-	virtual void NativeConstruct() override;
 
 public:
     UFUNCTION()
@@ -29,19 +24,26 @@ public:
     UFUNCTION()
     void UpdateMaxHP();
 
+    UFUNCTION()
+    void UpdateLifeEssence(int NewLifeEssence);
+
+protected:
+    virtual void NativeOnInitialized() override;
+    virtual void NativeConstruct() override;
+
 private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
-    class UTextBlock* LifeEssenceText;
+    TObjectPtr<UTextBlock> LifeEssenceText;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
-    class UTextBlock* MaxHPText;
+    TObjectPtr<UTextBlock> MaxHPText;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
-    class UTextBlock* HPText;
+    TObjectPtr<UTextBlock> HPText;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
-    class UImage* WeaponSlot1;
+    TObjectPtr<UImage> WeaponSlot1;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
-    class UImage* WeaponSlot2;
+    TObjectPtr<UImage> WeaponSlot2;
 };
