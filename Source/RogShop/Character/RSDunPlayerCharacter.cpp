@@ -50,7 +50,7 @@ ARSDunPlayerCharacter::ARSDunPlayerCharacter()
     DeathMontage = nullptr;
 
     // 던전 재화
-    LifeEssence = 0.f;
+    LifeEssence = 0;
 
     // 무기 컴포넌트
     WeaponComp = CreateDefaultSubobject<URSPlayerWeaponComponent>(TEXT("RSPlayerWeapon"));
@@ -402,18 +402,36 @@ void ARSDunPlayerCharacter::SetLifeEssence(int32 Amount)
 {
     int32 NewLifeEssence = FMath::Max(Amount, 0.0f);
     LifeEssence = NewLifeEssence;
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnLifeEssenceChange.Broadcast(LifeEssence);
+    }
 }
 
 void ARSDunPlayerCharacter::IncreaseLifeEssence(int32 Amount)
 {
     int32 NewLifeEssence = LifeEssence + Amount;
     LifeEssence = NewLifeEssence;
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnLifeEssenceChange.Broadcast(LifeEssence);
+    }
 }
 
 void ARSDunPlayerCharacter::DecreaseLifeEssence(int32 Amount)
 {
     int32 NewLifeEssence = FMath::Max(LifeEssence - Amount, 0.0f);
     LifeEssence = NewLifeEssence;
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnLifeEssenceChange.Broadcast(LifeEssence);
+    }
 }
 
 URSPlayerWeaponComponent* ARSDunPlayerCharacter::GetRSPlayerWeaponComponent()

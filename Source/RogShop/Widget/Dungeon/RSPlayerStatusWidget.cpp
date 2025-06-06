@@ -2,11 +2,14 @@
 
 
 #include "RSPlayerStatusWidget.h"
+
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Kismet/GameplayStatics.h"
+
 #include "RSDunPlayerController.h"
 #include "RSDunPlayerCharacter.h"
-#include "Kismet/GameplayStatics.h"
+
 #include "ItemInfoData.h"
 #include "RSDataSubsystem.h"
 
@@ -15,20 +18,22 @@ void URSPlayerStatusWidget::NativeOnInitialized()
     Super::NativeOnInitialized();
 
     ARSDunPlayerController* RSDunPlayerController = GetOwningPlayer<ARSDunPlayerController>();
+
     if (RSDunPlayerController)
     {
         RSDunPlayerController->OnWeaponSlotChange.AddDynamic(this, &URSPlayerStatusWidget::UpdateWeaponSlot);
         RSDunPlayerController->OnHPChange.AddDynamic(this, &URSPlayerStatusWidget::UpdateHP);
         RSDunPlayerController->OnMaxHPChange.AddDynamic(this, &URSPlayerStatusWidget::UpdateMaxHP);
+        RSDunPlayerController->OnLifeEssenceChange.AddDynamic(this, &URSPlayerStatusWidget::UpdateLifeEssence);
     }
 }
 
 void URSPlayerStatusWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	UpdateHP();
-	UpdateMaxHP();
+    
+    UpdateHP();
+    UpdateMaxHP();
 }
 
 void URSPlayerStatusWidget::UpdateWeaponSlot(int8 WeaponSlotIndex, FName WeaponKey)
@@ -106,5 +111,18 @@ void URSPlayerStatusWidget::UpdateMaxHP()
     else
     {
         UE_LOG(LogTemp, Warning, TEXT("PlayerChar or MaxHPText Null!"));
+    }
+}
+
+void URSPlayerStatusWidget::UpdateLifeEssence(int NewLifeEssence)
+{
+    if (LifeEssenceText)
+    {
+        FString LifeEssenceString = FString::Printf(TEXT("%d"), NewLifeEssence); // 정수 형태로 변환
+        LifeEssenceText->SetText(FText::FromString(LifeEssenceString));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("NewLifeEssence Null!"));
     }
 }

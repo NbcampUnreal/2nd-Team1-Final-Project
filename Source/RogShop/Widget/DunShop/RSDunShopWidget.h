@@ -7,6 +7,8 @@
 #include "ItemInfoData.h"
 #include "RSDunShopWidget.generated.h"
 
+class UButton;
+class UTextBlock;
 class UHorizontalBox;
 
 UCLASS()
@@ -15,9 +17,11 @@ class ROGSHOP_API URSDunShopWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-    void HandleItemPurchase(FName PurchasedID);
+    UFUNCTION()
+    void UpdateLifeEssence(int NewLifeEssence);
 
 protected:
+    virtual void NativeOnInitialized() override;
     virtual void NativeConstruct() override;
 
 private:
@@ -38,11 +42,11 @@ private:
     TSubclassOf<UUserWidget> RSDunShopItemWidgetClass;
 
     UPROPERTY(meta = (BindWidget))
-    class UButton* ExitBtn;
+    TObjectPtr<UButton> ExitBtn;
 
     UPROPERTY(meta = (BindWidget))
-    class UTextBlock* LifeEssenceText;
+    TObjectPtr<UTextBlock> LifeEssenceText;
 
     UPROPERTY(meta = (BindWidget))
-    UHorizontalBox* ItemHorizontalBox;
+    TObjectPtr<UHorizontalBox> ItemHorizontalBox;
 };
