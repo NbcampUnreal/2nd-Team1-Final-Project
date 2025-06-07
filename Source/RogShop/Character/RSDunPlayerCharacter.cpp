@@ -19,6 +19,7 @@
 #include "Perception/AISense_Sight.h"
 #include "Engine/OverlapResult.h"
 #include "RSDungeonStatusSaveGame.h"
+#include "RogShop/UtilDefine.h"
 
 // Sets default values
 ARSDunPlayerCharacter::ARSDunPlayerCharacter()
@@ -165,7 +166,7 @@ float ARSDunPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& 
 
     DecreaseHP(Damage);
 
-    UE_LOG(LogTemp, Warning, TEXT("[%s] took %.1f damage from [%s], Current Hp is %f"),
+    RS_LOG_DEBUG("[%s] took %.1f damage from [%s], Current Hp is %f",
         *GetName(),
         Damage,
         DamageCauser ? *DamageCauser->GetName() : TEXT("Unknown"),
@@ -315,10 +316,7 @@ void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
 void ARSDunPlayerCharacter::Interaction(const FInputActionValue& value)
 {
     // 애니메이션과 기획이 아직 준비되지 않았으므로 디버깅용 출력
-    if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Interaction Activated"));
-    }
+    RS_LOG_DEBUG("Interaction Activated");
 
     IRSInteractable* Interactable = Cast<IRSInteractable>(InteractActor);
     if (Interactable)
@@ -338,20 +336,14 @@ void ARSDunPlayerCharacter::NormalAttack(const FInputActionValue& value)
 void ARSDunPlayerCharacter::StrongAttack(const FInputActionValue& value)
 {
     // 애니메이션이 아직 준비되지 않았으므로 디버깅용 출력
-    if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("StrongAttack Activated"));
-    }
+    RS_LOG_DEBUG("StrongAttack Activated");
 }
 
 void ARSDunPlayerCharacter::FirstWeaponSlot(const FInputActionValue& value)
 {
     // 애니메이션이 아직 준비되지 않았으므로 디버깅용 출력
     // 추후에 해당 무기로 전환되는 기능 구현해야한다.
-    if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("FirstWeaponSlot Activated"));
-    }
+    RS_LOG_DEBUG("FirstWeaponSlot Activated");
 
     WeaponComp->EquipWeaponToCharacter(EWeaponSlot::FirstWeaponSlot);
 }
@@ -360,10 +352,7 @@ void ARSDunPlayerCharacter::SecondWeaponSlot(const FInputActionValue& value)
 {
     // 애니메이션이 아직 준비되지 않았으므로 디버깅용 출력
     // 추후에 해당 무기로 전환되는 기능 구현해야한다.
-    if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("SecondWeaponSlot Activated"));
-    }
+    RS_LOG_DEBUG("SecondWeaponSlot Activated");
 
     WeaponComp->EquipWeaponToCharacter(EWeaponSlot::SecondWeaponSlot);
 }
@@ -377,10 +366,7 @@ void ARSDunPlayerCharacter::ToggleInventoryUI(const FInputActionValue& value)
         PC->TogglePlayerInventoryWidget();
     }
 
-    if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("ToggleInventoryUI Activated"));
-    }
+    RS_LOG_DEBUG("ToggleInventoryUI Activated");
 }
 
 void ARSDunPlayerCharacter::ToggleInGameMenuUI(const FInputActionValue& value)
@@ -392,10 +378,7 @@ void ARSDunPlayerCharacter::ToggleInGameMenuUI(const FInputActionValue& value)
         PC->ToggleInGameMenuWidget();
     }
 
-    if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("ToggleInGameMenuUI Activated"));
-    }
+    RS_LOG_DEBUG("ToggleInGameMenuUI Activated");
 }
 
 void ARSDunPlayerCharacter::SetLifeEssence(int32 Amount)
@@ -462,7 +445,7 @@ void ARSDunPlayerCharacter::InteractTrace()
     if (!bHit)
     {
         InteractActor = nullptr;
-        DrawDebugSphere(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
+        RS_DRAW_DEBUG_SPHERE(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
         return;
     }
 
@@ -521,21 +504,21 @@ void ARSDunPlayerCharacter::InteractTrace()
             {
                 InteractActor = TargetActor;
 
-                DrawDebugSphere(GetWorld(), Center, InteractRadius, 32, FColor::Green, false, 0.f, 0, 1.0f);
+                RS_DRAW_DEBUG_SPHERE(GetWorld(), Center, InteractRadius, 32, FColor::Green, false, 0.f, 0, 1.0f);
             }
             else
             {
-                DrawDebugSphere(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
+                RS_DRAW_DEBUG_SPHERE(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
             }
         }
         else
         {
-            DrawDebugSphere(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
+            RS_DRAW_DEBUG_SPHERE(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
         }
     }
     else
     {
-        DrawDebugSphere(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
+        RS_DRAW_DEBUG_SPHERE(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
     }
 }
 

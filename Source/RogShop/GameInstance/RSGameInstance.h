@@ -18,5 +18,12 @@ public:
 	void TravelToLevel(const TSoftObjectPtr<UWorld>& TargetLevelAsset) const;
 
 public:
+	bool GetDebugLogEnabled() const;
+
+	void SetDebugLogEnabled(bool bEnable);
+
 	TArray<FName> PurchasedItemIDs;
+
+private:
+	bool bEnableDebugLog = false;
 };

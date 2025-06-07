@@ -4,9 +4,11 @@
 #include "RSCheatManager.h"
 #include "RSDunMonsterCharacter.h"
 #include "RSDunPlayerController.h"
+#include "RSGameInstance.h"
 
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "RogShop/UtilDefine.h"
 
 URSCheatManager::URSCheatManager()
 {
@@ -50,22 +52,22 @@ void URSCheatManager::TestDunMonsterAttack()
 
 void URSCheatManager::TestDunMonsterDeath()
 {
-    UE_LOG(LogTemp, Warning, TEXT("1"));
+    RS_LOG_DEBUG("1");
     UWorld* World = GetWorld();
     if (!World)
     {
-        UE_LOG(LogTemp, Warning, TEXT("2"));
+        RS_LOG_DEBUG("2");
         return;
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("3"));
+    RS_LOG_DEBUG("3");
     ARSDunMonsterCharacter* Monster = Cast<ARSDunMonsterCharacter>(
         UGameplayStatics::GetActorOfClass(World, ARSDunMonsterCharacter::StaticClass())
     );
 
     if (Monster)
     {
-        UE_LOG(LogTemp, Warning, TEXT("4"));
+        RS_LOG_DEBUG("4");
         //Monster->PlayDeathAnim();
         Monster->OnDeath();
     }
@@ -74,7 +76,10 @@ void URSCheatManager::TestDunMonsterDeath()
 void URSCheatManager::SpawnMonster(FString MonsterName)
 {
     UWorld* World = GetWorld();
-    if (!World) return;
+    if (!World)
+    {
+        return;
+    }
 
     FVector PlayerLocation = GetOuterAPlayerController()->GetPawn()->GetActorLocation();
     FVector Forward = GetOuterAPlayerController()->GetPawn()->GetActorForwardVector(); // �÷��̾ �ٶ󺸴� ����
@@ -83,30 +88,36 @@ void URSCheatManager::SpawnMonster(FString MonsterName)
     FVector DirectionToPlayer = (PlayerLocation - SpawnLocation).GetSafeNormal();
     FRotator SpawnRotation = FRotationMatrix::MakeFromX(DirectionToPlayer).Rotator();
 
-
     FString Key = MonsterName.ToLower();
     if (TSubclassOf<AActor>* FoundClass = MonsterMap.Find(Key))
     {
         World->SpawnActor<AActor>(*FoundClass, SpawnLocation, SpawnRotation);
-        UE_LOG(LogTemp, Warning, TEXT("Spawned monster: %s"), *Key);
+        RS_LOG_DEBUG("Spawned monster: %s", *Key);
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("Monster not found for key: %s"), *Key);
+        RS_LOG_DEBUG("Monster not found for key: %s", *Key);
     }
 }
 
 void URSCheatManager::SpawnDunShopNPC()
 {
     UWorld* World = GetWorld();
-    if (!World) return;
+
+    if (!World)
+    {
+        return;
+    }
 
     APlayerController* PC = GetOuterAPlayerController();
-    if (!PC) return;
+
+    if (!PC)
+    {
+        return;
+    }
 
     if (!DunShopNPCClass)
     {
-        UE_LOG(LogTemp, Warning, TEXT("DunShopNPCClass is not set!"));
         return;
     }
 
@@ -121,21 +132,18 @@ void URSCheatManager::SpawnWeaponPad()
 {
     if (!GetWorld() || !WeaponSpawnPadBPClass)
     {
-        UE_LOG(LogTemp, Warning, TEXT("GetWorld or WeaponSpawnPadBPClass Is Null !"));
         return;
     }
 
     APlayerController* PC = GetOuterAPlayerController();
     if (!PC)
     {
-        UE_LOG(LogTemp, Warning, TEXT("APlayerController Is Null !"));
         return;
     }
 
     APawn* PlayerPawn = PC->GetPawn();
     if (!PlayerPawn)
     {
-        UE_LOG(LogTemp, Warning, TEXT("APawn Is Null !"));
         return;
     }
 
@@ -151,6 +159,25 @@ void URSCheatManager::SpawnWeaponPad()
     FRotator SpawnRotation = FRotator::ZeroRotator;
 
     GetWorld()->SpawnActor<AActor>(WeaponSpawnPadBPClass, SpawnLocation, SpawnRotation);
+}
+
+void URSCheatManager::ToggleDebugLog() const
+{
+    if (!GetWorld())
+    {
+        return;
+    }
+
+    URSGameInstance* RSGameInstance = Cast<URSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+
+    if (!RSGameInstance)
+    {
+        return;
+    }
+
+    RSGameInstance->SetDebugLogEnabled(!RSGameInstance->GetDebugLogEnabled());
+
+    RS_LOG_DEBUG("DebugLog is now: Enabled");
 }
 
 void URSCheatManager::OpenTycoonLevel()

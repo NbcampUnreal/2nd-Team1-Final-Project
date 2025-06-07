@@ -9,7 +9,11 @@ void URSGameInstance::TravelToLevel(const TSoftObjectPtr<UWorld>& TargetLevelAss
 {
 	if (TargetLevelAsset.IsNull())
 	{
-		RS_LOG_C("TargetLevelAsset is Null", FColor::Red)
+		if (bEnableDebugLog)
+		{
+			RS_LOG_C("TargetLevelAsset is Null", FColor::Red)
+		}
+		
 		return;
 	}
 
@@ -19,4 +23,14 @@ void URSGameInstance::TravelToLevel(const TSoftObjectPtr<UWorld>& TargetLevelAss
 	// 레벨 이름만 추출하고 이동
 	FName LevelName = FName(*FPackageName::GetShortName(LevelPath));
 	UGameplayStatics::OpenLevel(GetWorld(), LevelName);
+}
+
+bool URSGameInstance::GetDebugLogEnabled() const
+{
+	return bEnableDebugLog;
+}
+
+void URSGameInstance::SetDebugLogEnabled(bool bEnable)
+{
+	bEnableDebugLog = bEnable;
 }
