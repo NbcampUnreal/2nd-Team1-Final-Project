@@ -176,7 +176,7 @@ void URSSpawnManager::SpawnShopNPCInLevel()
 	TArray<ATargetPoint*> ShopPoints;
 	for (TActorIterator<ATargetPoint> It(World); It; ++It)
 	{
-		if (It->Tags.Contains(FName("NPC")))
+		if (It->Tags.Contains(FName("Shop")))
 			ShopPoints.Add(*It);
 	}
 
@@ -190,6 +190,7 @@ void URSSpawnManager::SpawnShopNPCInLevel()
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	World->SpawnActor<AActor>(ShopNPCClass, SpawnTransform, SpawnParams);
+	UE_LOG(LogTemp, Warning, TEXT("상점 생성 성공"));
 }
 
 // Player 태그가 있는 TargetPoint에 플레이어 이동 또는 스폰
