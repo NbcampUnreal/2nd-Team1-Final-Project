@@ -14,6 +14,7 @@
 
 #include "RSDunPlayerCharacter.h"
 #include "RSDunPlayerController.h"
+#include "RogShop/UtilDefine.h"
 
 void URSDunShopWidget::NativeOnInitialized()
 {
@@ -47,10 +48,6 @@ void URSDunShopWidget::UpdateLifeEssence(int NewLifeEssence)
     {
         FString LifeEssenceString = FString::Printf(TEXT("%d"), NewLifeEssence); // 정수 형태로 변환
         LifeEssenceText->SetText(FText::FromString(LifeEssenceString));
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("NewLifeEssence Null!"));
     }
 }
 
@@ -125,7 +122,7 @@ void URSDunShopWidget::PopulateShopItems()
 
     if (!DataSubsystem || !DataSubsystem->Weapon || !DataSubsystem->Relic)
     {
-        UE_LOG(LogTemp, Warning, TEXT("DataSubsystem or DataTables are null"));
+        RS_LOG_DEBUG("DataSubsystem or DataTables are null");
         return;
     }
 
@@ -141,7 +138,7 @@ void URSDunShopWidget::PopulateShopItems()
 
         if (!ItemData)
         {
-            UE_LOG(LogTemp, Warning, TEXT("ItemData is Null"));
+            RS_LOG_DEBUG("ItemData is Null");
             continue;
         }
 

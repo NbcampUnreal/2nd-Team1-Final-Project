@@ -14,7 +14,7 @@
 #include "RSDataSubsystem.h"
 #include "Engine/World.h"
 #include "Components/CapsuleComponent.h"
-
+#include "RogShop/UtilDefine.h"
 
 // 외부에서 전달받은 월드 및 테이블 초기화
 void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, TSubclassOf<AActor> ShopNPC, TSubclassOf<AActor> DunNextStagePortal)
@@ -33,12 +33,12 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, T
 
 	if (!MonsterRawTable)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed Update MonsterRawTable"));
+		RS_LOG_DEBUG("Failed Update MonsterRawTable");
 		return;
 	}
 	if (!MonsterStateTable)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed Update Monster"));
+		RS_LOG_DEBUG("Failed Update Monster");
 		return;
 	}
 	
@@ -56,7 +56,7 @@ void URSSpawnManager::SpawnMonstersInLevel()
 {
 	if (!World || !MonsterRawTable || !MonsterStateTable) //월드나 테이블이 초기화되지 않았으면 리턴
 	{
-		UE_LOG(LogTemp, Warning, TEXT("몬스터 스폰 실패: 월드 또는 테이블이 초기화되지 않음"));
+		RS_LOG_DEBUG("몬스터 스폰 실패: 월드 또는 테이블이 초기화되지 않음");
 		return;
 	}
 
@@ -85,7 +85,7 @@ void URSSpawnManager::SpawnMonstersInLevel()
 
 	if (AllGroups.Num() == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MonsterRawTable에 데이터가 없습니다."));
+		RS_LOG_DEBUG("MonsterRawTable에 데이터가 없습니다.");
 		return;
 	}
 
@@ -99,7 +99,7 @@ void URSSpawnManager::SpawnMonstersInLevel()
 		// 타겟포인트가 없다면 경고로그 출력후 건너뜀
 		if (TilePoints.Num() == 0)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("타일 %s 에 타겟포인트가 없습니다."), *Pair.Key.ToString());
+			RS_LOG_DEBUG("타일 %s 에 타겟포인트가 없습니다.", *Pair.Key.ToString());
 			continue;
 		}
 
@@ -128,7 +128,7 @@ void URSSpawnManager::SpawnMonstersInLevel()
 				// 타겟포인트가 비어있다면 스폰 일부 생략
 				if (ShuffledPoints.Num() == 0)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("스폰할 타겟포인트가 부족하여 몬스터 일부는 생략됩니다."));
+					RS_LOG_DEBUG("스폰할 타겟포인트가 부족하여 몬스터 일부는 생략됩니다.");
 					break;
 				}
 
@@ -147,7 +147,7 @@ void URSSpawnManager::SpawnMonstersInLevel()
 				//생성 실패시 로그 출력
 				if (!Monster)
 				{
-					UE_LOG(LogTemp, Error, TEXT("몬스터 스폰 실패: %s"), *StateRow->MonsterClass->GetName());
+					RS_LOG_DEBUG("몬스터 스폰 실패: %s", *StateRow->MonsterClass->GetName());
 					continue;
 				}
 
@@ -169,7 +169,7 @@ void URSSpawnManager::SpawnShopNPCInLevel()
 {
 	if (!World || !ShopNPCClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("상점 생성 실패"));
+		RS_LOG_DEBUG("상점 생성 실패");
 		return;
 	}
 
@@ -197,7 +197,7 @@ void URSSpawnManager::SpawnPlayerAtStartPoint()
 {
 	if (!World)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed CreatePlayerCharacter"));
+		RS_LOG_DEBUG("Failed CreatePlayerCharacter");
 		return;
 	}
 
@@ -209,8 +209,8 @@ void URSSpawnManager::SpawnPlayerAtStartPoint()
 		// 모든 타겟포인트의 태그와 위치를 로그로 출력
 		if (It->Tags.Contains(FName("Player")))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("TargetPoint 이름: %s, 위치: %s, 태그 수: %d"),
-				*Target->GetName(),
+			RS_LOG_DEBUG("TargetPoint 이름: %s, 위치: %s, 태그 수: %d", 
+				*Target->GetName(), 
 				*Target->GetActorLocation().ToString(),
 				Target->Tags.Num());
 		}
@@ -225,7 +225,7 @@ void URSSpawnManager::SpawnPlayerAtStartPoint()
 
 	if (!StartPoint)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("스타트 포인트가 null입니다"));
+		RS_LOG_DEBUG("스타트 포인트가 null입니다");
 		return;
 	}
 
@@ -234,11 +234,11 @@ void URSSpawnManager::SpawnPlayerAtStartPoint()
 
 	if (!ExistingPlayer)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ExistingPlayer가 nullptr입니다."));
+		RS_LOG_DEBUG("ExistingPlayer가 nullptr입니다.");
 	}
 	if (!World)
 	{
-		UE_LOG(LogTemp, Error, TEXT("World가 nullptr입니다."));
+		RS_LOG_DEBUG("World가 nullptr입니다.");
 	}
 
 	if (ExistingPlayer)
@@ -261,7 +261,7 @@ FVector URSSpawnManager::GetBossArenaLocation() const
 {
 	if (!World)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("월드가 유효하지 않습니다."));
+		RS_LOG_DEBUG("월드가 유효하지 않습니다.");
 		return FVector::ZeroVector;
 	}
 
@@ -269,12 +269,12 @@ FVector URSSpawnManager::GetBossArenaLocation() const
 	{
 		if (It->Tags.Contains(FName("BossArena")))
 		{
-			UE_LOG(LogTemp, Log, TEXT("BossArena 타겟포인트 발견: %s"), *It->GetName());
+			RS_LOG_DEBUG("BossArena 타겟포인트 발견: %s", *It->GetName());
 			return It->GetActorLocation();
 		}
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("BossArena 태그가 있는 타겟포인트를 찾지 못했습니다."));
+	RS_LOG_DEBUG("BossArena 태그가 있는 타겟포인트를 찾지 못했습니다.");
 	return FVector::ZeroVector;
 }
 
@@ -282,7 +282,7 @@ AActor* URSSpawnManager::SpawnBossPortal(const FVector& BossWorldLocation, TSubc
 {
 	if (!World)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("World가 유효하지 않아 BossPortalTarget 검색 실패"));
+		RS_LOG_DEBUG("World가 유효하지 않아 BossPortalTarget 검색 실패");
 		return nullptr;
 	}
 
@@ -299,15 +299,14 @@ AActor* URSSpawnManager::SpawnBossPortal(const FVector& BossWorldLocation, TSubc
 			if (FMath::Abs(TargetLocation.X - BossWorldLocation.X) <= TileHalfSize &&
 				FMath::Abs(TargetLocation.Y - BossWorldLocation.Y) <= TileHalfSize)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("보스 포탈 타겟 발견: %s"), *Target->GetName());
+				RS_LOG_DEBUG("보스 포탈 타겟 발견: %s", *Target->GetName());
 				FActorSpawnParameters Params;
 				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 				FTransform SpawnTransform;
 				SpawnTransform.SetLocation(BossWorldLocation);
 				SpawnTransform.SetRotation(FQuat::Identity);
 				ARSDunBossRoomPortal* SpawnedPortal = World->SpawnActor<ARSDunBossRoomPortal>(PortalClass, SpawnTransform, Params);
-				UE_LOG(LogTemp, Warning, TEXT("보스포탈 생성 완료"));
-
+				RS_LOG_DEBUG("보스포탈 생성 완료");
 
 				if (SpawnedPortal)
 				{
@@ -315,7 +314,7 @@ AActor* URSSpawnManager::SpawnBossPortal(const FVector& BossWorldLocation, TSubc
 					BossArenaTransform.SetLocation(GetBossArenaLocation());
 					BossArenaTransform.SetRotation(FQuat::Identity);
 					SpawnedPortal->SetTargetTransform(BossArenaTransform);
-					UE_LOG(LogTemp, Warning, TEXT("보스 아레나 위치 지정 완료"));
+					RS_LOG_DEBUG("보스 아레나 위치 지정 완료");
 				}
 
 				return Target;
@@ -323,8 +322,7 @@ AActor* URSSpawnManager::SpawnBossPortal(const FVector& BossWorldLocation, TSubc
 		}
 	}
 
-
-	UE_LOG(LogTemp, Warning, TEXT("보스 타일 범위 내에서 BossArena 타겟을 찾지 못했습니다."));
+	RS_LOG_DEBUG("보스 타일 범위 내에서 BossArena 타겟을 찾지 못했습니다.");
 	return nullptr;
 }
 
@@ -332,7 +330,7 @@ FVector URSSpawnManager::GetNextStageLocation() const
 {
 	if (!World)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("월드가 유효하지 않습니다."));
+		RS_LOG_DEBUG("월드가 유효하지 않습니다.");
 		return FVector::ZeroVector;
 	}
 
@@ -340,12 +338,12 @@ FVector URSSpawnManager::GetNextStageLocation() const
 	{
 		if (It->Tags.Contains(FName("NextPotal")))
 		{
-			UE_LOG(LogTemp, Log, TEXT("NextPotal 타겟포인트 발견: %s"), *It->GetName());
+			RS_LOG_DEBUG("NextPotal 타겟포인트 발견: %s", *It->GetName());
 			return It->GetActorLocation();
 		}
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("NextPotal 태그가 있는 타겟포인트를 찾지 못했습니다."));
+	RS_LOG_DEBUG("NextPotal 태그가 있는 타겟포인트를 찾지 못했습니다.");
 	return FVector::ZeroVector;
 }
 
@@ -355,7 +353,7 @@ void URSSpawnManager::SpawnDunNextStagePortal() // 다음 스테이지 포탈 �
 {
 	if (!World || !DunNextStagePortalClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("다음 스테이지 포탈 생성 실패: World 또는 PortalClass 누락"));
+		RS_LOG_DEBUG("다음 스테이지 포탈 생성 실패: World 또는 PortalClass 누락");
 		return;
 	}
 
@@ -366,6 +364,6 @@ void URSSpawnManager::SpawnDunNextStagePortal() // 다음 스테이지 포탈 �
 
 	if (DunNextStagePortalInstance)
 	{
-		UE_LOG(LogTemp, Log, TEXT("다음 스테이지 포탈 생성 완료"));
+		RS_LOG_DEBUG("다음 스테이지 포탈 생성 완료");
 	}
 }

@@ -8,7 +8,7 @@
 #include "RSDungeonGameModeBase.h"
 #include "Engine/World.h"
 #include "Containers/Queue.h"
-
+#include "RogShop/UtilDefine.h"
 
 //생성자 : 기본값 초기화
 ARSMapGenerator::ARSMapGenerator()
@@ -488,12 +488,12 @@ ULevelStreamingDynamic* ARSMapGenerator::StreamTile(TSoftObjectPtr<UWorld> Level
 
     if (!bLoadSuccess || !StreamingLevel)
     {
-        UE_LOG(LogTemp, Warning, TEXT("레벨 로드 실패: %s"), *LevelToStream.ToString());
+        RS_LOG_DEBUG("레벨 로드 실패: %s", *LevelToStream.ToString());
     }
     else
     {
         StreamingLevel->OnLevelShown.AddUniqueDynamic(this, &ARSMapGenerator::OnSubLevelLoaded);
-        UE_LOG(LogTemp, Log, TEXT("레벨 로드 성공: %s"), *LevelToStream.ToString());
+        RS_LOG_DEBUG("레벨 로드 성공: %s", *LevelToStream.ToString());
     }
     return StreamingLevel;
 }
@@ -552,7 +552,7 @@ void ARSMapGenerator::ChooseShopTile()
 // 스트리밍 타일 로딩 완료 시 호출
 void ARSMapGenerator::OnSubLevelLoaded()
 {
-    UE_LOG(LogTemp, Warning, TEXT("서브 레벨 로딩 완료됨"));
+    RS_LOG_DEBUG("서브 레벨 로딩 완료됨");
     CheckAllTilesLoaded();
 
     //지연을 두고 로드 체크
@@ -586,7 +586,7 @@ void ARSMapGenerator::CheckAllTilesLoaded()
             }
         }
 
-        UE_LOG(LogTemp, Warning, TEXT("모든 타일 로딩 완료. GameMode로 전달"));
+        RS_LOG_DEBUG("모든 타일 로딩 완료. GameMode로 전달");
     }
     else if (!bAllLoaded)
     {
