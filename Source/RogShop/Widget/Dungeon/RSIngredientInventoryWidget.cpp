@@ -9,6 +9,7 @@
 #include "CookFoodData.h"
 #include "ItemSlot.h"
 #include "RSTycoonPlayerController.h"
+#include "RogShop/UtilDefine.h"
 
 void URSIngredientInventoryWidget::NativeConstruct()
 {
@@ -28,7 +29,7 @@ void URSIngredientInventoryWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
 {
 	if (!IngredientSlots || !InvecntorySlotWidgetClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SlotImageWidgetClass Null"));
+		RS_LOG_DEBUG("SlotImageWidgetClass Null");
 		return;
 	}
 

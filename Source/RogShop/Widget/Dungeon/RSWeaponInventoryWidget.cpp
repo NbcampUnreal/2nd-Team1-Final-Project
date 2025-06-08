@@ -8,6 +8,7 @@
 #include "RSPlayerWeaponComponent.h"
 #include "RSDataSubsystem.h"
 #include "ItemInfoData.h"
+#include "RogShop/UtilDefine.h"
 
 #include "Components/Image.h"
 
@@ -38,7 +39,7 @@ FReply URSWeaponInventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeom
         }
         else
         {
-            UE_LOG(LogTemp, Warning, TEXT("Invalid slot on mouse down"));
+            RS_LOG_DEBUG("Invalid slot on mouse down");
             return FReply::Unhandled();
         }
 
@@ -65,7 +66,7 @@ FReply URSWeaponInventoryWidget::NativeOnMouseButtonUp(const FGeometry& InGeomet
 
 void URSWeaponInventoryWidget::HandleLongPress()
 {
-    UE_LOG(LogTemp, Warning, TEXT("Long Press Detected on URSWeaponInventoryWidget Index: %d"), (int32)HeldSlotType);
+    RS_LOG_DEBUG("Long Press Detected on URSWeaponInventoryWidget Index: %d", (int32)HeldSlotType);
 
     // 추가 작업 필요
     ARSDunPlayerCharacter* DunPlayerChar = GetOwningPlayerPawn<ARSDunPlayerCharacter>();

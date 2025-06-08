@@ -116,10 +116,6 @@ void URSTycoonManagementWidget::BuyTileBorderSlide()
 			bIsBuyTileBorderValid = false;
 		}
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("BuyTileBorderSlideAni Null"));
-	}
 }
 
 void URSTycoonManagementWidget::BuyNPCBorderSlide()
@@ -142,10 +138,6 @@ void URSTycoonManagementWidget::BuyNPCBorderSlide()
 			PlayAnimation(BuyNPCBorderCloseAni);
 			bIsBuyNPCBorderValid = false;
 		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("BuyNPCParentBorderSlide Null"));
 	}
 }
 

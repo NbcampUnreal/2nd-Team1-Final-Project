@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "RSDunPlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "RogShop/UtilDefine.h"
 
 URSMeleeAttackBoxComponent::URSMeleeAttackBoxComponent()
 {
@@ -57,10 +58,9 @@ void URSMeleeAttackBoxComponent::OnAttackOverlap(
 		FVector KnockbackForce = KnockbackDir * 5000.f;
 
 		MoveComp->AddImpulse(KnockbackForce, true);
-		UE_LOG(LogTemp, Warning, TEXT("KnockBack Success!!"));
+		RS_LOG_DEBUG("KnockBack Success!!");
 	}
 
 	// Overlap 테스트용 로그
-	UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"), *OtherActor->GetName());
-
+	RS_LOG_DEBUG("Hit actor: %s", *OtherActor->GetName());
 }

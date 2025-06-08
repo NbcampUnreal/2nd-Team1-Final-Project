@@ -7,6 +7,7 @@
 #include "ItemInfoData.h"
 #include "Components/UniformGridPanel.h"
 #include "RSInventorySlotWidget.h"
+#include "RogShop/UtilDefine.h"
 
 void URSRelicInventoryWidget::NativeConstruct()
 {
@@ -26,7 +27,7 @@ void URSRelicInventoryWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
 {
     if (!RelicSlots || !InvecntorySlotWidgetClass)
     {
-        UE_LOG(LogTemp, Warning, TEXT("SlotImageWidgetClass Null"));
+        RS_LOG_DEBUG("SlotImageWidgetClass Null");
         return;
     }
 

@@ -93,10 +93,6 @@ void URSPlayerStatusWidget::UpdateHP()
         FString HPString = FString::Printf(TEXT("%.0f"), PlayerChar->GetHP()); // 소수점 없는 정수 형태로 변환
         HPText->SetText(FText::FromString(HPString));
     }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("PlayerChar or HPText Null!"));
-    }
 }
 
 void URSPlayerStatusWidget::UpdateMaxHP()
@@ -108,10 +104,6 @@ void URSPlayerStatusWidget::UpdateMaxHP()
         FString MaxHPString = FString::Printf(TEXT("%.0f"), PlayerChar->GetMaxHP()); // 소수점 없는 정수 형태로 변환
         MaxHPText->SetText(FText::FromString(MaxHPString));
     }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("PlayerChar or MaxHPText Null!"));
-    }
 }
 
 void URSPlayerStatusWidget::UpdateLifeEssence(int NewLifeEssence)
@@ -120,9 +112,5 @@ void URSPlayerStatusWidget::UpdateLifeEssence(int NewLifeEssence)
     {
         FString LifeEssenceString = FString::Printf(TEXT("%d"), NewLifeEssence); // 정수 형태로 변환
         LifeEssenceText->SetText(FText::FromString(LifeEssenceString));
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("NewLifeEssence Null!"));
     }
 }

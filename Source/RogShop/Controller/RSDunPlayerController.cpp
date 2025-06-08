@@ -67,10 +67,6 @@ void ARSDunPlayerController::InitializeRSDunMainWidget()
             RSDunMainHUDWidget->AddToViewport();
         }
     }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("RSDunMainHUDWidgetClass Null !"));
-    }
 }
 
 void ARSDunPlayerController::TogglePlayerInventoryWidget()

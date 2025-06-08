@@ -154,7 +154,7 @@ void ARSTycoonPlayerController::OnClickTile()
 	if (GetHitResultUnderCursor(ECC_WorldDynamic, true, HitResult))
 	{
 		//디버그
-		DrawDebugSphere(GetWorld(), HitResult.Location, 40, 20, FColor::Blue, false, 5);
+		RS_DRAW_DEBUG_SPHERE(GetWorld(), HitResult.Location, 40, 20, FColor::Blue, false, 5, 0, 1.0f);
 
 		AActor* HitActor = HitResult.GetActor();
 		if (ARSBaseTile* Tile = Cast<ARSBaseTile>(HitActor))

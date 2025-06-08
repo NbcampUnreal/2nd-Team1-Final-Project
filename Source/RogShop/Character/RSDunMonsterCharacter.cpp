@@ -224,16 +224,16 @@ void ARSDunMonsterCharacter::PerformAttackTrace()
 				RS_LOG("플레이어가 아닌 Pawn(몬스터, 가짜 Pawn 등)이 공격에 맞았습니다!");
 			}
 
-			DrawDebugBox(GetWorld(), Start, StartTraceBoxHalfSize, Rotation, bPlayerHit ? FColor::Red : FColor::Green, false, DrawDebugLineSeconds);
-			DrawDebugLine(GetWorld(), Start, End, bPlayerHit ? FColor::Red : FColor::Yellow, false, DrawDebugLineSeconds, 2, DrawDebugLineThickness);
-			DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, bPlayerHit ? FColor::Red : FColor::Green, false, DrawDebugLineSeconds);
+			RS_DRAW_DEBUG_BOX(GetWorld(), Start, StartTraceBoxHalfSize, Rotation, bPlayerHit ? FColor::Red : FColor::Green, false, DrawDebugLineSeconds, 0, 1.0f);
+			RS_DRAW_DEBUG_LINE(GetWorld(), Start, End, bPlayerHit ? FColor::Red : FColor::Yellow, false, DrawDebugLineSeconds, 2, DrawDebugLineThickness);
+			RS_DRAW_DEBUG_BOX(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, bPlayerHit ? FColor::Red : FColor::Green, false, DrawDebugLineSeconds, 0, 1.0f);
 
 		}
 		else
 		{
-			DrawDebugBox(GetWorld(), Start, StartTraceBoxHalfSize, Rotation, FColor::Green, false, DrawDebugLineSeconds);
-			DrawDebugLine(GetWorld(), Start, End, FColor::Yellow, false, DrawDebugLineSeconds, 2, DrawDebugLineThickness);
-			DrawDebugBox(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, FColor::Green, false, DrawDebugLineSeconds);
+			RS_DRAW_DEBUG_BOX(GetWorld(), Start, StartTraceBoxHalfSize, Rotation, FColor::Green, false, DrawDebugLineSeconds, 0, 1.0f);
+			RS_DRAW_DEBUG_LINE(GetWorld(), Start, End, FColor::Yellow, false, DrawDebugLineSeconds, 2, DrawDebugLineThickness);
+			RS_DRAW_DEBUG_BOX(GetWorld(), Center, LocalTraceBoxHalfSize, Rotation, FColor::Green, false, DrawDebugLineSeconds, 0, 1.0f);
 			RS_LOG("몬스터의 공격에 Pawn이 아닌 물체가 맞았거나 아무도 맞지 않았습니다!");
 		}
 	}
@@ -275,7 +275,8 @@ void ARSDunMonsterCharacter::FindNearPatrolPoint()
 		FCollisionShape::MakeSphere(maxDetectPatrolRoute),
 		collisionQueryParms
 	);
-//	DrawDebugSphere(GetWorld(), GetActorLocation(), maxDetectPatrolRoute, 16, FColor::Red, false, 60.f);
+
+//	RS_DRAW_DEBUG_SPHERE(GetWorld(), GetActorLocation(), maxDetectPatrolRoute, 16, FColor::Red, false, 60.f, 0, 1.0f);
 
 	if (!overlapResults.IsEmpty())
 	{

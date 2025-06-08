@@ -16,6 +16,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "RSDataSubsystem.h"
 #include "ItemInfoData.h"
+#include "RogShop/UtilDefine.h"
 
 void URSDunItemWidget::NativeConstruct()
 {
@@ -83,10 +84,6 @@ void URSDunItemWidget::OnBuyClicked()
             GI->PurchasedItemIDs.Add(CurrentRowName);  // 아이템 구매 후 중복 생성 방지를 위한 해당 아이디 저장
         }
     }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("No Buy Item"));
-    }
 }
 
 bool URSDunItemWidget::BuyItem()
@@ -96,13 +93,12 @@ bool URSDunItemWidget::BuyItem()
 
     if (!PlayerChar)
     {
-        UE_LOG(LogTemp, Warning, TEXT("BuyItem - Character or PC is nullptr"));
         return false;
     }
 
     if (PlayerChar->GetLifeEssence() - ItemData.Price < 0)
     {
-        UE_LOG(LogTemp, Warning, TEXT("BuyItem - More LifeEssence Need %d"), ItemData.Price - PlayerChar->GetLifeEssence());
+        RS_LOG_DEBUG("BuyItem - More LifeEssence Need %d", ItemData.Price - PlayerChar->GetLifeEssence());
         return false;
     }
 
@@ -122,7 +118,7 @@ bool URSDunItemWidget::BuyItem()
             }
             else
             {
-                UE_LOG(LogTemp, Warning, TEXT("RelicClassData is Null"));
+                RS_LOG_DEBUG("RelicClassData is Null");
                 bIsBuy = false;
             }
 
@@ -149,14 +145,13 @@ bool URSDunItemWidget::BuyItem()
             }
             else
             {
-                UE_LOG(LogTemp, Warning, TEXT("SpawnedWeapon or WeaponComp is Null"));
                 bIsBuy = false;
             }
 
             break;
         }
         default:
-            UE_LOG(LogTemp, Warning, TEXT("Not Define Item"));
+            RS_LOG_DEBUG("Not Define Item");
             bIsBuy = false;
             break;
     }
