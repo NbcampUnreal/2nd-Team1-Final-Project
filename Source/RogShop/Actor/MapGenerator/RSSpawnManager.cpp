@@ -190,7 +190,7 @@ void URSSpawnManager::SpawnShopNPCInLevel()
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	World->SpawnActor<AActor>(ShopNPCClass, SpawnTransform, SpawnParams);
-	UE_LOG(LogTemp, Warning, TEXT("상점 생성 성공"));
+	RS_LOG_DEBUG("상점 생성 성공");
 }
 
 // Player 태그가 있는 TargetPoint에 플레이어 이동 또는 스폰
