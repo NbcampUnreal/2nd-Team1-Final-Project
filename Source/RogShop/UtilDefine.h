@@ -95,3 +95,19 @@ do { \
 		DrawDebugSphere(World, Center, Radius, Segments, Color, bPersistent, LifeTime, DepthPriority, Thickness); \
 	} \
 } while (0)
+
+#define RS_DRAW_DEBUG_BOX(World, Center, Extent, Rotation, Color, bPersistent, LifeTime, DepthPriority, Thickness) \
+do { \
+	if (IsDebugLogEnabled(World)) \
+	{ \
+		DrawDebugBox(World, Center, Extent, Rotation, Color, bPersistent, LifeTime, DepthPriority, Thickness); \
+	} \
+} while (0)
+
+#define RS_DRAW_DEBUG_LINE(World, LineStart, LineEnd, Color, bPersistent, LifeTime, DepthPriority, Thickness) \
+do { \
+	if (IsDebugLogEnabled(World)) \
+	{ \
+		DrawDebugLine(World, LineStart, LineEnd, Color, bPersistent, LifeTime, DepthPriority, Thickness); \
+	} \
+} while (0)

@@ -43,7 +43,7 @@ void ARSTycoonNPC::MoveToTarget(FVector Location, AActor* Target)
 		// false	// 목적지를 네비게이션 메시에 투영(Projection)하지 않음
 	);
 
-	DrawDebugSphere(GetWorld(), Location, 50, 30, FColor::Red, false, 5);
+	RS_DRAW_DEBUG_SPHERE(GetWorld(), Location, 50, 30, FColor::Red, false, 5, 0, 1.0f);
 	
 	if (Result == EPathFollowingRequestResult::Type::Failed)
 	{
