@@ -99,9 +99,9 @@ URSTycoonOrderSlotWidget* URSTycoonSaleWidget::GetOrderSlotWidget(FFoodOrder Ord
 	{
 		if (URSTycoonOrderSlotWidget* OrderSlot = Cast<URSTycoonOrderSlotWidget>(Widget))
 		{
-			// RS_LOG_F("비교 하는 위젯 Order : %s", *OrderSlot->GetOrder().FoodKey.ToString())
+			// RS_LOG_F("비교 하는 위젯 Order : %s", *OrderSlot->GetOrder().FoodKey.ToString());
 			//
-			// RS_LOG_F("비교 하는 위젯 Order Customer : %s", *OrderSlot->GetOrder().Customer->GetName())
+			// RS_LOG_F("비교 하는 위젯 Order Customer : %s", *OrderSlot->GetOrder().Customer->GetName());
 
 			if (OrderSlot->GetOrder() == Order)
 			{
@@ -110,9 +110,9 @@ URSTycoonOrderSlotWidget* URSTycoonSaleWidget::GetOrderSlotWidget(FFoodOrder Ord
 		}
 	}
 
-	RS_LOG_C("해당하는 Order의 맞는 슬롯이 없습니다", FColor::Red)
-	RS_LOG_F_C("들어온 Order Key : %s", FColor::Red, *Order.FoodKey.ToString())
-	RS_LOG_F_C("들어온 Order Customer : %s", FColor::Red, Order.Customer.Get() ? *Order.Customer->GetName() : TEXT("NULL"))
+	RS_LOG_C("해당하는 Order의 맞는 슬롯이 없습니다", FColor::Red);
+	RS_LOG_F_C("들어온 Order Key : %s", FColor::Red, *Order.FoodKey.ToString());
+	RS_LOG_F_C("들어온 Order Customer : %s", FColor::Red, Order.Customer.Get() ? *Order.Customer->GetName() : TEXT("NULL"));
 
 	return nullptr;
 }

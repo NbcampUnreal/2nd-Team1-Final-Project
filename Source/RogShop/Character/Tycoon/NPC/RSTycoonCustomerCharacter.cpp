@@ -9,16 +9,21 @@
 #include "RSTycoonGameModeBase.h"
 #include "RSTycoonPlayerController.h"
 #include "Components/SphereComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "RogShop/UtilDefine.h"
 #include "RogShop/Actor/Tycoon/Tile/RSDoorTile.h"
 #include "RogShop/Actor/Tycoon/Tile/RSTableTile.h"
+#include "RogShop/Widget/Tycoon/RSTycoonFoodBubbleWidget.h"
 
 // Sets default values
 ARSTycoonCustomerCharacter::ARSTycoonCustomerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	FoodBubbleWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("FoodBubble"));
+	FoodBubbleWidgetComponent->SetupAttachment(RootComponent);
 }
 
 void ARSTycoonCustomerCharacter::Sit(ARSTableTile* Table, const FTransform& SitTransform)
@@ -29,6 +34,13 @@ void ARSTycoonCustomerCharacter::Sit(ARSTableTile* Table, const FTransform& SitT
 
 	SetActorLocation(SitTransform.GetLocation());
 	SetActorRotation(SitTransform.GetRotation());
+
+	if (URSTycoonFoodBubbleWidget* BubbleWidget = Cast<URSTycoonFoodBubbleWidget>(FoodBubbleWidgetComponent->GetWidget()))
+	{
+		//보이는 것 설정해야함
+		// BubbleWidget->SetImage(WantFoodKey);
+	}
+
 }
 
 void ARSTycoonCustomerCharacter::WaitFood()
@@ -38,7 +50,7 @@ void ARSTycoonCustomerCharacter::WaitFood()
 	FFoodOrder Order;
 	Order.FoodKey = WantFoodKey;
 	Order.Customer = this;
-	
+
 	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
 	GameMode->AddOrder(Order);
 }
@@ -78,12 +90,12 @@ void ARSTycoonCustomerCharacter::Leave()
 	FCookFoodData* Data = GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Food->
 	                                         FindRow<FCookFoodData>(WantFoodKey, TEXT("Get Price Of Food"));
 
-	RS_LOG_F_C("손님이 식사를 다 했습니다, 골드 +%d", FColor::Yellow, Data->Price)
+	RS_LOG_F_C("손님이 식사를 다 했습니다, 골드 +%d", FColor::Yellow, Data->Price);
 
 	ARSDoorTile* DoorTile = Cast<ARSDoorTile>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSDoorTile::StaticClass()));
 	MoveToTarget(DoorTile->GetSpawnPoint(), DoorTile);
 
 	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->AddGold(Data->Price);
-	
+
 	OnFinishEat.Broadcast(this);
 }

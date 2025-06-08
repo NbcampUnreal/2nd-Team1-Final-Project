@@ -52,7 +52,7 @@ void ARSTycoonChefCharacter::FindCookingTile()
 
 	if (CookingTileActors.Num() == 0)
 	{
-		RS_LOG_C("가게에 화구가 없습니다!", FColor::Red)
+		RS_LOG_C("가게에 화구가 없습니다!", FColor::Red);
 		return;
 	}
 
@@ -97,7 +97,7 @@ void ARSTycoonChefCharacter::FindCookingTile()
 	//화구가 꽉 차는 등의 이유
 	if (TargetCookingTile == nullptr)
 	{
-		RS_LOG_C("배치될 화구가 없습니다!", FColor::Red)
+		RS_LOG_C("배치될 화구가 없습니다!", FColor::Red);
 		return;
 	}
 	
@@ -124,7 +124,7 @@ void ARSTycoonChefCharacter::InteractTarget(AActor* TargetActor)
 
 	if (ARSCookingTile* CookingTile = Cast<ARSCookingTile>(TargetActor))
 	{
-		RS_LOG("요리사가 화구에 배치 되었습니다.")
+		RS_LOG("요리사가 화구에 배치 되었습니다.");
 
 		FTransform ChefTransform = PlacedCookingTile->GetChefTransform();
 		SetActorLocation(ChefTransform.GetLocation());

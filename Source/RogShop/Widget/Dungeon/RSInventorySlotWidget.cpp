@@ -59,7 +59,7 @@ void URSInventorySlotWidget::HandleLongPress()
 
         IngredientInventoryComp->DropItem(ItemDataTableKey);
 
-        RS_LOG("UI 클릭")
+        RS_LOG("UI 클릭");
     }
 }
 

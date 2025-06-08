@@ -27,7 +27,7 @@ EBTNodeResult::Type UBTT_RSWaiterMoveCookingTile::ExecuteTask(UBehaviorTreeCompo
 	ARSCookingTile* Tile = Cast<ARSCookingTile>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TileKey));
 	if (Tile == nullptr)
 	{
-		RS_LOG_C("TargetTile이 설정되있지 않습니다", FColor::Red)
+		RS_LOG_C("TargetTile이 설정되있지 않습니다", FColor::Red);
 		return EBTNodeResult::Failed;
 	}
 

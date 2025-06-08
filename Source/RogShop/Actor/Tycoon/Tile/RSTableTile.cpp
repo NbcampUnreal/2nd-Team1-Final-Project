@@ -33,7 +33,7 @@ void ARSTableTile::Interact(ACharacter* InteractCharacter)
 	}
 	else
 	{
-		RS_LOG_C("상호작용이 불가능합니다.", FColor::Red)
+		RS_LOG_C("상호작용이 불가능합니다.", FColor::Red);
 	}
 }
 
@@ -42,11 +42,11 @@ void ARSTableTile::Sit(ARSTycoonCustomerCharacter* Customer)
 	int32 CanSitIndex = GetCanSitingLocationIndex();
 	if (CanSitIndex == INDEX_NONE)
 	{
-		RS_LOG_C("테이블에 앉을 수 없습니다", FColor::Red)
+		RS_LOG_C("테이블에 앉을 수 없습니다", FColor::Red);
 		return;
 	}
 	
-	RS_LOG("손님이 앉음")
+	RS_LOG("손님이 앉음");
  
 	SittingCustomers[CanSitIndex] = Customer;
 
@@ -128,7 +128,7 @@ void ARSTableTile::BeginPlay()
 
 void ARSTableTile::Order(ARSTycoonCustomerCharacter* Customer)
 {
-	RS_LOG("주문을 받음")
+	RS_LOG("주문을 받음");
 
 	Customer->WaitFood();
 }
@@ -141,14 +141,14 @@ void ARSTableTile::Serving(ACharacter* InteractCharacter)
 	AActor* PickupActor = CanPickupCharacter->GetPickupActor();
 	if (PickupActor == nullptr)
 	{
-		RS_LOG_C("들고있는 음식이 없습니다", FColor::Red)
+		RS_LOG_C("들고있는 음식이 없습니다", FColor::Red);
 		return;
 	}
 
 	ARSBaseFood* Food = Cast<ARSBaseFood>(PickupActor);
 	if (Food == nullptr)
 	{
-		RS_LOG_C("들고 있는 액터가 음식이 아닙니다.", FColor::Red)
+		RS_LOG_C("들고 있는 액터가 음식이 아닙니다.", FColor::Red);
 		return;
 	}
 
@@ -165,7 +165,7 @@ void ARSTableTile::Serving(ACharacter* InteractCharacter)
 	ARSTycoonCustomerCharacter* OrderedCustomer = SittingCustomers[ServingCustomerIndex];
 	if (OrderedCustomer)
 	{
-		RS_LOG("음식을 전달했습니다")
+		RS_LOG("음식을 전달했습니다");
 
 		FoodActors[ServingCustomerIndex] = PickupActor;
 
@@ -174,6 +174,6 @@ void ARSTableTile::Serving(ACharacter* InteractCharacter)
 	}
 	else
 	{
-		RS_LOG_C("주문하신 손님이 없습니다.", FColor::Red)
+		RS_LOG_C("주문하신 손님이 없습니다.", FColor::Red);
 	}
 }
