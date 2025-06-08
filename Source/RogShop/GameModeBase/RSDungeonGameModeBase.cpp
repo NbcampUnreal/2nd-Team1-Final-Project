@@ -105,6 +105,7 @@ void ARSDungeonGameModeBase::OnMapReady()// 맵 로딩이 완료되었을 때 �
             GameMode->SpawnManager->SpawnMonstersInLevel();
             GameMode->SpawnManager->SpawnShopNPCInLevel();
             GameMode->SpawnManager->SpawnBossPortal(GameMode->MapGeneratorInstance->BossWorldLocation, GameMode->BossPortal);
+            GameMode->SpawnManager->SpawnBossMonster();
         }
     });
 }

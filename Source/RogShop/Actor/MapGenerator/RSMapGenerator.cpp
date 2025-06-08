@@ -34,7 +34,7 @@ void ARSMapGenerator::BeginPlay()
     ExpandPathToCoverMinTiles(0.5f);
     FindBossRoom(); // 경로 중 가장 먼 타일을 보스방으로 설정
     SpawnTiles();
-    SpawnBossArenaLevel();
+
 }
 
 //현재 위치에서 이동할 수 있는 다음 위치 선택
@@ -292,6 +292,7 @@ void ARSMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
 //타일 스폰 (연결 방향에 따라 회전 설정)
 void ARSMapGenerator::SpawnTiles()
 {
+    SpawnBossArenaLevel();
     for (int32 X = 0; X < GridSize; ++X)
     {
         for (int32 Y = 0; Y < GridSize; ++Y)

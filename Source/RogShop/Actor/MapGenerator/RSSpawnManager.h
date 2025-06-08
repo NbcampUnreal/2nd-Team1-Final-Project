@@ -41,6 +41,9 @@ public:
 	// 플레이어를 시작 위치에 스폰 또는 이동
 	void SpawnPlayerAtStartPoint();
 
+	// 보스몬스터 스폰 함수
+	void SpawnBossMonster();
+
 	AActor* SpawnBossPortal(const FVector& BossWorldLocation, TSubclassOf<AActor> PortalClass); // 보스 아레나로 가는 포탈을 소환하는 함수
 
 	// 보스 아레나 위치를 반환하는 함수

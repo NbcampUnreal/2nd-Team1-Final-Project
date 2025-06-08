@@ -60,7 +60,9 @@ void URSSpawnManager::SpawnMonstersInLevel()
 		return;
 	}
 
-	TMap<FVector2D, TArray<AActor*>> TileToTargets; // 타일별로 타겟 포인트들을 저장할 맵
+	UE_LOG(LogTemp, Warning, TEXT("SpawnMonstersInLevel 시작됨"));
+
+	TMap<FIntPoint, TArray<AActor*>> TileToTargets; // 타일별로 타겟 포인트들을 저장할 맵
 
 
 	for (TActorIterator<ATargetPoint> It(World); It; ++It) // 월드 내의 모든 TargetPoint 중에서 Monster 태그를 가진 것들을 타일별로 분류
@@ -71,9 +73,9 @@ void URSSpawnManager::SpawnMonstersInLevel()
 			FVector Location = Target->GetActorLocation();
 
 			// 위치 기반 타일 좌표 계산 (맵 생성기 기준과 동일하게)
-			int32 TileX = FMath::FloorToInt(Location.X / 4000.f); // 타일사이즈 4000.0f
-			int32 TileY = FMath::FloorToInt(Location.Y / 4000.f);
-			FVector2D TileCoord(TileX, TileY);
+			int32 TileX = FMath::RoundToInt(Location.X / 4000.f); // 타일사이즈 4000.0f
+			int32 TileY = FMath::RoundToInt(Location.Y / 4000.f);
+			FIntPoint TileCoord(TileX, TileY);
 
 			TileToTargets.FindOrAdd(TileCoord).Add(Target); //해당 타일 좌표에 타겟포인트 추가
 		}
@@ -89,10 +91,10 @@ void URSSpawnManager::SpawnMonstersInLevel()
 		return;
 	}
 
-	int32 GroupIndex = 0; // 그룹 인덱스 초기화
+	int32 TotalSpawned = 0;
 
 	// 각 타일마다 반복하면서 몬스터 스폰시도
-	for (const TPair<FVector2D, TArray<AActor*>>& Pair : TileToTargets)
+	for (const TPair<FIntPoint, TArray<AActor*>>& Pair : TileToTargets)
 	{
 		const TArray<AActor*>& TilePoints = Pair.Value;
 
@@ -103,9 +105,7 @@ void URSSpawnManager::SpawnMonstersInLevel()
 			continue;
 		}
 
-		// 스폰 그룹을 순차적으로 선택
-		FMonsterSpawnGroupData* Group = AllGroups[GroupIndex % AllGroups.Num()];
-		GroupIndex++;
+		FMonsterSpawnGroupData* Group = AllGroups[FMath::RandRange(0, AllGroups.Num() - 1)];// 타일마다 그룹 하나를 랜덤으로 선택
 
 		// 타겟 포인트 순서를 랜덤 섞기
 		TArray<AActor*> ShuffledPoints = TilePoints;
@@ -113,10 +113,17 @@ void URSSpawnManager::SpawnMonstersInLevel()
 		int32 TargetIndex = 0;
 
 		// 그룹 내에 정의된 몬스터 수 만큼 생성
+		int TileSpawned = 0;
 		for (const FMonsterCount& Entry : Group->SpawnGroup)
 		{
 			// 몬스터 상태 정보 테이블에서 해당 몬스터 정보 조회
 			FMonsterData* StateRow = MonsterStateTable->FindRow<FMonsterData>(Entry.MonsterRowName, TEXT("MonsterStateLookup"));
+
+			UE_LOG(LogTemp, Warning, TEXT("타일 (%d,%d) → 몬스터: %s x %d"),
+				Pair.Key.X, Pair.Key.Y,
+				*Entry.MonsterRowName.ToString(), Entry.Count);
+
+			TileSpawned += Entry.Count;
 			if (!StateRow || !StateRow->MonsterClass)
 			{
 				continue;
@@ -135,7 +142,15 @@ void URSSpawnManager::SpawnMonstersInLevel()
 				// 타겟 포인트 순환적으로 사용
 				AActor* Target = ShuffledPoints[TargetIndex % ShuffledPoints.Num()];
 				TargetIndex++;
-				FTransform SpawnTransform = Target->GetActorTransform(); // 위치 정보
+				//위치 약간 분산되게 조정
+				float OffsetRadius = 100.f;
+				float Angle = FMath::DegreesToRadians((i * 360.f) / Entry.Count);
+				FVector Offset = FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0) * OffsetRadius;
+				FVector FinalLocation = Target->GetActorLocation() + Offset + FVector(0, 0, 50.f);
+
+				FTransform SpawnTransform;
+				SpawnTransform.SetLocation(FinalLocation);
+				SpawnTransform.SetRotation(FQuat::Identity);
 
 				FActorSpawnParameters Params;
 				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -159,9 +174,12 @@ void URSSpawnManager::SpawnMonstersInLevel()
 				//몬스터 능력치 초기화
 				Monster->IncreaseHP(StateRow->MaxHP);
 				Monster->ChangeMoveSpeed(StateRow->MoveSpeed);
+				TotalSpawned++;
 			}
 		}
+		UE_LOG(LogTemp, Warning, TEXT("타일 (%d,%d) → 총 스폰 수: %d"), Pair.Key.X, Pair.Key.Y, TileSpawned);
 	}
+	UE_LOG(LogTemp, Warning, TEXT("총 스폰된 몬스터 수: %d"), TotalSpawned);
 }
 
 // NPC 태그가 있는 TargetPoint 중 하나에 상점 NPC 스폰
@@ -258,11 +276,11 @@ void URSSpawnManager::SpawnPlayerAtStartPoint()
 	}
 }
 
-FVector URSSpawnManager::GetBossArenaLocation() const
+FVector URSSpawnManager::GetBossArenaLocation() const // 보스 아레나 위치를 찾는 함수
 {
 	if (!World)
 	{
-		RS_LOG_DEBUG("월드가 유효하지 않습니다.");
+		RS_LOG_DEBUG("[보스아레나] 월드가 유효하지 않습니다.");
 		return FVector::ZeroVector;
 	}
 
@@ -279,7 +297,7 @@ FVector URSSpawnManager::GetBossArenaLocation() const
 	return FVector::ZeroVector;
 }
 
-AActor* URSSpawnManager::SpawnBossPortal(const FVector& BossWorldLocation, TSubclassOf<AActor> PortalClass)
+AActor* URSSpawnManager::SpawnBossPortal(const FVector& BossWorldLocation, TSubclassOf<AActor> PortalClass) // 보스 포탈을 찾는 함수
 {
 	if (!World)
 	{
@@ -312,6 +330,14 @@ AActor* URSSpawnManager::SpawnBossPortal(const FVector& BossWorldLocation, TSubc
 				if (SpawnedPortal)
 				{
 					FTransform BossArenaTransform;
+					FVector SpawnLocation = GetBossArenaLocation();
+					ACharacter* ExistingPlayer = UGameplayStatics::GetPlayerCharacter(World, 0);
+					float HalfHeight = 88.f;
+					if (ExistingPlayer && ExistingPlayer->GetCapsuleComponent())
+					{
+						HalfHeight = ExistingPlayer->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+					}
+					SpawnLocation.Z += HalfHeight;
 					BossArenaTransform.SetLocation(GetBossArenaLocation());
 					BossArenaTransform.SetRotation(FQuat::Identity);
 					SpawnedPortal->SetTargetTransform(BossArenaTransform);
@@ -327,7 +353,7 @@ AActor* URSSpawnManager::SpawnBossPortal(const FVector& BossWorldLocation, TSubc
 	return nullptr;
 }
 
-FVector URSSpawnManager::GetNextStageLocation() const
+FVector URSSpawnManager::GetNextStageLocation() const //다음 스테이지 포탈 위치 찾는 함수
 {
 	if (!World)
 	{
@@ -367,4 +393,67 @@ void URSSpawnManager::SpawnDunNextStagePortal() // 다음 스테이지 포탈 �
 	{
 		RS_LOG_DEBUG("다음 스테이지 포탈 생성 완료");
 	}
+}
+
+void URSSpawnManager::SpawnBossMonster()
+{
+	if (!World || !MonsterStateTable)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("보스 몬스터 스폰 실패: World 또는 MonsterStateTable이 초기화되지 않음"));
+		return;
+	}
+
+	// Boss 태그가 붙은 TargetPoint 찾기
+	ATargetPoint* BossTarget = nullptr;
+	for (TActorIterator<ATargetPoint> It(World); It; ++It)
+	{
+		if (It->Tags.Contains(FName("Boss")))
+		{
+			BossTarget = *It;
+			break;
+		}
+	}
+
+	if (!BossTarget)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Boss 태그를 가진 TargetPoint를 찾을 수 없습니다."));
+		return;
+	}
+
+	// MonsterStateTable에서 MainFloor 행을 찾기
+	FName BossMonsterRowName(TEXT("MainFlower"));
+	FMonsterData* BossData = MonsterStateTable->FindRow<FMonsterData>(BossMonsterRowName, TEXT("SpawnBossMonster"));
+	if (!BossData || !BossData->MonsterClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MonsterStateTable에서 MainFloor 보스 몬스터 정보를 찾을 수 없습니다."));
+		return;
+	}
+
+	// 보스 스폰 위치 설정
+	FVector SpawnLocation = BossTarget->GetActorLocation();
+	FRotator SpawnRotation = BossTarget->GetActorRotation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	// 보스 몬스터 생성
+	ARSDunMonsterCharacter* BossMonster = World->SpawnActor<ARSDunMonsterCharacter>(
+		BossData->MonsterClass, SpawnLocation, SpawnRotation, SpawnParams);
+
+	if (!BossMonster)
+	{
+		UE_LOG(LogTemp, Error, TEXT("보스 몬스터 스폰 실패: %s"), *BossData->MonsterClass->GetName());
+		return;
+	}
+
+	// 위치 조정 (Z축 캡슐 반영)
+	SpawnLocation.Z += BossMonster->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+	BossMonster->SetActorLocation(SpawnLocation);
+
+	// 능력치 설정
+	BossMonster->IncreaseHP(BossData->MaxHP);
+	BossMonster->ChangeMoveSpeed(BossData->MoveSpeed);
+
+	UE_LOG(LogTemp, Warning, TEXT("보스 몬스터 '%s'가 스폰되었습니다."), *BossMonster->GetName());
+
 }
