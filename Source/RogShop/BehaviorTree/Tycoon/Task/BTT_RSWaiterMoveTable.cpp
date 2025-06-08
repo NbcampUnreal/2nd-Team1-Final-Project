@@ -25,7 +25,7 @@ EBTNodeResult::Type UBTT_RSWaiterMoveTable::ExecuteTask(UBehaviorTreeComponent& 
 		OwnerComp.GetBlackboardComponent()->GetValueAsObject(CustomerKey));
 	if (Customer == nullptr)
 	{
-		RS_LOG_C("TargetCustomer가 설정되있지 않습니다", FColor::Red)
+		RS_LOG_C("TargetCustomer가 설정되있지 않습니다", FColor::Red);
 		return EBTNodeResult::Failed;
 	}
 

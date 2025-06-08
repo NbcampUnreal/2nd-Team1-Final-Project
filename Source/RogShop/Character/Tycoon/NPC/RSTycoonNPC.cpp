@@ -47,7 +47,7 @@ void ARSTycoonNPC::MoveToTarget(FVector Location, AActor* Target)
 	
 	if (Result == EPathFollowingRequestResult::Type::Failed)
 	{
-		RS_LOG_C("NPC 이동 실패", FColor::Red)
+		RS_LOG_C("NPC 이동 실패", FColor::Red);
 
 		//재시도
 		FTimerHandle TimerHandle;

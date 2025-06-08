@@ -11,7 +11,7 @@ void URSGameInstance::TravelToLevel(const TSoftObjectPtr<UWorld>& TargetLevelAss
 	{
 		if (bEnableDebugLog)
 		{
-			RS_LOG_C("TargetLevelAsset is Null", FColor::Red)
+			RS_LOG_C("TargetLevelAsset is Null", FColor::Red);
 		}
 		
 		return;

@@ -29,6 +29,6 @@ void URSTycoonSaveGame::AddIngredient(FName IngredientKey, int32 Amount)
 	}
 	else
 	{
-		RS_LOG_C("재료를 추가하지 못했습니다.", FColor::Red)
+		RS_LOG_C("재료를 추가하지 못했습니다.", FColor::Red);
 	}
 }

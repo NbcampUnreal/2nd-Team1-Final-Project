@@ -26,7 +26,7 @@ int32 URSBaseInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 {
 	if (GetFilledSize() >= GetSlotMaxSize())
 	{
-		RS_LOG_C("인벤토리가 가득 찼습니다.", FColor::Red)
+		RS_LOG_C("인벤토리가 가득 찼습니다.", FColor::Red);
 		return -1;
 	}
 

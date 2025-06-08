@@ -159,7 +159,7 @@ void ARSTycoonPlayerController::OnClickTile()
 		AActor* HitActor = HitResult.GetActor();
 		if (ARSBaseTile* Tile = Cast<ARSBaseTile>(HitActor))
 		{
-			RS_LOG_F("%s 타일이 선택됬습니다", *HitActor->GetName())
+			RS_LOG_F("%s 타일이 선택됬습니다", *HitActor->GetName());
 
 			ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
 			check(TileMap)
@@ -180,7 +180,7 @@ void ARSTycoonPlayerController::OnClickTile()
 			}
 			else
 			{
-				RS_LOG("ManagementWidget is Null")
+				RS_LOG("ManagementWidget is Null");
 			}
 		}
 	}
