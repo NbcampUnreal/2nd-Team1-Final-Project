@@ -7,6 +7,7 @@
 #include "RSTycoonNPC.h"
 #include "RSTycoonCustomerCharacter.generated.h"
 
+class UWidgetComponent;
 class ARSTableTile;
 class USphereComponent;
 class ARSTycoonBaseAIController;
@@ -42,7 +43,7 @@ public:
 
 protected:
 	virtual void InteractTarget(AActor* TargetActor) override;
-
+	
 private:
 	void Leave();
 	
@@ -50,6 +51,10 @@ public:
 	FName WantFoodKey;
 
 	FOnFinishEat OnFinishEat;
+
+protected:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UWidgetComponent> FoodBubbleWidgetComponent;
 
 private:
 	UPROPERTY(VisibleAnywhere)
