@@ -78,7 +78,7 @@ void ARSTycoonCustomerCharacter::Leave()
 	FCookFoodData* Data = GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Food->
 	                                         FindRow<FCookFoodData>(WantFoodKey, TEXT("Get Price Of Food"));
 
-	RS_LOG_F_C("손님이 식사를 다 했습니다, 골드 +%d", FColor::Yellow, Data->Price)
+	RS_LOG_F_C("손님이 식사를 다 했습니다, 골드 +%d", FColor::Yellow, Data->Price);
 
 	ARSDoorTile* DoorTile = Cast<ARSDoorTile>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSDoorTile::StaticClass()));
 	MoveToTarget(DoorTile->GetSpawnPoint(), DoorTile);

@@ -213,7 +213,7 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 
 void ARSTycoonGameModeBase::EndSale()
 {
-	RS_LOG_C("게임 끝", FColor::Orange)
+	RS_LOG_C("게임 끝", FColor::Orange);
 
 	GetWorldTimerManager().ClearTimer(CustomerTimerHandle);
 	GetWorldTimerManager().ClearTimer(GameTimerHandle);

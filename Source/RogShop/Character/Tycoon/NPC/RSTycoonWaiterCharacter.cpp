@@ -26,7 +26,7 @@ void ARSTycoonWaiterCharacter::Pickup(AActor* Actor)
 {
 	if (PickupActor)
 	{
-		RS_LOG_C("이미 음식을 들고 있습니다", FColor::Red)
+		RS_LOG_C("이미 음식을 들고 있습니다", FColor::Red);
 		return;
 	}
 
@@ -40,7 +40,7 @@ AActor* ARSTycoonWaiterCharacter::Drop(FVector DropLocation)
 {
 	if (PickupActor == nullptr)
 	{
-		RS_LOG_C("들고있는 Actor가 없습니다", FColor::Red)
+		RS_LOG_C("들고있는 Actor가 없습니다", FColor::Red);
 		return nullptr;
 	}
 
@@ -110,7 +110,7 @@ void ARSTycoonWaiterCharacter::InteractTable(ARSTableTile* Table)
 		}
 		else
 		{
-			RS_LOG_C("들고 있는 엑터가 음식이 아닙니다.", FColor::Red)
+			RS_LOG_C("들고 있는 엑터가 음식이 아닙니다.", FColor::Red);
 		}
 	}
 }

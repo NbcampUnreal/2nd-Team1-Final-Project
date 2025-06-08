@@ -43,7 +43,7 @@ void ARSCookingTile::Interact(ACharacter* InteractCharacter)
 	}
 	else if (State == ECookingState::Cooking)
 	{
-		RS_LOG_F_C("요리중 입니다 : %s", FColor::Orange, *CookingFoodOrder.FoodKey.ToString())
+		RS_LOG_F_C("요리중 입니다 : %s", FColor::Orange, *CookingFoodOrder.FoodKey.ToString());
 	}
 }
 
@@ -55,7 +55,7 @@ void ARSCookingTile::OrderToCook()
 	auto& Orders = GameMode->GetOrders();
 	if (Orders.Num() == 0)
 	{
-		RS_LOG_C("오더가 없습니다", FColor::Red)
+		RS_LOG_C("오더가 없습니다", FColor::Red);
 		return;
 	}
 
@@ -125,6 +125,6 @@ void ARSCookingTile::TakeFood(ACharacter* InteractCharacter)
 	}
 	else
 	{
-		RS_LOG_C("화구에 완성된 음식이 없습니다", FColor::Red)
+		RS_LOG_C("화구에 완성된 음식이 없습니다", FColor::Red);
 	}
 }

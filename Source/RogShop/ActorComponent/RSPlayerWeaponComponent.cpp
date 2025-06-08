@@ -177,7 +177,7 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 			PC->OnWeaponSlotChange.Broadcast(1, NewWeaponKey);
 		}
 
-		RS_LOG("0 Slot Add Weapon")
+		RS_LOG("0 Slot Add Weapon");
 	}
 	else if (WeaponActors[1] == nullptr)
 	{
@@ -192,7 +192,7 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 			PC->OnWeaponSlotChange.Broadcast(2, NewWeaponKey);
 		}
 
-		RS_LOG("1 Slot Add Weapon")
+		RS_LOG("1 Slot Add Weapon");
 	}
 	else
 	{

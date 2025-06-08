@@ -72,7 +72,7 @@ AActor* ARSTycoonPlayerCharacter::Drop(FVector DropLocation)
 {
 	if (PickupActor == nullptr)
 	{
-		RS_LOG_C("들고있는 Actor가 없습니다", FColor::Red)
+		RS_LOG_C("들고있는 Actor가 없습니다", FColor::Red);
 		return nullptr;
 	}
 
@@ -118,7 +118,7 @@ void ARSTycoonPlayerCharacter::OnInteract(const FInputActionValue& Value)
 	}
 
 	ARSBaseTile* Tile = Cast<ARSBaseTile>(MinActor);
-	RS_LOG_F("상호작용 하는 Tile 이름 : %s", *Tile->GetTileDisplayName())
+	RS_LOG_F("상호작용 하는 Tile 이름 : %s", *Tile->GetTileDisplayName());
 
 	Tile->Interact(this);
 }

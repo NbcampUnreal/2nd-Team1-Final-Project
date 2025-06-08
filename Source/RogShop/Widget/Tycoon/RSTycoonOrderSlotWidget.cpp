@@ -25,7 +25,7 @@ void URSTycoonOrderSlotWidget::SetOrder(FFoodOrder Order)
 
 	if (CurrentData == nullptr)
 	{
-		RS_LOG_C("데이터 접근 실패!! : URSTycoonOrderSlotWidget", FColor::Red)
+		RS_LOG_C("데이터 접근 실패!! : URSTycoonOrderSlotWidget", FColor::Red);
 		return;
 	}
 	

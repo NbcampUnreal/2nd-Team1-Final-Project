@@ -29,7 +29,7 @@ void ARSTileMap::ChangeTile(int32 Index, FName TileKey)
 {
 	if (Index < 0)
 	{
-		RS_LOG_C("유효하지 않는 타일 Index 입니다", FColor::Red)
+		RS_LOG_C("유효하지 않는 타일 Index 입니다", FColor::Red);
 		return;
 	}
 
@@ -151,7 +151,7 @@ void ARSTileMap::LoadTileMap()
 
 	if (LoadedGame)
 	{
-		RS_LOG_C("타일 로드 성공", FColor::Yellow)
+		RS_LOG_C("타일 로드 성공", FColor::Yellow);
 		TileName2DMap = LoadedGame->Tile2DMap;
 		Width = LoadedGame->Width;
 		Height = LoadedGame->Height;
@@ -168,7 +168,7 @@ void ARSTileMap::LoadTileMap()
 	}
 	else
 	{
-		RS_LOG_C("타일 로드 실패, 기본 타일로 생성", FColor::Yellow)
+		RS_LOG_C("타일 로드 실패, 기본 타일로 생성", FColor::Yellow);
 		SetDefaultSettings();
 	}
 }
@@ -193,7 +193,7 @@ void ARSTileMap::CreateTiles()
 {
 	check(DefaultTileType)
 
-	RS_LOG_F("%d x %d Tile 생성", Width, Height)
+	RS_LOG_F("%d x %d Tile 생성", Width, Height);
 
 	//배치되어 있는 타일 전체 삭제
 	if (TileActors.Num() > 0)
@@ -293,6 +293,6 @@ void ARSTileMap::ActiveNPC()
 
 void ARSTileMap::DeleteTileData()
 {
-	RS_LOG_C("저장 데이터 삭제", FColor::Orange)
+	RS_LOG_C("저장 데이터 삭제", FColor::Orange);
 	UGameplayStatics::DeleteGameInSlot(TileMapSaveSlot, 0);
 }

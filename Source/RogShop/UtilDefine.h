@@ -15,47 +15,71 @@ inline bool IsDebugLogEnabled(UWorld* World)
 	return GI && GI->GetDebugLogEnabled();
 }
 
-//기본
+// 기본
 #define RS_LOG(Str) \
-	UE_LOG(LogTemp, Warning, TEXT(Str))\
-	if (GEngine) \
-	{	\
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT(Str)); \
-	}
+do { \
+	if (IsDebugLogEnabled(GWorld)) \
+	{ \
+		UE_LOG(LogTemp, Warning, TEXT(Str)); \
+		if (GEngine) \
+		{ \
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT(Str)); \
+		} \
+	} \
+} while (0)
 
-//Color 있는 버전
+// Color 있는 버전
 #define RS_LOG_C(Str, Color) \
-	UE_LOG(LogTemp, Warning, TEXT(Str))\
-	if (GEngine) \
-	{	\
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, Color, TEXT(Str)); \
-	}
+do { \
+	if (IsDebugLogEnabled(GWorld)) \
+	{ \
+		UE_LOG(LogTemp, Warning, TEXT(Str)); \
+		if (GEngine) \
+		{ \
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, Color, TEXT(Str)); \
+		} \
+	} \
+} while (0)
 
-//String 버전
+// FString 버전
 #define RS_LOG_S(Str) \
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *Str) \
-	if (GEngine) \
-	{	\
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, Str); \
-	}
+do { \
+	if (IsDebugLogEnabled(GWorld)) \
+	{ \
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *Str); \
+		if (GEngine) \
+		{ \
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, Str); \
+		} \
+	} \
+} while (0)
 
-//Format 버전
+// Format 버전
 #define RS_LOG_F(FormatString, ...) \
-	UE_LOG(LogTemp, Warning, TEXT(FormatString), ##__VA_ARGS__) \
-	if (GEngine) \
-	{	\
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT(FormatString), ##__VA_ARGS__)); \
-	}
+do { \
+	if (IsDebugLogEnabled(GWorld)) \
+	{ \
+		UE_LOG(LogTemp, Warning, TEXT(FormatString), ##__VA_ARGS__); \
+		if (GEngine) \
+		{ \
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT(FormatString), ##__VA_ARGS__)); \
+		} \
+	} \
+} while (0)
 
-//Format, Color 버전
+// Format + Color 버전
 #define RS_LOG_F_C(FormatString, Color, ...) \
-	UE_LOG(LogTemp, Warning, TEXT(FormatString), ##__VA_ARGS__) \
-	if (GEngine) \
-	{	\
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, Color, FString::Printf(TEXT(FormatString), ##__VA_ARGS__)); \
-	}
+do { \
+	if (IsDebugLogEnabled(GWorld)) \
+	{ \
+		UE_LOG(LogTemp, Warning, TEXT(FormatString), ##__VA_ARGS__); \
+		if (GEngine) \
+		{ \
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, Color, FString::Printf(TEXT(FormatString), ##__VA_ARGS__)); \
+		} \
+	} \
+} while (0)
 
-// 위에 로그 찍는 부분들 IsDebugLogEnabled 값 사용해서 찍을 수 있도록 수정 필요
 #define RS_LOG_DEBUG(Format, ...) \
 do { \
 	if (IsDebugLogEnabled(GWorld)) \
