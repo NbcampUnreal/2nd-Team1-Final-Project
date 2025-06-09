@@ -44,4 +44,7 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UDataTable> DungeonLevel;
+
+	UPROPERTY()
+	TObjectPtr<UDataTable> DungeonObject;
 };
