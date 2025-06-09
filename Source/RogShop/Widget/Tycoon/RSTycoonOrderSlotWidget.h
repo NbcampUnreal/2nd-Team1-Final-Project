@@ -7,7 +7,7 @@
 #include "Blueprint/UserWidget.h"
 #include "RSTycoonOrderSlotWidget.generated.h"
 
-struct FIngredientData;
+struct FIngredientDetailData;
 class UProgressBar;
 class UTextBlock;
 class UImage;

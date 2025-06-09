@@ -29,17 +29,17 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
 {
     URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
 
-    if (!DataSubsystem || !DataSubsystem->Weapon || !DataSubsystem->WeaponClass)
+    if (!DataSubsystem || !DataSubsystem->WeaponInfo || !DataSubsystem->WeaponDetail)
     {
         return;
     }
 
     // 데이터 테이블에서 모든 무기 Row 가져오기
     TArray<FItemInfoData*> AllWeapons;
-    DataSubsystem->Weapon->GetAllRows(TEXT("WeaponSpawn"), AllWeapons);
+    DataSubsystem->WeaponInfo->GetAllRows(TEXT("WeaponSpawn"), AllWeapons);
     
     // 데이터 테이블에서 모든 무기 Row에 대한 Row Name을 가져오기
-    TArray<FName> AllRowNames = DataSubsystem->Weapon->GetRowNames();
+    TArray<FName> AllRowNames = DataSubsystem->WeaponInfo->GetRowNames();
 
     TArray<FName> FilteredRowNames;
     
@@ -92,8 +92,8 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
     GetActorBounds(true, Origin, BoxExtent);
     FVector SpawnLocation = Origin + FVector(0, 0, BoxExtent.Z + 50);
 
-    FItemInfoData* WeaponData = DataSubsystem->Weapon->FindRow<FItemInfoData>(RandomRowName, TEXT("SpawnWeapon"));
-    FDungeonWeaponData* WeaponClassData = DataSubsystem->WeaponClass->FindRow<FDungeonWeaponData>(RandomRowName, TEXT("SpawnWeapon"));
+    FItemInfoData* WeaponData = DataSubsystem->WeaponInfo->FindRow<FItemInfoData>(RandomRowName, TEXT("SpawnWeapon"));
+    FDungeonWeaponData* WeaponClassData = DataSubsystem->WeaponDetail->FindRow<FDungeonWeaponData>(RandomRowName, TEXT("SpawnWeapon"));
 
     if (WeaponData && WeaponClassData && WeaponData->ItemStaticMesh && WeaponClassData->WeaponClass)
     {

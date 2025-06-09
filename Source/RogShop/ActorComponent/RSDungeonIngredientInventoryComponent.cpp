@@ -99,7 +99,7 @@ void URSDungeonIngredientInventoryComponent::DropItem(FName ItemKey)
 
 	ARSDungeonGroundIngredient* DungeonGroundItem = World->SpawnActor<ARSDungeonGroundIngredient>(ARSDungeonGroundIngredient::StaticClass(), CurCharacter->GetActorTransform());
 
-	FItemInfoData* Data = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Ingredient->FindRow<FItemInfoData>(ItemKey, TEXT("Get Ingredient"));
+	FItemInfoData* Data = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->IngredientInfo->FindRow<FItemInfoData>(ItemKey, TEXT("Get IngredientInfo"));
 
 	if (Data)
 	{

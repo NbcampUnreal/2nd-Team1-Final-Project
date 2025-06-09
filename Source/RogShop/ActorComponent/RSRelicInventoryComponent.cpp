@@ -63,7 +63,7 @@ bool URSRelicInventoryComponent::CheckValidRelicKey(const FName& RelicKey)
 {
 	URSDataSubsystem* Data = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>();
 
-	if (FItemInfoData* Row = Data->Relic->FindRow<FItemInfoData>(RelicKey, TEXT("Contains DungeonItemData")))
+	if (FItemInfoData* Row = Data->RelicInfo->FindRow<FItemInfoData>(RelicKey, TEXT("Contains DungeonItemData")))
 	{
 		return true;
 	}
@@ -119,7 +119,7 @@ void URSRelicInventoryComponent::LoadRelicData()
 			return;
 		}
 
-		UDataTable* RelicClassDataTable = DataSubsystem->RelicClass;
+		UDataTable* RelicClassDataTable = DataSubsystem->RelicDetail;
 		if (!RelicClassDataTable)
 		{
 			return;

@@ -7,7 +7,7 @@
 #include "RogShop/UtilDefine.h"
 #include "Components/CapsuleComponent.h"
 #include "RSDataSubsystem.h"
-#include "CookFoodData.h"
+#include "ItemInfoData.h"
 #include "RSDungeonGameModeBase.h"
 #include "RSDungeonGroundIngredient.h"
 
@@ -408,8 +408,8 @@ void ARSDunMonsterCharacter::MonsterItemDrop()
 	}
 
 	UDataTable* MonsterDataTable = DataSubsystem->Monster;
-	UDataTable* IngredientDataTable = DataSubsystem->Ingredient;
-	if (!MonsterDataTable || !IngredientDataTable)
+	UDataTable* IngredientInfoDataTable = DataSubsystem->IngredientInfo;
+	if (!MonsterDataTable || !IngredientInfoDataTable)
 	{
 		RS_LOG("몬스터 데이터테이블 혹은 재료 데이터테이블 로딩 실패");
 		return;
@@ -422,14 +422,14 @@ void ARSDunMonsterCharacter::MonsterItemDrop()
 		{
 			// TODO : 드랍 확률 적용하기
 
-			FIngredientData* IngredientDataRow = IngredientDataTable->FindRow<FIngredientData>(e.IngredientName, TEXT("Get IngredientDataRow"));
-			if (IngredientDataRow)
+			FItemInfoData* IngredientInfoDataRow = IngredientInfoDataTable->FindRow<FItemInfoData>(e.IngredientName, TEXT("Get IngredientDetailData"));
+			if (IngredientInfoDataRow)
 			{
 				ARSDungeonGroundIngredient* DungeonIngredient = GetWorld()->SpawnActor<ARSDungeonGroundIngredient>(ARSDungeonGroundIngredient::StaticClass(), GetActorTransform());
 
-				if (DungeonIngredient && IngredientDataRow->Mesh)
+				if (DungeonIngredient && IngredientInfoDataRow->ItemStaticMesh)
 				{
-					DungeonIngredient->InitItemInfo(e.IngredientName, IngredientDataRow->Mesh);
+					DungeonIngredient->InitItemInfo(e.IngredientName, IngredientInfoDataRow->ItemStaticMesh);
 				}
 			}
 		}

@@ -22,19 +22,22 @@ public:
 	TObjectPtr<UDataTable> Food;
 	
 	UPROPERTY()
-	TObjectPtr<UDataTable> Ingredient;
+	TObjectPtr<UDataTable> IngredientInfo;
 
 	UPROPERTY()
-	TObjectPtr<UDataTable> Weapon;
+	TObjectPtr<UDataTable> IngredientDetail;
 
 	UPROPERTY()
-	TObjectPtr<UDataTable> WeaponClass;
+	TObjectPtr<UDataTable> WeaponInfo;
 
 	UPROPERTY()
-	TObjectPtr<UDataTable> Relic;
+	TObjectPtr<UDataTable> WeaponDetail;
 
 	UPROPERTY()
-	TObjectPtr<UDataTable> RelicClass;
+	TObjectPtr<UDataTable> RelicInfo;
+
+	UPROPERTY()
+	TObjectPtr<UDataTable> RelicDetail;
 
 	UPROPERTY()
 	TObjectPtr<UDataTable> ForestMonsterSpawnGroup;

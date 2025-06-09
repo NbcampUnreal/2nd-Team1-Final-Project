@@ -47,23 +47,13 @@ public:
 
 // TODO : 텍스처 데이터 추가 및 데이터 테이블 분리
 USTRUCT(BlueprintType)
-struct ROGSHOP_API FIngredientData : public FTableRowBase
+struct ROGSHOP_API FIngredientDetailData : public FTableRowBase
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString Name;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EIngredientType Category;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString Description;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UStaticMesh> Mesh;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UTexture2D> Image;
 };

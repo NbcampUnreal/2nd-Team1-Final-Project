@@ -39,6 +39,11 @@ FReply URSInventorySlotWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry
     return FReply::Unhandled();
 }
 
+void URSInventorySlotWidget::SetIsPressable(bool bNewIsPressable)
+{
+    bIsPressable = bNewIsPressable;
+}
+
 void URSInventorySlotWidget::HandleLongPress()
 {
     // 유물 슬롯이 아닐때만 처리

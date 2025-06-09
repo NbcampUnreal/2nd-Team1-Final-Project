@@ -40,11 +40,11 @@ void URSPlayerStatusWidget::UpdateWeaponSlot(int8 WeaponSlotIndex, FName WeaponK
 {
     if (URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>())
     {
-        if (DataSubsystem->Weapon)
+        if (DataSubsystem->WeaponInfo)
         {
-            const FItemInfoData* FoundData = DataSubsystem->Weapon->FindRow<FItemInfoData>(
+            const FItemInfoData* FoundData = DataSubsystem->WeaponInfo->FindRow<FItemInfoData>(
                 WeaponKey,
-                TEXT("Weapon Data Lookup") // 디버깅용 Context
+                TEXT("WeaponInfo Data Lookup") // 디버깅용 Context
             );
 
             if (FoundData)

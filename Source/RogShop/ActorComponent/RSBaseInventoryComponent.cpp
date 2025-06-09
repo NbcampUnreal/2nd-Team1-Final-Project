@@ -4,7 +4,7 @@
 #include "RSBaseInventoryComponent.h"
 #include "RogShop/UtilDefine.h"
 #include "RogShop/GameInstanceSubsystem/RSDataSubsystem.h"
-#include "RogShop/DataTable/CookFoodData.h"
+#include "ItemInfoData.h"
 #include "ItemSlot.h"
 
 URSBaseInventoryComponent::URSBaseInventoryComponent()
@@ -143,7 +143,7 @@ bool URSBaseInventoryComponent::CheckValidItem(const FName& ItemKey)
 {
 	URSDataSubsystem* Data = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>();
 
-	if (FIngredientData* Row = Data->Ingredient->FindRow<FIngredientData>(ItemKey, TEXT("Contains IngredientData")))
+	if (FItemInfoData* Row = Data->IngredientInfo->FindRow<FItemInfoData>(ItemKey, TEXT("Contains IngredientDetailData")))
 	{
 		return true;
 	}
