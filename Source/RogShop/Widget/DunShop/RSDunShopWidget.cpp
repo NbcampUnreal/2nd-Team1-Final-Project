@@ -120,7 +120,7 @@ void URSDunShopWidget::PopulateShopItems()
 {
     URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
 
-    if (!DataSubsystem || !DataSubsystem->Weapon || !DataSubsystem->Relic)
+    if (!DataSubsystem || !DataSubsystem->WeaponInfo || !DataSubsystem->RelicInfo)
     {
         RS_LOG_DEBUG("DataSubsystem or DataTables are null");
         return;
@@ -131,7 +131,7 @@ void URSDunShopWidget::PopulateShopItems()
 
     for (int32 i = 0; i < AddItemCount; ++i)
     {
-        TPair<FName, FItemInfoData*> RandomItem = GetRandomItemFromDataTable(DataSubsystem->Weapon, DataSubsystem->Relic);
+        TPair<FName, FItemInfoData*> RandomItem = GetRandomItemFromDataTable(DataSubsystem->WeaponInfo, DataSubsystem->RelicInfo);
 
         FName FoundRowName = RandomItem.Key;
         FItemInfoData* ItemData = RandomItem.Value;

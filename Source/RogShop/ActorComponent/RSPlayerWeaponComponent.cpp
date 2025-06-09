@@ -177,7 +177,7 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 			PC->OnWeaponSlotChange.Broadcast(1, NewWeaponKey);
 		}
 
-		RS_LOG("0 Slot Add Weapon");
+		RS_LOG("0 Slot Add WeaponInfo");
 	}
 	else if (WeaponActors[1] == nullptr)
 	{
@@ -192,7 +192,7 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 			PC->OnWeaponSlotChange.Broadcast(2, NewWeaponKey);
 		}
 
-		RS_LOG("1 Slot Add Weapon");
+		RS_LOG("1 Slot Add WeaponInfo");
 	}
 	else
 	{
@@ -256,8 +256,8 @@ void URSPlayerWeaponComponent::DropWeaponToSlot(EWeaponSlot TargetWeaponSlot)
 	// 땅에 버려질 액터에 세팅할 값을 데이터 테이블에 가져와 세팅한다.
 	FName WeaponKey = WeaponActors[TargetIndex]->GetDataTableKey();
 
-	FItemInfoData* ItemInfoData = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Weapon->FindRow<FItemInfoData>(WeaponKey, TEXT("Get WeaponData"));
-	FDungeonWeaponData* WeaponData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponClass->FindRow<FDungeonWeaponData>(WeaponKey, TEXT("Get WeaponData"));
+	FItemInfoData* ItemInfoData = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponInfo->FindRow<FItemInfoData>(WeaponKey, TEXT("Get WeaponData"));
+	FDungeonWeaponData* WeaponData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponDetail->FindRow<FDungeonWeaponData>(WeaponKey, TEXT("Get WeaponData"));
 	if (ItemInfoData && WeaponData)
 	{
 		UStaticMesh* ItemStaticMesh = ItemInfoData->ItemStaticMesh;
@@ -491,8 +491,8 @@ void URSPlayerWeaponComponent::LoadRequested()
 		return;
 	}
 
-	UDataTable* WeaponDataTable = DataSubsystem->Weapon;
-	UDataTable* WeaponClassDataTable = DataSubsystem->WeaponClass;
+	UDataTable* WeaponDataTable = DataSubsystem->WeaponInfo;
+	UDataTable* WeaponDetailDataTable = DataSubsystem->WeaponDetail;
 	if (!WeaponDataTable)
 	{
 		return;
@@ -512,7 +512,7 @@ void URSPlayerWeaponComponent::LoadRequested()
 		FName CurWeaponName = WeaponLoadGame->WeaponActors[i];
 
 		FItemInfoData* Data = WeaponDataTable->FindRow<FItemInfoData>(CurWeaponName, TEXT("Get WeaponData"));
-		FDungeonWeaponData* WeaponData = WeaponClassDataTable->FindRow<FDungeonWeaponData>(CurWeaponName, TEXT("Get WeaponData"));
+		FDungeonWeaponData* WeaponData = WeaponDetailDataTable->FindRow<FDungeonWeaponData>(CurWeaponName, TEXT("Get WeaponData"));
 
 		if (Data && WeaponData && WeaponData->WeaponClass)
 		{

@@ -108,7 +108,7 @@ bool URSDunItemWidget::BuyItem()
     {
         case EItemType::Relic:
         {
-            FDungeonRelicData* RelicClassData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->RelicClass->FindRow<FDungeonRelicData>(CurrentRowName, TEXT("Get RelicData"));
+            FDungeonRelicData* RelicClassData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->RelicDetail->FindRow<FDungeonRelicData>(CurrentRowName, TEXT("Get RelicData"));
 
             if (RelicClassData && RelicClassData->RelicClass)
             {
@@ -126,7 +126,7 @@ bool URSDunItemWidget::BuyItem()
         }
         case EItemType::Weapon:
         {
-            FDungeonWeaponData* WeaponClassData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponClass->FindRow<FDungeonWeaponData>(CurrentRowName, TEXT("Get WeaponData"));
+            FDungeonWeaponData* WeaponClassData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponDetail->FindRow<FDungeonWeaponData>(CurrentRowName, TEXT("Get WeaponData"));
 
             FActorSpawnParameters SpawnParams;
             SpawnParams.Owner = PlayerChar;

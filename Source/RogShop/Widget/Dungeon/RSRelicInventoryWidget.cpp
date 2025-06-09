@@ -69,13 +69,13 @@ void URSRelicInventoryWidget::UpdateSlots(FName RelicDataTableKey)
         return;
     }
 
-    UDataTable* RelicDataTable = DataSubsystem->Relic;
+    UDataTable* RelicDataTable = DataSubsystem->RelicInfo;
     if (!RelicDataTable)
     {
         return;
     }
 
-    FItemInfoData* Data = RelicDataTable->FindRow<FItemInfoData>(RelicDataTableKey, TEXT("Get Relic"));
+    FItemInfoData* Data = RelicDataTable->FindRow<FItemInfoData>(RelicDataTableKey, TEXT("Get RelicInfo"));
     if (Data)
     {
         for (size_t i = 0; i < InvecntorySlots.Num(); ++i)

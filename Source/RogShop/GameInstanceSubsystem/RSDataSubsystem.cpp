@@ -12,22 +12,23 @@ void URSDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	const URSDataSubsystemSettings* DataSettings = GetDefault<URSDataSubsystemSettings>();
 	Food = DataSettings->FoodDataTable.LoadSynchronous();
-	Ingredient = DataSettings->IngredientDataTable.LoadSynchronous();
-	Weapon = DataSettings->WeaponDataTable.LoadSynchronous();
-	WeaponClass = DataSettings->WeaponClassDataTable.LoadSynchronous();
-	Relic = DataSettings->RelicDataTable.LoadSynchronous();
-	RelicClass = DataSettings->RelicClassDataTable.LoadSynchronous();
+	IngredientInfo = DataSettings->IngredientDataTable.LoadSynchronous();
+	IngredientDetail = DataSettings->IngredientDetailDataTable.LoadSynchronous();
+	WeaponInfo = DataSettings->WeaponDataTable.LoadSynchronous();
+	WeaponDetail = DataSettings->WeaponDetailDataTable.LoadSynchronous();
+	RelicInfo = DataSettings->RelicDataTable.LoadSynchronous();
+	RelicDetail = DataSettings->RelicDetailDataTable.LoadSynchronous();
 	ForestMonsterSpawnGroup = DataSettings->ForestMonsterSpawnGroupDataTable.LoadSynchronous();
 	Monster = DataSettings->MonsterDataTable.LoadSynchronous();
 	DungeonLevel = DataSettings->DungeonLevelDataTable.LoadSynchronous();
 	DungeonObject = DataSettings->DungeonObjectDataTable.LoadSynchronous();
 
 	check(Food)
-	check(Ingredient)
-	check(Weapon)
-	check(WeaponClass)
-	check(Relic)
-	check(RelicClass)
+	check(IngredientInfo)
+	check(WeaponInfo)
+	check(WeaponDetail)
+	check(RelicInfo)
+	check(RelicDetail)
 	check(ForestMonsterSpawnGroup)
 	check(Monster)
 }

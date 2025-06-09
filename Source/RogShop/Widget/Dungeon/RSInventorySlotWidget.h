@@ -24,7 +24,7 @@ protected:
     virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 public:
-    void SetIsPressable(bool bNewIsPressable) { bIsPressable = bNewIsPressable; }
+    void SetIsPressable(bool bNewIsPressable);
 
 private:
     void HandleLongPress();

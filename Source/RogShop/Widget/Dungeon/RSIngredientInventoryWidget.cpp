@@ -6,7 +6,7 @@
 #include "Components/UniformGridPanel.h"
 #include "RSInventorySlotWidget.h"
 #include "RSDataSubsystem.h"
-#include "CookFoodData.h"
+#include "ItemInfoData.h"
 #include "ItemSlot.h"
 #include "RSTycoonPlayerController.h"
 #include "RogShop/UtilDefine.h"
@@ -45,11 +45,11 @@ void URSIngredientInventoryWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
 			int32 Row = i / NumColumns;
 			int32 Col = i % NumColumns;
 
-			// 슬롯 인덱스 설정
-			NewSlotImage->SetIsPressable(true);
-
 			IngredientSlots->AddChildToUniformGrid(NewSlotImage, Row, Col);
 			InvecntorySlots.Add(NewSlotImage);
+
+			// 슬롯 인덱스 설정
+			NewSlotImage->SetIsPressable(true);
 		}
 	}
 }
@@ -74,7 +74,7 @@ void URSIngredientInventoryWidget::UpdateSlots(int32 IngredientSlotIndex, FItemS
 		return;
 	}
 
-	UDataTable* IngredientDataTable = DataSubsystem->Ingredient;
+	UDataTable* IngredientDataTable = DataSubsystem->IngredientInfo;
 	if (!IngredientDataTable)
 	{
 		return;
@@ -83,11 +83,11 @@ void URSIngredientInventoryWidget::UpdateSlots(int32 IngredientSlotIndex, FItemS
 	FName IngredientKey = IngredientItemSlot.ItemKey;
 	int32 ItemCount = IngredientItemSlot.Quantity;
 
-	FIngredientData* Data = IngredientDataTable->FindRow<FIngredientData>(IngredientKey, TEXT("Get Ingredient"));
-	if (Data)
+	FItemInfoData* IngredientInfoDataRow = IngredientDataTable->FindRow<FItemInfoData>(IngredientKey, TEXT("Get IngredientInfo"));
+	if (IngredientInfoDataRow)
 	{
 		// TODO : 현재 데이터에 대한 텍스처 정보를 가져온다.
 		// nullptr 대신에 텍스처 정보를 넘겨야한다.
-		InvecntorySlots[IngredientSlotIndex]->SetSlotItemInfo(IngredientKey, Data->Image, FString::FromInt(ItemCount));
+		InvecntorySlots[IngredientSlotIndex]->SetSlotItemInfo(IngredientKey, IngredientInfoDataRow->ItemIcon, FString::FromInt(ItemCount));
 	}
 }

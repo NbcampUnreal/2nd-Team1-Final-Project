@@ -22,16 +22,19 @@ public:
 	TSoftObjectPtr<UDataTable> IngredientDataTable;
 
 	UPROPERTY(Config, EditAnywhere)
+	TSoftObjectPtr<UDataTable> IngredientDetailDataTable;
+
+	UPROPERTY(Config, EditAnywhere)
 	TSoftObjectPtr<UDataTable> WeaponDataTable;
 
 	UPROPERTY(Config, EditAnywhere)
-	TSoftObjectPtr<UDataTable> WeaponClassDataTable;
+	TSoftObjectPtr<UDataTable> WeaponDetailDataTable;
 
 	UPROPERTY(Config, EditAnywhere)
 	TSoftObjectPtr<UDataTable> RelicDataTable;
 
 	UPROPERTY(Config, EditAnywhere)
-	TSoftObjectPtr<UDataTable> RelicClassDataTable;
+	TSoftObjectPtr<UDataTable> RelicDetailDataTable;
 
 	UPROPERTY(Config, EditAnywhere)
 	TSoftObjectPtr<UDataTable> ForestMonsterSpawnGroupDataTable;
