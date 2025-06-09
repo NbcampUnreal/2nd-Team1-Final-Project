@@ -154,13 +154,6 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 		GetHP(),
 		GetMaxHP()
 	);
-	
-	// TODO : 해당 로직으로 인해 사망이 2번 호출되므로 제거해야한다.
-	// 체력 감소 함수에서 체크하므로 해당 작업을 할 필요가 없다.
-	if (GetHP() <= 0)
-	{
-		OnDeath();
-	}
 
 	return Damage;
 }
