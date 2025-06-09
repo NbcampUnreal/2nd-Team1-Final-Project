@@ -523,6 +523,9 @@ FVector ARSMapGenerator::SpawnBossArenaLevel()
         ArenaUniqueName
     );
 
+    SpawnedLevels.Add(StreamingLevel);
+    StreamingLevel->OnLevelShown.AddUniqueDynamic(this, &ARSMapGenerator::OnSubLevelLoaded);
+
     return ArenaOffset;
 }
 
