@@ -86,6 +86,7 @@ void ARSTileMap::ChangeTileSize(int32 NewWidth, int32 NewHeight)
 	for (FTileRow& Row : TileName2DMap)
 	{
 		Row.Tiles.SetNum(NewWidth);
+		Row.YawValues.SetNum(NewWidth);
 		for (int i = 0; i < NewWidth; i++)
 		{
 			//Array를 확장하면서 생긴 FName이라면 비어있으므로 기본 타일을 넣어줌 
@@ -99,6 +100,21 @@ void ARSTileMap::ChangeTileSize(int32 NewWidth, int32 NewHeight)
 	CreateTiles();
 }
 
+void ARSTileMap::RotateTile(int32 Index, float YawValue)
+{
+	if (Index < 0)
+	{
+		RS_LOG_C("유효하지 않는 타일 Index 입니다", FColor::Red);
+		return;
+	}
+
+	int32 Row = Index / Width;
+	int32 Column = Index % Width;
+	
+	TileActors[Index]->SetActorRotation(FRotator(0, YawValue, 0));
+	TileName2DMap[Row].YawValues[Column] = YawValue;
+}
+
 void ARSTileMap::SpawnActorInMap(UClass* ActorClass)
 {
 	FVector HalfTileSize = DefaultTileType->GetDefaultObject<ARSBaseTile>()->GetTileSize() * 0.5f;
@@ -106,10 +122,10 @@ void ARSTileMap::SpawnActorInMap(UClass* ActorClass)
 	FVector RandomLocation = FVector(FMath::FRand()) * MapSize;
 	FVector SpawnLocation = GetActorLocation() + RandomLocation - HalfTileSize;
 	SpawnLocation.Z = GetActorLocation().Z + 100;
-	
+
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	
+
 	GetWorld()->SpawnActor(ActorClass, &SpawnLocation, &FRotator::ZeroRotator, SpawnParams);
 }
 
@@ -117,10 +133,10 @@ FVector ARSTileMap::GetMapCenter()
 {
 	FVector Size = GetMapSize();
 	FVector Center = GetActorLocation();
-	FVector HalfTileSize = DefaultTileType.GetDefaultObject()->GetTileSize() * 0.5f; 
+	FVector HalfTileSize = DefaultTileType.GetDefaultObject()->GetTileSize() * 0.5f;
 
 	//Center에서 타일의 중심이 생성되기 때문에 위치를 보정해줘야함
-	Center.Y += Size.Y * 0.5f - HalfTileSize.Y;  
+	Center.Y += Size.Y * 0.5f - HalfTileSize.Y;
 	Center.X += Size.X * 0.5f - HalfTileSize.X;
 
 	return Center;
@@ -182,6 +198,7 @@ void ARSTileMap::SetDefaultSettings()
 		for (int j = 0; j < DefaultWidth; j++)
 		{
 			TileName2DMap[i].Tiles.Add(ARSBaseTile::GetStaticTileKey());
+			TileName2DMap[i].YawValues.Add(0);
 		}
 	}
 
@@ -240,21 +257,6 @@ void ARSTileMap::CreateTiles()
 	}
 }
 
-TSubclassOf<ARSBaseTile> ARSTileMap::GetTileClass(const FName& TileKey)
-{
-	for (TSubclassOf<ARSBaseTile> TileType : TileTypes)
-	{
-		if (TileType->GetDefaultObject<ARSBaseTile>()->GetTileKey() == TileKey)
-		{
-			return TileType;
-		}
-	}
-
-	//아무것도 매치되지 않음
-	checkf(false, TEXT("%s에 매칭되는 타일이 없습니다."), *TileKey.ToString());
-	return nullptr;
-}
-
 ARSBaseTile* ARSTileMap::CreateTile(const TSubclassOf<ARSBaseTile>& TileClass, int32 Row, int32 Column)
 {
 	FActorSpawnParameters SpawnParams;
@@ -272,6 +274,7 @@ ARSBaseTile* ARSTileMap::CreateTile(const TSubclassOf<ARSBaseTile>& TileClass, i
 
 	TileActor->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 	TileActor->SetActorLocation(Location);
+	TileActor->SetActorRelativeRotation(FRotator(0, TileName2DMap[Row].YawValues[Column], 0));
 
 	return TileActor;
 }
@@ -280,7 +283,7 @@ void ARSTileMap::ActiveNPC()
 {
 	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
 	check(GameMode)
-	
+
 	for (auto NPC : GameMode->GetNPCs())
 	{
 		if (ARSTycoonChefCharacter* Chef = Cast<ARSTycoonChefCharacter>(NPC))
@@ -295,4 +298,20 @@ void ARSTileMap::DeleteTileData()
 {
 	RS_LOG_C("저장 데이터 삭제", FColor::Orange);
 	UGameplayStatics::DeleteGameInSlot(TileMapSaveSlot, 0);
+}
+
+
+TSubclassOf<ARSBaseTile> ARSTileMap::GetTileClass(const FName& TileKey)
+{
+	for (TSubclassOf<ARSBaseTile> TileType : TileTypes)
+	{
+		if (TileType->GetDefaultObject<ARSBaseTile>()->GetTileKey() == TileKey)
+		{
+			return TileType;
+		}
+	}
+
+	//아무것도 매치되지 않음
+	checkf(false, TEXT("%s에 매칭되는 타일이 없습니다."), *TileKey.ToString());
+	return nullptr;
 }

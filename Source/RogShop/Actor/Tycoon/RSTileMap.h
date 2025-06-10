@@ -23,6 +23,7 @@ public:
 	void ChangeTile(int32 Index, FName TileKey);
 	void SaveTileMap();
 	void ChangeTileSize(int32 NewWidth, int32 NewHeight);
+	void RotateTile(int32 Index, float YawValue);
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnActorInMap(UClass* ActorClass);
@@ -41,12 +42,13 @@ private:
 	void LoadTileMap();
 	void SetDefaultSettings();
 	void CreateTiles();
-	TSubclassOf<ARSBaseTile> GetTileClass(const FName& TileKey);
 	ARSBaseTile* CreateTile(const TSubclassOf<ARSBaseTile>& TileClass, int32 Row, int32 Column);
 	void ActiveNPC();
 	
 	UFUNCTION(CallInEditor)
 	void DeleteTileData();
+
+	TSubclassOf<ARSBaseTile> GetTileClass(const FName& TileKey);
 
 private:
 	static const FString TileMapSaveSlot;
@@ -80,7 +82,7 @@ private:
 	TObjectPtr<ANavMeshBoundsVolume> NavVolume;
 
 	UPROPERTY()
-	TArray<TObjectPtr<ARSBaseTile>> TileActors;
+	TArray<TObjectPtr<ARSBaseTile>> TileActors;	//실제 타일들 Actor
 
 	int32 Width, Height;
 };

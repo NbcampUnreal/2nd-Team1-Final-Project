@@ -108,7 +108,6 @@ void ARSTycoonPlayerController::SettingWidget()
 #pragma endregion
 
 #pragma region Input
-
 void ARSTycoonPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -121,14 +120,10 @@ void ARSTycoonPlayerController::SetupInputComponent()
 		EnhancedInput->BindAction(TileClickAction, ETriggerEvent::Triggered, this, &ARSTycoonPlayerController::OnClickTile);
 	}
 
-	if (ZoomInAction)
+	if (ZoomAction)
 	{
-		EnhancedInput->BindAction(ZoomInAction, ETriggerEvent::Triggered, this, &ARSTycoonPlayerController::OnZoomIn);
-	}
-
-	if (ZoomOutAction)
-	{
-		EnhancedInput->BindAction(ZoomOutAction, ETriggerEvent::Triggered, this, &ARSTycoonPlayerController::OnZoomOut);
+		EnhancedInput->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ARSTycoonPlayerController::OnZoom);
+		EnhancedInput->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ARSTycoonPlayerController::OnRotateTile);
 	}
 }
 
@@ -139,53 +134,6 @@ void ARSTycoonPlayerController::SettingInput()
 	auto InputSubsystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
 	InputSubsystem->AddMappingContext(IMC, 0);
 }
-
-void ARSTycoonPlayerController::OnClickTile()
-{
-	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
-	check(GameMode)
-
-	if (GameMode->GetState() != ETycoonGameMode::Management)
-	{
-		return;
-	}
-
-	FHitResult HitResult;
-	if (GetHitResultUnderCursor(ECC_WorldDynamic, true, HitResult))
-	{
-		//디버그
-		RS_DRAW_DEBUG_SPHERE(GetWorld(), HitResult.Location, 40, 20, FColor::Blue, false, 5, 0, 1.0f);
-
-		AActor* HitActor = HitResult.GetActor();
-		if (ARSBaseTile* Tile = Cast<ARSBaseTile>(HitActor))
-		{
-			RS_LOG_F("%s 타일이 선택됬습니다", *HitActor->GetName());
-
-			ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
-			check(TileMap)
-
-			auto& Tiles = TileMap->GetTiles();
-			for (int i = 0; i < Tiles.Num(); i++)
-			{
-				if (Tiles[i] == Tile)
-				{
-					SelectTileIndex = i;
-					break;
-				}
-			}
-
-			if (ManagementWidget)
-			{
-				ManagementWidget->BuyTileBorderSlide();
-			}
-			else
-			{
-				RS_LOG("ManagementWidget is Null");
-			}
-		}
-	}
-}
-
 
 #pragma endregion
 
@@ -210,73 +158,125 @@ void ARSTycoonPlayerController::SettingCamera()
 	SetViewTarget(MainCamera);
 
 	// MaxMainCameraFov = MainCamera->GetTileMapCameraFov();
-	
+
 	MainCamera->GetCameraComponent()->SetFieldOfView(MaxMainCameraFov);
 	TopCamera->GetCameraComponent()->SetOrthoWidth(MaxTopCameraOrthoWidth);
-	
+
 	GetWorldTimerManager().SetTimerForNextTick([&]()
 	{
 		SetCameraLocationToCenter();
 	});
 }
 
-void ARSTycoonPlayerController::OnZoomIn()
+void ARSTycoonPlayerController::OnZoom(const FInputActionValue& Value)
 {
+	float InputAction = Value.Get<float>();
 	if (GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->GetState() == ETycoonGameMode::Management)
 	{
-		//탑 카메라
-		float OrthoWidth = TopCamera->GetCameraComponent()->OrthoWidth;
-		if (OrthoWidth >= MaxTopCameraOrthoWidth)
+		if (SelectTileIndex != INDEX_NONE)
 		{
-			OrthoWidth = MaxTopCameraOrthoWidth;
-			TopCamera->AttachPlayer();
+			return;
 		}
 
-		OrthoWidth -= OrthoWidthSensitivity;
-		TopCamera->GetCameraComponent()->SetOrthoWidth(OrthoWidth);
-	}
-	else
-	{
-		//메인 카메라
-		float PerspectiveFov = MainCamera->GetCameraComponent()->FieldOfView;
-		if (PerspectiveFov >= MaxMainCameraFov)
-		{
-			PerspectiveFov = MaxMainCameraFov;
-			MainCamera->AttachPlayer();
-		}
-
-		PerspectiveFov -= FovSensitivity;
-		MainCamera->GetCameraComponent()->SetFieldOfView(PerspectiveFov);
-	}
-	
-}
-
-void ARSTycoonPlayerController::OnZoomOut()
-{
-	if (GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->GetState() == ETycoonGameMode::Management)
-	{
 		//탑 카메라
-		float OrthoWidth = TopCamera->GetCameraComponent()->OrthoWidth + OrthoWidthSensitivity;
+		float OrthoWidth = TopCamera->GetCameraComponent()->OrthoWidth + OrthoWidthSensitivity * InputAction;
 		if (OrthoWidth >= MaxTopCameraOrthoWidth)
 		{
 			OrthoWidth = MaxTopCameraOrthoWidth;
 			TopCamera->SetLocationToCenter();
 		}
-	
+		else
+		{
+			TopCamera->AttachPlayer();
+		}
+
 		TopCamera->GetCameraComponent()->SetOrthoWidth(OrthoWidth);
 	}
 	else
 	{
 		//메인 카메라
-		float PerspectiveFov = MainCamera->GetCameraComponent()->FieldOfView + FovSensitivity;
+		float PerspectiveFov = MainCamera->GetCameraComponent()->FieldOfView + FovSensitivity * InputAction;
 		if (PerspectiveFov >= MaxMainCameraFov)
 		{
 			PerspectiveFov = MaxMainCameraFov;
 			MainCamera->SetLocationToCenter();
 		}
-	
+		else
+		{
+			MainCamera->AttachPlayer();
+		}
+
 		MainCamera->GetCameraComponent()->SetFieldOfView(PerspectiveFov);
 	}
+}
+#pragma endregion
+
+#pragma region TileChange
+void ARSTycoonPlayerController::OnClickTile()
+{
+	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
+	check(GameMode)
+
+	if (GameMode->GetState() != ETycoonGameMode::Management)
+	{
+		return;
+	}
+
+	check(ManagementWidget)
+	ManagementWidget->BuyTileBorderSlide();
+
+	//타일을 한번 선택한 후 어딜 누르든 타일 선택이 취소됨
+	if (SelectTileIndex != INDEX_NONE)
+	{
+		SelectTileIndex = INDEX_NONE;
+		return;
+	}
+
+	FHitResult HitResult;
+	if (GetHitResultUnderCursor(ECC_WorldDynamic, true, HitResult))
+	{
+		//디버그
+		RS_DRAW_DEBUG_SPHERE(GetWorld(), HitResult.Location, 40, 20, FColor::Blue, false, 5, 0, 1.0f);
+
+		AActor* HitActor = HitResult.GetActor();
+		if (ARSBaseTile* Tile = Cast<ARSBaseTile>(HitActor))
+		{
+			ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
+			check(TileMap)
+
+			auto& Tiles = TileMap->GetTiles();
+			for (int i = 0; i < Tiles.Num(); i++)
+			{
+				if (Tiles[i] == Tile)
+				{
+					SelectTileIndex = i;
+					break;
+				}
+			}
+
+			RS_LOG_F("%s 타일이 선택됬습니다", *HitActor->GetName());
+		}
+	}
+}
+
+void ARSTycoonPlayerController::OnRotateTile(const FInputActionValue& Value)
+{
+	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
+	check(GameMode)
+
+	if (GameMode->GetState() != ETycoonGameMode::Management || SelectTileIndex == INDEX_NONE)
+	{
+		return;
+	}
+
+	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
+	check(TileMap)
+
+	float Yaw = TileMap->GetTiles()[SelectTileIndex]->GetActorRotation().Yaw;
+	const float Sign = Value.Get<float>();
+	Yaw += 90 * Sign;
+
+	TileMap->RotateTile(SelectTileIndex, Yaw);
 }
 #pragma endregion
 
