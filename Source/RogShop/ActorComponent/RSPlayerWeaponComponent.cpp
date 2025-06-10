@@ -281,6 +281,7 @@ void URSPlayerWeaponComponent::DropWeaponToSlot(EWeaponSlot TargetWeaponSlot)
 		if (GroundWeapon && ItemStaticMesh && WeaponClass)
 		{
 			GroundWeapon->InitInteractableWeapon(WeaponKey, ItemStaticMesh, WeaponClass);
+			GroundWeapon->RandImpulse();
 		}
 	}
 

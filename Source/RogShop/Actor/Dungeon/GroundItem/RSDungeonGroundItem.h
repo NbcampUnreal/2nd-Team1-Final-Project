@@ -22,6 +22,10 @@ protected:
 public:
 	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
 
+// 아이템을 랜덤한 방향으로 날린다.
+public:
+	void RandImpulse();
+
 // 컴포넌트
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))

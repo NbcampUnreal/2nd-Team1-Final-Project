@@ -437,6 +437,7 @@ void ARSDunMonsterCharacter::MonsterItemDrop()
 				if (DungeonIngredient && IngredientInfoDataRow->ItemStaticMesh)
 				{
 					DungeonIngredient->InitItemInfo(e.IngredientName, IngredientInfoDataRow->ItemStaticMesh, 1);
+					DungeonIngredient->RandImpulse();
 				}
 			}
 		}
