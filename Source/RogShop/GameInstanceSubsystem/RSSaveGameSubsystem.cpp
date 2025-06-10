@@ -49,6 +49,7 @@ void URSSaveGameSubsystem::AddIngredientDungeonToTycoon(FName IngredientKey, int
 		if (Ingredients[i].ItemKey == IngredientKey)
 		{
 			Ingredients[i].Quantity += Amount;
+			UGameplayStatics::SaveGameToSlot(TycoonSaveGame, TycoonSaveSlot, 0);
 			return;
 		}
 
@@ -62,6 +63,8 @@ void URSSaveGameSubsystem::AddIngredientDungeonToTycoon(FName IngredientKey, int
 	{
 		Ingredients[NoneIndex].ItemKey = IngredientKey;
 		Ingredients[NoneIndex].Quantity = Amount;
+		
+		UGameplayStatics::SaveGameToSlot(TycoonSaveGame, TycoonSaveSlot, 0);
 	}
 	else
 	{
