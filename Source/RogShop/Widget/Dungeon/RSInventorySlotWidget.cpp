@@ -18,7 +18,7 @@ void URSInventorySlotWidget::NativeConstruct()
 
 }
 
-void URSInventorySlotWidget::SetSlotItemInfo(FName NewItemDataTableKey, UTexture2D* NewItemIcon, FString NewItemCount)
+void URSInventorySlotWidget::SetSlotItemInfo(FName NewItemDataTableKey, UObject* NewItemIcon, FString NewItemCount)
 {
     if (NewItemDataTableKey != NAME_None)
     {
@@ -27,7 +27,7 @@ void URSInventorySlotWidget::SetSlotItemInfo(FName NewItemDataTableKey, UTexture
 
     if (ItemIcon)
     {
-        ItemIcon->SetBrushFromTexture(NewItemIcon);
+        ItemIcon->SetBrushResourceObject(NewItemIcon);
     }
 
     if (ItemCount)

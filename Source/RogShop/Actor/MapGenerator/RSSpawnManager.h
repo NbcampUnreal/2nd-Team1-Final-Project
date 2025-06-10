@@ -56,11 +56,6 @@ public:
 #pragma endregion
 
 private:
-#pragma region 비공개함수
-	void InitalizeDungeonObject();
-#pragma endregion
-
-private:
 
 #pragma region 내부 변수
 

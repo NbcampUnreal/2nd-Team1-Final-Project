@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "RSCanPickup.h"
 #include "GameFramework/Character.h"
+#include "SkeletalMergingLibrary.h"
 #include "RSTycoonPlayerCharacter.generated.h"
 
 class USphereComponent;
@@ -24,7 +25,14 @@ public:
 	virtual AActor* Drop(FVector DropLocation) override;
 	virtual AActor* GetPickupActor() override { return PickupActor; }
 
+protected:
+	virtual void BeginPlay() override;
+
 private:
+	// 스켈레탈 메시 관련
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SkeletalMesh", meta = (AllowPrivateAccess = true))
+	FSkeletalMeshMergeParams SkeletalMeshMergeParams;
+
 	void OnMove(const FInputActionValue& Value);
 	void OnInteract(const FInputActionValue& Value);
 

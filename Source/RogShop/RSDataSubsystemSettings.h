@@ -40,6 +40,12 @@ public:
 	TSoftObjectPtr<UDataTable> ForestMonsterSpawnGroupDataTable;
 
 	UPROPERTY(Config, EditAnywhere)
+	TSoftObjectPtr<UDataTable> DesetMonsterSpawnGroupDataTable;
+
+	UPROPERTY(Config, EditAnywhere)
+	TSoftObjectPtr<UDataTable> CaveMonsterSpawnGroupDataTable;
+
+	UPROPERTY(Config, EditAnywhere)
 	TSoftObjectPtr<UDataTable> MonsterDataTable;
 
 	UPROPERTY(Config, EditAnywhere)

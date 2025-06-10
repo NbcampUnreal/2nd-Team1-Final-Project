@@ -19,6 +19,8 @@ void URSDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	RelicInfo = DataSettings->RelicDataTable.LoadSynchronous();
 	RelicDetail = DataSettings->RelicDetailDataTable.LoadSynchronous();
 	ForestMonsterSpawnGroup = DataSettings->ForestMonsterSpawnGroupDataTable.LoadSynchronous();
+	DesertMonsterSpawnGroup = DataSettings->DesetMonsterSpawnGroupDataTable.LoadSynchronous();
+	CaveMonsterSpawnGroup = DataSettings->CaveMonsterSpawnGroupDataTable.LoadSynchronous();
 	Monster = DataSettings->MonsterDataTable.LoadSynchronous();
 	DungeonLevel = DataSettings->DungeonLevelDataTable.LoadSynchronous();
 	DungeonObject = DataSettings->DungeonObjectDataTable.LoadSynchronous();
@@ -30,5 +32,7 @@ void URSDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	check(RelicInfo)
 	check(RelicDetail)
 	check(ForestMonsterSpawnGroup)
+	check(DesertMonsterSpawnGroup)
+	check(CaveMonsterSpawnGroup)
 	check(Monster)
 }

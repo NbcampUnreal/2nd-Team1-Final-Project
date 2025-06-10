@@ -11,6 +11,8 @@
 #include "Engine/World.h"                             
 #include "TimerManager.h"                             
 #include "RogShop/UtilDefine.h"
+#include "RSSaveGameSubsystem.h"
+#include "RSDungeonStageSaveGame.h"
 
 ARSDungeonGameModeBase::ARSDungeonGameModeBase()
 {
@@ -20,17 +22,17 @@ ARSDungeonGameModeBase::ARSDungeonGameModeBase()
 void ARSDungeonGameModeBase::BeginPlay()// 게임이 시작될 때 호출됨
 {
     Super::BeginPlay();
-    
-    TileIndex = 0; // 저장된 타일 인덱스 값을 불러와 줘야함
-
-    URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
-    if (!DataSubsystem) return;
-
-    LevelDataTable = DataSubsystem->DungeonLevel;
-    if (!LevelDataTable)
+    UGameInstance* CurGameInstance = GetGameInstance();
+    if (CurGameInstance)
     {
-        return;
+        URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+        if (SaveGameSubsystem)
+        {
+            SaveGameSubsystem->OnSaveRequested.AddDynamic(this, &ARSDungeonGameModeBase::SaveDungeonInfo);
+        }
     }
+
+    LoadDungeonInfo();
 
     ACharacter* PlayerChar = Cast<ACharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
     if (PlayerChar)
@@ -52,13 +54,14 @@ void ARSDungeonGameModeBase::BeginPlay()// 게임이 시작될 때 호출됨
 
 void ARSDungeonGameModeBase::SpawnMap()// 선택된 맵 타입에 따라 맵 생성기 액터를 스폰
 {
-    if (!LevelDataTable) //데이터 테이블이 초기화 되지 않았으면 리턴
+    URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
+    if (!DataSubsystem)
     {
-        RS_LOG_DEBUG("맵 생성 실패 : 데이터 테이블이 초기화 되지 않았습니다");
         return;
     }
+
     TArray<FDungeonLevelData*> AllGroups;
-    LevelDataTable->GetAllRows(TEXT("LevelRowData"), AllGroups);
+    DataSubsystem->DungeonLevel->GetAllRows(TEXT("LevelRowData"), AllGroups);
 
     if (AllGroups.Num() == 0)
     {
@@ -74,11 +77,65 @@ void ARSDungeonGameModeBase::SpawnMap()// 선택된 맵 타입에 따라 맵 생
     FVector Location = FVector::ZeroVector;
     FRotator Rotation = FRotator::ZeroRotator;
 
-    MapGeneratorInstance = GetWorld()->SpawnActor<ARSMapGenerator>(ForestMapGeneratorClass, Location, Rotation, SpawnParams);// 해당 맵 생성기 액터를 월드에 스폰
+    MapGeneratorInstance = GetWorld()->SpawnActor<ARSMapGenerator>(MapGeneratorClass, Location, Rotation, SpawnParams);// 해당 맵 생성기 액터를 월드에 스폰
     MapGeneratorInstance->SetTileType(Level->GridSize, Level->TileSize,
         Level->LineTileLevel[FMath::RandRange(0, Level->LineTileLevel.Num() - 1)], Level->CornerTileLevel[FMath::RandRange(0, Level->CornerTileLevel.Num() - 1)], Level->CrossTileLevel[FMath::RandRange(0, Level->CrossTileLevel.Num() - 1)],
         Level->TTileLevel[FMath::RandRange(0, Level->TTileLevel.Num() - 1)], Level->DeadEndTileLevel[FMath::RandRange(0, Level->DeadEndTileLevel.Num() - 1)], Level->BossArenaLevel[FMath::RandRange(0, Level->BossArenaLevel.Num() - 1)], Level->EnvLevel[FMath::RandRange(0, Level->EnvLevel.Num() - 1)]);
     MapGeneratorInstance->StartMapGenerator();
+}
+
+int32 ARSDungeonGameModeBase::GetSeed() const
+{
+    return Seed;
+}
+
+void ARSDungeonGameModeBase::InitRandSeed()
+{
+    Seed = FMath::RandRange(1, INT32_MAX);
+}
+
+int32 ARSDungeonGameModeBase::GetTileIndex() const
+{
+    return TileIndex;
+}
+
+void ARSDungeonGameModeBase::IncrementAtTileIndex()
+{
+    TileIndex += 1;
+}
+
+void ARSDungeonGameModeBase::SaveDungeonInfo()
+{
+    // SaveGame 오브젝트 생성
+    URSDungeonStageSaveGame* DungeonStageSaveGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::CreateSaveGameObject(URSDungeonStageSaveGame::StaticClass()));
+    if (!DungeonStageSaveGame)
+    {
+        return;
+    }
+
+    // 세이브
+    DungeonStageSaveGame->TileIndex = TileIndex;
+    DungeonStageSaveGame->Seed = Seed;
+
+    // 저장
+    UGameplayStatics::SaveGameToSlot(DungeonStageSaveGame, DungeonInfoSaveSlotName, 0);
+}
+
+void ARSDungeonGameModeBase::LoadDungeonInfo()
+{
+    // 저장된 세이브 로드
+    URSDungeonStageSaveGame* DungeonInfoLoadGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::LoadGameFromSlot(DungeonInfoSaveSlotName, 0));
+    if (DungeonInfoLoadGame)
+    {
+        TileIndex = DungeonInfoLoadGame->TileIndex;
+        Seed = DungeonInfoLoadGame->Seed;
+    }
+
+    // 시드 값이 설정되어있지 않은 경우 랜덤한 시드를 설정한다.
+    if (Seed == 0)
+    {
+        InitRandSeed();
+    }
 }
 
 void ARSDungeonGameModeBase::OnMapReady()// 맵 로딩이 완료되었을 때 호출되는 함수
@@ -114,9 +171,4 @@ void ARSDungeonGameModeBase::NotifyMapReady()
     RS_LOG_DEBUG("GameMode::NotifyMapReady - 델리게이트 Broadcast");
     OnMapFullyLoaded.Broadcast();
     OnMapReady();
-}
-
-void ARSDungeonGameModeBase::SaveLevelIndex()
-{
-    // 다음레벨로 넘어가기전 호출해 레벨 인덱스를 저장해줘야한다
 }

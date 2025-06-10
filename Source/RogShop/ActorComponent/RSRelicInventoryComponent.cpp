@@ -8,6 +8,7 @@
 #include "RSDunPlayerController.h"
 #include "RSDunPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "RSSaveGameSubsystem.h"
 #include "RSDungeonRelicSaveGame.h"
 #include "RSBaseRelic.h"
 
@@ -26,10 +27,23 @@ void URSRelicInventoryComponent::BeginPlay()
 	LoadRelicData();
 	
 	ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
-	if (OwnerCharacter)
+	if (!OwnerCharacter)
 	{
-		OwnerCharacter->OnSaveRequested.AddDynamic(this, &URSRelicInventoryComponent::SaveRelicData);
+		return;
 	}
+	UGameInstance* CurGameInstance = OwnerCharacter->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+	if (!SaveGameSubsystem)
+	{
+		return;
+	}
+
+	SaveGameSubsystem->OnSaveRequested.AddDynamic(this, &URSRelicInventoryComponent::SaveRelicData);
 }
 
 void URSRelicInventoryComponent::AddRelic(FName RelicKey)
@@ -81,71 +95,72 @@ void URSRelicInventoryComponent::SaveRelicData()
 	}
 
 	RelicSaveGame->RelicList = this->RelicList;
+
+	// 저장
+	UGameplayStatics::SaveGameToSlot(RelicSaveGame, RelicSaveSlotName, 0);
 }
 
 void URSRelicInventoryComponent::LoadRelicData()
 {
-	// SaveGame 오브젝트 생성
-	URSDungeonRelicSaveGame* RelicSaveGame = Cast<URSDungeonRelicSaveGame>(UGameplayStatics::CreateSaveGameObject(URSDungeonRelicSaveGame::StaticClass()));
-	if (!RelicSaveGame)
+	// 저장된 세이브 로드
+	URSDungeonRelicSaveGame* RelicLoadGame = Cast<URSDungeonRelicSaveGame>(UGameplayStatics::LoadGameFromSlot(RelicSaveSlotName, 0));
+	if (RelicLoadGame)
 	{
-		return;
-	}
-
-	TArray<FName> LoadRelicList = RelicSaveGame->RelicList;
-	for (size_t i = 0; i < LoadRelicList.Num(); ++i)
-	{
-		FName CurRelicName = LoadRelicList[i];
-
-		// 동작 시켜야할 클래스를 찾아온다.
-		ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
-		if (!OwnerCharacter)
+		TArray<FName> LoadRelicList = RelicLoadGame->RelicList;
+		for (size_t i = 0; i < LoadRelicList.Num(); ++i)
 		{
-			return;
+			FName CurRelicName = LoadRelicList[i];
+
+			// 동작 시켜야할 클래스를 찾아온다.
+			ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
+			if (!OwnerCharacter)
+			{
+				return;
+			}
+
+			FString ObjectString = CurRelicName.ToString() + TEXT("Object");
+			FName ObjectName = FName(*ObjectString);
+
+			UGameInstance* CurGameInstance = OwnerCharacter->GetGameInstance();
+			if (!CurGameInstance)
+			{
+				return;
+			}
+
+			URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+			if (!DataSubsystem)
+			{
+				return;
+			}
+
+			UDataTable* RelicClassDataTable = DataSubsystem->RelicDetail;
+			if (!RelicClassDataTable)
+			{
+				return;
+			}
+
+			FDungeonRelicData* RelicClassData = RelicClassDataTable->FindRow<FDungeonRelicData>(CurRelicName, TEXT("Get RelicClassData"));
+			if (!RelicClassData)
+			{
+				return;
+			}
+
+			if (!RelicClassData->RelicClass)
+			{
+				return;
+			}
+
+			URSBaseRelic* SpawnRelic = NewObject<URSBaseRelic>(OwnerCharacter, ObjectName, EObjectFlags::RF_Transient, RelicClassData->RelicClass);
+			if (!SpawnRelic)
+			{
+				return;
+			}
+
+			// 유물 인벤토리에 해당 유물 추가
+			AddRelic(CurRelicName);
+
+			// 유물의 로직을 적용
+			SpawnRelic->ApplyEffect(OwnerCharacter);
 		}
-
-		FString ObjectString = CurRelicName.ToString() + TEXT("Object");
-		FName ObjectName = FName(*ObjectString);
-
-		UGameInstance* CurGameInstance = OwnerCharacter->GetGameInstance();
-		if (!CurGameInstance)
-		{
-			return;
-		}
-
-		URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
-		if (!DataSubsystem)
-		{
-			return;
-		}
-
-		UDataTable* RelicClassDataTable = DataSubsystem->RelicDetail;
-		if (!RelicClassDataTable)
-		{
-			return;
-		}
-
-		FDungeonRelicData* RelicClassData = RelicClassDataTable->FindRow<FDungeonRelicData>(CurRelicName, TEXT("Get RelicClassData"));
-		if (!RelicClassData)
-		{
-			return;
-		}
-
-		if (!RelicClassData->RelicClass)
-		{
-			return;
-		}
-
-		URSBaseRelic* SpawnRelic = NewObject<URSBaseRelic>(OwnerCharacter, ObjectName, EObjectFlags::RF_Transient, RelicClassData->RelicClass);
-		if (!SpawnRelic)
-		{
-			return;
-		}
-
-		// 유물 인벤토리에 해당 유물 추가
-		AddRelic(CurRelicName);
-
-		// 유물의 로직을 적용
-		SpawnRelic->ApplyEffect(OwnerCharacter);
 	}
 }

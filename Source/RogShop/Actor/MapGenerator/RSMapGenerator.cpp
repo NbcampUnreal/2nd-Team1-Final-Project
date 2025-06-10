@@ -17,7 +17,6 @@ ARSMapGenerator::ARSMapGenerator()
     PrimaryActorTick.bCanEverTick = false;
     ShopTilePos = FVector2D::ZeroVector;
     bMapGenerationComplete = false;
-    Seed = 8888;
 }
 
 
@@ -28,7 +27,16 @@ void ARSMapGenerator::BeginPlay()
 // 맵 생성 프로세스 시작
 void ARSMapGenerator::StartMapGenerator()
 {
-    RandomStream.Initialize(Seed);
+    ARSDungeonGameModeBase* DungeonGameMode = GetWorld()->GetAuthGameMode<ARSDungeonGameModeBase>();
+
+    if (!DungeonGameMode)
+    {
+        return;
+    }
+
+    int32 CurSeed = DungeonGameMode->GetSeed();
+
+    RandomStream.Initialize(CurSeed);
 
     GenerateMainPath();
     ChooseShopTile();
@@ -104,12 +112,6 @@ void ARSMapGenerator::GenerateMainPath()
         Current = Next;
         Path.Add(Current);
     }
-}
-
-// 외부에서 시드를 설정할 함수
-void ARSMapGenerator::SetSeed(int32 RandomSeed)
-{
-    Seed = RandomSeed;
 }
 
 // 유효한 위치인지 확인 (그리드 안에 있는지)
