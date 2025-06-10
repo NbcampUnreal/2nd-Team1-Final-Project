@@ -25,7 +25,6 @@ public:
 	void OnMapReady(); // 맵이 완전히 로드되었을 때 실행되는 콜백
 	UFUNCTION()
 	void NotifyMapReady(); //MapGenerator가 호출하는 함수
-	void SaveLevelIndex();
 #pragma endregion
 
 #pragma region Delegate
@@ -70,7 +69,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<ACharacter> PlayerClass; // 플레이어 캐릭터 클래스
-	int32 TileIndex;
 #pragma endregion
 
 private:
@@ -82,5 +80,31 @@ private:
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StageClear", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AActor> DunNextStagePortalClass;
+#pragma endregion
+
+#pragma region Dungeon Info
+public:
+	int32 GetSeed() const;
+	void InitRandSeed();
+
+	int32 GetTileIndex() const;
+	void IncrementAtTileIndex();
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Info", meta = (AllowPrivateAccess = "true"))
+	int32 Seed;	// 해당 값을 기준으로 맵 생성
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Info", meta = (AllowPrivateAccess = "true"))
+	int32 TileIndex;
+#pragma endregion
+
+
+#pragma region SaveData
+public:
+	UFUNCTION()
+	void SaveDungeonInfo();
+
+private:
+	void LoadDungeonInfo();
 #pragma endregion
 };
