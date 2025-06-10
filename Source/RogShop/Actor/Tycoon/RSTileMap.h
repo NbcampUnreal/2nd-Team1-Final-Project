@@ -51,8 +51,6 @@ private:
 	TSubclassOf<ARSBaseTile> GetTileClass(const FName& TileKey);
 
 private:
-	static const FString TileMapSaveSlot;
-
 	UPROPERTY(EditDefaultsOnly, Category="TileMap")
 	TSubclassOf<ARSBaseTile> DefaultTileType;
 
