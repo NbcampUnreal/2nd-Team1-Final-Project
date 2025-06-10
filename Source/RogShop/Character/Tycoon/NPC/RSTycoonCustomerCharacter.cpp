@@ -69,6 +69,10 @@ void ARSTycoonCustomerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	FoodBubbleWidgetComponent->SetVisibility(false);
+
+	// 커스텀 스켈레탈 메시 적용
+	USkeletalMesh* MergeSkeletalMesh = USkeletalMergingLibrary::MergeMeshes(SkeletalMeshMergeParams);
+	GetMesh()->SetSkeletalMeshAsset(MergeSkeletalMesh);
 }
 
 void ARSTycoonCustomerCharacter::InteractTarget(AActor* TargetActor)
