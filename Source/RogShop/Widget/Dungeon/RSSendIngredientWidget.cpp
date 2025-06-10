@@ -4,7 +4,9 @@
 #include "RSSendIngredientWidget.h"
 #include "Components/Button.h"
 #include "GameFramework/PlayerController.h"
+#include "RSDungeonGameModeBase.h"
 #include "RSGameInstance.h"
+#include "RSSaveGameSubsystem.h"
 
 void URSSendIngredientWidget::NativeConstruct()
 {
@@ -27,11 +29,29 @@ void URSSendIngredientWidget::NextStageTravel()
 {
 	// TODO : 재료를 보낼 수 있는 만큼 골랐는지 확인 후 적게 골랐다면 경고창을 띄운다.
 
-	URSGameInstance* GameInstance = GetGameInstance<URSGameInstance>();
-	if (GameInstance)
+	ARSDungeonGameModeBase* DungeonGameMode = GetWorld()->GetAuthGameMode<ARSDungeonGameModeBase>();
+	if (!DungeonGameMode)
 	{
-		GameInstance->TravelToLevel(TargetLevelAsset);
+		return;
 	}
+	DungeonGameMode->IncrementAtTileIndex();
+	DungeonGameMode->InitRandSeed();
+
+	URSGameInstance* GameInstance = GetGameInstance<URSGameInstance>();
+	if (!GameInstance)
+	{
+		return;
+	}
+
+	URSSaveGameSubsystem* SaveGameSubsystem = GameInstance->GetSubsystem<URSSaveGameSubsystem>();
+	if (!SaveGameSubsystem)
+	{
+		return;
+	}
+
+	SaveGameSubsystem->OnSaveRequested.Broadcast();
+
+	GameInstance->TravelToLevel(TargetLevelAsset);
 }
 
 void URSSendIngredientWidget::ExitWidget()

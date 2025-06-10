@@ -11,6 +11,7 @@
 #include "Engine/World.h"                             
 #include "TimerManager.h"                             
 #include "RogShop/UtilDefine.h"
+#include "RSSaveGameSubsystem.h"
 #include "RSDungeonStageSaveGame.h"
 
 ARSDungeonGameModeBase::ARSDungeonGameModeBase()
@@ -21,6 +22,15 @@ ARSDungeonGameModeBase::ARSDungeonGameModeBase()
 void ARSDungeonGameModeBase::BeginPlay()// 게임이 시작될 때 호출됨
 {
     Super::BeginPlay();
+    UGameInstance* CurGameInstance = GetGameInstance();
+    if (CurGameInstance)
+    {
+        URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+        if (SaveGameSubsystem)
+        {
+            SaveGameSubsystem->OnSaveRequested.AddDynamic(this, &ARSDungeonGameModeBase::SaveDungeonInfo);
+        }
+    }
 
     LoadDungeonInfo();
 
@@ -106,19 +116,20 @@ void ARSDungeonGameModeBase::SaveDungeonInfo()
     // 세이브
     DungeonStageSaveGame->TileIndex = TileIndex;
     DungeonStageSaveGame->Seed = Seed;
+
+    // 저장
+    UGameplayStatics::SaveGameToSlot(DungeonStageSaveGame, DungeonInfoSaveSlotName, 0);
 }
 
 void ARSDungeonGameModeBase::LoadDungeonInfo()
 {
-    // SaveGame 오브젝트 생성
-    URSDungeonStageSaveGame* DungeonStageSaveGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::CreateSaveGameObject(URSDungeonStageSaveGame::StaticClass()));
-    if (!DungeonStageSaveGame)
+    // 저장된 세이브 로드
+    URSDungeonStageSaveGame* DungeonInfoLoadGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::LoadGameFromSlot(DungeonInfoSaveSlotName, 0));
+    if (DungeonInfoLoadGame)
     {
-        return;
+        TileIndex = DungeonInfoLoadGame->TileIndex;
+        Seed = DungeonInfoLoadGame->Seed;
     }
-
-    TileIndex = DungeonStageSaveGame->TileIndex;
-    Seed = DungeonStageSaveGame->Seed;
 
     // 시드 값이 설정되어있지 않은 경우 랜덤한 시드를 설정한다.
     if (Seed == 0)
