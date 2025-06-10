@@ -23,6 +23,9 @@ private:
 	UFUNCTION()
 	void OnBaseAreaButtonClicked();
 
+	UFUNCTION()
+	void OnCloseButtonClicked ();
+
 // UI
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
@@ -30,6 +33,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
 	TObjectPtr<UButton> BaseAreaButton;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
+	TObjectPtr<UButton> CloseButton;
 
 // 버튼 클릭으로 이동 할 레벨
 private:
