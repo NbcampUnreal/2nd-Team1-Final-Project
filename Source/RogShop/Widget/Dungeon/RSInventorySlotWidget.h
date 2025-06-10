@@ -22,7 +22,7 @@ public:
 
 // 현재 슬롯에 대한 아이템 정보
 public:
-    void SetSlotItemInfo(FName NewItemDataTableKey, UTexture2D* NewItemImage, FString NewItemCount);
+    void SetSlotItemInfo(FName NewItemDataTableKey, UObject* NewItemImage, FString NewItemCount);
 
     FName GetItemDataTableKey() const;
 
