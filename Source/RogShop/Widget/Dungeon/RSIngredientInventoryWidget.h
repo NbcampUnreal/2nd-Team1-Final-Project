@@ -22,6 +22,7 @@ protected:
 public:
     void CreateSlots(int32 NumSlots, int32 NumColumns);
 
+    // 슬롯 수, 열을 기준으로 슬롯 생성
     UFUNCTION()
     void UpdateSlots(int32 IngredientSlotIndex, FItemSlot IngredientItemSlot);
 

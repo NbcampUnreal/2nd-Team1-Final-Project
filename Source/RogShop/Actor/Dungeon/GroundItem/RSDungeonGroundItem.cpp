@@ -16,16 +16,27 @@ ARSDungeonGroundItem::ARSDungeonGroundItem()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	MeshComp->SetupAttachment(SceneComp);
 	MeshComp->SetCollisionProfileName(TEXT("Interactable"));
-	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	MeshComp->SetSimulatePhysics(true);
-	MeshComp->SetEnableGravity(true);
-	MeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }
 
 // Called when the game starts or when spawned
 void ARSDungeonGroundItem::BeginPlay()
 {
 	Super::BeginPlay();
+
+
+	
+}
+
+void ARSDungeonGroundItem::Interact(ARSDunPlayerCharacter* Interactor)
+{
+
+}
+
+void ARSDungeonGroundItem::RandImpulse()
+{
+	MeshComp->SetSimulatePhysics(true);
+	MeshComp->SetEnableGravity(true);
+	MeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	if (MeshComp && MeshComp->IsSimulatingPhysics())
 	{
@@ -38,11 +49,5 @@ void ARSDungeonGroundItem::BeginPlay()
 
 		MeshComp->AddImpulse(RandomImpulse, NAME_None, true);
 	}
-	
-}
-
-void ARSDungeonGroundItem::Interact(ARSDunPlayerCharacter* Interactor)
-{
-
 }
 

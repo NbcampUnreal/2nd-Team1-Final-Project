@@ -36,6 +36,7 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "GameInstanceSubsystem"),
             Path.Combine(ModuleDirectory, "SaveGame"),
             Path.Combine(ModuleDirectory, "SaveGame", "Dungeon"),
+            Path.Combine(ModuleDirectory, "SaveGame", "Tycoon"),
             Path.Combine(ModuleDirectory, "Struct"),
         });
 

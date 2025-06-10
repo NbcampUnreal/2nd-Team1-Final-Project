@@ -125,6 +125,7 @@ void URSDungeonIngredientInventoryComponent::DropItem(FName ItemKey)
 		if (DungeonGroundItem && ItemStaticMesh)
 		{
 			DungeonGroundItem->InitItemInfo(ItemKey, ItemStaticMesh, CurItemQuantity);
+			DungeonGroundItem->RandImpulse();
 
 			ItemIndex = RemoveItem(ItemKey, INT32_MAX);
 		}

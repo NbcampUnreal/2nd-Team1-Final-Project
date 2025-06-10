@@ -5,6 +5,8 @@
 #include "Blueprint/UserWidget.h"
 #include "RSDunPlayerCharacter.h"
 #include "GameFramework/PlayerController.h"
+#include "RSSendIngredientWidget.h"
+#include "RSDungeonIngredientInventoryComponent.h"
 
 ARSDunNextStagePortal::ARSDunNextStagePortal()
 {
@@ -34,13 +36,22 @@ void ARSDunNextStagePortal::Interact(ARSDunPlayerCharacter* Interactor)
 			return;
 		}
 
-		SendIngredientWidgetInstance = CreateWidget<UUserWidget>(PC, SendIngredientWidgetClass);
-
+		SendIngredientWidgetInstance = CreateWidget<URSSendIngredientWidget>(PC, SendIngredientWidgetClass);
 		if (!SendIngredientWidgetInstance)
 		{
 			return;
 		}
 
+		URSDungeonIngredientInventoryComponent* IngredientInventoryComp = Interactor->GetRSDungeonIngredientInventoryComponent();
+		if (!IngredientInventoryComp)
+		{
+			return;
+		}
+
+		const TArray<FItemSlot>& IngredientItems = IngredientInventoryComp->GetItems();
+
+		SendIngredientWidgetInstance->CreateSendIngredientSlots(2);
+		SendIngredientWidgetInstance->CreatePlayerIngredientSlots(IngredientItems);
 		SendIngredientWidgetInstance->AddToViewport();
 
 		FInputModeUIOnly InputMode;
