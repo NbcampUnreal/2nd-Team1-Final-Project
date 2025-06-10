@@ -21,17 +21,8 @@ ARSDungeonGameModeBase::ARSDungeonGameModeBase()
 void ARSDungeonGameModeBase::BeginPlay()// 게임이 시작될 때 호출됨
 {
     Super::BeginPlay();
-    
+
     LoadDungeonInfo();
-
-    URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
-    if (!DataSubsystem) return;
-
-    LevelDataTable = DataSubsystem->DungeonLevel;
-    if (!LevelDataTable)
-    {
-        return;
-    }
 
     ACharacter* PlayerChar = Cast<ACharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
     if (PlayerChar)
@@ -53,13 +44,14 @@ void ARSDungeonGameModeBase::BeginPlay()// 게임이 시작될 때 호출됨
 
 void ARSDungeonGameModeBase::SpawnMap()// 선택된 맵 타입에 따라 맵 생성기 액터를 스폰
 {
-    if (!LevelDataTable) //데이터 테이블이 초기화 되지 않았으면 리턴
+    URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
+    if (!DataSubsystem)
     {
-        RS_LOG_DEBUG("맵 생성 실패 : 데이터 테이블이 초기화 되지 않았습니다");
         return;
     }
+
     TArray<FDungeonLevelData*> AllGroups;
-    LevelDataTable->GetAllRows(TEXT("LevelRowData"), AllGroups);
+    DataSubsystem->DungeonLevel->GetAllRows(TEXT("LevelRowData"), AllGroups);
 
     if (AllGroups.Num() == 0)
     {
@@ -75,7 +67,7 @@ void ARSDungeonGameModeBase::SpawnMap()// 선택된 맵 타입에 따라 맵 생
     FVector Location = FVector::ZeroVector;
     FRotator Rotation = FRotator::ZeroRotator;
 
-    MapGeneratorInstance = GetWorld()->SpawnActor<ARSMapGenerator>(ForestMapGeneratorClass, Location, Rotation, SpawnParams);// 해당 맵 생성기 액터를 월드에 스폰
+    MapGeneratorInstance = GetWorld()->SpawnActor<ARSMapGenerator>(MapGeneratorClass, Location, Rotation, SpawnParams);// 해당 맵 생성기 액터를 월드에 스폰
     MapGeneratorInstance->SetTileType(Level->GridSize, Level->TileSize,
         Level->LineTileLevel[FMath::RandRange(0, Level->LineTileLevel.Num() - 1)], Level->CornerTileLevel[FMath::RandRange(0, Level->CornerTileLevel.Num() - 1)], Level->CrossTileLevel[FMath::RandRange(0, Level->CrossTileLevel.Num() - 1)],
         Level->TTileLevel[FMath::RandRange(0, Level->TTileLevel.Num() - 1)], Level->DeadEndTileLevel[FMath::RandRange(0, Level->DeadEndTileLevel.Num() - 1)], Level->BossArenaLevel[FMath::RandRange(0, Level->BossArenaLevel.Num() - 1)], Level->EnvLevel[FMath::RandRange(0, Level->EnvLevel.Num() - 1)]);
