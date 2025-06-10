@@ -20,10 +20,7 @@ void URSInventorySlotWidget::NativeConstruct()
 
 void URSInventorySlotWidget::SetSlotItemInfo(FName NewItemDataTableKey, UObject* NewItemIcon, FString NewItemCount)
 {
-    if (NewItemDataTableKey != NAME_None)
-    {
-        ItemDataTableKey = NewItemDataTableKey;
-    }
+    ItemDataTableKey = NewItemDataTableKey;
 
     if (ItemIcon)
     {
@@ -39,6 +36,31 @@ void URSInventorySlotWidget::SetSlotItemInfo(FName NewItemDataTableKey, UObject*
 FName URSInventorySlotWidget::GetItemDataTableKey() const
 {
     return ItemDataTableKey;
+}
+
+UObject* URSInventorySlotWidget::GetItemIcon() const
+{
+    UObject* IconResourceObject = nullptr;
+
+    if (ItemIcon)
+    {
+        const FSlateBrush& ItemIconBrush = ItemIcon->GetBrush();
+        IconResourceObject = ItemIconBrush.GetResourceObject();
+    }
+
+    return IconResourceObject;
+}
+
+FString URSInventorySlotWidget::GetItemQuantity() const
+{
+    FString ItemCountString;
+
+    if (ItemCount)
+    {
+        ItemCountString = ItemCount->GetText().ToString();
+    }
+
+    return ItemCountString;
 }
 
 void URSInventorySlotWidget::HandleSlotClicked()

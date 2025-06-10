@@ -19,7 +19,7 @@ void URSRelicInventoryWidget::NativeConstruct()
         RSDunPlayerController->OnRelicAdded.AddDynamic(this, &URSRelicInventoryWidget::UpdateSlots);
 
         // 24개 슬롯, 4열 기준 생성
-        CreateSlots(24, 4);
+        CreateSlots(24, 5);
     }
 }
 

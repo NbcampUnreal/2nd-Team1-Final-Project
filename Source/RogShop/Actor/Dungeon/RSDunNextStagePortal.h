@@ -7,6 +7,8 @@
 #include "RSInteractable.h"
 #include "RSDunNextStagePortal.generated.h"
 
+class URSSendIngredientWidget;
+
 UCLASS()
 class ROGSHOP_API ARSDunNextStagePortal : public AActor, public IRSInteractable
 {
@@ -35,5 +37,5 @@ private:
 	TSubclassOf<UUserWidget> SendIngredientWidgetClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UUserWidget> SendIngredientWidgetInstance;
+	TObjectPtr<URSSendIngredientWidget> SendIngredientWidgetInstance;
 };

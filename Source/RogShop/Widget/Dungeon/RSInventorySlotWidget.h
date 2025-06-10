@@ -26,6 +26,10 @@ public:
 
     FName GetItemDataTableKey() const;
 
+    UObject* GetItemIcon() const;
+
+    FString GetItemQuantity() const;
+
 private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemInfo", meta = (AllowPrivateAccess = "true"))
     FName ItemDataTableKey;
