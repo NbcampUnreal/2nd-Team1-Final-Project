@@ -4,6 +4,7 @@
 #include "RSTileMap.h"
 
 #include "NavigationSystem.h"
+#include "RSSaveGameSubsystem.h"
 #include "RSTycoonGameModeBase.h"
 #include "Components/BrushComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -14,8 +15,6 @@
 #include "Tycoon/NPC/RSTycoonChefCharacter.h"
 #include "Tycoon/NPC/RSTycoonNPC.h"
 #include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
-
-const FString ARSTileMap::TileMapSaveSlot = TEXT("TileMapSaveSlot");
 
 ARSTileMap::ARSTileMap()
 {
@@ -74,7 +73,8 @@ void ARSTileMap::SaveTileMap()
 	SaveGameInstance->ChefCount = ChefCount;
 
 	// 저장
-	UGameplayStatics::SaveGameToSlot(SaveGameInstance, TileMapSaveSlot, 0);
+	const FString& SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
+	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SlotName, 0);
 }
 
 void ARSTileMap::ChangeTileSize(int32 NewWidth, int32 NewHeight)
@@ -110,7 +110,7 @@ void ARSTileMap::RotateTile(int32 Index, float YawValue)
 
 	int32 Row = Index / Width;
 	int32 Column = Index % Width;
-	
+
 	TileActors[Index]->SetActorRotation(FRotator(0, YawValue, 0));
 	TileName2DMap[Row].YawValues[Column] = YawValue;
 }
@@ -162,8 +162,9 @@ void ARSTileMap::BeginPlay()
 
 void ARSTileMap::LoadTileMap()
 {
-	URSTycoonTileMapSaveGame* LoadedGame = Cast<URSTycoonTileMapSaveGame>(
-		UGameplayStatics::LoadGameFromSlot(TileMapSaveSlot, 0));
+	const FString& SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
+	URSTycoonTileMapSaveGame* LoadedGame =
+		Cast<URSTycoonTileMapSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
 
 	if (LoadedGame)
 	{
@@ -297,7 +298,8 @@ void ARSTileMap::ActiveNPC()
 void ARSTileMap::DeleteTileData()
 {
 	RS_LOG_C("저장 데이터 삭제", FColor::Orange);
-	UGameplayStatics::DeleteGameInSlot(TileMapSaveSlot, 0);
+	const FString& SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
+	UGameplayStatics::DeleteGameInSlot(SlotName, 0);
 }
 
 

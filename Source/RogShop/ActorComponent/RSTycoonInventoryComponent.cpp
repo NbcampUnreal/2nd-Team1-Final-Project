@@ -5,6 +5,7 @@
 
 #include "ItemSlot.h"
 #include "RSIngredientInventoryWidget.h"
+#include "RSSaveGameSubsystem.h"
 #include "RSTycoonPlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
@@ -47,17 +48,23 @@ void URSTycoonInventoryComponent::Close()
 
 void URSTycoonInventoryComponent::SaveItemData()
 {
+	Super::SaveItemData();
+
 	URSTycoonSaveGame* SaveGame =
 		Cast<URSTycoonSaveGame>(UGameplayStatics::CreateSaveGameObject(URSTycoonSaveGame::StaticClass()));
 
 	SaveGame->Ingredients = ItemList;
 
-	UGameplayStatics::SaveGameToSlot(SaveGame, SaveSlotName, 0);
+	const FString& SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonSaveSlot;
+	UGameplayStatics::SaveGameToSlot(SaveGame, SlotName, 0);
 }
 
 void URSTycoonInventoryComponent::LoadItemData()
 {
-	URSTycoonSaveGame* SaveGame = Cast<URSTycoonSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, 0));
+	Super::LoadItemData();
+	
+	const FString& SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonSaveSlot;
+	URSTycoonSaveGame* SaveGame = Cast<URSTycoonSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
 	if (SaveGame)
 	{
 		ItemList = SaveGame->Ingredients;

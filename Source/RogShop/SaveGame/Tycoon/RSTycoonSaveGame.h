@@ -17,9 +17,6 @@ class ROGSHOP_API URSTycoonSaveGame : public USaveGame
 	GENERATED_BODY()
 
 public:
-	void AddIngredient(FName IngredientKey, int32 Amount);
-	
-public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FItemSlot> Ingredients;
 };
