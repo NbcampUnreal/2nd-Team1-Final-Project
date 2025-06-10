@@ -34,4 +34,25 @@ private:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
     TArray<TObjectPtr<URSInventorySlotWidget>> InvecntorySlots;
+
+// 슬롯 클릭시 재료 드랍
+private:
+    UFUNCTION()
+    void IngredientSlotPress();
+
+    UFUNCTION()
+    void IngredientSlotRelease();
+
+    UFUNCTION()
+    void IngredientDrop();
+
+    UFUNCTION()
+    void SetClickIngredientName(FName NewClickIngredientName);
+
+private:
+    float HoldThreshold;    // 마우스 좌클릭 키다운 시간
+
+    FTimerHandle HoldTimerHandle;   // 마우스 좌클릭 타이머
+
+    FName ClickIngredientName;  // 클릭한 슬롯의 재료의 데이터 테이블 RowName
 };

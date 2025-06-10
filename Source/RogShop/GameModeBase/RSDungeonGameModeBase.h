@@ -8,15 +8,6 @@
 #include "RSMapGenerator.h"
 #include "RSDungeonGameModeBase.generated.h"
 
-// 던전 맵 타입을 나타내는 열거형
-UENUM(BlueprintType)
-enum class EMapType : uint8
-{
-	Forest     UMETA(DisplayName = "숲"),
-	Desert     UMETA(DisplayName = "사막"),
-	Cave       UMETA(DisplayName = "동굴")
-};
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBossDead);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMapFullyLoaded);
 
@@ -34,6 +25,7 @@ public:
 	void OnMapReady(); // 맵이 완전히 로드되었을 때 실행되는 콜백
 	UFUNCTION()
 	void NotifyMapReady(); //MapGenerator가 호출하는 함수
+	void SaveLevelIndex();
 #pragma endregion
 
 #pragma region Delegate
@@ -47,7 +39,7 @@ public:
 
 private:
 #pragma region 비공개 함수
-	void SpawnMap(EMapType MapType); // 선택된 맵 타입에 따라 맵 생성
+	void SpawnMap(); // 선택된 맵 타입에 따라 맵 생성
 #pragma endregion
 
 protected:
@@ -61,9 +53,6 @@ protected:
 
 public:
 #pragma region 에디터 설정 값
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Map Type")
-	EMapType CurrentMapType; // 현재 맵 타입
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC")
 	TSubclassOf<AActor> ShopNPCClass; // 상점 NPC 클래스
 
@@ -81,12 +70,14 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<ACharacter> PlayerClass; // 플레이어 캐릭터 클래스
-	UPROPERTY(EditDefaultsOnly, Category = "Potal")
-	TSubclassOf<AActor> BossPortal; // 보스룸 이동 포탈
+	int32 TileIndex;
 #pragma endregion
 
 private:
 	FTimerHandle WaitForMapHandle; // 맵 로딩 후 딜레이 핸들
+
+	// 레벨 데이터 테이블
+	UDataTable* LevelDataTable;
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StageClear", meta = (AllowPrivateAccess = "true"))
