@@ -11,6 +11,7 @@
 #include "Engine/World.h"                             
 #include "TimerManager.h"                             
 #include "RogShop/UtilDefine.h"
+#include "RSDungeonStageSaveGame.h"
 
 ARSDungeonGameModeBase::ARSDungeonGameModeBase()
 {
@@ -21,7 +22,7 @@ void ARSDungeonGameModeBase::BeginPlay()// 게임이 시작될 때 호출됨
 {
     Super::BeginPlay();
     
-    TileIndex = 0; // 저장된 타일 인덱스 값을 불러와 줘야함
+    LoadDungeonInfo();
 
     URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
     if (!DataSubsystem) return;
@@ -81,6 +82,59 @@ void ARSDungeonGameModeBase::SpawnMap()// 선택된 맵 타입에 따라 맵 생
     MapGeneratorInstance->StartMapGenerator();
 }
 
+int32 ARSDungeonGameModeBase::GetSeed() const
+{
+    return Seed;
+}
+
+void ARSDungeonGameModeBase::InitRandSeed()
+{
+    Seed = FMath::RandRange(1, INT32_MAX);
+}
+
+int32 ARSDungeonGameModeBase::GetTileIndex() const
+{
+    return TileIndex;
+}
+
+void ARSDungeonGameModeBase::IncrementAtTileIndex()
+{
+    TileIndex += 1;
+}
+
+void ARSDungeonGameModeBase::SaveDungeonInfo()
+{
+    // SaveGame 오브젝트 생성
+    URSDungeonStageSaveGame* DungeonStageSaveGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::CreateSaveGameObject(URSDungeonStageSaveGame::StaticClass()));
+    if (!DungeonStageSaveGame)
+    {
+        return;
+    }
+
+    // 세이브
+    DungeonStageSaveGame->TileIndex = TileIndex;
+    DungeonStageSaveGame->Seed = Seed;
+}
+
+void ARSDungeonGameModeBase::LoadDungeonInfo()
+{
+    // SaveGame 오브젝트 생성
+    URSDungeonStageSaveGame* DungeonStageSaveGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::CreateSaveGameObject(URSDungeonStageSaveGame::StaticClass()));
+    if (!DungeonStageSaveGame)
+    {
+        return;
+    }
+
+    TileIndex = DungeonStageSaveGame->TileIndex;
+    Seed = DungeonStageSaveGame->Seed;
+
+    // 시드 값이 설정되어있지 않은 경우 랜덤한 시드를 설정한다.
+    if (Seed == 0)
+    {
+        InitRandSeed();
+    }
+}
+
 void ARSDungeonGameModeBase::OnMapReady()// 맵 로딩이 완료되었을 때 호출되는 함수
 {
     RS_LOG_DEBUG("맵 로딩 완료, 캐릭터 생성 시작");
@@ -114,9 +168,4 @@ void ARSDungeonGameModeBase::NotifyMapReady()
     RS_LOG_DEBUG("GameMode::NotifyMapReady - 델리게이트 Broadcast");
     OnMapFullyLoaded.Broadcast();
     OnMapReady();
-}
-
-void ARSDungeonGameModeBase::SaveLevelIndex()
-{
-    // 다음레벨로 넘어가기전 호출해 레벨 인덱스를 저장해줘야한다
 }
