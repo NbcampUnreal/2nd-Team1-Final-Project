@@ -42,6 +42,7 @@ public:
 	ARSTableTile* GetSittingTable() const { return SitTableTile; }
 
 protected:
+	virtual void BeginPlay() override;
 	virtual void InteractTarget(AActor* TargetActor) override;
 	
 private:
@@ -53,7 +54,7 @@ public:
 	FOnFinishEat OnFinishEat;
 
 protected:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UWidgetComponent> FoodBubbleWidgetComponent;
 
 private:

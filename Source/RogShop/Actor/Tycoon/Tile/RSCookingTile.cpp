@@ -59,8 +59,8 @@ void ARSCookingTile::OrderToCook()
 		return;
 	}
 
-	//임시로 제일 가까이 있는거부터 제작하게
-	FFoodOrder FoodOrder = Orders[0];
+	//제일 가까이 있는거부터 제작하게
+	FFoodOrder FoodOrder = GameMode->GetOrderToCook();
 
 	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->RemoveOrder(FoodOrder);
 	Cook(FoodOrder);

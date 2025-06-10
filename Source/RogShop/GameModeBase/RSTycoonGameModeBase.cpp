@@ -243,3 +243,9 @@ float ARSTycoonGameModeBase::GetGameTime() const
 {
 	return GetWorldTimerManager().GetTimerElapsed(GameTimerHandle);
 }
+
+FFoodOrder ARSTycoonGameModeBase::GetOrderToCook()
+{
+	//제일 처음 주문을 반환
+	return FoodOrders[0];
+}
