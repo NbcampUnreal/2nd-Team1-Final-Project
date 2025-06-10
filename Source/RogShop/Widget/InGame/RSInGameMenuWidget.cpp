@@ -18,6 +18,10 @@ void URSInGameMenuWidget::NativeConstruct()
 	{
 		BaseAreaButton->OnClicked.AddDynamic(this, &URSInGameMenuWidget::OnBaseAreaButtonClicked);
 	}
+	if (CloseButton)
+	{
+		CloseButton->OnClicked.AddDynamic(this, &URSInGameMenuWidget::OnCloseButtonClicked);
+	}
 }
 
 void URSInGameMenuWidget::OnMainMenuButtonClicked()
@@ -39,5 +43,14 @@ void URSInGameMenuWidget::OnBaseAreaButtonClicked()
 	if (RSGameInstance)
 	{
 		RSGameInstance->TravelToLevel(BaseAreaLevelAsset);
+	}
+}
+
+void URSInGameMenuWidget::OnCloseButtonClicked()
+{
+	// 메뉴 닫기
+	if (GetWorld())
+	{
+		SetVisibility(ESlateVisibility::Hidden);
 	}
 }
