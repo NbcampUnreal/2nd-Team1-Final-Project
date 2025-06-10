@@ -30,9 +30,8 @@ public:
 	void PlayAttackAnim();
 	void PlaySpawnAnim();
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UFUNCTION(BlueprintCallable)
 	void PlayAction(int32 actionIdx, FVector interestedPos);
-	void PlayAction_Implementation(int32 actionIdx, FVector interestedPos);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void UtillitySkill(int32 actionIdx, FVector interestedPos);
@@ -45,13 +44,15 @@ public:
 	bool GetIsMeleeSkill(int32 actionIdx);//근접공격 여부 판별, 컨트롤러 전달
 
 	UFUNCTION(BlueprintCallable)
+	bool GetIsPlayingAnim();//몽타주가 실행중인지 
+
+	UFUNCTION(BlueprintCallable)
 	float GetAtkRange();
 	UFUNCTION(BlueprintCallable)
 	float GetStrafeRange();
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void OnEveryMontageEnded(UAnimMontage* montage, bool bInterrupted);  //모든 몽타주에 대해 검사함
-	void OnEveryMontageEnded_Implementation(UAnimMontage* montage, bool bInterrupted);
+	UFUNCTION(BlueprintCallable)
+	void OnEveryMontageEnded(UAnimMontage* montage, bool bInterrupted);  //모든 몽타주에 대해 검사함		
 
 	//Navigation Invoker function
 	FORCEINLINE class UNavigationInvokerComponent* GetNavInvoker() const { return navInvoker; };
@@ -86,6 +87,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int32 skillActionIdx;//어떤 스킬을 시전하는 중인지 저장, PerformActionTrace 에서 해당 변수를 참조해 행동하도록 함
+
+	bool bIsPlayingAnim;
 
 	//NavInvoker
 	UPROPERTY(BlueprintReadWrite, Category = Navigation, meta = (AllowPrivateAccess = "true"))//Navigation Invoker Setting

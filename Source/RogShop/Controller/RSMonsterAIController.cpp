@@ -38,7 +38,7 @@ void ARSMonsterAIController::AISkillAction(int32 actionIdx, FVector interestedPo
 	{
 		ARSDunMonsterCharacter* ctrlChr;
 		ctrlChr = Cast<ARSDunMonsterCharacter>(ctrlPawn);//Figure out who is possessed Character
-		if (ctrlChr)
+		if (ctrlChr&&!ctrlChr->GetIsPlayingAnim())
 		{
 			ctrlChr->PlayAction(actionIdx, interestedPos);
 		}

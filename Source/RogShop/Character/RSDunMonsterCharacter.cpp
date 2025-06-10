@@ -40,6 +40,7 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 
 	meleeAtkRange = 150.0f;
 	strafeRange = 500.0f;
+	bIsPlayingAnim = false;
 }
 
 void ARSDunMonsterCharacter::BeginPlay()
@@ -92,10 +93,11 @@ void ARSDunMonsterCharacter::PlaySpawnAnim()
 	if (SpawnMontage)
 	{
 		PlayAnimMontage(SpawnMontage);
+		bIsPlayingAnim = true;
 	}
 }
 
-void ARSDunMonsterCharacter::PlayAction_Implementation(int32 actionIdx, FVector interestedPos)
+void ARSDunMonsterCharacter::PlayAction(int32 actionIdx, FVector interestedPos)
 {
 	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
 
@@ -104,9 +106,10 @@ void ARSDunMonsterCharacter::PlayAction_Implementation(int32 actionIdx, FVector 
 		UAnimMontage* action = MonsterAttackSkills[actionIdx].SkillMontage;
 		if (animInstance && action)
 		{
-			if (animInstance->Montage_IsPlaying(action) == false)
+			if (!bIsPlayingAnim)
 			{
 				animInstance->Montage_Play(action);
+				bIsPlayingAnim = true;
 				skillActionIdx = actionIdx;
 			}
 		}
@@ -124,14 +127,18 @@ void ARSDunMonsterCharacter::UtillitySkill_Implementation(int32 actionIdx, FVect
 
 }
 
-void ARSDunMonsterCharacter::OnEveryMontageEnded_Implementation(UAnimMontage* montage, bool bInterrupted)
+void ARSDunMonsterCharacter::OnEveryMontageEnded(UAnimMontage* montage, bool bInterrupted)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-	if (montage == DeathMontage && !AnimInstance->Montage_IsPlaying(montage))//사망 하는 경우
+	if (!AnimInstance->Montage_IsPlaying(montage))
 	{
-		Destroy();
-	}
+		if (montage == DeathMontage)//사망 하는 경우
+		{
+			Destroy();
+		}
+		bIsPlayingAnim = false;
+	}	
 }
 
 float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -444,6 +451,11 @@ int32 ARSDunMonsterCharacter::GetActionLength()
 bool ARSDunMonsterCharacter::GetIsMeleeSkill(int32 actionIdx)
 {
 	return MonsterAttackSkills[actionIdx].skillType == ESkillType::Melee;
+}
+
+bool ARSDunMonsterCharacter::GetIsPlayingAnim()
+{
+	return bIsPlayingAnim;
 }
 
 float ARSDunMonsterCharacter::GetAtkRange()
