@@ -29,4 +29,7 @@ public:
 	UFUNCTION()
 	virtual void SaveItemData() override;
 	virtual void LoadItemData() override;
+
+private:
+	const FString IngredientInventorySaveSlotName = TEXT("IngredientInventorySaveSlot");
 };
