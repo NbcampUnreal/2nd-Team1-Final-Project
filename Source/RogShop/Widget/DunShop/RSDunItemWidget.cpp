@@ -49,7 +49,7 @@ void URSDunItemWidget::SetItemData(const FItemInfoData& InItemData)
 
     if (ItemImage && ItemData.ItemIcon)
     {
-        ItemImage->SetBrushFromTexture(ItemData.ItemIcon);
+        ItemImage->SetBrushResourceObject(ItemData.ItemIcon);
     }
 }
 
