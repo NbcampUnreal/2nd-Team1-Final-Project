@@ -17,12 +17,27 @@ ARSDungeonGroundItem::ARSDungeonGroundItem()
 	MeshComp->SetupAttachment(SceneComp);
 	MeshComp->SetCollisionProfileName(TEXT("Interactable"));
 	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	MeshComp->SetSimulatePhysics(true);
+	MeshComp->SetEnableGravity(true);
+	MeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }
 
 // Called when the game starts or when spawned
 void ARSDungeonGroundItem::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (MeshComp && MeshComp->IsSimulatingPhysics())
+	{
+		// X, Y는 랜덤, Z는 위로 튀게
+		FVector RandomImpulse = FVector(
+			FMath::FRandRange(-200.f, 200.f),
+			FMath::FRandRange(-200.f, 200.f),
+			FMath::FRandRange(300.f, 500.f)
+		);
+
+		MeshComp->AddImpulse(RandomImpulse, NAME_None, true);
+	}
 	
 }
 
