@@ -6,16 +6,21 @@
 #include "AIController.h"
 #include "RSTycoonGameModeBase.h"
 #include "Components/SphereComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "RogShop/UtilDefine.h"
 #include "RogShop/Actor/Tycoon/RSTileMap.h"
 #include "RogShop/Actor/Tycoon/Tile/RSBaseTile.h"
 #include "RogShop/Actor/Tycoon/Tile/RSCookingTile.h"
+#include "RogShop/Widget/Tycoon/RSTycoonFoodBubbleWidget.h"
 
 
 ARSTycoonChefCharacter::ARSTycoonChefCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	FoodBubbleWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("FoodBubble"));
+	FoodBubbleWidgetComponent->SetupAttachment(RootComponent);
 }
 
 void ARSTycoonChefCharacter::Tick(float DeltaSeconds)
@@ -116,6 +121,8 @@ void ARSTycoonChefCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	FindCookingTile();
+	
+	FoodBubbleWidgetComponent->SetVisibility(false);
 }
 
 void ARSTycoonChefCharacter::InteractTarget(AActor* TargetActor)
@@ -147,6 +154,13 @@ void ARSTycoonChefCharacter::TryCook()
 	if (GameMode->GetOrders().Num() > 0)
 	{
 		bCooking = true;
+
+		URSTycoonFoodBubbleWidget* FoodBubble = Cast<URSTycoonFoodBubbleWidget>(FoodBubbleWidgetComponent->GetWidget());
+		check(FoodBubble)
+
+		FoodBubbleWidgetComponent->SetVisibility(true);
+		FoodBubble->SetImage(GameMode->GetOrderToCook().FoodKey);
+		
 		PlacedCookingTile->Interact(this);
 	}
 }
@@ -156,5 +170,6 @@ void ARSTycoonChefCharacter::CheckFinish()
 	if (PlacedCookingTile->GetState() == ECookingState::Finish)
 	{
 		bCooking = false;
+		FoodBubbleWidgetComponent->SetVisibility(false);
 	}
 }

@@ -17,24 +17,32 @@ ARSMapGenerator::ARSMapGenerator()
     PrimaryActorTick.bCanEverTick = false;
     ShopTilePos = FVector2D::ZeroVector;
     bMapGenerationComplete = false;
-    TileSize = 4000.0f;
-    Seed = 8888;
-    GridSize = 3;
 }
 
-// 맵 생성 프로세스 시작
+
 void ARSMapGenerator::BeginPlay()
 {
     Super::BeginPlay();
+}
+// 맵 생성 프로세스 시작
+void ARSMapGenerator::StartMapGenerator()
+{
+    ARSDungeonGameModeBase* DungeonGameMode = GetWorld()->GetAuthGameMode<ARSDungeonGameModeBase>();
 
-    RandomStream.Initialize(Seed);
+    if (!DungeonGameMode)
+    {
+        return;
+    }
+
+    int32 CurSeed = DungeonGameMode->GetSeed();
+
+    RandomStream.Initialize(CurSeed);
 
     GenerateMainPath();
     ChooseShopTile();
     ExpandPathToCoverMinTiles(0.5f);
     FindBossRoom(); // 경로 중 가장 먼 타일을 보스방으로 설정
     SpawnTiles();
-
 }
 
 //현재 위치에서 이동할 수 있는 다음 위치 선택
@@ -104,12 +112,6 @@ void ARSMapGenerator::GenerateMainPath()
         Current = Next;
         Path.Add(Current);
     }
-}
-
-// 외부에서 시드를 설정할 함수
-void ARSMapGenerator::SetSeed(int32 RandomSeed)
-{
-    Seed = RandomSeed;
 }
 
 // 유효한 위치인지 확인 (그리드 안에 있는지)
@@ -293,6 +295,7 @@ void ARSMapGenerator::ExpandPathToCoverMinTiles(float MinRatio)
 void ARSMapGenerator::SpawnTiles()
 {
     SpawnBossArenaLevel();
+    SpawnEnvLevel();
     for (int32 X = 0; X < GridSize; ++X)
     {
         for (int32 Y = 0; Y < GridSize; ++Y)
@@ -314,10 +317,10 @@ void ARSMapGenerator::SpawnTiles()
             FString TileName = FString::Printf(TEXT("Tile_%d_%d"), X, Y); //유니크한 이름
             TSoftObjectPtr<UWorld> SelectedLevel = nullptr;
 
-            // 보스방일 경우 보스 타일 사용
-            if (BossRoomTileLevel.IsValid() && Pos == BossRoomPos)
+            // 보스방일 경우 보스 타일 사용 -> DeadEndTile사용하는거로 변경
+            if (Pos == BossRoomPos)
             {
-                SelectedLevel = BossRoomTileLevel;
+                SelectedLevel = DeadEndTileLevel;
                 if (!SelectedLevel.IsValid())
                 {
                     SelectedLevel.LoadSynchronous(); //강제 로드
@@ -339,7 +342,8 @@ void ARSMapGenerator::SpawnTiles()
                     Rot = FRotator(0, 180, 0);
                 }   // 입구 위
             }
-            else {
+            else 
+            {
                 // 방향 수에 따라 타일 분기
                 switch (DirCount)
                 {
@@ -465,12 +469,23 @@ void ARSMapGenerator::SpawnTiles()
 
 ULevelStreamingDynamic* ARSMapGenerator::StreamTile(TSoftObjectPtr<UWorld> LevelToStream, const FVector& Location, const FRotator& Rotation, const FString& UniqueName) //동적으로 UWorld 타일을 로딩 및 배치
 {
-    if (!LevelToStream.IsValid()) return nullptr;
+    if (!LevelToStream.IsValid())
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[StreamTile] 유효하지 않은 LevelToStream입니다: %s"), *LevelToStream.ToString());
+        return nullptr;
+    }
 
     //위치와 회전을 담을 객체
     FTransform LevelTransform;
     LevelTransform.SetLocation(Location);
     LevelTransform.SetRotation(Rotation.Quaternion());
+
+    UE_LOG(LogTemp, Warning, TEXT("[MapGen] 현재 타일 사이즈: %f"), TileSize);
+    UE_LOG(LogTemp, Log, TEXT("[StreamTile] 로딩 요청 - Level: %s, 위치: %s, 회전: %s, 이름: %s"),
+        *LevelToStream.ToString(),
+        *Location.ToString(),
+        *Rotation.ToString(),
+        *UniqueName);
 
 
     bool bLoadSuccess = false;
@@ -507,7 +522,7 @@ FVector ARSMapGenerator::SpawnBossArenaLevel()
         BossArenaLevel.LoadSynchronous();
     }
 
-    FVector ArenaOffset = FVector(TileSize * GridSize * 2, TileSize * GridSize * 2, 0.0f); // 현재 맵과 떨어진 좌표
+    FVector ArenaOffset = FVector(TileSize * GridSize*2 , TileSize * GridSize*2 , 0.0f); // 현재 맵과 떨어진 좌표
     FString ArenaUniqueName = TEXT("BossArena");
 
     bool bSuccess = false;
@@ -522,6 +537,13 @@ FVector ARSMapGenerator::SpawnBossArenaLevel()
         bSuccess,
         ArenaUniqueName
     );
+
+
+    if (!bSuccess || !StreamingLevel)
+    {
+        UE_LOG(LogTemp, Error, TEXT("보스 아레나 레벨 로딩 실패"));
+        return FVector::ZeroVector;
+    }
 
     SpawnedLevels.Add(StreamingLevel);
     StreamingLevel->OnLevelShown.AddUniqueDynamic(this, &ARSMapGenerator::OnSubLevelLoaded);
@@ -604,6 +626,50 @@ void ARSMapGenerator::CheckAllTilesLoaded()
 bool ARSMapGenerator::IsMapFullyLoaded() const
 {
     return bIsMapLoaded;
+}
+void ARSMapGenerator::SetTileType(int32 IGridSize, float ITileSize, TSoftObjectPtr<UWorld> ILineTileLevel, TSoftObjectPtr<UWorld> ICornerTileLevel, TSoftObjectPtr<UWorld> ICrossTileLevel, TSoftObjectPtr<UWorld> ITTileLevel, TSoftObjectPtr<UWorld> IDeadEndTileLevel, TSoftObjectPtr<UWorld> IBossArenaLevel, TSoftObjectPtr<UWorld> IEnvLevel)
+{
+    GridSize = ITileSize;
+    TileSize = IGridSize;
+    LineTileLevel = ILineTileLevel;
+    CornerTileLevel = ICornerTileLevel;
+    CrossTileLevel = ICrossTileLevel;
+    TTileLevel = ITTileLevel;
+    DeadEndTileLevel = IDeadEndTileLevel;
+    BossArenaLevel = IBossArenaLevel;
+    EnvLevel = IEnvLevel;
+}
+void ARSMapGenerator::SpawnEnvLevel()
+{
+    if (!EnvLevel.IsValid())
+    {
+        EnvLevel.LoadSynchronous();
+    }
+
+    FVector EnvOffset = FVector(0.0f,0.0f, 0.0f); // 현재 맵과 떨어진 좌표
+    FString EnvUniqueName = TEXT("Env");
+
+    bool bSuccess = false;
+    FTransform ArenaTransform;
+    ArenaTransform.SetLocation(EnvOffset);
+    ArenaTransform.SetRotation(FQuat::Identity);
+
+    ULevelStreamingDynamic* StreamingLevel = ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(
+        GetWorld(),
+        EnvLevel,
+        ArenaTransform,
+        bSuccess,
+        EnvUniqueName
+    );
+
+
+    if (!bSuccess || !StreamingLevel)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Env 레벨 로딩 실패"));
+    }
+
+    SpawnedLevels.Add(StreamingLevel);
+    StreamingLevel->OnLevelShown.AddUniqueDynamic(this, &ARSMapGenerator::OnSubLevelLoaded);
 }
 
 

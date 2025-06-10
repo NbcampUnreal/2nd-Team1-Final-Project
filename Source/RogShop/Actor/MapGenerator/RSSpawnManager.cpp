@@ -7,6 +7,7 @@
 #include "EngineUtils.h"
 #include "MonsterSpawnGroupData.h"
 #include "MonsterData.h"
+#include "DungeonObjectData.h"
 #include "Algo/RandomShuffle.h"
 #include "RSDungeonGameModeBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -17,19 +18,39 @@
 #include "RogShop/UtilDefine.h"
 
 // 외부에서 전달받은 월드 및 테이블 초기화
-void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, TSubclassOf<AActor> ShopNPC, TSubclassOf<AActor> DunNextStagePortal)
+void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance,int32 TileIndex)
 {
 	World = InWorld;
-	ShopNPCClass = ShopNPC;
-	DunNextStagePortalClass = DunNextStagePortal;
+	LevelIndex = TileIndex;
 
 	if (!GameInstance) return;
 
 	URSDataSubsystem* DataSubsystem = GameInstance->GetSubsystem<URSDataSubsystem>();
-	if (!DataSubsystem) return;
+	if (!DataSubsystem)
+	{
+		return;
+	}
 
-	MonsterRawTable = DataSubsystem->ForestMonsterSpawnGroup;
+	switch (LevelIndex)
+	{
+	case 0:
+		// 숲 몬스터 그룹
+		MonsterRawTable = DataSubsystem->ForestMonsterSpawnGroup;
+		break;
+	case 1:
+		// 사막 몬스터 그룹
+		MonsterRawTable = DataSubsystem->DesertMonsterSpawnGroup;
+		break;
+	case 2:
+		// 동굴 몬스터 그룹
+		MonsterRawTable = DataSubsystem->CaveMonsterSpawnGroup;
+		break;
+	default:
+		return;
+		break;
+	}
 	MonsterStateTable = DataSubsystem->Monster;
+	DungeonObjectTable = DataSubsystem->DungeonObject;
 
 	if (!MonsterRawTable)
 	{
@@ -39,6 +60,11 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, T
 	if (!MonsterStateTable)
 	{
 		RS_LOG_DEBUG("Failed Update Monster");
+		return;
+	}
+	if (!DungeonObjectTable)
+	{
+		RS_LOG_DEBUG("Failed Update DungeonObject");
 		return;
 	}
 	
@@ -185,7 +211,7 @@ void URSSpawnManager::SpawnMonstersInLevel()
 // NPC 태그가 있는 TargetPoint 중 하나에 상점 NPC 스폰
 void URSSpawnManager::SpawnShopNPCInLevel()
 {
-	if (!World || !ShopNPCClass)
+	if (!World)
 	{
 		RS_LOG_DEBUG("상점 생성 실패");
 		return;
@@ -207,7 +233,7 @@ void URSSpawnManager::SpawnShopNPCInLevel()
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	World->SpawnActor<AActor>(ShopNPCClass, SpawnTransform, SpawnParams);
+	World->SpawnActor<AActor>(DungeonObjectTable->FindRow<FDungeonObjectData>(FName("ShopNPC"), TEXT("SpawnActor"))->ObjectClass, SpawnTransform, SpawnParams);
 	RS_LOG_DEBUG("상점 생성 성공");
 }
 
@@ -297,7 +323,7 @@ FVector URSSpawnManager::GetBossArenaLocation() const // 보스 아레나 위치
 	return FVector::ZeroVector;
 }
 
-AActor* URSSpawnManager::SpawnBossPortal(const FVector& BossWorldLocation, TSubclassOf<AActor> PortalClass) // 보스 포탈을 찾는 함수
+AActor* URSSpawnManager::SpawnBossPortal(const FVector& BossWorldLocation) // 보스 포탈을 찾는 함수
 {
 	if (!World)
 	{
@@ -324,7 +350,7 @@ AActor* URSSpawnManager::SpawnBossPortal(const FVector& BossWorldLocation, TSubc
 				FTransform SpawnTransform;
 				SpawnTransform.SetLocation(BossWorldLocation);
 				SpawnTransform.SetRotation(FQuat::Identity);
-				ARSDunBossRoomPortal* SpawnedPortal = World->SpawnActor<ARSDunBossRoomPortal>(PortalClass, SpawnTransform, Params);
+				ARSDunBossRoomPortal* SpawnedPortal = World->SpawnActor<ARSDunBossRoomPortal>(DungeonObjectTable->FindRow<FDungeonObjectData>(FName("BossRoomPortal"), TEXT("SpawnActor"))->ObjectClass, SpawnTransform, Params);
 				RS_LOG_DEBUG("보스포탈 생성 완료");
 
 				if (SpawnedPortal)
@@ -378,7 +404,7 @@ FVector URSSpawnManager::GetNextStageLocation() const //다음 스테이지 포�
 
 void URSSpawnManager::SpawnDunNextStagePortal() // 다음 스테이지 포탈 생성 함수
 {
-	if (!World || !DunNextStagePortalClass)
+	if (!World)
 	{
 		RS_LOG_DEBUG("다음 스테이지 포탈 생성 실패: World 또는 PortalClass 누락");
 		return;
@@ -387,12 +413,7 @@ void URSSpawnManager::SpawnDunNextStagePortal() // 다음 스테이지 포탈 �
 	FTransform PortalTransform;
 	PortalTransform.SetLocation(GetNextStageLocation()); 
 
-	DunNextStagePortalInstance = World->SpawnActor<AActor>(DunNextStagePortalClass, PortalTransform);
-
-	if (DunNextStagePortalInstance)
-	{
-		RS_LOG_DEBUG("다음 스테이지 포탈 생성 완료");
-	}
+	World->SpawnActor<AActor>(DungeonObjectTable->FindRow<FDungeonObjectData>(FName("NextStagePortal"), TEXT("SpawnActor"))->ObjectClass, PortalTransform);
 }
 
 void URSSpawnManager::SpawnBossMonster()
@@ -419,9 +440,23 @@ void URSSpawnManager::SpawnBossMonster()
 		UE_LOG(LogTemp, Warning, TEXT("Boss 태그를 가진 TargetPoint를 찾을 수 없습니다."));
 		return;
 	}
-
-	// MonsterStateTable에서 MainFloor 행을 찾기
-	FName BossMonsterRowName(TEXT("MainFlower"));
+	FName BossMonsterRowName;
+	// MonsterStateTable에서 보스몬스터 찾기
+	switch (LevelIndex)
+	{
+	case 0:
+		BossMonsterRowName=TEXT("MainFlower");
+		break;
+	case 1:
+		BossMonsterRowName=TEXT("Worm");
+		break;
+	case 2:
+		BossMonsterRowName=TEXT("SpiderQueen");
+		break;
+	default:
+		BossMonsterRowName = NAME_None;
+		break;
+	}
 	FMonsterData* BossData = MonsterStateTable->FindRow<FMonsterData>(BossMonsterRowName, TEXT("SpawnBossMonster"));
 	if (!BossData || !BossData->MonsterClass)
 	{

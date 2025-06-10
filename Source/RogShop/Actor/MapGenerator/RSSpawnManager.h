@@ -30,7 +30,7 @@ public:
 #pragma region 공개 함수
 
 	// 월드와 데이터테이블 초기화
-	void Initialize(UWorld* InWorld, UGameInstance* GameInstance, TSubclassOf<AActor> ShopNPC, TSubclassOf<AActor> DunNextStagePortal);
+	void Initialize(UWorld* InWorld, UGameInstance* GameInstance,int32 TileIndex);
 
 	// 몬스터들을 타겟포인트 위치에 스폰
 	void SpawnMonstersInLevel();
@@ -44,7 +44,7 @@ public:
 	// 보스몬스터 스폰 함수
 	void SpawnBossMonster();
 
-	AActor* SpawnBossPortal(const FVector& BossWorldLocation, TSubclassOf<AActor> PortalClass); // 보스 아레나로 가는 포탈을 소환하는 함수
+	AActor* SpawnBossPortal(const FVector& BossWorldLocation); // 보스 아레나로 가는 포탈을 소환하는 함수
 
 	// 보스 아레나 위치를 반환하는 함수
 	UFUNCTION(BlueprintCallable)
@@ -68,23 +68,12 @@ private:
 	// 몬스터 상태 데이터 테이블
 	UDataTable* MonsterStateTable;
 
-	// 상점 NPC 클래스
-	TSubclassOf<AActor> ShopNPCClass;
+	// 오브젝트 데이터 테이블
+	UDataTable* DungeonObjectTable;
 
 #pragma endregion
-
-#pragma region BossRoomPortal
-private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "BossRoomPortal", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<ARSDunBossRoomPortal> DunBossRoomPortalClass;
-#pragma endregion
-
 #pragma region StageClear
 private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StageClear", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<AActor> DunNextStagePortalClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StageClear", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<AActor> DunNextStagePortalInstance;
+	int32 LevelIndex; // 현재 레벨 인덱스
 #pragma endregion
 };

@@ -16,8 +16,6 @@ class UAIPerceptionStimuliSourceComponent;
 
 struct FInputActionValue;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSaveRequested);
-
 UCLASS()
 class ROGSHOP_API ARSDunPlayerCharacter : public ARSDunBaseCharacter
 {
@@ -154,10 +152,8 @@ private:
 	float AttackSpeed;
 
 // 세이브 및 로드
-public:
-	UPROPERTY(BlueprintAssignable)
-	FOnSaveRequested OnSaveRequested;	// 저장 요청을 의미하는 이벤트 디스패처
 
+public:
 	UFUNCTION()
 	void SaveStatus();
 

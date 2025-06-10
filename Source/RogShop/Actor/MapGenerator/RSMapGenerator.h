@@ -40,8 +40,9 @@ class ROGSHOP_API ARSMapGenerator : public AActor
 public:
 	ARSMapGenerator();
 
-	// 외부함수에서 시드 설정 함수
-	void SetSeed(int32 RandomSeed);
+	void SetTileType(int32 IGridSize, float ITileSize, TSoftObjectPtr<UWorld> ILineTileLevel, TSoftObjectPtr<UWorld> ICornerTileLevel, TSoftObjectPtr<UWorld> ICrossTileLevel, TSoftObjectPtr<UWorld> ITTileLevel, TSoftObjectPtr<UWorld> IDeadEndTileLevel, TSoftObjectPtr<UWorld> IBossArenaLevel, TSoftObjectPtr<UWorld> IEnvLevel);
+	void StartMapGenerator();
+
 
 #pragma region 타일로딩상태 검증함수
 	UFUNCTION()
@@ -61,6 +62,7 @@ protected:
 	void ChooseShopTile(); // 상점 타일 위치 선택 함수
 	void SpawnTiles(); // 타일 스폰 함수
 	FVector SpawnBossArenaLevel(); // 보스 아레나 레벨 스폰함수
+	void SpawnEnvLevel(); // 포스트 프로세스 레벨 스폰함수
 #pragma endregion
 
 #pragma region 유틸리티 함수
@@ -73,12 +75,9 @@ protected:
 #pragma region 공개 변수
 public:
 
-	// 타일 크기, 시드 , 그리드 크기
+	// 타일 크기, 그리드 크기
 	UPROPERTY(EditAnywhere, Category = "Room Status") // 타일 크기
 	float TileSize;
-
-	UPROPERTY(EditAnywhere, Category = "Room Status") // 시드
-	int32 Seed;
 
 	UPROPERTY(EditAnywhere, Category = "Room Status") // 그리드 크기
 	int32 GridSize;
@@ -99,11 +98,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Room Spawning") // 막다른길 타일
 	TSoftObjectPtr<UWorld> DeadEndTileLevel;
 
-	UPROPERTY(EditAnywhere, Category = "Room Spawning") // 보스방 타일
-	TSoftObjectPtr<UWorld> BossRoomTileLevel;
-
 	UPROPERTY(EditAnywhere, Category = "Room Spawning") // 보스 아레나 타일
 	TSoftObjectPtr<UWorld> BossArenaLevel;
+	UPROPERTY(EditAnywhere, Category = "Room Spawning") // 포스트 프로세싱 타일
+	TSoftObjectPtr<UWorld> EnvLevel;
 
 
 	UPROPERTY()
@@ -121,6 +119,7 @@ private:
 	TMap<FVector2D, FTileData> TileMap;// 타일 맵 데이터
 	FRandomStream RandomStream; // 랜덤 스트림
 	FVector2D BossRoomPos; // 보스방 위치
+
 
 	bool bMapGenerationComplete; // 맵 생성 완료 여부
 	bool bIsMapLoaded = false; // 맵이 완전히 로드되었는지 여우

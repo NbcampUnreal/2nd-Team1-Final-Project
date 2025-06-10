@@ -12,7 +12,7 @@ ARSDungeonGroundIngredient::ARSDungeonGroundIngredient()
 
 }
 
-void ARSDungeonGroundIngredient::InitItemInfo(FName NewDataTableKey, UStaticMesh* NewMesh)
+void ARSDungeonGroundIngredient::InitItemInfo(FName NewDataTableKey, UStaticMesh* NewMesh, int32 NewQuantity)
 {
 	if (!NewMesh)
 	{
@@ -24,6 +24,8 @@ void ARSDungeonGroundIngredient::InitItemInfo(FName NewDataTableKey, UStaticMesh
 	MeshComp->SetStaticMesh(NewMesh);
 
 	MeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	Quantity = NewQuantity;
 }
 
 void ARSDungeonGroundIngredient::Interact(ARSDunPlayerCharacter* Interactor)
@@ -37,7 +39,7 @@ void ARSDungeonGroundIngredient::Interact(ARSDunPlayerCharacter* Interactor)
 
 	if (DungeonInventoryComp)
 	{
-		DungeonInventoryComp->AddItem(DataTableKey);
+		DungeonInventoryComp->AddItem(DataTableKey, Quantity);
 
 		Destroy();
 	}

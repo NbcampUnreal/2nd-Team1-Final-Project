@@ -18,6 +18,7 @@
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
 #include "Engine/OverlapResult.h"
+#include "RSSaveGameSubsystem.h"
 #include "RSDungeonStatusSaveGame.h"
 #include "RogShop/UtilDefine.h"
 
@@ -85,7 +86,19 @@ void ARSDunPlayerCharacter::BeginPlay()
     USkeletalMesh* MergeSkeletalMesh = USkeletalMergingLibrary::MergeMeshes(SkeletalMeshMergeParams);
     GetMesh()->SetSkeletalMeshAsset(MergeSkeletalMesh);
 
-    OnSaveRequested.AddDynamic(this, &ARSDunPlayerCharacter::SaveStatus);
+    UGameInstance* CurGameInstance = GetGameInstance();
+    if (!CurGameInstance)
+    {
+        return;
+    }
+
+    URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+    if (!SaveGameSubsystem)
+    {
+        return;
+    }
+
+    SaveGameSubsystem->OnSaveRequested.AddDynamic(this, &ARSDunPlayerCharacter::SaveStatus);
 
     LoadStatus();
 }

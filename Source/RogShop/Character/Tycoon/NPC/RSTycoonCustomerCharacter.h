@@ -5,6 +5,7 @@
 
 #include "CoreMinimal.h"
 #include "RSTycoonNPC.h"
+#include "SkeletalMergingLibrary.h"
 #include "RSTycoonCustomerCharacter.generated.h"
 
 class UWidgetComponent;
@@ -42,6 +43,7 @@ public:
 	ARSTableTile* GetSittingTable() const { return SitTableTile; }
 
 protected:
+	virtual void BeginPlay() override;
 	virtual void InteractTarget(AActor* TargetActor) override;
 	
 private:
@@ -53,7 +55,7 @@ public:
 	FOnFinishEat OnFinishEat;
 
 protected:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UWidgetComponent> FoodBubbleWidgetComponent;
 
 private:
@@ -62,4 +64,8 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<ARSTableTile> SitTableTile;
+
+	// 스켈레탈 메시 관련
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SkeletalMesh", meta = (AllowPrivateAccess = true))
+	FSkeletalMeshMergeParams SkeletalMeshMergeParams;
 };

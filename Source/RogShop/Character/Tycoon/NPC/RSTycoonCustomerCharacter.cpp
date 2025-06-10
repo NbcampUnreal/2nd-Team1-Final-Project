@@ -35,12 +35,11 @@ void ARSTycoonCustomerCharacter::Sit(ARSTableTile* Table, const FTransform& SitT
 	SetActorLocation(SitTransform.GetLocation());
 	SetActorRotation(SitTransform.GetRotation());
 
-	if (URSTycoonFoodBubbleWidget* BubbleWidget = Cast<URSTycoonFoodBubbleWidget>(FoodBubbleWidgetComponent->GetWidget()))
-	{
-		//보이는 것 설정해야함
-		// BubbleWidget->SetImage(WantFoodKey);
-	}
+	URSTycoonFoodBubbleWidget* BubbleWidget = Cast<URSTycoonFoodBubbleWidget>(FoodBubbleWidgetComponent->GetWidget());
+	check(BubbleWidget)
 
+	FoodBubbleWidgetComponent->SetVisibility(true);
+	BubbleWidget->SetImage(WantFoodKey);
 }
 
 void ARSTycoonCustomerCharacter::WaitFood()
@@ -58,9 +57,22 @@ void ARSTycoonCustomerCharacter::WaitFood()
 void ARSTycoonCustomerCharacter::Eat()
 {
 	State = ETycoonCustomerState::Eat;
+	
+	FoodBubbleWidgetComponent->SetVisibility(false);
 
 	FTimerHandle Timer;
 	GetWorldTimerManager().SetTimer(Timer, this, &ARSTycoonCustomerCharacter::Leave, 5.f, false);
+}
+
+void ARSTycoonCustomerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	FoodBubbleWidgetComponent->SetVisibility(false);
+
+	// 커스텀 스켈레탈 메시 적용
+	USkeletalMesh* MergeSkeletalMesh = USkeletalMergingLibrary::MergeMeshes(SkeletalMeshMergeParams);
+	GetMesh()->SetSkeletalMeshAsset(MergeSkeletalMesh);
 }
 
 void ARSTycoonCustomerCharacter::InteractTarget(AActor* TargetActor)

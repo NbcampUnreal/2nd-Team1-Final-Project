@@ -97,21 +97,21 @@ void URSWeaponInventoryWidget::UpdateWeaponSlot(int8 WeaponSlotIndex, FName Weap
             {
                 if (WeaponSlot1->Brush.GetResourceObject() == nullptr)
                 {
-                    WeaponSlot1->SetBrushFromTexture(FoundData->ItemIcon);
+                    WeaponSlot1->SetBrushResourceObject(FoundData->ItemIcon);
                 }
                 else if (WeaponSlot2->Brush.GetResourceObject() == nullptr)
                 {
-                    WeaponSlot2->SetBrushFromTexture(FoundData->ItemIcon);
+                    WeaponSlot2->SetBrushResourceObject(FoundData->ItemIcon);
                 }
                 else
                 {
                     if (WeaponSlotIndex == 0 || WeaponSlotIndex == 1)
                     {
-                        WeaponSlot1->SetBrushFromTexture(FoundData->ItemIcon);
+                        WeaponSlot1->SetBrushResourceObject(FoundData->ItemIcon);
                     }
                     else
                     {
-                        WeaponSlot2->SetBrushFromTexture(FoundData->ItemIcon);
+                        WeaponSlot2->SetBrushResourceObject(FoundData->ItemIcon);
                     }
                 }
             }

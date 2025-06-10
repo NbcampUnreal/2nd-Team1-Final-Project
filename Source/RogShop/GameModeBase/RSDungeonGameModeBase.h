@@ -8,15 +8,6 @@
 #include "RSMapGenerator.h"
 #include "RSDungeonGameModeBase.generated.h"
 
-// 던전 맵 타입을 나타내는 열거형
-UENUM(BlueprintType)
-enum class EMapType : uint8
-{
-	Forest     UMETA(DisplayName = "숲"),
-	Desert     UMETA(DisplayName = "사막"),
-	Cave       UMETA(DisplayName = "동굴")
-};
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBossDead);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMapFullyLoaded);
 
@@ -47,7 +38,7 @@ public:
 
 private:
 #pragma region 비공개 함수
-	void SpawnMap(EMapType MapType); // 선택된 맵 타입에 따라 맵 생성
+	void SpawnMap(); // 선택된 맵 타입에 따라 맵 생성
 #pragma endregion
 
 protected:
@@ -61,35 +52,36 @@ protected:
 
 public:
 #pragma region 에디터 설정 값
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Map Type")
-	EMapType CurrentMapType; // 현재 맵 타입
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC")
-	TSubclassOf<AActor> ShopNPCClass; // 상점 NPC 클래스
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Platform")
-	TSubclassOf<AActor> PlatformClass; // 플랫폼 액터 클래스
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dungeon")
-	TSubclassOf<ARSMapGenerator> ForestMapGeneratorClass; // 숲 맵 생성기 클래스
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dungeon")
-	TSubclassOf<ARSMapGenerator> DesertMapGeneratorClass; // 사막 맵 생성기 클래스
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dungeon")
-	TSubclassOf<ARSMapGenerator> CaveMapGeneratorClass; // 동굴 맵 생성기 클래스
-
-	UPROPERTY(EditDefaultsOnly, Category = "Player")
-	TSubclassOf<ACharacter> PlayerClass; // 플레이어 캐릭터 클래스
-	UPROPERTY(EditDefaultsOnly, Category = "Potal")
-	TSubclassOf<AActor> BossPortal; // 보스룸 이동 포탈
+	TSubclassOf<ARSMapGenerator> MapGeneratorClass; //맵 생성기 클래스
 #pragma endregion
 
-private:
-	FTimerHandle WaitForMapHandle; // 맵 로딩 후 딜레이 핸들
+#pragma region Dungeon Info
+public:
+	int32 GetSeed() const;
+	void InitRandSeed();
+
+	int32 GetTileIndex() const;
+	void IncrementAtTileIndex();
 
 private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StageClear", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<AActor> DunNextStagePortalClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Info", meta = (AllowPrivateAccess = "true"))
+	int32 Seed;	// 해당 값을 기준으로 맵 생성
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Info", meta = (AllowPrivateAccess = "true"))
+	int32 TileIndex;
+#pragma endregion
+
+
+#pragma region SaveData
+public:
+	UFUNCTION()
+	void SaveDungeonInfo();
+
+private:
+	void LoadDungeonInfo();
+
+private:
+	const FString DungeonInfoSaveSlotName = TEXT("DungeonInfoSaveSlot");
 #pragma endregion
 };

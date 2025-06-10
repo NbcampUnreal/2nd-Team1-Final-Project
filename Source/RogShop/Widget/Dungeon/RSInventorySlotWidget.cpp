@@ -5,70 +5,20 @@
 #include "RogShop/UtilDefine.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
-#include "RSDunPlayerCharacter.h"
-#include "RSDungeonIngredientInventoryComponent.h"
+#include "Components/Button.h"
 
 void URSInventorySlotWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    bIsPressable = false;
-    HoldThreshold = 0.5f;
-}
-
-FReply URSInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
-{
-    // 좌클릭 키다운
-    if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+    if (SlotButton)
     {
-        GetWorld()->GetTimerManager().SetTimer(HoldTimerHandle, this, &URSInventorySlotWidget::HandleLongPress, HoldThreshold, false);
-        return FReply::Handled();
+        SlotButton->OnPressed.AddDynamic(this, &URSInventorySlotWidget::HandleSlotClicked);
     }
 
-    return FReply::Unhandled();
 }
 
-FReply URSInventorySlotWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
-{
-    if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
-    {
-        GetWorld()->GetTimerManager().ClearTimer(HoldTimerHandle);
-        return FReply::Handled();
-    }
-
-    return FReply::Unhandled();
-}
-
-void URSInventorySlotWidget::SetIsPressable(bool bNewIsPressable)
-{
-    bIsPressable = bNewIsPressable;
-}
-
-void URSInventorySlotWidget::HandleLongPress()
-{
-    // 유물 슬롯이 아닐때만 처리
-    if (bIsPressable)
-    {
-        // 추가 작업 필요
-        ARSDunPlayerCharacter* CurCharacter = GetOwningPlayerPawn<ARSDunPlayerCharacter>();
-        if (!CurCharacter)
-        {
-            return;
-        }
-
-        URSDungeonIngredientInventoryComponent* IngredientInventoryComp = CurCharacter->GetRSDungeonIngredientInventoryComponent();
-        if (!IngredientInventoryComp)
-        {
-            return;
-        }
-
-        IngredientInventoryComp->DropItem(ItemDataTableKey);
-
-        RS_LOG("UI 클릭");
-    }
-}
-
-void URSInventorySlotWidget::SetSlotItemInfo(FName NewItemDataTableKey, UTexture2D* NewItemIcon, FString NewItemCount)
+void URSInventorySlotWidget::SetSlotItemInfo(FName NewItemDataTableKey, UObject* NewItemIcon, FString NewItemCount)
 {
     if (NewItemDataTableKey != NAME_None)
     {
@@ -77,7 +27,7 @@ void URSInventorySlotWidget::SetSlotItemInfo(FName NewItemDataTableKey, UTexture
 
     if (ItemIcon)
     {
-        ItemIcon->SetBrushFromTexture(NewItemIcon);
+        ItemIcon->SetBrushResourceObject(NewItemIcon);
     }
 
     if (ItemCount)
@@ -89,4 +39,14 @@ void URSInventorySlotWidget::SetSlotItemInfo(FName NewItemDataTableKey, UTexture
 FName URSInventorySlotWidget::GetItemDataTableKey() const
 {
     return ItemDataTableKey;
+}
+
+void URSInventorySlotWidget::HandleSlotClicked()
+{
+    OnSlotClicked.Broadcast(ItemDataTableKey);
+}
+
+UButton* URSInventorySlotWidget::GetSlotButton()
+{
+    return SlotButton;
 }

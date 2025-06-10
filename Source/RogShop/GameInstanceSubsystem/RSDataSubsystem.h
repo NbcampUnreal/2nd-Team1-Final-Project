@@ -43,6 +43,12 @@ public:
 	TObjectPtr<UDataTable> ForestMonsterSpawnGroup;
 
 	UPROPERTY()
+	TObjectPtr<UDataTable> DesertMonsterSpawnGroup;
+
+	UPROPERTY()
+	TObjectPtr<UDataTable> CaveMonsterSpawnGroup;
+
+	UPROPERTY()
 	TObjectPtr<UDataTable> Monster;
 
 	UPROPERTY()
