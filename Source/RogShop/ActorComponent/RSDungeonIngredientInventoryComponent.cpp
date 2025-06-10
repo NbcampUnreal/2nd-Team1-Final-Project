@@ -83,7 +83,8 @@ int32 URSDungeonIngredientInventoryComponent::RemoveItem(FName ItemKey, int32 Am
 
 void URSDungeonIngredientInventoryComponent::DropItem(FName ItemKey)
 {
-	if (!CheckValidItem(ItemKey) || GetQuantity(ItemKey) == 0)
+	int32 CurItemQuantity = GetQuantity(ItemKey);
+	if (!CheckValidItem(ItemKey) || CurItemQuantity == 0)
 	{
 		RS_LOG_C("아이템 드랍에 실패했습니다.", FColor::Red);
 		return;
@@ -101,17 +102,32 @@ void URSDungeonIngredientInventoryComponent::DropItem(FName ItemKey)
 
 	FItemInfoData* Data = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->IngredientInfo->FindRow<FItemInfoData>(ItemKey, TEXT("Get IngredientInfo"));
 
+	int32 ItemIndex = -1;
+
 	if (Data)
 	{
 		UStaticMesh* ItemStaticMesh = Data->ItemStaticMesh;
 
 		if (DungeonGroundItem && ItemStaticMesh)
 		{
-			DungeonGroundItem->InitItemInfo(ItemKey, ItemStaticMesh);
+			DungeonGroundItem->InitItemInfo(ItemKey, ItemStaticMesh, CurItemQuantity);
 
-			RemoveItem(ItemKey, INT32_MAX);
+			ItemIndex = RemoveItem(ItemKey, INT32_MAX);
 		}
 	}
+
+	// UI 갱신되도록 이벤트 디스패처 호출
+	ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
+	if (!PC)
+	{
+		return;
+	}
+	if (ItemIndex == -1)
+	{
+		return;
+	}
+
+	PC->OnIngredientChange.Broadcast(ItemIndex, FItemSlot());
 }
 
 void URSDungeonIngredientInventoryComponent::SaveItemData()

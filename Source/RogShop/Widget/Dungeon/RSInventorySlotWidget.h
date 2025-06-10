@@ -8,6 +8,9 @@
 
 class UImage;
 class UTextBlock;
+class UButton;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSlotClicked, FName, SlotItemDataTableKey);
 
 UCLASS()
 class ROGSHOP_API URSInventorySlotWidget : public UUserWidget
@@ -17,26 +20,6 @@ class ROGSHOP_API URSInventorySlotWidget : public UUserWidget
 public:
     virtual void NativeConstruct() override;
 
-
-// 위젯 클릭
-protected:
-    virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-    virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-
-public:
-    void SetIsPressable(bool bNewIsPressable);
-
-private:
-    void HandleLongPress();
-
-private:
-    UPROPERTY()
-    bool bIsPressable;  // 해당 값이 true인 경우 버튼 입력을 받습니다.
-
-    float HoldThreshold;    // 마우스 좌클릭 키다운 시간
-
-    FTimerHandle HoldTimerHandle;
-
 // 현재 슬롯에 대한 아이템 정보
 public:
     void SetSlotItemInfo(FName NewItemDataTableKey, UTexture2D* NewItemImage, FString NewItemCount);
@@ -44,12 +27,27 @@ public:
     FName GetItemDataTableKey() const;
 
 private:
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemInfo", meta = (BindWidget, AllowPrivateAccess = "true"))
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemInfo", meta = (AllowPrivateAccess = "true"))
     FName ItemDataTableKey;
 
+public:
+    FOnSlotClicked OnSlotClicked;
+
+private:
+    UFUNCTION()
+    void HandleSlotClicked();
+
+// 위젯
+public:
+    UButton* GetSlotButton();
+
+private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemInfo", meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<UImage> ItemIcon;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemInfo", meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<UTextBlock> ItemCount;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemInfo", meta = (BindWidget, AllowPrivateAccess = "true"))
+    TObjectPtr<UButton> SlotButton;
 };
