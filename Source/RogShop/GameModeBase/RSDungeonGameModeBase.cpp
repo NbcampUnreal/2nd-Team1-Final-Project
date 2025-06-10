@@ -104,8 +104,6 @@ void ARSDungeonGameModeBase::IncrementAtTileIndex()
 
 void ARSDungeonGameModeBase::SaveDungeonInfo()
 {
-    // 다음레벨로 넘어가기전 호출해 레벨 인덱스를 저장해줘야한다
-
     // SaveGame 오브젝트 생성
     URSDungeonStageSaveGame* DungeonStageSaveGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::CreateSaveGameObject(URSDungeonStageSaveGame::StaticClass()));
     if (!DungeonStageSaveGame)
