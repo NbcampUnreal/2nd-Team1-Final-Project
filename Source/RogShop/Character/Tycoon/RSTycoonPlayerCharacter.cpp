@@ -85,6 +85,15 @@ AActor* ARSTycoonPlayerCharacter::Drop(FVector DropLocation)
 	return Temp;
 }
 
+void ARSTycoonPlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// 커스텀 스켈레탈 메시 적용
+	USkeletalMesh* MergeSkeletalMesh = USkeletalMergingLibrary::MergeMeshes(SkeletalMeshMergeParams);
+	GetMesh()->SetSkeletalMeshAsset(MergeSkeletalMesh);
+}
+
 void ARSTycoonPlayerCharacter::OnMove(const FInputActionValue& Value)
 {
 	FVector Input = Value.Get<FVector>();
