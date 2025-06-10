@@ -36,9 +36,10 @@ public:
 	void EndSale();
 	void StartWaitMode();
 	void StartManagementMode();
-
+	
 	float GetGameTime() const; //게임 경과 시간을 반환해줌
 	const TArray<FFoodOrder>& GetOrders() const { return FoodOrders; }
+	FFoodOrder GetOrderToCook();
 	const TArray<TObjectPtr<ARSTycoonCustomerCharacter>>& GetCustomers() const { return Customers; }
 	const TArray<ARSTycoonNPC*>& GetNPCs() const { return NPCs; }
 	int32 GetSaleStartHour() const { return SaleStartHour; }
