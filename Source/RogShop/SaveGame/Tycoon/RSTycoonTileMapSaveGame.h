@@ -14,6 +14,9 @@ struct FTileRow
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FName> Tiles;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<int32> YawValues;
 };
 
 UCLASS()

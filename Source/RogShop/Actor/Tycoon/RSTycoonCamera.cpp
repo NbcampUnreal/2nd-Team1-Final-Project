@@ -28,6 +28,11 @@ ARSTycoonCamera::ARSTycoonCamera()
 
 void ARSTycoonCamera::AttachPlayer()
 {
+	if (Target.IsValid())
+	{
+		return;
+	}
+	
 	ARSTycoonPlayerCharacter* Player = Cast<ARSTycoonPlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetCharacter());
 	check(Player)
 	Target = Player;

@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RSTycoonPlayerController.generated.h"
 
+struct FInputActionValue;
 struct FFoodOrder;
 struct FItemSlot;
 class URSTycoonInventoryComponent;
@@ -35,11 +36,6 @@ public:
 	void StartSaleMode();
 	void EndSaleMode();
 	void StartManagementMode();
-
-	int32 GetSelectTileIndex() const { return SelectTileIndex; }
-
-private:
-	int32 SelectTileIndex = INDEX_NONE;
 
 #pragma endregion
 
@@ -97,9 +93,6 @@ protected:
 private:
 	void SettingInput();
 
-	UFUNCTION()
-	void OnClickTile();
-	
 public:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputAction> MoveAction;
@@ -112,10 +105,7 @@ private:
 	TObjectPtr<UInputAction> TileClickAction;
 	
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputAction> ZoomInAction;
-	
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UInputAction> ZoomOutAction;
+	TObjectPtr<UInputAction> ZoomAction;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputMappingContext> IMC;
@@ -130,9 +120,7 @@ private:
 	void SettingCamera();
 	
 	UFUNCTION()
-	void OnZoomIn();
-	UFUNCTION()
-	void OnZoomOut();
+	void OnZoom(const FInputActionValue& Value);
 
 protected:
 	UPROPERTY(EditAnywhere)
@@ -156,6 +144,20 @@ private:
 	
 #pragma endregion 
 
+#pragma region TileChange
+public:
+	int32 GetSelectTileIndex() const { return SelectTileIndex; }
+
+private:
+	UFUNCTION()
+	void OnClickTile();
+	UFUNCTION()
+	void OnRotateTile(const FInputActionValue& Value);
+	
+private:
+	int32 SelectTileIndex = INDEX_NONE;
+#pragma endregion 
+	
 public:
 	void AddGold(int32 Value);
 	void AddCustomerCount(int32 Value);
