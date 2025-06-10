@@ -34,13 +34,16 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance,in
 	switch (LevelIndex)
 	{
 	case 0:
+		// 숲 몬스터 그룹
 		MonsterRawTable = DataSubsystem->ForestMonsterSpawnGroup;
 		break;
 	case 1:
 		// 사막 몬스터 그룹
+		MonsterRawTable = DataSubsystem->DesertMonsterSpawnGroup;
 		break;
 	case 2:
 		// 동굴 몬스터 그룹
+		MonsterRawTable = DataSubsystem->CaveMonsterSpawnGroup;
 		break;
 	default:
 		return;
