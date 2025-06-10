@@ -9,6 +9,7 @@
 #include "RSDataSubsystem.h"
 #include "ItemInfoData.h"
 #include "ItemSlot.h"
+#include "RSSaveGameSubsystem.h"
 #include "RSDungeonIngredientSaveGame.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -16,13 +17,26 @@ void URSDungeonIngredientInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	LoadItemData();
-
 	ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
-	if (OwnerCharacter)
+	if (!OwnerCharacter)
 	{
-		OwnerCharacter->OnSaveRequested.AddDynamic(this, &URSDungeonIngredientInventoryComponent::SaveItemData);
+		return;
 	}
+	UGameInstance* CurGameInstance = OwnerCharacter->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+	if (!SaveGameSubsystem)
+	{
+		return;
+	}
+
+	SaveGameSubsystem->OnSaveRequested.AddDynamic(this, &URSDungeonIngredientInventoryComponent::SaveItemData);
+
+	LoadItemData();
 }
 
 int32 URSDungeonIngredientInventoryComponent::AddItem(FName ItemKey, int32 Amount)
@@ -139,23 +153,22 @@ void URSDungeonIngredientInventoryComponent::SaveItemData()
 		return;
 	}
 
-	// 세이브
 	IngredientSaveGame->ItemList = ItemList;
+
+	// 저장
+	UGameplayStatics::SaveGameToSlot(IngredientSaveGame, IngredientInventorySaveSlotName, 0);
 }
 
 void URSDungeonIngredientInventoryComponent::LoadItemData()
 {
-	// SaveGame 오브젝트 생성
-	URSDungeonIngredientSaveGame* IngredientSaveGame = Cast<URSDungeonIngredientSaveGame>(UGameplayStatics::CreateSaveGameObject(URSDungeonIngredientSaveGame::StaticClass()));
-	if (!IngredientSaveGame)
+	// 저장된 세이브 로드
+	URSDungeonIngredientSaveGame* IngredientLoadGame = Cast<URSDungeonIngredientSaveGame>(UGameplayStatics::LoadGameFromSlot(IngredientInventorySaveSlotName, 0));
+	if (IngredientLoadGame)
 	{
-		return;
-	}
-
-	// 로드
-	TArray<FItemSlot> LoadItemList = IngredientSaveGame->ItemList;
-	for (size_t i = 0; i < LoadItemList.Num(); ++i)
-	{
-		AddItem(LoadItemList[i].ItemKey, LoadItemList[i].Quantity);
+		TArray<FItemSlot> LoadItemList = IngredientLoadGame->ItemList;
+		for (size_t i = 0; i < LoadItemList.Num(); ++i)
+		{
+			AddItem(LoadItemList[i].ItemKey, LoadItemList[i].Quantity);
+		}
 	}
 }

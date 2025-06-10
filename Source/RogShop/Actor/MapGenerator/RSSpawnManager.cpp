@@ -26,7 +26,10 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance,in
 	if (!GameInstance) return;
 
 	URSDataSubsystem* DataSubsystem = GameInstance->GetSubsystem<URSDataSubsystem>();
-	if (!DataSubsystem) return;
+	if (!DataSubsystem)
+	{
+		return;
+	}
 
 	switch (LevelIndex)
 	{

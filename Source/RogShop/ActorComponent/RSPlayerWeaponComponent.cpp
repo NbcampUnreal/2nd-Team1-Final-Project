@@ -11,6 +11,7 @@
 #include "ItemInfoData.h"
 #include "RSDungeonGroundWeapon.h"
 #include "RSDunPlayerController.h"
+#include "RSSaveGameSubsystem.h"
 #include "RSDungeonWeaponSaveGame.h"
 
 // Sets default values for this component's properties
@@ -34,10 +35,24 @@ void URSPlayerWeaponComponent::BeginPlay()
 	LoadRequested();
 	
 	ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
-	if (OwnerCharacter)
+	if (!OwnerCharacter)
 	{
-		OwnerCharacter->OnSaveRequested.AddDynamic(this, &URSPlayerWeaponComponent::SaveRequested);
+		return;
 	}
+	UGameInstance* CurGameInstance = OwnerCharacter->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+	if (!SaveGameSubsystem)
+	{
+		return;
+	}
+
+	SaveGameSubsystem->OnSaveRequested.AddDynamic(this, &URSPlayerWeaponComponent::SaveRequested);
+
 }
 
 void URSPlayerWeaponComponent::HandleNormalAttackInput()
@@ -465,13 +480,12 @@ void URSPlayerWeaponComponent::SaveRequested()
 
 void URSPlayerWeaponComponent::LoadRequested()
 {
-	// 널 체크
+	// 세이브가 있는지 확인 후 로드
 	URSDungeonWeaponSaveGame* WeaponLoadGame = Cast<URSDungeonWeaponSaveGame>(UGameplayStatics::LoadGameFromSlot(WeaponSaveSlotName, 0));
 	if (!WeaponLoadGame)
 	{
 		return;
 	}
-
 
 	ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
 	if (!OwnerCharacter)

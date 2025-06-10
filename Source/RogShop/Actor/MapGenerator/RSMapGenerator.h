@@ -40,8 +40,6 @@ class ROGSHOP_API ARSMapGenerator : public AActor
 public:
 	ARSMapGenerator();
 
-	// 외부함수에서 시드 설정 함수
-	void SetSeed(int32 RandomSeed);
 	void SetTileType(int32 IGridSize, float ITileSize, TSoftObjectPtr<UWorld> ILineTileLevel, TSoftObjectPtr<UWorld> ICornerTileLevel, TSoftObjectPtr<UWorld> ICrossTileLevel, TSoftObjectPtr<UWorld> ITTileLevel, TSoftObjectPtr<UWorld> IDeadEndTileLevel, TSoftObjectPtr<UWorld> IBossArenaLevel, TSoftObjectPtr<UWorld> IEnvLevel);
 	void StartMapGenerator();
 
@@ -77,12 +75,9 @@ protected:
 #pragma region 공개 변수
 public:
 
-	// 타일 크기, 시드 , 그리드 크기
+	// 타일 크기, 그리드 크기
 	UPROPERTY(EditAnywhere, Category = "Room Status") // 타일 크기
 	float TileSize;
-
-	UPROPERTY(EditAnywhere, Category = "Room Status") // 시드
-	int32 Seed;
 
 	UPROPERTY(EditAnywhere, Category = "Room Status") // 그리드 크기
 	int32 GridSize;
