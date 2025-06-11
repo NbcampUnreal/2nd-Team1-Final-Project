@@ -63,10 +63,9 @@ void URSDunPlayerAnimInstance::PlayFootstepSound() //발소리 재생 함수
 
 			// 캐릭터 클래스에서 발소리 맵 가져오기
 			ARSDunPlayerCharacter* Player = Cast<ARSDunPlayerCharacter>(Character);
-			if (Player && Player->FootstepSounds.Contains(SurfaceType))
+			if (Player)
 			{
-				USoundBase* FootstepSound = Player->FootstepSounds[SurfaceType];
-				if (FootstepSound)
+				if (USoundBase* FootstepSound = Player->GetFootstepSound(SurfaceType))
 				{
 					UGameplayStatics::PlaySoundAtLocation(Player, FootstepSound, Player->GetActorLocation());
 				}

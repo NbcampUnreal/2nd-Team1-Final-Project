@@ -144,6 +144,7 @@ public:
 	void IncreaseAttackSpeed(float Amount);
 	void DecreaseAttackSpeed(float Amount);
 
+
 private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
 	float AttackPower;
@@ -151,11 +152,14 @@ private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
 	float AttackSpeed;
 
-public:
 // 발소리 관련
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Footstep")
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Footstep", meta = (AllowPrivateAccess = "true"))
 	TMap<TEnumAsByte<EPhysicalSurface>, USoundBase*> FootstepSounds;
 
+//발소리 관련
+public:
+	USoundBase* GetFootstepSound(EPhysicalSurface SurfaceType) const;
 // 세이브 및 로드
 
 public:
