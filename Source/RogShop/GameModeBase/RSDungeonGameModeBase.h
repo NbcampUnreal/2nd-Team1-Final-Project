@@ -80,8 +80,5 @@ public:
 
 private:
 	void LoadDungeonInfo();
-
-private:
-	const FString DungeonInfoSaveSlotName = TEXT("DungeonInfoSaveSlot");
 #pragma endregion
 };

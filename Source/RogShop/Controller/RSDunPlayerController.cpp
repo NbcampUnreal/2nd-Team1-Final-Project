@@ -6,6 +6,7 @@
 #include "RSDunMainHUDWidget.h"
 #include "RSPlayerInventoryWidget.h"
 #include "TimerManager.h"
+#include "RSDunPlayerCharacter.h"
 
 ARSDunPlayerController::ARSDunPlayerController()
 {
@@ -28,6 +29,8 @@ void ARSDunPlayerController::BeginPlay()
     AddMapping();
 
     InitializeRSDunMainWidget();
+
+    BindCharacterDelegates();
 }
 
 void ARSDunPlayerController::AddMapping()
@@ -108,6 +111,7 @@ void ARSDunPlayerController::ShowLoadingUI()
         }
     }
 }
+
 void ARSDunPlayerController::HideLoadingUI()
 {
     if (LoadingUIWidget)
@@ -115,4 +119,32 @@ void ARSDunPlayerController::HideLoadingUI()
         LoadingUIWidget->RemoveFromParent();
         LoadingUIWidget = nullptr;
     }
+}
+
+void ARSDunPlayerController::ShowPlayerDeathWidget()
+{
+    if (RSDeathWidgetClass)
+    {
+        RSDeathWidget = CreateWidget<UUserWidget>(this, RSDeathWidgetClass);
+
+        if (RSDeathWidget)
+        {
+            RSDeathWidget->AddToViewport();
+        }
+
+        if (RSDunMainHUDWidget)
+        {
+            RSDunMainHUDWidget->HideAllWidgets();
+        }
+    }
+}
+
+void ARSDunPlayerController::BindCharacterDelegates()
+{
+    ARSDunPlayerCharacter* CurPawn = GetPawn<ARSDunPlayerCharacter>();
+    if (CurPawn)
+    {
+        CurPawn->OnCharacterDied.AddDynamic(this, &ARSDunPlayerController::ShowPlayerDeathWidget);
+    }
+
 }

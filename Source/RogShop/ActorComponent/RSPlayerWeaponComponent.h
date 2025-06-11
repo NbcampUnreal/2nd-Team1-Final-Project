@@ -89,6 +89,4 @@ private:
 	UFUNCTION()
 	void LoadRequested();
 
-private:
-	const FString WeaponSaveSlotName = TEXT("WeaponSaveSlot");
 };
