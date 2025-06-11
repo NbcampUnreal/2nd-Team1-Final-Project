@@ -5,6 +5,7 @@
 #include "RSCheatManager.h"
 #include "RSDunMainHUDWidget.h"
 #include "RSPlayerInventoryWidget.h"
+#include "RSDunPlayerCharacter.h"
 
 ARSDunPlayerController::ARSDunPlayerController()
 {
@@ -26,6 +27,8 @@ void ARSDunPlayerController::BeginPlay()
     AddMapping();
 
     InitializeRSDunMainWidget();
+
+    BindCharacterDelegates();
 }
 
 void ARSDunPlayerController::AddMapping()
@@ -83,4 +86,32 @@ void ARSDunPlayerController::ToggleInGameMenuWidget()
     {
         RSDunMainHUDWidget->HandleInGameMenuWidget();
     }
+}
+
+void ARSDunPlayerController::ShowPlayerDeathWidget()
+{
+    if (RSDeathWidgetClass)
+    {
+        RSDeathWidget = CreateWidget<UUserWidget>(this, RSDeathWidgetClass);
+
+        if (RSDeathWidget)
+        {
+            RSDeathWidget->AddToViewport();
+        }
+
+        if (RSDunMainHUDWidget)
+        {
+            RSDunMainHUDWidget->HideAllWidgets();
+        }
+    }
+}
+
+void ARSDunPlayerController::BindCharacterDelegates()
+{
+    ARSDunPlayerCharacter* CurPawn = GetPawn<ARSDunPlayerCharacter>();
+    if (CurPawn)
+    {
+        CurPawn->OnCharacterDied.AddDynamic(this, &ARSDunPlayerController::ShowPlayerDeathWidget);
+    }
+
 }
