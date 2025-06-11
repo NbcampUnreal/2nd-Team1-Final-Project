@@ -328,9 +328,6 @@ void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::Interaction(const FInputActionValue& value)
 {
-    // 애니메이션과 기획이 아직 준비되지 않았으므로 디버깅용 출력
-    RS_LOG_DEBUG("Interaction Activated");
-
     IRSInteractable* Interactable = Cast<IRSInteractable>(InteractActor);
     if (Interactable)
     {
@@ -512,11 +509,20 @@ void ARSDunPlayerCharacter::InteractTrace()
                 {
                     InteractActor = TargetActor;
 
-                    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
-                    if (PC)
+                    // 바로 상호작용 해야하는 경우
+                    if (Interactable->GetIsAutoInteract() == true)
                     {
-                        PC->ShowInteractWidget();
-                        PC->OnInteractableFound.Broadcast(Interactable->GetInteractName());
+                        Interactable->Interact(this);
+                    }
+                    // 유저가 직접 상호작용 해야하는 경우
+                    else
+                    {
+                        ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+                        if (PC)
+                        {
+                            PC->ShowInteractWidget();
+                            PC->OnInteractableFound.Broadcast(Interactable->GetInteractName());
+                        }
                     }
 
                     RS_DRAW_DEBUG_SPHERE(GetWorld(), Center, InteractRadius, 32, FColor::Green, false, 0.f, 0, 1.0f);

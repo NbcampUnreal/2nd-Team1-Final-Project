@@ -105,6 +105,9 @@ public:
 	TArray<FMonsterIngredientsData> Ingredients;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	int32 DropLifeEssenceQuantity;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float MaxHP;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
