@@ -83,7 +83,7 @@ void URSSendIngredientWidget::NextStageTravel()
 		IngredientInventoryComp->RemoveItem(ItemDataTableKey, ItemQuantity);
 
 		// 보낼 재료를 타이쿤으로 세이브하도록 보낸다.
-		TycoonSaveGame->AddIngredient(ItemDataTableKey, ItemQuantity);
+		//TycoonSaveGame->AddIngredient(ItemDataTableKey, ItemQuantity);
 	}
 
 	// 게임모드의 값을 다음 스테이지를 위해 변경

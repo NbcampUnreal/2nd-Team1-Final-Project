@@ -24,6 +24,10 @@ void URSDunMainHUDWidget::NativeConstruct()
     {
         PlayerStatusWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
     }
+    if (InteractWidget)
+    {
+		InteractWidget->SetVisibility(ESlateVisibility::Hidden);
+    }
 }
 
 void URSDunMainHUDWidget::HandleInGameMenuWidget()
