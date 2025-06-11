@@ -364,7 +364,7 @@ AActor* URSSpawnManager::SpawnBossPortal(const FVector& BossWorldLocation) // �
 						HalfHeight = ExistingPlayer->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
 					}
 					SpawnLocation.Z += HalfHeight;
-					BossArenaTransform.SetLocation(GetBossArenaLocation());
+					BossArenaTransform.SetLocation(SpawnLocation);
 					BossArenaTransform.SetRotation(FQuat::Identity);
 					SpawnedPortal->SetTargetTransform(BossArenaTransform);
 					RS_LOG_DEBUG("보스 아레나 위치 지정 완료");

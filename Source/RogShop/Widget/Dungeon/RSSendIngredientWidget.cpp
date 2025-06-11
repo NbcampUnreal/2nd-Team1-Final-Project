@@ -13,7 +13,6 @@
 #include "ItemInfoData.h"
 #include "RSInventorySlotWidget.h"
 #include "ItemSlot.h"
-#include "RSTycoonSaveGame.h"
 #include "RSDunPlayerCharacter.h"
 #include "RSDungeonIngredientInventoryComponent.h"
 
@@ -44,10 +43,8 @@ void URSSendIngredientWidget::NextStageTravel()
 		return;
 	}
 
-	// 타이쿤 세이브 게임으로 오브젝트 생성
-	// 아이템을 타이쿤으로 세이브하기 위해서 사용
-	URSTycoonSaveGame* TycoonSaveGame = Cast<URSTycoonSaveGame>(UGameplayStatics::CreateSaveGameObject(URSTycoonSaveGame::StaticClass()));
-	if (!TycoonSaveGame)
+	URSSaveGameSubsystem* SaveGameSubsystem = GameInstance->GetSubsystem<URSSaveGameSubsystem>();
+	if (!SaveGameSubsystem)
 	{
 		return;
 	}
@@ -83,7 +80,7 @@ void URSSendIngredientWidget::NextStageTravel()
 		IngredientInventoryComp->RemoveItem(ItemDataTableKey, ItemQuantity);
 
 		// 보낼 재료를 타이쿤으로 세이브하도록 보낸다.
-		TycoonSaveGame->AddIngredient(ItemDataTableKey, ItemQuantity);
+		SaveGameSubsystem->AddIngredientDungeonToTycoon(ItemDataTableKey, ItemQuantity);
 	}
 
 	// 게임모드의 값을 다음 스테이지를 위해 변경
@@ -96,12 +93,6 @@ void URSSendIngredientWidget::NextStageTravel()
 	DungeonGameMode->InitRandSeed();
 
 	// 데이터 세이브 이벤트 호출
-	URSSaveGameSubsystem* SaveGameSubsystem = GameInstance->GetSubsystem<URSSaveGameSubsystem>();
-	if (!SaveGameSubsystem)
-	{
-		return;
-	}
-
 	SaveGameSubsystem->OnSaveRequested.Broadcast();
 
 	// 다음 스테이지로 레벨 이동
