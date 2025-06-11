@@ -26,6 +26,24 @@ void URSDunMainHUDWidget::NativeConstruct()
     }
 }
 
+void URSDunMainHUDWidget::HideAllWidgets()
+{
+    if (InGameMenuWidget)
+    {
+        InGameMenuWidget->SetVisibility(ESlateVisibility::Hidden);
+    }
+
+    if (PlayerInventoryWidget)
+    {
+        PlayerInventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+    }
+
+    if (PlayerStatusWidget)
+    {
+        PlayerStatusWidget->SetVisibility(ESlateVisibility::Hidden);
+    }
+}
+
 void URSDunMainHUDWidget::HandleInGameMenuWidget()
 {
     // 다른 UI를 보이지 않도록 설정하고, 인게임 메뉴 UI를 보이도록 Visibility 설정 변경

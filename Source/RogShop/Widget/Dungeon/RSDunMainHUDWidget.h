@@ -19,6 +19,8 @@ public:
     virtual void NativeConstruct() override;
 
 public:
+    void HideAllWidgets();
+
     void HandleInGameMenuWidget();
     void HandlePlayerInventoryWidget();
 
