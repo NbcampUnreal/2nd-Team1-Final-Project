@@ -118,13 +118,37 @@ void ARSDungeonGameModeBase::SaveDungeonInfo()
     DungeonStageSaveGame->Seed = Seed;
 
     // 저장
-    UGameplayStatics::SaveGameToSlot(DungeonStageSaveGame, DungeonInfoSaveSlotName, 0);
+    UGameInstance* CurGameInstance = GetGameInstance();
+    if (!CurGameInstance)
+    {
+        return;
+    }
+
+    URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+    if (!SaveGameSubsystem)
+    {
+        return;
+    }
+
+    UGameplayStatics::SaveGameToSlot(DungeonStageSaveGame, SaveGameSubsystem->DungeonInfoSaveSlotName, 0);
 }
 
 void ARSDungeonGameModeBase::LoadDungeonInfo()
 {
     // 저장된 세이브 로드
-    URSDungeonStageSaveGame* DungeonInfoLoadGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::LoadGameFromSlot(DungeonInfoSaveSlotName, 0));
+    UGameInstance* CurGameInstance = GetGameInstance();
+    if (!CurGameInstance)
+    {
+        return;
+    }
+
+    URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+    if (!SaveGameSubsystem)
+    {
+        return;
+    }
+
+    URSDungeonStageSaveGame* DungeonInfoLoadGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->DungeonInfoSaveSlotName, 0));
     if (DungeonInfoLoadGame)
     {
         TileIndex = DungeonInfoLoadGame->TileIndex;

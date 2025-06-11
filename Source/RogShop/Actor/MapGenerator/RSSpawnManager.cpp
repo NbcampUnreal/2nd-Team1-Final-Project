@@ -122,6 +122,11 @@ void URSSpawnManager::SpawnMonstersInLevel()
 	// 각 타일마다 반복하면서 몬스터 스폰시도
 	for (const TPair<FIntPoint, TArray<AActor*>>& Pair : TileToTargets)
 	{
+		if (FMath::Abs(Pair.Key.X) <= 0 && FMath::Abs(Pair.Key.Y) <= 0) //플레이어 스폰 타일에는 스폰 안되게
+		{
+			continue;
+		}
+
 		const TArray<AActor*>& TilePoints = Pair.Value;
 
 		// 타겟포인트가 없다면 경고로그 출력후 건너뜀
@@ -261,10 +266,14 @@ void URSSpawnManager::SpawnPlayerAtStartPoint()
 		}
 
 
-		if (It->Tags.Contains(FName("Player")) && FVector::Dist(It->GetActorLocation(), FVector::ZeroVector) < 3000.f)
+		if (It->Tags.Contains(FName("Player")))
 		{
-			StartPoint = *It;
-			break;
+			FVector Location = It->GetActorLocation();
+			if (Location.X >= -2000.f && Location.X <= 2000.f && Location.Y >= -2000.f && Location.Y <= 2000.f)
+			{
+				StartPoint = *It;
+				break;
+			}
 		}
 	}
 

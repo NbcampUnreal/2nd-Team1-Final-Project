@@ -97,13 +97,49 @@ void URSRelicInventoryComponent::SaveRelicData()
 	RelicSaveGame->RelicList = this->RelicList;
 
 	// 저장
-	UGameplayStatics::SaveGameToSlot(RelicSaveGame, RelicSaveSlotName, 0);
+	ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
+	if (!OwnerCharacter)
+	{
+		return;
+	}
+	UGameInstance* CurGameInstance = OwnerCharacter->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+	if (!SaveGameSubsystem)
+	{
+		return;
+
+	}
+
+	UGameplayStatics::SaveGameToSlot(RelicSaveGame, SaveGameSubsystem->RelicSaveSlotName, 0);
 }
 
 void URSRelicInventoryComponent::LoadRelicData()
 {
 	// 저장된 세이브 로드
-	URSDungeonRelicSaveGame* RelicLoadGame = Cast<URSDungeonRelicSaveGame>(UGameplayStatics::LoadGameFromSlot(RelicSaveSlotName, 0));
+	ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
+	if (!OwnerCharacter)
+	{
+		return;
+	}
+	UGameInstance* CurGameInstance = OwnerCharacter->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+	if (!SaveGameSubsystem)
+	{
+		return;
+
+	}
+
+	URSDungeonRelicSaveGame* RelicLoadGame = Cast<URSDungeonRelicSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->RelicSaveSlotName, 0));
 	if (RelicLoadGame)
 	{
 		TArray<FName> LoadRelicList = RelicLoadGame->RelicList;
@@ -112,20 +148,8 @@ void URSRelicInventoryComponent::LoadRelicData()
 			FName CurRelicName = LoadRelicList[i];
 
 			// 동작 시켜야할 클래스를 찾아온다.
-			ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
-			if (!OwnerCharacter)
-			{
-				return;
-			}
-
 			FString ObjectString = CurRelicName.ToString() + TEXT("Object");
 			FName ObjectName = FName(*ObjectString);
-
-			UGameInstance* CurGameInstance = OwnerCharacter->GetGameInstance();
-			if (!CurGameInstance)
-			{
-				return;
-			}
 
 			URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
 			if (!DataSubsystem)
