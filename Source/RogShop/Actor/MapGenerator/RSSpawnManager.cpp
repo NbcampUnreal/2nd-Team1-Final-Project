@@ -261,10 +261,14 @@ void URSSpawnManager::SpawnPlayerAtStartPoint()
 		}
 
 
-		if (It->Tags.Contains(FName("Player")) && FVector::Dist(It->GetActorLocation(), FVector::ZeroVector) < 3000.f)
+		if (It->Tags.Contains(FName("Player")))
 		{
-			StartPoint = *It;
-			break;
+			FVector Location = It->GetActorLocation();
+			if (Location.X >= -2000.f && Location.X <= 2000.f && Location.Y >= -2000.f && Location.Y <= 2000.f)
+			{
+				StartPoint = *It;
+				break;
+			}
 		}
 	}
 
