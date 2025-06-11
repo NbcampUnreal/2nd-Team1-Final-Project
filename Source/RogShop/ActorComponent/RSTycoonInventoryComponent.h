@@ -29,7 +29,5 @@ public:
 	bool IsOpen() const { return bIsOpen; };
 
 private:
-	const FString SaveSlotName = "TycoonGame";
-
 	bool bIsOpen;
 };

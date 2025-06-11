@@ -22,8 +22,7 @@ void URSIngredientInventoryWidget::NativeConstruct()
 	{
 		RSDunPlayerController->OnIngredientChange.AddDynamic(this, &URSIngredientInventoryWidget::UpdateSlots);
 		
-		// 24개 슬롯, 4열 기준 생성
-		CreateSlots(24, 4);
+		CreateSlots(9, 3);
 	}
 
 	HoldThreshold = 0.5f;
@@ -96,8 +95,6 @@ void URSIngredientInventoryWidget::UpdateSlots(int32 IngredientSlotIndex, FItemS
 	FItemInfoData* IngredientInfoDataRow = IngredientDataTable->FindRow<FItemInfoData>(IngredientKey, TEXT("Get IngredientInfo"));
 	if (IngredientInfoDataRow)
 	{
-		// TODO : 현재 데이터에 대한 텍스처 정보를 가져온다.
-		// nullptr 대신에 텍스처 정보를 넘겨야한다.
 		InvecntorySlots[IngredientSlotIndex]->SetSlotItemInfo(IngredientKey, IngredientInfoDataRow->ItemIcon, FString::FromInt(ItemCount));
 	}
 	else
@@ -121,7 +118,6 @@ void URSIngredientInventoryWidget::IngredientSlotRelease()
 
 void URSIngredientInventoryWidget::IngredientDrop()
 {
-	// 추가 작업 필요
 	ARSDunPlayerCharacter* CurCharacter = GetOwningPlayerPawn<ARSDunPlayerCharacter>();
 	if (!CurCharacter)
 	{

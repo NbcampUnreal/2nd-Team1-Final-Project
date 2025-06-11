@@ -5,6 +5,7 @@
 
 #include "CoreMinimal.h"
 #include "RSTycoonNPC.h"
+#include "SkeletalMergingLibrary.h"
 #include "RSTycoonCustomerCharacter.generated.h"
 
 class UWidgetComponent;
@@ -63,4 +64,8 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<ARSTableTile> SitTableTile;
+
+	// 스켈레탈 메시 관련
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SkeletalMesh", meta = (AllowPrivateAccess = true))
+	FSkeletalMeshMergeParams SkeletalMeshMergeParams;
 };

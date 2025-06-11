@@ -26,7 +26,7 @@ do { \
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT(Str)); \
 		} \
 	} \
-} while (0)
+} while (0);
 
 // Color 있는 버전
 #define RS_LOG_C(Str, Color) \
@@ -39,7 +39,7 @@ do { \
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, Color, TEXT(Str)); \
 		} \
 	} \
-} while (0)
+} while (0);
 
 // FString 버전
 #define RS_LOG_S(Str) \
@@ -52,7 +52,7 @@ do { \
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, Str); \
 		} \
 	} \
-} while (0)
+} while (0);
 
 // Format 버전
 #define RS_LOG_F(FormatString, ...) \
@@ -65,7 +65,7 @@ do { \
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT(FormatString), ##__VA_ARGS__)); \
 		} \
 	} \
-} while (0)
+} while (0);
 
 // Format + Color 버전
 #define RS_LOG_F_C(FormatString, Color, ...) \
@@ -78,7 +78,7 @@ do { \
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, Color, FString::Printf(TEXT(FormatString), ##__VA_ARGS__)); \
 		} \
 	} \
-} while (0)
+} while (0);
 
 #define RS_LOG_DEBUG(Format, ...) \
 do { \
@@ -86,7 +86,7 @@ do { \
 	{ \
 		UE_LOG(LogTemp, Warning, TEXT(Format), ##__VA_ARGS__); \
 	} \
-} while(0)
+} while(0);
 
 #define RS_DRAW_DEBUG_SPHERE(World, Center, Radius, Segments, Color, bPersistent, LifeTime, DepthPriority, Thickness) \
 do { \
@@ -94,7 +94,7 @@ do { \
 	{ \
 		DrawDebugSphere(World, Center, Radius, Segments, Color, bPersistent, LifeTime, DepthPriority, Thickness); \
 	} \
-} while (0)
+} while (0);
 
 #define RS_DRAW_DEBUG_BOX(World, Center, Extent, Rotation, Color, bPersistent, LifeTime, DepthPriority, Thickness) \
 do { \
@@ -102,7 +102,7 @@ do { \
 	{ \
 		DrawDebugBox(World, Center, Extent, Rotation, Color, bPersistent, LifeTime, DepthPriority, Thickness); \
 	} \
-} while (0)
+} while (0);
 
 #define RS_DRAW_DEBUG_LINE(World, LineStart, LineEnd, Color, bPersistent, LifeTime, DepthPriority, Thickness) \
 do { \
@@ -110,4 +110,4 @@ do { \
 	{ \
 		DrawDebugLine(World, LineStart, LineEnd, Color, bPersistent, LifeTime, DepthPriority, Thickness); \
 	} \
-} while (0)
+} while (0);
