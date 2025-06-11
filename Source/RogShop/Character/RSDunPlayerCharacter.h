@@ -159,6 +159,4 @@ public:
 
 	void LoadStatus();
 
-private:
-	const FString StatusSaveSlotName = TEXT("StatusSaveSlot");
 };
