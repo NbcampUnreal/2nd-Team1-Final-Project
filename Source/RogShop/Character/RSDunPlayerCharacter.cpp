@@ -583,13 +583,37 @@ void ARSDunPlayerCharacter::SaveStatus()
     StatusSaveGame->LifeEssence = LifeEssence;
 
     // 저장
-    UGameplayStatics::SaveGameToSlot(StatusSaveGame, StatusSaveSlotName, 0);
+    UGameInstance* CurGameInstance = GetGameInstance();
+    if (!CurGameInstance)
+    {
+        return;
+    }
+
+    URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+    if (!SaveGameSubsystem)
+    {
+        return;
+    }
+
+    UGameplayStatics::SaveGameToSlot(StatusSaveGame, SaveGameSubsystem->StatusSaveSlotName, 0);
 }
 
 void ARSDunPlayerCharacter::LoadStatus()
 {
-    // SaveGame 오브젝트 생성
-    URSDungeonStatusSaveGame* StatusLoadGame = Cast<URSDungeonStatusSaveGame>(UGameplayStatics::LoadGameFromSlot(StatusSaveSlotName, 0));
+    // 저장된 세이브 로드
+    UGameInstance* CurGameInstance = GetGameInstance();
+    if (!CurGameInstance)
+    {
+        return;
+    }
+
+    URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+    if (!SaveGameSubsystem)
+    {
+        return;
+    }
+
+    URSDungeonStatusSaveGame* StatusLoadGame = Cast<URSDungeonStatusSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->StatusSaveSlotName, 0));
     if (!StatusLoadGame)
     {
         return;
