@@ -58,7 +58,13 @@ public:
 	TObjectPtr<UInputAction> ToggleInventoryAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
 	TObjectPtr<UInputAction> ToggleInGameMenuAction;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> LoadingUIWidgetClass;
+	UPROPERTY()
+	UUserWidget* LoadingUIWidget;
+	UFUNCTION(BlueprintCallable)
+	void ShowLoadingUI();
+	void HideLoadingUI();
 // 위젯
 public:
 	void InitializeRSDunMainWidget();
