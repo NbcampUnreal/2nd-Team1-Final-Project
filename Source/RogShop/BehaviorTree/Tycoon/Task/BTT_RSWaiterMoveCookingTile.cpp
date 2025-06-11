@@ -20,9 +20,7 @@ UBTT_RSWaiterMoveCookingTile::UBTT_RSWaiterMoveCookingTile()
 EBTNodeResult::Type UBTT_RSWaiterMoveCookingTile::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
-
 	
-
 	const FName TileKey = TEXT("TargetTile");
 	ARSCookingTile* Tile = Cast<ARSCookingTile>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TileKey));
 	if (Tile == nullptr)
@@ -48,18 +46,27 @@ void UBTT_RSWaiterMoveCookingTile::TickTask(UBehaviorTreeComponent& OwnerComp, u
 	
 	const FName TileKey = TEXT("TargetTile");
 	const FName CustomerKey = TEXT("TargetCustomer");
-	
+
+	//기본적으로 Interact를 하고 난 후 실행, 여기선 CookingTile과 Interact 후 실행
 	//움직임이 완료되면
 	ARSTycoonWaiterCharacter* Waiter = Cast<ARSTycoonWaiterCharacter>(OwnerComp.GetAIOwner()->GetCharacter());
-	if (!Waiter->IsMoving())
+	if (!Waiter->HasTarget())
 	{
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TileKey, nullptr);
+		
 		AActor* PickupActor = Waiter->GetPickupActor();
-		check(PickupActor)
+		if (PickupActor == nullptr)
+		{
+			RS_LOG("웨이터 가져가기 취소됨")
+			
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(CustomerKey, nullptr);
+			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+			return;
+		}
 
 		ARSBaseFood* Food = Cast<ARSBaseFood>(PickupActor);
 		check(Food)
 
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TileKey, nullptr);
 		OwnerComp.GetBlackboardComponent()->SetValueAsObject(CustomerKey, Food->Order.Customer.Get());
 		
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

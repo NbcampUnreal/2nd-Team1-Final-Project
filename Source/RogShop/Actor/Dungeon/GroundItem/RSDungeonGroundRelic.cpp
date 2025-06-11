@@ -7,23 +7,9 @@
 #include "RSDunPlayerCharacter.h"
 #include "RSRelicInventoryComponent.h"
 
-void ARSDungeonGroundRelic::InitInteractableRelic(FName NewDataTableKey, UStaticMesh* NewMesh, const TSubclassOf<URSBaseRelic> NewRelicClass)
+void ARSDungeonGroundRelic::SetRelicClass(const TSubclassOf<URSBaseRelic> NewRelicClass)
 {
-	if (!NewMesh)
-	{
-		RS_LOG_C("Invalid StaticMesh Used", FColor::Red);
-	}
-	if (!NewRelicClass)
-	{
-		RS_LOG_C("Invalid Blueprint Class Used", FColor::Red);
-	}
-
-	DataTableKey = NewDataTableKey;
-
-	MeshComp->SetStaticMesh(NewMesh);
 	RelicClass = NewRelicClass;
-
-	MeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }
 
 void ARSDungeonGroundRelic::Interact(ARSDunPlayerCharacter* Interactor)

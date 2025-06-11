@@ -103,9 +103,13 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
             FRotator::ZeroRotator
         );
 
+        FText ItemName = WeaponData->ItemName;
+        UStaticMesh* ItemStaticMesh = WeaponData->ItemStaticMesh;
+
         if (GroundWeapon)
         {
-            GroundWeapon->InitInteractableWeapon(RandomRowName, WeaponData->ItemStaticMesh, WeaponClassData->WeaponClass);
+            GroundWeapon->InitGroundItemInfo(ItemName, false, RandomRowName, ItemStaticMesh);
+            GroundWeapon->SetWeaponClass(WeaponClassData->WeaponClass);
         }
     }
 }

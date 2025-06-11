@@ -22,6 +22,17 @@ protected:
 public:
 	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
 
+	virtual FText GetInteractName() const override;
+
+	virtual bool GetIsAutoInteract() const override;
+
+protected:
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Interact")
+	FText InteractName;
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Interact")
+	bool bIsAutoInteract;
+
 // 레벨 이동
 private:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Level", meta = (AllowPrivateAccess = true))

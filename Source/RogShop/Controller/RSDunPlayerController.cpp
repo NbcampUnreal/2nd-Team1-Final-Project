@@ -5,6 +5,7 @@
 #include "RSCheatManager.h"
 #include "RSDunMainHUDWidget.h"
 #include "RSPlayerInventoryWidget.h"
+#include "TimerManager.h"
 #include "RSDunPlayerCharacter.h"
 
 ARSDunPlayerController::ARSDunPlayerController()
@@ -16,6 +17,7 @@ ARSDunPlayerController::ARSDunPlayerController()
 void ARSDunPlayerController::BeginPlay()
 {
     Super::BeginPlay();
+    ShowLoadingUI();
 
     // 마우스 커서를 감추고, Input모드를 게임온리로 변경
     bShowMouseCursor = false;
@@ -85,6 +87,37 @@ void ARSDunPlayerController::ToggleInGameMenuWidget()
     if (RSDunMainHUDWidget)
     {
         RSDunMainHUDWidget->HandleInGameMenuWidget();
+    }
+}
+
+void ARSDunPlayerController::ShowLoadingUI()
+{
+    if (LoadingUIWidgetClass)
+    {
+        LoadingUIWidget = CreateWidget<UUserWidget>(this, LoadingUIWidgetClass);
+        if (LoadingUIWidget)
+        {
+            LoadingUIWidget->AddToViewport(999);
+
+            // 2초 후 커튼 제거 예약
+            FTimerHandle TimerHandle;
+            GetWorld()->GetTimerManager().SetTimer(
+                TimerHandle,
+                this,
+                &ARSDunPlayerController::HideLoadingUI,
+                2.0f,
+                false
+            );
+        }
+    }
+}
+
+void ARSDunPlayerController::HideLoadingUI()
+{
+    if (LoadingUIWidget)
+    {
+        LoadingUIWidget->RemoveFromParent();
+        LoadingUIWidget = nullptr;
     }
 }
 

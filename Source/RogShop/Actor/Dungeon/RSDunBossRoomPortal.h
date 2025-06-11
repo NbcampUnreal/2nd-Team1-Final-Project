@@ -18,16 +18,18 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-// 컴포넌트
-private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
-	TObjectPtr<USceneComponent> SceneComp;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
-	TObjectPtr<UStaticMeshComponent> MeshComp;
-
 // 상호작용
 public:
 	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
+
+	virtual FText GetInteractName() const override;
+
+	virtual bool GetIsAutoInteract() const override;
+
+protected:
+	FText InteractName;
+
+	bool bIsAutoInteract;
 
 // 이동할 위치 정보
 public:
@@ -36,4 +38,11 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	FTransform TargetTransform;
+
+// 컴포넌트
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
+	TObjectPtr<USceneComponent> SceneComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UStaticMeshComponent> MeshComp;
 };

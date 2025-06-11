@@ -14,6 +14,9 @@ ARSDunBossRoomPortal::ARSDunBossRoomPortal()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	MeshComp->SetupAttachment(SceneComp);
 	MeshComp->SetCollisionProfileName("Interactable");
+
+	InteractName = FText::FromString(TEXT("보스 방으로"));
+	bIsAutoInteract = false;
 }
 
 void ARSDunBossRoomPortal::BeginPlay()
@@ -28,5 +31,15 @@ void ARSDunBossRoomPortal::Interact(ARSDunPlayerCharacter* Interactor)
 	{
 		Interactor->SetActorTransform(TargetTransform);
 	}
+}
+
+FText ARSDunBossRoomPortal::GetInteractName() const
+{
+	return InteractName;
+}
+
+bool ARSDunBossRoomPortal::GetIsAutoInteract() const
+{
+	return bIsAutoInteract;
 }
 

@@ -25,4 +25,8 @@ class ROGSHOP_API IRSInteractable
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual void Interact(ARSDunPlayerCharacter* Interactor) = 0;
+
+	virtual FText GetInteractName() const = 0;
+
+	virtual bool GetIsAutoInteract() const = 0;
 };
