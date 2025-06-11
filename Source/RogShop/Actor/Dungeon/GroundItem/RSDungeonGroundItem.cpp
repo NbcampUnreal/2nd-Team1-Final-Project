@@ -16,6 +16,9 @@ ARSDungeonGroundItem::ARSDungeonGroundItem()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	MeshComp->SetupAttachment(SceneComp);
 	MeshComp->SetCollisionProfileName(TEXT("Interactable"));
+
+	InteractName = FText::GetEmpty();
+	bIsAutoInteract = false;
 }
 
 // Called when the game starts or when spawned
@@ -30,6 +33,27 @@ void ARSDungeonGroundItem::BeginPlay()
 void ARSDungeonGroundItem::Interact(ARSDunPlayerCharacter* Interactor)
 {
 
+}
+
+FText ARSDungeonGroundItem::GetInteractName() const
+{
+	return InteractName;
+}
+
+bool ARSDungeonGroundItem::GetIsAutoInteract() const
+{
+	return bIsAutoInteract;
+}
+
+void ARSDungeonGroundItem::InitGroundItemInfo(FText NewInteractName, bool NewbIsAutoInteract, FName NewDataTableKey, UStaticMesh* NewMesh)
+{
+	InteractName = NewInteractName;
+
+	bIsAutoInteract = NewbIsAutoInteract;
+
+	DataTableKey = NewDataTableKey;
+
+	MeshComp->SetStaticMesh(NewMesh);
 }
 
 void ARSDungeonGroundItem::RandImpulse()

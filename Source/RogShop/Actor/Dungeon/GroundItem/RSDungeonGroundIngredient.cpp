@@ -12,22 +12,6 @@ ARSDungeonGroundIngredient::ARSDungeonGroundIngredient()
 
 }
 
-void ARSDungeonGroundIngredient::InitItemInfo(FName NewDataTableKey, UStaticMesh* NewMesh, int32 NewQuantity)
-{
-	if (!NewMesh)
-	{
-		RS_LOG_C("Invalid StaticMesh Used", FColor::Red);
-	}
-
-	DataTableKey = NewDataTableKey;
-
-	MeshComp->SetStaticMesh(NewMesh);
-
-	MeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-
-	Quantity = NewQuantity;
-}
-
 void ARSDungeonGroundIngredient::Interact(ARSDunPlayerCharacter* Interactor)
 {
 	if (!Interactor)
@@ -43,4 +27,9 @@ void ARSDungeonGroundIngredient::Interact(ARSDunPlayerCharacter* Interactor)
 
 		Destroy();
 	}
+}
+
+void ARSDungeonGroundIngredient::SetQuantity(int32 NewQuantity)
+{
+	Quantity = NewQuantity;
 }

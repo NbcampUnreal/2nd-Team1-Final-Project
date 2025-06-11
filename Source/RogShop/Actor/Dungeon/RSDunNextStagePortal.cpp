@@ -18,6 +18,9 @@ ARSDunNextStagePortal::ARSDunNextStagePortal()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	MeshComp->SetupAttachment(SceneComp);
 	MeshComp->SetCollisionProfileName("Interactable");
+
+	InteractName = FText::FromString(TEXT("다음 스테이지로"));
+	bIsAutoInteract = false;
 }
 
 void ARSDunNextStagePortal::BeginPlay()
@@ -59,4 +62,14 @@ void ARSDunNextStagePortal::Interact(ARSDunPlayerCharacter* Interactor)
 		PC->SetShowMouseCursor(true);
 		PC->FlushPressedKeys();
 	}
+}
+
+FText ARSDunNextStagePortal::GetInteractName() const
+{
+	return InteractName;
+}
+
+bool ARSDunNextStagePortal::GetIsAutoInteract() const
+{
+	return bIsAutoInteract;
 }

@@ -434,9 +434,13 @@ void ARSDunMonsterCharacter::MonsterItemDrop()
 			{
 				ARSDungeonGroundIngredient* DungeonIngredient = GetWorld()->SpawnActor<ARSDungeonGroundIngredient>(ARSDungeonGroundIngredient::StaticClass(), GetActorTransform());
 
-				if (DungeonIngredient && IngredientInfoDataRow->ItemStaticMesh)
+				if (DungeonIngredient)
 				{
-					DungeonIngredient->InitItemInfo(e.IngredientName, IngredientInfoDataRow->ItemStaticMesh, 1);
+					FText ItemName = IngredientInfoDataRow->ItemName;
+					UStaticMesh* ItemStaticMesh = IngredientInfoDataRow->ItemStaticMesh;
+
+					DungeonIngredient->InitGroundItemInfo(ItemName, false, e.IngredientName, ItemStaticMesh);
+					DungeonIngredient->SetQuantity(1);
 					DungeonIngredient->RandImpulse();
 				}
 			}
