@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "RSInteractable.h" // ÀÎÅÍÆäÀÌ½º Çì´õ
+#include "RSInteractable.h" // ì¸í„°í˜ì´ìŠ¤ í—¤ë”
 #include "RSDunShopNpcActor.generated.h"
 
 UCLASS()
@@ -13,19 +13,26 @@ class ROGSHOP_API ARSDunShopNpcActor : public AActor, public IRSInteractable
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ARSDunShopNpcActor();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+// ìƒí˜¸ì‘ìš©
+public:
 	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
 
-	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	virtual FText GetInteractName() const override;
+
+	virtual bool GetIsAutoInteract() const override;
+
+protected:
+	FText InteractName;
+
+	bool bIsAutoInteract;
+
+// ìƒí˜¸ì‘ìš©ì‹œ ê·¸ë ¤ë‚¼ UI
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UUserWidget> StoreWidgetClass;
 };

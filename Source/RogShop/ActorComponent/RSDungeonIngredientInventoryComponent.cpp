@@ -120,11 +120,13 @@ void URSDungeonIngredientInventoryComponent::DropItem(FName ItemKey)
 
 	if (Data)
 	{
+		FText ItemName = Data->ItemName;
 		UStaticMesh* ItemStaticMesh = Data->ItemStaticMesh;
 
 		if (DungeonGroundItem && ItemStaticMesh)
 		{
-			DungeonGroundItem->InitItemInfo(ItemKey, ItemStaticMesh, CurItemQuantity);
+			DungeonGroundItem->InitGroundItemInfo(ItemName, false, ItemKey, ItemStaticMesh);
+			DungeonGroundItem->SetQuantity(CurItemQuantity);
 			DungeonGroundItem->RandImpulse();
 
 			ItemIndex = RemoveItem(ItemKey, INT32_MAX);
@@ -157,13 +159,49 @@ void URSDungeonIngredientInventoryComponent::SaveItemData()
 	IngredientSaveGame->ItemList = ItemList;
 
 	// 저장
-	UGameplayStatics::SaveGameToSlot(IngredientSaveGame, IngredientInventorySaveSlotName, 0);
+	ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
+	if (!OwnerCharacter)
+	{
+		return;
+	}
+	UGameInstance* CurGameInstance = OwnerCharacter->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+	if (!SaveGameSubsystem)
+	{
+		return;
+
+	}
+
+	UGameplayStatics::SaveGameToSlot(IngredientSaveGame, SaveGameSubsystem->IngredientInventorySaveSlotName, 0);
 }
 
 void URSDungeonIngredientInventoryComponent::LoadItemData()
 {
 	// 저장된 세이브 로드
-	URSDungeonIngredientSaveGame* IngredientLoadGame = Cast<URSDungeonIngredientSaveGame>(UGameplayStatics::LoadGameFromSlot(IngredientInventorySaveSlotName, 0));
+	ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
+	if (!OwnerCharacter)
+	{
+		return;
+	}
+	UGameInstance* CurGameInstance = OwnerCharacter->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+	if (!SaveGameSubsystem)
+	{
+		return;
+
+	}
+
+	URSDungeonIngredientSaveGame* IngredientLoadGame = Cast<URSDungeonIngredientSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->IngredientInventorySaveSlotName, 0));
 	if (IngredientLoadGame)
 	{
 		TArray<FItemSlot> LoadItemList = IngredientLoadGame->ItemList;

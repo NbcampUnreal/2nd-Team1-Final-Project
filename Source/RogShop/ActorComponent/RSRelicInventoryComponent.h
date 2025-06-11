@@ -39,6 +39,4 @@ public:
 private:
 	void LoadRelicData();
 
-private:
-	const FString RelicSaveSlotName = TEXT("RelicSaveSlot");
 };

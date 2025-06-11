@@ -34,7 +34,7 @@ void URSDunItemWidget::SetItemData(const FItemInfoData& InItemData)
 
     if (ItemNameText)
     {
-        ItemNameText->SetText(FText::FromString(ItemData.ItemName));
+        ItemNameText->SetText(ItemData.ItemName);
     }
 
     if (ItemDesText)

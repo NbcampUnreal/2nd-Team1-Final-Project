@@ -52,5 +52,12 @@ void URSInGameMenuWidget::OnCloseButtonClicked()
 	if (GetWorld())
 	{
 		SetVisibility(ESlateVisibility::Hidden);
+
+		if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+		{
+			FInputModeGameOnly InputMode;
+			PC->SetInputMode(InputMode);
+			PC->bShowMouseCursor = false;
+		}
 	}
 }

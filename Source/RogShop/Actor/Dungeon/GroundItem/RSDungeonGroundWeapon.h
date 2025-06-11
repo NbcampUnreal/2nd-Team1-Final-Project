@@ -17,13 +17,12 @@ class ROGSHOP_API ARSDungeonGroundWeapon : public ARSDungeonGroundItem
 public:	
 	ARSDungeonGroundWeapon();
 
-public:	
-// 해당 엑터의 메시 세팅 및 상호작용에 필요한 변수 세팅
-	void InitInteractableWeapon(FName NewDataTableKey, UStaticMesh* NewMesh, const TSubclassOf<ARSDungeonItemBase> NewWeaponClass);
-
 // 상호작용
 public:
 	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
+
+public:
+	void SetWeaponClass(const TSubclassOf<ARSDungeonItemBase> NewWeaponClass);
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TargetClass", meta = (AllowPrivateAccess = true))

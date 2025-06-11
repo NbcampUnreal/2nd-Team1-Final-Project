@@ -16,6 +16,9 @@ ARSInteractableLevelTravel::ARSInteractableLevelTravel()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	MeshComp->SetupAttachment(SceneComp);
 	MeshComp->SetCollisionProfileName("Interactable");
+
+	InteractName = FText::GetEmpty();
+	bIsAutoInteract = false;
 }
 
 void ARSInteractableLevelTravel::BeginPlay()
@@ -54,4 +57,14 @@ void ARSInteractableLevelTravel::Interact(ARSDunPlayerCharacter* Interactor)
 	{
 		RSGameInstance->TravelToLevel(TargetLevelAsset);
 	}
+}
+
+FText ARSInteractableLevelTravel::GetInteractName() const
+{
+	return InteractName;
+}
+
+bool ARSInteractableLevelTravel::GetIsAutoInteract() const
+{
+	return bIsAutoInteract;
 }

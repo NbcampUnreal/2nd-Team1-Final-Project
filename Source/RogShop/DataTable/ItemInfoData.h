@@ -42,7 +42,7 @@ public:
 	EItemRarity ItemRarity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString ItemName;
+	FText ItemName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText Description;

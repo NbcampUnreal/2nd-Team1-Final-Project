@@ -82,6 +82,10 @@ void ARSTycoonWaiterCharacter::BeginPlay()
 
 	AActor* TileMap = UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass());
 	AIController->GetBlackboardComponent()->SetValueAsObject(FName(TEXT("TileMap")), Cast<ARSTileMap>(TileMap));
+
+	// 커스텀 스켈레탈 메시 적용
+	USkeletalMesh* MergeSkeletalMesh = USkeletalMergingLibrary::MergeMeshes(SkeletalMeshMergeParams);
+	GetMesh()->SetSkeletalMeshAsset(MergeSkeletalMesh);
 }
 
 void ARSTycoonWaiterCharacter::InteractTable(ARSTableTile* Table)

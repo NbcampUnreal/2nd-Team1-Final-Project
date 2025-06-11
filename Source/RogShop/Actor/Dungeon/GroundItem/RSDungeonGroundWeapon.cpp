@@ -13,25 +13,6 @@ ARSDungeonGroundWeapon::ARSDungeonGroundWeapon()
 	PrimaryActorTick.bCanEverTick = false;
 }
 
-void ARSDungeonGroundWeapon::InitInteractableWeapon(FName NewDataTableKey, UStaticMesh* NewMesh, const TSubclassOf<ARSDungeonItemBase> NewWeaponClass)
-{
-	if (!NewMesh)
-	{
-		RS_LOG_C("Invalid StaticMesh Used", FColor::Red);
-	}
-	if (!NewWeaponClass)
-	{
-		RS_LOG_C("Invalid Blueprint Class Used", FColor::Red);
-	}
-
-	DataTableKey = NewDataTableKey;
-
-	MeshComp->SetStaticMesh(NewMesh);
-	WeaponClass = NewWeaponClass;
-
-	MeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-}
-
 void ARSDungeonGroundWeapon::Interact(ARSDunPlayerCharacter* Interactor)
 {
 	if (!Interactor)
@@ -53,5 +34,10 @@ void ARSDungeonGroundWeapon::Interact(ARSDunPlayerCharacter* Interactor)
 
 		Destroy();
 	}
+}
+
+void ARSDungeonGroundWeapon::SetWeaponClass(const TSubclassOf<ARSDungeonItemBase> NewWeaponClass)
+{
+	WeaponClass = NewWeaponClass;
 }
 

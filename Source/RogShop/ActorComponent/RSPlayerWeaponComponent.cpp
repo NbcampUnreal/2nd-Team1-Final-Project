@@ -275,12 +275,14 @@ void URSPlayerWeaponComponent::DropWeaponToSlot(EWeaponSlot TargetWeaponSlot)
 	FDungeonWeaponData* WeaponData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponDetail->FindRow<FDungeonWeaponData>(WeaponKey, TEXT("Get WeaponData"));
 	if (ItemInfoData && WeaponData)
 	{
+		FText ItemName = ItemInfoData->ItemName;
 		UStaticMesh* ItemStaticMesh = ItemInfoData->ItemStaticMesh;
 		TSubclassOf<ARSDungeonItemBase> WeaponClass = WeaponData->WeaponClass;
 
 		if (GroundWeapon && ItemStaticMesh && WeaponClass)
 		{
-			GroundWeapon->InitInteractableWeapon(WeaponKey, ItemStaticMesh, WeaponClass);
+			GroundWeapon->InitGroundItemInfo(ItemName, false, WeaponKey, ItemStaticMesh);
+			GroundWeapon->SetWeaponClass(WeaponClass);
 			GroundWeapon->RandImpulse();
 		}
 	}
@@ -476,26 +478,48 @@ void URSPlayerWeaponComponent::SaveRequested()
 	WeaponSaveGame->WeaponSlot = CurWeaponSlot;
 	
 	// 저장
-	UGameplayStatics::SaveGameToSlot(WeaponSaveGame, WeaponSaveSlotName, 0);
-}
-
-void URSPlayerWeaponComponent::LoadRequested()
-{
-	// 세이브가 있는지 확인 후 로드
-	URSDungeonWeaponSaveGame* WeaponLoadGame = Cast<URSDungeonWeaponSaveGame>(UGameplayStatics::LoadGameFromSlot(WeaponSaveSlotName, 0));
-	if (!WeaponLoadGame)
-	{
-		return;
-	}
-
 	ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
 	if (!OwnerCharacter)
 	{
 		return;
 	}
-
 	UGameInstance* CurGameInstance = OwnerCharacter->GetGameInstance();
 	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+	if (!SaveGameSubsystem)
+	{
+		return;
+	}
+
+	UGameplayStatics::SaveGameToSlot(WeaponSaveGame, SaveGameSubsystem->WeaponSaveSlotName, 0);
+}
+
+void URSPlayerWeaponComponent::LoadRequested()
+{
+	// 세이브가 있는지 확인 후 로드
+	ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
+	if (!OwnerCharacter)
+	{
+		return;
+	}
+	UGameInstance* CurGameInstance = OwnerCharacter->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+	if (!SaveGameSubsystem)
+	{
+		return;
+	}
+
+	URSDungeonWeaponSaveGame* WeaponLoadGame = Cast<URSDungeonWeaponSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->WeaponSaveSlotName, 0));
+	if (!WeaponLoadGame)
 	{
 		return;
 	}

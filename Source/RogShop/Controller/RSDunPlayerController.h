@@ -58,7 +58,13 @@ public:
 	TObjectPtr<UInputAction> ToggleInventoryAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
 	TObjectPtr<UInputAction> ToggleInGameMenuAction;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> LoadingUIWidgetClass;
+	UPROPERTY()
+	UUserWidget* LoadingUIWidget;
+	UFUNCTION(BlueprintCallable)
+	void ShowLoadingUI();
+	void HideLoadingUI();
 // 위젯
 public:
 	void InitializeRSDunMainWidget();
@@ -66,13 +72,27 @@ public:
 	void TogglePlayerInventoryWidget();
 	void ToggleInGameMenuWidget();
 
+	UFUNCTION()
+	void ShowPlayerDeathWidget();
+
 private:
-	// 블루프린트에서 지정할 수 있도록 TSubclassOf로 선언
+	// 플레이어 캐릭터의 메인 허드 위젯
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UUserWidget> RSDunMainHUDWidgetClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<URSDunMainHUDWidget> RSDunMainHUDWidget;
+
+	// 플레이어 캐릭터의 사망 위젯
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> RSDeathWidgetClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UUserWidget> RSDeathWidget;
+
+// 캐릭터의 델리게이트에 바인딩하는 함수를 모은 함수
+private:
+	void BindCharacterDelegates();
 
 // 이벤트 디스패처
 public:
