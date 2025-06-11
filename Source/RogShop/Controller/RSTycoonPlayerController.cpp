@@ -3,6 +3,7 @@
 
 #include "RSTycoonPlayerController.h"
 
+#include "CanvasItem.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "RSIngredientInventoryWidget.h"
@@ -10,6 +11,8 @@
 #include "RSTycoonInventoryComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/HUD.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "RogShop/UtilDefine.h"
 #include "RogShop/Actor/Tycoon/RSTileMap.h"
@@ -155,18 +158,77 @@ void ARSTycoonPlayerController::SettingCamera()
 
 	MainCamera = Cast<ARSTycoonCamera>(TycoonCameras[MainCameraIndex]);
 	TopCamera = Cast<ARSTycoonCamera>(TycoonCameras[1 - MainCameraIndex]);
+	
 	SetViewTarget(MainCamera);
+	SetCameraLocationToCenter();
 
-	// MaxMainCameraFov = MainCamera->GetTileMapCameraFov();
-
-	MainCamera->GetCameraComponent()->SetFieldOfView(MaxMainCameraFov);
-	TopCamera->GetCameraComponent()->SetOrthoWidth(MaxTopCameraOrthoWidth);
-
-	GetWorldTimerManager().SetTimerForNextTick([&]()
-	{
-		SetCameraLocationToCenter();
-	});
+	//SetViewTarget으로 뷰를 설정하면 이론상 다음 프레임에 행렬이 변경되어야 하는데 실제로 NextTick에 실행해보면
+	//갱신되지 않아 이상한데에 찍혀 물리적인 딜레이를 주었다.
+	// FTimerHandle TimerHandle;
+	// GetWorldTimerManager().SetTimer(TimerHandle, [&]()
+	// {
+	// 	SetMaxLengthOfMainCamera();
+	// }, 0.05f, false);
 }
+
+void ARSTycoonPlayerController::SetMaxLengthOfMainCamera()
+{
+	/*
+	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
+	check(TileMap)
+
+	FVector Center = TileMap->GetMapCenter();
+	FVector HalfSize = TileMap->GetMapSize() * 0.5f;
+
+	TArray<FVector> Vertices;
+	Vertices.SetNum(4);
+	Vertices[0] = FVector(Center.X + HalfSize.X, Center.Y - HalfSize.Y, Center.Z);
+	Vertices[1] = FVector(Center.X + HalfSize.X, Center.Y + HalfSize.Y, Center.Z);
+	Vertices[2] = FVector(Center.X - HalfSize.X, Center.Y - HalfSize.Y, Center.Z);
+	Vertices[3] = FVector(Center.X - HalfSize.X, Center.Y + HalfSize.Y, Center.Z);
+
+	//반복문 이전 세팅
+	bool bAllVertexInScreen;
+	MainCamera->GetSpringArmComponent()->TargetArmLength = 0;
+	MainCamera->GetSpringArmComponent()->MarkRenderTransformDirty();
+	MainCamera->GetSpringArmComponent()->UpdateComponentToWorld();
+
+	int32 ScreenW, ScreenH;
+	GetViewportSize(ScreenW, ScreenH);
+	RS_LOG_F("Screen : %d %d", ScreenW, ScreenH)
+
+	do
+	{
+		MainCamera->GetSpringArmComponent()->TargetArmLength += CameraMoveSensitivity;
+		MainCamera->GetSpringArmComponent()->MarkRenderTransformDirty();
+		MainCamera->GetSpringArmComponent()->UpdateComponentToWorld();
+
+		UpdateCameraManager(0.0f);
+		
+		bAllVertexInScreen = true;
+		FVector2D ScreenPosition;
+		for (FVector Vertex : Vertices)
+		{
+			ProjectWorldLocationToScreen(Vertex, ScreenPosition);
+
+			//디버그용
+			RS_LOG_F_C("%f %f", FColor::Orange, ScreenPosition.X, ScreenPosition.Y);
+			FVector WorldLo, WorldFront;
+			DeprojectScreenPositionToWorld(ScreenPosition.X, ScreenPosition.Y, WorldLo, WorldFront);
+			DrawDebugSphere(GetWorld(), WorldLo, 2, 30, FColor::Orange, false, 10);
+			
+			if (ScreenPosition.X < 0 || ScreenPosition.X > ScreenW ||
+				ScreenPosition.Y < 0 || ScreenPosition.Y > ScreenH)
+			{
+				bAllVertexInScreen = false;
+			}
+		}
+	} while (!bAllVertexInScreen);
+
+	MaxCameraLengthOfMainCamera = MainCamera->GetSpringArmComponent()->TargetArmLength;
+	*/
+}
+
 
 void ARSTycoonPlayerController::OnZoom(const FInputActionValue& Value)
 {
@@ -180,33 +242,49 @@ void ARSTycoonPlayerController::OnZoom(const FInputActionValue& Value)
 
 		//탑 카메라
 		float OrthoWidth = TopCamera->GetCameraComponent()->OrthoWidth + OrthoWidthSensitivity * InputAction;
-		if (OrthoWidth >= MaxTopCameraOrthoWidth)
-		{
-			OrthoWidth = MaxTopCameraOrthoWidth;
-			TopCamera->SetLocationToCenter();
-		}
-		else
-		{
-			TopCamera->AttachPlayer();
-		}
 
+		//최댓값 설정에 너무 많은 시간을 뺏김. 제거
+		// if (OrthoWidth >= MaxTopCameraOrthoWidth)
+		// {
+		// 	OrthoWidth = MaxTopCameraOrthoWidth;
+		// 	TopCamera->SetLocationToCenter();
+		// }
+		// else
+		// {
+		//		TopCamera->AttachPlayer();
+		// }
+		
+		if (OrthoWidth < MinOrthoWidth)
+		{
+			OrthoWidth = MinOrthoWidth;
+		}
+		
+		TopCamera->AttachPlayer();
 		TopCamera->GetCameraComponent()->SetOrthoWidth(OrthoWidth);
 	}
 	else
 	{
 		//메인 카메라
-		float PerspectiveFov = MainCamera->GetCameraComponent()->FieldOfView + FovSensitivity * InputAction;
-		if (PerspectiveFov >= MaxMainCameraFov)
-		{
-			PerspectiveFov = MaxMainCameraFov;
-			MainCamera->SetLocationToCenter();
-		}
-		else
-		{
-			MainCamera->AttachPlayer();
-		}
+		float CameraLength = MainCamera->GetSpringArmComponent()->TargetArmLength + CameraMoveSensitivity * InputAction;
+		
+		//최댓값 설정에 너무 많은 시간을 뺏김. 제거
+		// if (PerspectiveFov >= MaxCameraLengthOfMainCamera)
+		// {
+		// 	PerspectiveFov = MaxCameraLengthOfMainCamera;
+		// 	MainCamera->SetLocationToCenter();
+		// }
+		// else
+		// {
+		// 	MainCamera->AttachPlayer();
+		// }
 
-		MainCamera->GetCameraComponent()->SetFieldOfView(PerspectiveFov);
+		if (CameraLength < MinLengthOfMainCamera)
+		{
+			CameraLength = MinLengthOfMainCamera;
+		}
+		
+		MainCamera->AttachPlayer();
+		MainCamera->GetSpringArmComponent()->TargetArmLength = CameraLength;
 	}
 }
 #pragma endregion

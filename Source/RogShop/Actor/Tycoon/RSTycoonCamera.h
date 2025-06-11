@@ -20,9 +20,8 @@ public:
 	void AttachPlayer();
 	void SetLocationToCenter();
 
-	float GetTileMapCameraFov();
-	float GetCameraOrthoWidth();
 	TObjectPtr<UCameraComponent> GetCameraComponent() const { return Camera; }
+	TObjectPtr<USpringArmComponent> GetSpringArmComponent() const { return SpringArm; }
 	
 	virtual void Tick(float DeltaTime) override;
 	
