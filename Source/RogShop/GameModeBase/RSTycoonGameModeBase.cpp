@@ -77,6 +77,10 @@ void ARSTycoonGameModeBase::RemoveOrder(FFoodOrder Order)
 void ARSTycoonGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+#if WITH_EDITOR
+	GetGameInstance<URSGameInstance>()->SetDebugLogEnabled(true);
+#endif
 	
 	GetWorldTimerManager().SetTimerForNextTick([&]()
 	{

@@ -118,22 +118,25 @@ public:
 	
 private:
 	void SettingCamera();
+
+	UFUNCTION(BlueprintCallable)
+	void SetMaxLengthOfMainCamera();
 	
 	UFUNCTION()
 	void OnZoom(const FInputActionValue& Value);
 
 protected:
-	UPROPERTY(EditAnywhere)
-	float FovSensitivity = 4.f;
+	UPROPERTY(EditDefaultsOnly)
+	float CameraMoveSensitivity = 4.f;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float OrthoWidthSensitivity = 20.f;
-	
-	UPROPERTY(EditAnywhere) // 임시
-	float MaxMainCameraFov = 90.f;
 
-	UPROPERTY(EditAnywhere) // 임시
-	float MaxTopCameraOrthoWidth = 2000.f;
+	UPROPERTY(EditDefaultsOnly)
+	float MinLengthOfMainCamera = 50.f;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float MinOrthoWidth;
 
 private:
 	UPROPERTY()
