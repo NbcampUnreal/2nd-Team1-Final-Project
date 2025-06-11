@@ -8,8 +8,10 @@
 #include "Components/CapsuleComponent.h"
 #include "RSDataSubsystem.h"
 #include "ItemInfoData.h"
+#include "DungeonObjectData.h"
 #include "RSDungeonGameModeBase.h"
 #include "RSDungeonGroundIngredient.h"
+#include "RSDungeonGroundLifeEssence.h"
 
 ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 {
@@ -444,6 +446,21 @@ void ARSDunMonsterCharacter::MonsterItemDrop()
 					DungeonIngredient->RandImpulse();
 				}
 			}
+		}
+	}
+
+	UDataTable* DungeonObjectDataTable = DataSubsystem->DungeonObject;
+	FDungeonObjectData* DungeonObjectDataRow = DungeonObjectDataTable->FindRow<FDungeonObjectData>(FName("LifeEssence"), TEXT("Get DungeonObjectDataTable"));;
+	if (MonsterDataRow && DungeonObjectDataRow && DungeonObjectDataRow->ObjectClass)
+	{
+		ARSDungeonGroundLifeEssence* DungeonLifeEssence = GetWorld()->SpawnActor<ARSDungeonGroundLifeEssence>(DungeonObjectDataRow->ObjectClass, GetActorTransform());
+
+		if (DungeonLifeEssence)
+		{
+			int32 LifeEssenceQuantity = MonsterDataRow->DropLifeEssenceQuantity;
+
+			DungeonLifeEssence->RandImpulse();
+			DungeonLifeEssence->SetQuantity(LifeEssenceQuantity);
 		}
 	}
 }
