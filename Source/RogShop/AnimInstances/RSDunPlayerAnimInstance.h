@@ -21,6 +21,9 @@ public:
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Footstep")
+	void PlayFootstepSound(); //ë°œì†Œë¦¬ ì¬ìƒ í•¨ìˆ˜
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "References")
 	TObjectPtr<ACharacter> Character;
@@ -28,11 +31,11 @@ protected:
 	TObjectPtr<UCharacterMovementComponent> CharacterMovement;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement Data")
-	FVector Velocity;	// ¼Óµµ º¤ÅÍ
+	FVector Velocity;	// ì†ë„ ë²¡í„°
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement Data")
-	float GroundSpeed;	// ¼öÆòÀ¸·Î ÀÌµ¿ÁßÀÎ ¼Óµµ
+	float GroundSpeed;	// ìˆ˜í‰ìœ¼ë¡œ ì´ë™ì¤‘ì¸ ì†ë„
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement Data")
-	bool bShouldMove;	// ÀÌµ¿ ÁßÀÎÁö ¿©ºÎ
+	bool bShouldMove;	// ì´ë™ ì¤‘ì¸ì§€ ì—¬ë¶€
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement Data")
-	bool bIsFalling;	// ³«ÇÏ ÁßÀÎÁö ¿©ºÎ
+	bool bIsFalling;	// ë‚™í•˜ ì¤‘ì¸ì§€ ì—¬ë¶€
 };

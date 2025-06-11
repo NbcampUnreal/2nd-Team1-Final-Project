@@ -151,6 +151,11 @@ private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
 	float AttackSpeed;
 
+public:
+// 발소리 관련
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Footstep")
+	TMap<TEnumAsByte<EPhysicalSurface>, USoundBase*> FootstepSounds;
+
 // 세이브 및 로드
 
 public:
