@@ -139,6 +139,22 @@ void ARSDunPlayerController::ShowPlayerDeathWidget()
     }
 }
 
+void ARSDunPlayerController::ShowInteractWidget()
+{
+    if (RSDunMainHUDWidget)
+    {
+        RSDunMainHUDWidget->ShowInteractWidget();
+    }
+}
+
+void ARSDunPlayerController::HideInteractWidget()
+{
+    if (RSDunMainHUDWidget)
+    {
+        RSDunMainHUDWidget->HideInteractWidget();
+    }
+}
+
 void ARSDunPlayerController::BindCharacterDelegates()
 {
     ARSDunPlayerCharacter* CurPawn = GetPawn<ARSDunPlayerCharacter>();

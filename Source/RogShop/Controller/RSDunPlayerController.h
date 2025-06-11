@@ -14,6 +14,7 @@ class URSPlayerInventoryWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotChange, int8, WeaponSlotIndex, FName, WeaponKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnIngredientChange, int32, IngredientSlotIndex, FItemSlot, IngredientItemSlot);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteractableFound, FText, InteractName);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRelicAdded, FName, RelicKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLifeEssenceChange, int32, NewLifeEssence);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHPChange);
@@ -58,15 +59,13 @@ public:
 	TObjectPtr<UInputAction> ToggleInventoryAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input")
 	TObjectPtr<UInputAction> ToggleInGameMenuAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TSubclassOf<UUserWidget> LoadingUIWidgetClass;
-	UPROPERTY()
-	UUserWidget* LoadingUIWidget;
+
+// 위젯
+public:
 	UFUNCTION(BlueprintCallable)
 	void ShowLoadingUI();
 	void HideLoadingUI();
-// 위젯
-public:
+
 	void InitializeRSDunMainWidget();
 
 	void TogglePlayerInventoryWidget();
@@ -75,7 +74,17 @@ public:
 	UFUNCTION()
 	void ShowPlayerDeathWidget();
 
+	void ShowInteractWidget();
+	void HideInteractWidget();
+
 private:
+	// 로딩 위젯
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> LoadingUIWidgetClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UUserWidget> LoadingUIWidget;
+
 	// 플레이어 캐릭터의 메인 허드 위젯
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UUserWidget> RSDunMainHUDWidgetClass;
@@ -104,6 +113,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnRelicAdded OnRelicAdded;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnInteractableFound OnInteractableFound;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnLifeEssenceChange OnLifeEssenceChange;

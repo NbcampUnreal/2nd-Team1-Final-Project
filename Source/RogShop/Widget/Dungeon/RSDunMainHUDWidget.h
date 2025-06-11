@@ -25,6 +25,9 @@ public:
     void HandleInGameMenuWidget();
     void HandlePlayerInventoryWidget();
 
+    void ShowInteractWidget();
+    void HideInteractWidget();
+
 private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<URSPlayerStatusWidget> PlayerStatusWidget;
