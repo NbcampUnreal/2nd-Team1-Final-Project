@@ -73,7 +73,7 @@ void ARSTileMap::SaveTileMap()
 	SaveGameInstance->ChefCount = ChefCount;
 
 	// 저장
-	const FString& SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
+	FString SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
 	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SlotName, 0);
 }
 
@@ -162,7 +162,7 @@ void ARSTileMap::BeginPlay()
 
 void ARSTileMap::LoadTileMap()
 {
-	const FString& SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
+	FString SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
 	URSTycoonTileMapSaveGame* LoadedGame =
 		Cast<URSTycoonTileMapSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
 
@@ -298,7 +298,8 @@ void ARSTileMap::ActiveNPC()
 void ARSTileMap::DeleteTileData()
 {
 	RS_LOG_C("저장 데이터 삭제", FColor::Orange);
-	const FString& SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
+	
+	FString SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
 	UGameplayStatics::DeleteGameInSlot(SlotName, 0);
 }
 

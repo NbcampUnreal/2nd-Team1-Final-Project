@@ -21,7 +21,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void MoveToTarget(FVector Location, AActor* Target);
 
-	bool IsMoving() const { return MoveTarget != nullptr; }
+	bool HasTarget() const { return MoveTarget != nullptr; }
 	
 protected:
 	virtual void BeginPlay() override;
