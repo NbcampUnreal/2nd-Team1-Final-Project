@@ -455,84 +455,88 @@ void ARSDunPlayerCharacter::InteractTrace()
     // 캐릭터를 중심으로 반지름 크기의 구체를 사용해 InteractTrace 채널과 오버랩된 액터들을 탐색한다.
     bool bHit = GetWorld()->OverlapMultiByChannel(OutOverlaps, Center, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(InteractRadius), Params);
     
-    if (!bHit)
+    if (bHit)
     {
-        InteractActor = nullptr;
-        RS_DRAW_DEBUG_SPHERE(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
-        return;
-    }
+        FVector Forward = GetActorForwardVector();
 
-    FVector Forward = GetActorForwardVector();
+        // 전방 내에 있는 액터와 가장 가까이 있는 액터를 병행해서 계산한다.
+        AActor* ClosestInFront = nullptr;
+        float ClosestInFrontDist = TNumericLimits<float>::Max();
 
-    // 전방 내에 있는 액터와 가장 가까이 있는 액터를 병행해서 계산한다.
-    AActor* ClosestInFront = nullptr;
-    float ClosestInFrontDist = TNumericLimits<float>::Max();
+        AActor* ClosestActor = nullptr;
+        float CosestActorDistance = TNumericLimits<float>::Max();
 
-    AActor* ClosestActor = nullptr;
-    float CosestActorDistance = TNumericLimits<float>::Max();
-
-    for (const FOverlapResult& Result : OutOverlaps)
-    {
-        AActor* Target = Result.GetActor();
-        if (!Target)
+        for (const FOverlapResult& Result : OutOverlaps)
         {
-            continue;
-        }
-
-        // 대상 액터까지의 벡터 및 거리 계산
-        FVector ToTarget = Target->GetActorLocation() - Center;
-        float Distance = ToTarget.Size();
-        FVector DirToTarget = ToTarget.GetSafeNormal();
-
-        // 전방 벡터와의 내적으로 전방과의 각도 계산
-        float Dot = FVector::DotProduct(Forward, DirToTarget);
-        float Angle = FMath::RadiansToDegrees(FMath::Acos(Dot));
-
-        // 전방 내 혀용 각도 안에 있으며, 현재까지 가장 가까운 액터일 경우
-        if (Angle <= InteractAngle && Distance < ClosestInFrontDist)
-        {
-            ClosestInFront = Target;
-            ClosestInFrontDist = Distance;
-        }
-
-        // 전방 여부와 관계없이 가장 가까운 액터일 경우
-        if (Distance < CosestActorDistance)
-        {
-            ClosestActor = Target;
-            CosestActorDistance = Distance;
-        }
-    }
-
-    // 전방 또는 전체 액터 중 유효한 액터가 있는 경우
-    if (ClosestInFront || ClosestActor)
-    {
-        // 전방을 우선으로 사용한다.
-        AActor* TargetActor = (ClosestInFront != nullptr) ? ClosestInFront : ClosestActor;
-
-        // 대상 액터가 상호작용 인터페이스를 구현했는지 확인하고 구현했다면 저장한다.
-        if (TargetActor && TargetActor->GetClass()->ImplementsInterface(URSInteractable::StaticClass()))
-        {
-            IRSInteractable* Interactable = Cast<IRSInteractable>(TargetActor);
-            if (Interactable)
+            AActor* Target = Result.GetActor();
+            if (!Target)
             {
-                InteractActor = TargetActor;
-
-                RS_DRAW_DEBUG_SPHERE(GetWorld(), Center, InteractRadius, 32, FColor::Green, false, 0.f, 0, 1.0f);
+                continue;
             }
-            else
+
+            // 대상 액터까지의 벡터 및 거리 계산
+            FVector ToTarget = Target->GetActorLocation() - Center;
+            float Distance = ToTarget.Size();
+            FVector DirToTarget = ToTarget.GetSafeNormal();
+
+            // 전방 벡터와의 내적으로 전방과의 각도 계산
+            float Dot = FVector::DotProduct(Forward, DirToTarget);
+            float Angle = FMath::RadiansToDegrees(FMath::Acos(Dot));
+
+            // 전방 내 혀용 각도 안에 있으며, 현재까지 가장 가까운 액터일 경우
+            if (Angle <= InteractAngle && Distance < ClosestInFrontDist)
             {
-                RS_DRAW_DEBUG_SPHERE(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
+                ClosestInFront = Target;
+                ClosestInFrontDist = Distance;
+            }
+
+            // 전방 여부와 관계없이 가장 가까운 액터일 경우
+            if (Distance < CosestActorDistance)
+            {
+                ClosestActor = Target;
+                CosestActorDistance = Distance;
             }
         }
-        else
+
+        // 전방 또는 전체 액터 중 유효한 액터가 있는 경우
+        if (ClosestInFront || ClosestActor)
         {
-            RS_DRAW_DEBUG_SPHERE(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
+            // 전방을 우선으로 사용한다.
+            AActor* TargetActor = (ClosestInFront != nullptr) ? ClosestInFront : ClosestActor;
+
+            // 대상 액터가 상호작용 인터페이스를 구현했는지 확인하고 구현했다면 저장한다.
+            if (TargetActor && TargetActor->GetClass()->ImplementsInterface(URSInteractable::StaticClass()))
+            {
+                IRSInteractable* Interactable = Cast<IRSInteractable>(TargetActor);
+                if (Interactable)
+                {
+                    InteractActor = TargetActor;
+
+                    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+                    if (PC)
+                    {
+                        PC->ShowInteractWidget();
+                        PC->OnInteractableFound.Broadcast(Interactable->GetInteractName());
+                    }
+
+                    RS_DRAW_DEBUG_SPHERE(GetWorld(), Center, InteractRadius, 32, FColor::Green, false, 0.f, 0, 1.0f);
+
+                    return;
+                }
+            }
         }
     }
-    else
+
+    // 상호작용 가능한 액터를 찾지 못한 경우
+    InteractActor = nullptr;
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
     {
-        RS_DRAW_DEBUG_SPHERE(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
+        PC->HideInteractWidget();
     }
+
+    RS_DRAW_DEBUG_SPHERE(GetWorld(), Center, InteractRadius, 32, FColor::Red, false, 0.f, 0, 1.0f);
 }
 
 float ARSDunPlayerCharacter::GetAttackPower() const
@@ -622,4 +626,9 @@ void ARSDunPlayerCharacter::LoadStatus()
     // 로드
     ChangeHP(StatusLoadGame->HP);
     LifeEssence = StatusLoadGame->LifeEssence;
+}
+USoundBase* ARSDunPlayerCharacter::GetFootstepSound(EPhysicalSurface SurfaceType) const
+{
+    const USoundBase* const* FoundSound = FootstepSounds.Find(SurfaceType);
+    return FoundSound ? const_cast<USoundBase*>(*FoundSound) : nullptr;
 }

@@ -25,6 +25,7 @@ void URSDunMainHUDWidget::NativeConstruct()
     {
         PlayerStatusWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
     }
+
     if (InteractWidget)
     {
 		InteractWidget->SetVisibility(ESlateVisibility::Hidden);
@@ -46,6 +47,11 @@ void URSDunMainHUDWidget::HideAllWidgets()
     if (PlayerStatusWidget)
     {
         PlayerStatusWidget->SetVisibility(ESlateVisibility::Hidden);
+    }
+
+    if (InteractWidget)
+    {
+        InteractWidget->SetVisibility(ESlateVisibility::Hidden);
     }
 }
 
@@ -121,5 +127,21 @@ void URSDunMainHUDWidget::HandlePlayerInventoryWidget()
             PC->bShowMouseCursor = true;
             PC->FlushPressedKeys();
         }
+    }
+}
+
+void URSDunMainHUDWidget::ShowInteractWidget()
+{
+    if (InteractWidget)
+    {
+        InteractWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
+    }
+}
+
+void URSDunMainHUDWidget::HideInteractWidget()
+{
+    if (InteractWidget)
+    {
+        InteractWidget->SetVisibility(ESlateVisibility::Hidden);
     }
 }

@@ -37,10 +37,11 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "SaveGame"),
             Path.Combine(ModuleDirectory, "SaveGame", "Dungeon"),
             Path.Combine(ModuleDirectory, "SaveGame", "Tycoon"),
+            Path.Combine(ModuleDirectory, "SaveGame", "Option"),
             Path.Combine(ModuleDirectory, "Struct"),
         });
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule", "NavigationSystem", "DeveloperSettings", "SkeletalMerging", "UMG" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule", "NavigationSystem", "DeveloperSettings", "SkeletalMerging", "UMG", "PhysicsCore" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
