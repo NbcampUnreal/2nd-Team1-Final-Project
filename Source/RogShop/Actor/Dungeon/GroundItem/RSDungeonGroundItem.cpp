@@ -16,9 +16,6 @@ ARSDungeonGroundItem::ARSDungeonGroundItem()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	MeshComp->SetupAttachment(SceneComp);
 	MeshComp->SetCollisionProfileName(TEXT("Interactable"));
-	MeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	MeshComp->SetSimulatePhysics(true);
-	MeshComp->SetEnableGravity(true);
 }
 
 // Called when the game starts or when spawned
