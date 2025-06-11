@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "RSCanPickup.h"
 #include "RSTycoonNPC.h"
+#include "SkeletalMergingLibrary.h"
 #include "RSTycoonWaiterCharacter.generated.h"
 
 class ARSTableTile;
@@ -34,4 +35,8 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<AActor> PickupActor;
+
+	// 스켈레탈 메시 관련
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SkeletalMesh", meta = (AllowPrivateAccess = true))
+	FSkeletalMeshMergeParams SkeletalMeshMergeParams;
 };
