@@ -3,6 +3,7 @@
 #include "RSDunMainHUDWidget.h"
 #include "RSInGameMenuWidget.h"
 #include "RSPlayerStatusWidget.h"
+#include "RSInteractWidget.h"
 #include "RSPlayerInventoryWidget.h"
 #include "GameFramework/PlayerController.h"
 
@@ -23,6 +24,10 @@ void URSDunMainHUDWidget::NativeConstruct()
     if (PlayerStatusWidget)
     {
         PlayerStatusWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+    }
+    if (InteractWidget)
+    {
+		InteractWidget->SetVisibility(ESlateVisibility::Hidden);
     }
 }
 
