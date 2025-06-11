@@ -1,87 +1,160 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "OptionMenuWidget.h"
 #include "Components/Button.h"
 #include "Components/ComboBoxString.h"
-#include "GameFramework/GameUserSettings.h"
+#include "Components/Slider.h"
+#include "Sound/SoundClass.h"
 #include "Kismet/GameplayStatics.h"
-
-#define LOCTEXT_NAMESPACE "OptionMenuWidget"
+#include "GameFramework/GameUserSettings.h"
+#include "OptionSaveGame.h"
 
 void UOptionMenuWidget::NativeConstruct()
 {
-	Super::NativeConstruct();
+    Super::NativeConstruct();
 
-	if (BackButton)
-	{
-		BackButton->OnClicked.AddDynamic(this, &UOptionMenuWidget::OnBackButtonClicked);
-	}
+    if (BackButton)
+        BackButton->OnClicked.AddDynamic(this, &UOptionMenuWidget::OnBackButtonClicked);
 
-	if (ResolutionComboBox)
-	{
-		ResolutionComboBox->ClearOptions();
-		ResolutionComboBox->AddOption(TEXT("1920x1080"));
-		ResolutionComboBox->AddOption(TEXT("1280x720"));
-		ResolutionComboBox->AddOption(TEXT("800x600"));
-		ResolutionComboBox->SetSelectedIndex(0);
-	}
+    if (ApplyButton)
+        ApplyButton->OnClicked.AddDynamic(this, &UOptionMenuWidget::OnApplyButtonClicked);
 
-	if (WindowModeComboBox)
-	{
-		WindowModeComboBox->ClearOptions();
-		WindowModeComboBox->AddOption(TEXT("Fullscreen"));
-		WindowModeComboBox->AddOption(TEXT("WindowedFullscreen"));
-		WindowModeComboBox->AddOption(TEXT("Windowed"));
-		WindowModeComboBox->SetSelectedIndex(0);
-	}
+    if (MasterVolumeSlider)
+        MasterVolumeSlider->OnValueChanged.AddDynamic(this, &UOptionMenuWidget::OnMasterVolumeChanged);
 
-	if (ApplyButton)
-	{
-		ApplyButton->OnClicked.AddDynamic(this, &UOptionMenuWidget::OnApplyButtonClicked);
-	}
+    if (BGMVolumeSlider)
+        BGMVolumeSlider->OnValueChanged.AddDynamic(this, &UOptionMenuWidget::OnBGMVolumeChanged);
+
+    if (SFXVolumeSlider)
+        SFXVolumeSlider->OnValueChanged.AddDynamic(this, &UOptionMenuWidget::OnSFXVolumeChanged);
+
+    if (ResolutionComboBox)
+    {
+        ResolutionComboBox->ClearOptions();
+        ResolutionComboBox->AddOption(TEXT("1920x1080"));
+        ResolutionComboBox->AddOption(TEXT("1280x720"));
+        ResolutionComboBox->AddOption(TEXT("800x600"));
+    }
+
+    if (WindowModeComboBox)
+    {
+        WindowModeComboBox->ClearOptions();
+        WindowModeComboBox->AddOption(TEXT("Fullscreen"));
+        WindowModeComboBox->AddOption(TEXT("WindowedFullscreen"));
+        WindowModeComboBox->AddOption(TEXT("Windowed"));
+    }
+
+    LoadSettings();
 }
 
-void UOptionMenuWidget::OnBackButtonClicked()
+void UOptionMenuWidget::LoadSettings()
 {
-	RemoveFromParent();
+    if (UGameplayStatics::DoesSaveGameExist(TEXT("OptionSaveSlot"), 0))
+    {
+        UOptionSaveGame* LoadedGame = Cast<UOptionSaveGame>(
+            UGameplayStatics::LoadGameFromSlot(TEXT("OptionSaveSlot"), 0));
+
+        if (LoadedGame)
+        {
+            if (MasterVolumeSlider)
+                MasterVolumeSlider->SetValue(LoadedGame->MasterVolume);
+            if (BGMVolumeSlider)
+                BGMVolumeSlider->SetValue(LoadedGame->BGMVolume);
+            if (SFXVolumeSlider)
+                SFXVolumeSlider->SetValue(LoadedGame->SFXVolume);
+            if (ResolutionComboBox)
+                ResolutionComboBox->SetSelectedIndex(LoadedGame->ResolutionIndex);
+            if (WindowModeComboBox)
+                WindowModeComboBox->SetSelectedIndex(LoadedGame->WindowModeIndex);
+        }
+    }
+    else
+    {
+        // ê¸°ë³¸ê°’ ì„ íƒ
+        if (ResolutionComboBox)
+            ResolutionComboBox->SetSelectedIndex(0);
+        if (WindowModeComboBox)
+            WindowModeComboBox->SetSelectedIndex(0);
+    }
+}
+
+void UOptionMenuWidget::SaveSettings()
+{
+    UOptionSaveGame* SaveGameInstance = Cast<UOptionSaveGame>(
+        UGameplayStatics::CreateSaveGameObject(UOptionSaveGame::StaticClass()));
+
+    if (MasterVolumeSlider)
+        SaveGameInstance->MasterVolume = MasterVolumeSlider->GetValue();
+    if (BGMVolumeSlider)
+        SaveGameInstance->BGMVolume = BGMVolumeSlider->GetValue();
+    if (SFXVolumeSlider)
+        SaveGameInstance->SFXVolume = SFXVolumeSlider->GetValue();
+    if (ResolutionComboBox)
+        SaveGameInstance->ResolutionIndex = ResolutionComboBox->GetSelectedIndex();
+    if (WindowModeComboBox)
+        SaveGameInstance->WindowModeIndex = WindowModeComboBox->GetSelectedIndex();
+
+    UGameplayStatics::SaveGameToSlot(SaveGameInstance, TEXT("OptionSaveSlot"), 0);
 }
 
 void UOptionMenuWidget::OnApplyButtonClicked()
 {
-	if (!ResolutionComboBox || !WindowModeComboBox) return;
+    if (!ResolutionComboBox || !WindowModeComboBox) return;
 
-	FString SelectedResolution = ResolutionComboBox->GetSelectedOption();
-	FString SelectedWindowMode = WindowModeComboBox->GetSelectedOption();
+    FString SelectedResolution = ResolutionComboBox->GetSelectedOption();
+    FString SelectedWindowMode = WindowModeComboBox->GetSelectedOption();
 
-	//Resolution ComboBox ¼³Á¤
-	int32 Width;
-	int32 Height;
+    int32 Width = 1280;
+    int32 Height = 720;
 
-	FString Left, Right;
-	if (SelectedResolution.Split(TEXT("x"), &Left, &Right))
-	{
-		Width = FCString::Atoi(*Left);
-		Height = FCString::Atoi(*Right);
-	}
+    FString Left, Right;
+    if (SelectedResolution.Split(TEXT("x"), &Left, &Right))
+    {
+        Width = FCString::Atoi(*Left);
+        Height = FCString::Atoi(*Right);
+    }
 
-	//WindowMode ComboBox ¼³Á¤
-	EWindowMode::Type WindowMode;
-	if (SelectedWindowMode == TEXT("Fullscreen"))
-		WindowMode = EWindowMode::Fullscreen;
-	else if (SelectedWindowMode == TEXT("WindowedFullscreen"))
-		WindowMode = EWindowMode::WindowedFullscreen;
-	else if (SelectedWindowMode == TEXT("Windowed"))
-		WindowMode = EWindowMode::Windowed;
+    EWindowMode::Type WindowMode = EWindowMode::Windowed;
+    if (SelectedWindowMode == TEXT("Fullscreen"))
+        WindowMode = EWindowMode::Fullscreen;
+    else if (SelectedWindowMode == TEXT("WindowedFullscreen"))
+        WindowMode = EWindowMode::WindowedFullscreen;
 
-	//¼³Á¤ Àû¿ë
-	UGameUserSettings* Settings = GEngine->GetGameUserSettings();
-	if (Settings)
-	{
-		Settings->SetScreenResolution(FIntPoint(Width, Height));
-		Settings->SetFullscreenMode(WindowMode);
-		Settings->ApplySettings(false);
-		Settings->SaveSettings();
-	}
+    UGameUserSettings* Settings = GEngine->GetGameUserSettings();
+    if (Settings)
+    {
+        Settings->SetScreenResolution(FIntPoint(Width, Height));
+        Settings->SetFullscreenMode(WindowMode);
+        Settings->ApplySettings(false);
+        Settings->SaveSettings();
+    }
 
+    SaveSettings();
+}
+
+void UOptionMenuWidget::OnBackButtonClicked()
+{
+    RemoveFromParent();
+}
+
+void UOptionMenuWidget::OnMasterVolumeChanged(float Value)
+{
+    if (SC_Master)
+    {
+        SC_Master->Properties.Volume = Value;
+    }
+}
+
+void UOptionMenuWidget::OnBGMVolumeChanged(float Value)
+{
+    if (SC_BGM)
+    {
+        SC_BGM->Properties.Volume = Value;
+    }
+}
+
+void UOptionMenuWidget::OnSFXVolumeChanged(float Value)
+{
+    if (SC_SFX)
+    {
+        SC_SFX->Properties.Volume = Value;
+    }
 }
