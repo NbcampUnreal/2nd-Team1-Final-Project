@@ -627,3 +627,8 @@ void ARSDunPlayerCharacter::LoadStatus()
     ChangeHP(StatusLoadGame->HP);
     LifeEssence = StatusLoadGame->LifeEssence;
 }
+USoundBase* ARSDunPlayerCharacter::GetFootstepSound(EPhysicalSurface SurfaceType) const
+{
+    const USoundBase* const* FoundSound = FootstepSounds.Find(SurfaceType);
+    return FoundSound ? const_cast<USoundBase*>(*FoundSound) : nullptr;
+}
