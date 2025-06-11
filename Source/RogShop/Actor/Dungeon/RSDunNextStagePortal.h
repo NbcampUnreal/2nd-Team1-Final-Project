@@ -31,6 +31,15 @@ private:
 public:
 	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
 
+	virtual FText GetInteractName() const override;
+
+	virtual bool GetIsAutoInteract() const override;
+
+protected:
+	FText InteractName;
+
+	bool bIsAutoInteract;
+
 // 상호작용시 띄워줄 UI
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))

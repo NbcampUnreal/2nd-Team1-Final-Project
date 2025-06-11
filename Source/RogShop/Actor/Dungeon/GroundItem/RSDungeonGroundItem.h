@@ -22,6 +22,22 @@ protected:
 public:
 	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
 
+	virtual FText GetInteractName() const override;
+
+	virtual bool GetIsAutoInteract() const override;
+
+protected:
+	FText InteractName;
+
+	bool bIsAutoInteract;
+
+// 기본 정보
+public:
+	void InitGroundItemInfo(FText NewInteractName, bool NewbIsAutoInteract, FName NewDataTableKey, UStaticMesh* NewMesh);
+
+protected:
+	FName DataTableKey;	// 데이터 테이블의 RowName을 ID값으로 사용한다.
+
 // 아이템을 랜덤한 방향으로 날린다.
 public:
 	void RandImpulse();
@@ -32,9 +48,5 @@ protected:
 	TObjectPtr<USceneComponent> SceneComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UStaticMeshComponent> MeshComp;
-
-// 데이터 테이블의 RowName을 ID값으로 사용한다.
-protected:
-	FName DataTableKey;
 
 };

@@ -275,12 +275,14 @@ void URSPlayerWeaponComponent::DropWeaponToSlot(EWeaponSlot TargetWeaponSlot)
 	FDungeonWeaponData* WeaponData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponDetail->FindRow<FDungeonWeaponData>(WeaponKey, TEXT("Get WeaponData"));
 	if (ItemInfoData && WeaponData)
 	{
+		FText ItemName = ItemInfoData->ItemName;
 		UStaticMesh* ItemStaticMesh = ItemInfoData->ItemStaticMesh;
 		TSubclassOf<ARSDungeonItemBase> WeaponClass = WeaponData->WeaponClass;
 
 		if (GroundWeapon && ItemStaticMesh && WeaponClass)
 		{
-			GroundWeapon->InitInteractableWeapon(WeaponKey, ItemStaticMesh, WeaponClass);
+			GroundWeapon->InitGroundItemInfo(ItemName, false, WeaponKey, ItemStaticMesh);
+			GroundWeapon->SetWeaponClass(WeaponClass);
 			GroundWeapon->RandImpulse();
 		}
 	}
