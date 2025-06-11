@@ -17,11 +17,17 @@ class ROGSHOP_API URSInteractWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+protected:
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
-	TObjectPtr<UTextBlock> ObjectName;
+private:
+	UFUNCTION()
+	void UpdateInteractName(FText NewInteractName);
 
+private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
 	TObjectPtr<UTextBlock> InteractKey;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
+	TObjectPtr<UTextBlock> InteractName;
 };
