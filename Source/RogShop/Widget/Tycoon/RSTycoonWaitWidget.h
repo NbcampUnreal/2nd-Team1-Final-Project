@@ -38,7 +38,4 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UButton* OutButton;
-
-	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<UWorld> BaseAreaLevel;
 };

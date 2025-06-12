@@ -7,6 +7,8 @@
 #include "RSInteractable.h"
 #include "RSInteractableLevelTravel.generated.h"
 
+enum class ERSLevelCategory : uint8;
+
 UCLASS()
 class ROGSHOP_API ARSInteractableLevelTravel : public AActor, public IRSInteractable
 {
@@ -36,7 +38,7 @@ protected:
 // 레벨 이동
 private:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Level", meta = (AllowPrivateAccess = true))
-	TSoftObjectPtr<UWorld> TargetLevelAsset;
+	ERSLevelCategory TargetLevel;
 
 // 컴포넌트
 private:

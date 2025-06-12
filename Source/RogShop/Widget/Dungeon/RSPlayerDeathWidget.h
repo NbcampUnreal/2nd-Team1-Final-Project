@@ -23,9 +23,4 @@ private:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
 	TObjectPtr<UButton> BaseAreaButton;
-
-// 버튼 클릭으로 이동 할 레벨
-private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level", meta = (AllowPrivateAccess = "true"))
-	TSoftObjectPtr<UWorld> BaseAreaLevelAsset;
 };
