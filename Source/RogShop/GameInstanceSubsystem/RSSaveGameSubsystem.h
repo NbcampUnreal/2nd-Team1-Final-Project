@@ -16,10 +16,16 @@ class ROGSHOP_API URSSaveGameSubsystem : public UGameInstanceSubsystem
 public:
 	void AddIngredientDungeonToTycoon(FName IngredientKey, int32 Amount);
 	
+	void DeleteAllSaveFile();
+
+	void DeleteDungeonSaveFile();
+
+	bool DoesDungeonSaveFileExist();
+
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnSaveRequested OnSaveRequested;	// 저장 요청을 의미하는 이벤트 디스패처
-	
+
 // 세이브 슬롯 네임
 public:
 	// 던전
