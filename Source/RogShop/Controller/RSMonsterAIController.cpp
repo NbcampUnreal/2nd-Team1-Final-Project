@@ -157,5 +157,11 @@ void ARSMonsterAIController::RotateToFocus(FVector lookFor)
 		deltaYaw = FMath::FindDeltaAngleDegrees(currentYaw, targetYaw);
 
 		newRot = chrRot + FRotator(0, deltaYaw*rotateSpeed, 0);
+
+		ctrlPawn->SetActorRotation(newRot);
+	}
+	else
+	{
+		return;
 	}
 }

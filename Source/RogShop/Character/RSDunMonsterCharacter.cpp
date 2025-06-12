@@ -241,7 +241,28 @@ void ARSDunMonsterCharacter::PerformAttackTrace()
 	}
 	else if (actionData.skillType == ESkillType::Range) // 원거리 공격인 경우
 	{
+		if (projectile == nullptr)
+		{
+			return;
+		}
 		// TODO: 원거리 공격 로직 작성
+		const FMonsterAttackTraceData& TraceData = CachedAttackTraceDataArray[skillActionIdx];
+		FVector Start = GetMesh()->GetSocketLocation(TraceData.SocketLocation);
+		FRotator socketRot = GetMesh()->GetSocketRotation(TraceData.SocketLocation);
+		Start += GetActorForwardVector() * TraceData.TraceForwardOffset;
+		Start += GetActorRightVector() * TraceData.TraceRightOffset;
+		Start += GetActorUpVector() * TraceData.TraceUpOffset;
+
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+		spawnParams.Instigator = GetInstigator();
+		UWorld* world = GetWorld();
+		AMonsterProjectileBase* rangedBullet = world->SpawnActor<AMonsterProjectileBase>(projectile, Start, socketRot, spawnParams);
+		if (rangedBullet)
+		{
+			const FVector launchDir = socketRot.Vector();
+			rangedBullet->Fire(launchDir);
+		}
 	}	
 }
 
