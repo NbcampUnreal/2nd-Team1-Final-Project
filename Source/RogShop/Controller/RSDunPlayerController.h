@@ -64,7 +64,6 @@ public:
 public:
 	UFUNCTION(BlueprintCallable)
 	void ShowLoadingUI();
-	void HideLoadingUI();
 
 	void InitializeRSDunMainWidget();
 

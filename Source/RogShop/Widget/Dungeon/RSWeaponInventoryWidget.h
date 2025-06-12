@@ -6,41 +6,45 @@
 #include "Blueprint/UserWidget.h"
 #include "RSWeaponInventoryWidget.generated.h"
 
-UENUM()
-enum class EWeaponSlotType : uint8
-{
-	None,
-	Slot1,
-	Slot2
-};
+class URSInventorySlotWidget;
 
 UCLASS()
 class ROGSHOP_API URSWeaponInventoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+protected:
+	virtual void NativeConstruct() override;
+
 public:
 	UFUNCTION()
 	void UpdateWeaponSlot(int8 WeaponSlotIndex, FName WeaponKey);
 
-protected:
-	virtual void NativeConstruct() override;
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
-	class UImage* WeaponSlot1;
+	TObjectPtr<URSInventorySlotWidget> WeaponSlot1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
-	class UImage* WeaponSlot2;
+	TObjectPtr<URSInventorySlotWidget> WeaponSlot2;
 
-	FTimerHandle HoldTimerHandle;
-	EWeaponSlotType HeldSlotType = EWeaponSlotType::None;
+// 슬롯 클릭시 재료 드랍
+private:
+	UFUNCTION()
+	void WeaponSlotPress();
 
-	// 마우스 좌클릭 키다운 시간
-	float HoldThreshold = 0.5f; 
+	UFUNCTION()
+	void WeaponSlotRelease();
 
-	// 슬롯 홀드 완료 시 처리 함수
-	void HandleLongPress();
+	UFUNCTION()
+	void WeaponDrop();
+
+	UFUNCTION()
+	void SetClickWeaponName(FName NewClickWeaponName);
+
+private:
+	float HoldThreshold;    // 마우스 좌클릭 키다운 시간
+
+	FTimerHandle HoldTimerHandle;   // 마우스 좌클릭 타이머
+
+	FName ClickWeaponName;  // 클릭한 슬롯의 재료의 데이터 테이블 RowName
 };
