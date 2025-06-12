@@ -7,6 +7,7 @@
 #include "RSPlayerInventoryWidget.h"
 #include "TimerManager.h"
 #include "RSDunPlayerCharacter.h"
+#include "RSDungeonGameModeBase.h"
 
 ARSDunPlayerController::ARSDunPlayerController()
 {
@@ -92,22 +93,20 @@ void ARSDunPlayerController::ToggleInGameMenuWidget()
 
 void ARSDunPlayerController::ShowLoadingUI()
 {
-    if (LoadingUIWidgetClass)
-    {
-        LoadingUIWidget = CreateWidget<UUserWidget>(this, LoadingUIWidgetClass);
-        if (LoadingUIWidget)
-        {
-            LoadingUIWidget->AddToViewport(999);
-        }
-    }
-}
+    ARSDungeonGameModeBase* DungeonGameModeBase = GetWorld()->GetAuthGameMode<ARSDungeonGameModeBase>();
 
-void ARSDunPlayerController::HideLoadingUI()
-{
-    if (LoadingUIWidget)
+    // 던전 게임모드일 경우에만 로딩창이 그려지도록 구현
+    if (DungeonGameModeBase)
     {
-        LoadingUIWidget->RemoveFromParent();
-        LoadingUIWidget = nullptr;
+        if (LoadingUIWidgetClass)
+        {
+            LoadingUIWidget = CreateWidget<UUserWidget>(this, LoadingUIWidgetClass);
+
+            if (LoadingUIWidget)
+            {
+                LoadingUIWidget->AddToViewport(999);
+            }
+        }
     }
 }
 

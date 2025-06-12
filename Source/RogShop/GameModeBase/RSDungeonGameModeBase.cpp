@@ -171,30 +171,26 @@ void ARSDungeonGameModeBase::OnMapReady()// 맵 로딩이 완료되었을 때 �
 
     GetWorld()->GetTimerManager().SetTimerForNextTick([WeakThis]()
     {
-        if (!WeakThis.IsValid()) return;
-
-
+        if (!WeakThis.IsValid())
+        {
+            return;
+        }
+        
         ARSDungeonGameModeBase* GameMode = WeakThis.Get();
-
+        
         if (!GameMode->SpawnManager)
         {
             RS_LOG_DEBUG("스폰 매니저 생성");
             GameMode->SpawnManager = NewObject<URSSpawnManager>(GameMode, URSSpawnManager::StaticClass());
             GameMode->SpawnManager->Initialize(GameMode->GetWorld(), GameMode->GetGameInstance(), GameMode->TileIndex);
-
+        
             GameMode->SpawnManager->SpawnPlayerAtStartPoint();
             GameMode->SpawnManager->SpawnMonstersInLevel();
             GameMode->SpawnManager->SpawnShopNPCInLevel();
             GameMode->SpawnManager->SpawnBossPortal(GameMode->MapGeneratorInstance->BossWorldLocation);
             GameMode->SpawnManager->SpawnBossMonster();
-
-            APlayerController* PC = UGameplayStatics::GetPlayerController(GameMode, 0);
-            ARSDunPlayerController* DunPC = Cast<ARSDunPlayerController>(PC);
-
-            if (DunPC)
-            {
-                DunPC->HideLoadingUI();
-            }
+        
+            GameMode->OnGameReady.Broadcast();
         }
     });
 }
