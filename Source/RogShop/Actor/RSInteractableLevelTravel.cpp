@@ -5,6 +5,7 @@
 #include "RSDunPlayerCharacter.h"
 #include "RSGameInstance.h"
 #include "RSSaveGameSubsystem.h"
+#include "RSLevelSubsystem.h"
 
 ARSInteractableLevelTravel::ARSInteractableLevelTravel()
 {
@@ -50,12 +51,16 @@ void ARSInteractableLevelTravel::Interact(ARSDunPlayerCharacter* Interactor)
 
 	SaveGameSubsystem->OnSaveRequested.Broadcast();
 
-
-	// 레벨 이동 함수 호출
 	URSGameInstance* RSGameInstance = Interactor->GetGameInstance<URSGameInstance>();
 	if (RSGameInstance)
 	{
-		RSGameInstance->TravelToLevel(TargetLevelAsset);
+		// 레벨 이동
+		URSLevelSubsystem* LevelSubsystem = RSGameInstance->GetSubsystem<URSLevelSubsystem>();
+
+		if (LevelSubsystem)
+		{
+			LevelSubsystem->TravelToLevel(TargetLevel);
+		}
 	}
 }
 

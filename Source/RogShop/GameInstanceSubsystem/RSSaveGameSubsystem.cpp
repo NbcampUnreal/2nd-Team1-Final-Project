@@ -122,25 +122,40 @@ bool URSSaveGameSubsystem::DoesDungeonSaveFileExist()
 		return false;
 	}
 
-	if (UGameplayStatics::DoesSaveGameExist(WeaponSaveSlotName, 0))
+	if (!UGameplayStatics::DoesSaveGameExist(WeaponSaveSlotName, 0))
 	{
 		return false;
 	}
 
-	if (UGameplayStatics::DoesSaveGameExist(RelicSaveSlotName, 0))
+	if (!UGameplayStatics::DoesSaveGameExist(RelicSaveSlotName, 0))
 	{
 		return false;
 	}
 
-	if (UGameplayStatics::DoesSaveGameExist(StatusSaveSlotName, 0))
+	if (!UGameplayStatics::DoesSaveGameExist(StatusSaveSlotName, 0))
 	{
 		return false;
 	}
 
-	if (UGameplayStatics::DoesSaveGameExist(DungeonInfoSaveSlotName, 0))
+	if (!UGameplayStatics::DoesSaveGameExist(DungeonInfoSaveSlotName, 0))
 	{
 		return false;
 	}
 
 	return true;
+}
+
+bool URSSaveGameSubsystem::DoesTycoonSaveFileExist()
+{
+	if (UGameplayStatics::DoesSaveGameExist(TycoonSaveSlot, 0))
+	{
+		return true;
+	}
+
+	if (UGameplayStatics::DoesSaveGameExist(TycoonTileMapSaveSlot, 0))
+	{
+		return true;
+	}
+
+	return false;
 }

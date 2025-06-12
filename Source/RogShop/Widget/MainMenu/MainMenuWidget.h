@@ -36,21 +36,17 @@ public:
 protected:
 
 	UPROPERTY(meta= (BindWidget))
-	class UButton* StartButton;
+	TObjectPtr<UButton> StartButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* LoadButton;
+	TObjectPtr<UButton> LoadButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* OptionButton;
+	TObjectPtr<UButton> OptionButton;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UButton> ExitButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<UUserWidget> OptionMenuWidgetClass;
-
-	UPROPERTY(meta = (BindWidget))
-	class UButton* ExitButton;
-
-private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level", meta = (AllowPrivateAccess = true))
-	TSoftObjectPtr<UWorld> NewGameTargetLevelAsset;
 };

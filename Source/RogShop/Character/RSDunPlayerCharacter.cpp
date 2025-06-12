@@ -210,9 +210,21 @@ void ARSDunPlayerCharacter::OnDeath()
         MovementComponent->SetMovementMode(EMovementMode::MOVE_None);
     }
 
+    // AI에게 감지되지 않도록 AI퍼셉션 자극 소스 제거
     if (AIPerceptionStimuliSourceComp)
     {
         AIPerceptionStimuliSourceComp->UnregisterFromPerceptionSystem();
+    }
+
+    // 던전 세이브 파일 제거
+    UGameInstance* CurGameInstance = GetGameInstance();
+    if (CurGameInstance)
+    {
+        URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+        if (SaveGameSubsystem)
+        {
+            SaveGameSubsystem->DeleteDungeonSaveFile();
+        }
     }
 }
 

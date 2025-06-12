@@ -4,6 +4,7 @@
 #include "RSTycoonWaitWidget.h"
 
 #include "RSGameInstance.h"
+#include "RSLevelSubsystem.h"
 #include "RSTycoonGameModeBase.h"
 #include "Components/Button.h"
 
@@ -28,5 +29,15 @@ void URSTycoonWaitWidget::OnClickManagementButton()
 
 void URSTycoonWaitWidget::OnClickOutButton()
 {
-	GetGameInstance<URSGameInstance>()->TravelToLevel(BaseAreaLevel);
+	// 레벨 이동
+	URSGameInstance* RSGameInstance = Cast<URSGameInstance>(GetWorld()->GetGameInstance());
+	if (RSGameInstance)
+	{
+		URSLevelSubsystem* LevelSubsystem = RSGameInstance->GetSubsystem<URSLevelSubsystem>();
+
+		if (LevelSubsystem)
+		{
+			LevelSubsystem->TravelToLevel(ERSLevelCategory::BaseArea);
+		}
+	}
 }
