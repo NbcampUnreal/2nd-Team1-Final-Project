@@ -130,6 +130,16 @@ void ARSTycoonGameModeBase::CreateCustomer()
 
 	ARSTycoonCustomerCharacter* Customer = SpawnDoorTile->SpawnCustomer(OrderFoodKey, TargetTableTile);
 	Customers.Add(Customer);
+
+	if (CustomerAddSound)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(
+			this,
+			CustomerAddSound,
+			SpawnDoorTile->GetActorLocation(),
+			FRotator::ZeroRotator
+		);
+	}
 }
 
 void ARSTycoonGameModeBase::RemoveCustomer(ARSTycoonCustomerCharacter* Customer)
