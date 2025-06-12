@@ -8,6 +8,8 @@ ARSMonsterAIController::ARSMonsterAIController()
 	avoidanceRadius = 100.0f;
 	avoidanceWeight = 100.0f;
 	currentPatrolIdx = 0;
+
+	rotateSpeed = 0.01f;
 }
 
 void ARSMonsterAIController::SetRVOAvoidanceEnabled(bool bEnable)//path find bottleneck resolving function
@@ -104,5 +106,56 @@ void ARSMonsterAIController::MoveToCurrentPatrolPoint()
 		);
 
 		currentPatrolIdx = (currentPatrolIdx + 1) % patrolPoints.Num();
+	}
+}
+
+bool ARSMonsterAIController::IsFocusing(FVector lookFor)
+{
+	APawn* ctrlPawn = GetPawn();
+	FVector look;
+	FVector direction;
+	float dot;
+	bool bIsLook = true;
+	if (ctrlPawn)
+	{
+		look = ctrlPawn->GetActorForwardVector();
+		direction = (lookFor - ctrlPawn->GetActorLocation()).GetSafeNormal();
+		dot = FVector::DotProduct(look, direction);
+
+		if (dot >= 0.99f)
+		{
+			bIsLook = true;
+		}
+		else
+		{
+			bIsLook = false;
+		}
+	}
+
+	return bIsLook;
+}
+
+void ARSMonsterAIController::RotateToFocus(FVector lookFor)
+{
+	APawn* ctrlPawn = GetPawn();
+	FVector chrPos;
+	FVector look;
+	FRotator chrRot;
+	FRotator newRot;
+	float targetYaw;
+	float currentYaw;
+	float deltaYaw;
+
+	if (ctrlPawn)
+	{
+		chrPos = ctrlPawn->GetActorLocation();
+		chrRot = ctrlPawn->GetActorRotation();
+		look = (lookFor - chrPos).GetSafeNormal();
+
+		targetYaw = look.Rotation().Yaw;
+		currentYaw = chrRot.Yaw;
+		deltaYaw = FMath::FindDeltaAngleDegrees(currentYaw, targetYaw);
+
+		newRot = chrRot + FRotator(0, deltaYaw*rotateSpeed, 0);
 	}
 }

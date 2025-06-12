@@ -27,6 +27,9 @@ protected://Value
 	float avoidanceWeight;
 
 	int32 currentPatrolIdx;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float rotateSpeed;
 public://Function
 	ARSMonsterAIController();
 
@@ -43,6 +46,12 @@ public://Function
 
 	UFUNCTION(BlueprintCallable)
 	bool IsMeleeSkill(int32 actionIdx);
+
+	UFUNCTION(BlueprintCallable)
+	bool IsFocusing(FVector lookFor);
+
+	UFUNCTION(BlueprintCallable)
+	void RotateToFocus(FVector lookFor);
 
 	//Patrol
 	UFUNCTION(BlueprintCallable)
