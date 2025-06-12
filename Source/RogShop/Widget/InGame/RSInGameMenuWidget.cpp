@@ -4,6 +4,7 @@
 #include "RSInGameMenuWidget.h"
 #include "Components/Button.h"
 #include "RSGameInstance.h"
+#include "RSLevelSubsystem.h"
 
 void URSInGameMenuWidget::NativeConstruct()
 {
@@ -30,7 +31,12 @@ void URSInGameMenuWidget::OnMainMenuButtonClicked()
 	URSGameInstance* RSGameInstance = Cast<URSGameInstance>(GetWorld()->GetGameInstance());
 	if (RSGameInstance)
 	{
-		RSGameInstance->TravelToLevel(MainMenuLevelAsset);
+		URSLevelSubsystem* LevelSubsystem = RSGameInstance->GetSubsystem<URSLevelSubsystem>();
+
+		if (LevelSubsystem)
+		{
+			LevelSubsystem->TravelToLevel(ERSLevelCategory::MainMenu);
+		}
 	}
 }
 
@@ -42,7 +48,12 @@ void URSInGameMenuWidget::OnBaseAreaButtonClicked()
 	URSGameInstance* RSGameInstance = Cast<URSGameInstance>(GetWorld()->GetGameInstance());
 	if (RSGameInstance)
 	{
-		RSGameInstance->TravelToLevel(BaseAreaLevelAsset);
+		URSLevelSubsystem* LevelSubsystem = RSGameInstance->GetSubsystem<URSLevelSubsystem>();
+
+		if (LevelSubsystem)
+		{
+			LevelSubsystem->TravelToLevel(ERSLevelCategory::BaseArea);
+		}
 	}
 }
 

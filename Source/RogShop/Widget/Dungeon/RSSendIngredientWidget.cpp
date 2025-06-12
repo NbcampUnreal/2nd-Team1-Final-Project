@@ -10,6 +10,7 @@
 #include "RSGameInstance.h"
 #include "RSSaveGameSubsystem.h"
 #include "RSDataSubsystem.h"
+#include "RSLevelSubsystem.h"
 #include "ItemInfoData.h"
 #include "RSInventorySlotWidget.h"
 #include "ItemSlot.h"
@@ -37,13 +38,13 @@ void URSSendIngredientWidget::NextStageTravel()
 {
 	// TODO : 재료를 보낼 수 있는 만큼 골랐는지 확인 후 적게 골랐다면 경고창을 띄운다.
 
-	URSGameInstance* GameInstance = GetGameInstance<URSGameInstance>();
-	if (!GameInstance)
+	URSGameInstance* RSGameInstance = GetGameInstance<URSGameInstance>();
+	if (!RSGameInstance)
 	{
 		return;
 	}
 
-	URSSaveGameSubsystem* SaveGameSubsystem = GameInstance->GetSubsystem<URSSaveGameSubsystem>();
+	URSSaveGameSubsystem* SaveGameSubsystem = RSGameInstance->GetSubsystem<URSSaveGameSubsystem>();
 	if (!SaveGameSubsystem)
 	{
 		return;
@@ -96,7 +97,12 @@ void URSSendIngredientWidget::NextStageTravel()
 	SaveGameSubsystem->OnSaveRequested.Broadcast();
 
 	// 다음 스테이지로 레벨 이동
-	GameInstance->TravelToLevel(TargetLevelAsset);
+	URSLevelSubsystem* LevelSubsystem = RSGameInstance->GetSubsystem<URSLevelSubsystem>();
+
+	if (LevelSubsystem)
+	{
+		LevelSubsystem->TravelToLevel(ERSLevelCategory::Dungeon);
+	}
 }
 
 void URSSendIngredientWidget::ExitWidget()
