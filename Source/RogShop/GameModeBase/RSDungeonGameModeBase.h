@@ -9,6 +9,7 @@
 #include "RSDungeonGameModeBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBossDead);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameReady);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMapFullyLoaded);
 
 // 던전 게임모드 클래스 정의
@@ -31,6 +32,9 @@ public:
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnBossDead OnBossDead;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnGameReady OnGameReady;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnMapFullyLoaded OnMapFullyLoaded;
