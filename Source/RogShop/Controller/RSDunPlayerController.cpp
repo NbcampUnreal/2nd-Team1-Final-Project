@@ -98,16 +98,6 @@ void ARSDunPlayerController::ShowLoadingUI()
         if (LoadingUIWidget)
         {
             LoadingUIWidget->AddToViewport(999);
-
-            // 2초 후 커튼 제거 예약
-            FTimerHandle TimerHandle;
-            GetWorld()->GetTimerManager().SetTimer(
-                TimerHandle,
-                this,
-                &ARSDunPlayerController::HideLoadingUI,
-                2.0f,
-                false
-            );
         }
     }
 }
