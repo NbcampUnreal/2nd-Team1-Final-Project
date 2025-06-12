@@ -20,6 +20,8 @@ public:
 	GENERATED_TILE()
 
 	virtual void Interact(ACharacter* InteractCharacter) override;
+	virtual void ResetAll() override;
+	
 	void Sit(ARSTycoonCustomerCharacter* Customer);
 	
 	int32 GetOrderWaitCustomerIndex();

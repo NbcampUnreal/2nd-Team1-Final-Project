@@ -39,6 +39,8 @@ public:
 	void WaitFood();
 	void Eat();
 
+	virtual void StopAllAction() override;
+	
 	ETycoonCustomerState GetState() const { return State; }
 	ARSTableTile* GetSittingTable() const { return SitTableTile; }
 

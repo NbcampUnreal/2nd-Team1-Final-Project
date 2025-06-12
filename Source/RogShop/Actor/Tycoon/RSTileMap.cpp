@@ -12,6 +12,7 @@
 #include "RogShop/UtilDefine.h"
 #include "RogShop/SaveGame/Tycoon/RSTycoonTileMapSaveGame.h"
 #include "Tile/RSBaseTile.h"
+#include "Tile/RSCookingTile.h"
 #include "Tycoon/NPC/RSTycoonChefCharacter.h"
 #include "Tycoon/NPC/RSTycoonNPC.h"
 #include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
@@ -113,6 +114,14 @@ void ARSTileMap::RotateTile(int32 Index, float YawValue)
 
 	TileActors[Index]->SetActorRotation(FRotator(0, YawValue, 0));
 	TileName2DMap[Row].YawValues[Column] = YawValue;
+}
+
+void ARSTileMap::ResetAllTile()
+{
+	for (auto& Tile : TileActors)
+	{
+		Tile->ResetAll();
+	}
 }
 
 void ARSTileMap::SpawnActorInMap(UClass* ActorClass)

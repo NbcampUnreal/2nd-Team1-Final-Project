@@ -14,6 +14,7 @@
 #include "Tycoon/NPC/RSTycoonCustomerCharacter.h"
 #include "ItemSlot.h"
 #include "RSIngredientInventoryWidget.h"
+#include "RogShop/Actor/Tycoon/RSTileMap.h"
 #include "RogShop/Actor/Tycoon/Tile/RSIceBoxTile.h"
 
 
@@ -26,7 +27,7 @@ ARSTycoonGameModeBase::ARSTycoonGameModeBase()
 
 void ARSTycoonGameModeBase::StartSaleMode()
 {
-	State = ETycoonGameMode::Sales;
+	State = ETycoonGameMode::Sale;
 
 	SettingGame();
 
@@ -35,7 +36,7 @@ void ARSTycoonGameModeBase::StartSaleMode()
 	Controller->StartSaleMode();
 	
 	GetWorldTimerManager().SetTimer(CustomerTimerHandle, this, &ARSTycoonGameModeBase::CreateCustomer, 5.f, true);
-	GetWorldTimerManager().SetTimer(GameTimerHandle, this, &ARSTycoonGameModeBase::EndSale, SalePlayMinute * 60, false);
+	GetWorldTimerManager().SetTimer(GameTimerHandle, this, &ARSTycoonGameModeBase::EndSaleMode, SalePlayMinute * 60, false);
 }
 
 void ARSTycoonGameModeBase::SettingGame()
@@ -151,7 +152,7 @@ void ARSTycoonGameModeBase::RemoveCustomer(ARSTycoonCustomerCharacter* Customer)
 	FName OrderFoodKey;
 	if (Customers.Num() == 0 && !CanOrder(OrderFoodKey))
 	{
-		EndSale();
+		EndSaleMode();
 	}
 }
 
@@ -225,13 +226,34 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 	return bResult;
 }
 
-void ARSTycoonGameModeBase::EndSale()
+void ARSTycoonGameModeBase::EndSaleMode()
 {
 	RS_LOG_C("게임 끝", FColor::Orange);
 
+	State = ETycoonGameMode::EndSale;
+	
+	//리셋
 	GetWorldTimerManager().ClearTimer(CustomerTimerHandle);
 	GetWorldTimerManager().ClearTimer(GameTimerHandle);
 
+	for (auto& NPC : NPCs)
+	{
+		NPC->StopAllAction();
+	}
+	
+	for (auto& Customer : Customers)
+	{
+		Customer->StopAllAction();
+		Customer->Destroy();
+	}
+
+	Customers.Empty();
+	FoodOrders.Empty();
+
+	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
+	check(TileMap)
+	TileMap->ResetAllTile();
+	
 	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->EndSaleMode();
 }
 
@@ -240,10 +262,6 @@ void ARSTycoonGameModeBase::StartWaitMode()
 	State = ETycoonGameMode::Wait;
 	
 	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->StartWaitMode();
-
-	//리셋 
-	
-	FoodOrders.Empty();
 }
 
 void ARSTycoonGameModeBase::StartManagementMode()

@@ -53,6 +53,8 @@ void ARSTycoonPlayerController::EndSaleMode()
 	FInputModeUIOnly InputMode;
 	SetInputMode(InputMode);
 	ChangeMainWidget(SaleResultWidget);
+
+	SaleWidget->RemoveAllOrderSlots();
 }
 
 void ARSTycoonPlayerController::StartManagementMode()

@@ -57,6 +57,11 @@ void URSTycoonSaleWidget::StopOrderSlotAnimation(FFoodOrder Order)
 	}
 }
 
+void URSTycoonSaleWidget::RemoveAllOrderSlots()
+{
+	OrderSlotParentBox->ClearChildren();
+}
+
 void URSTycoonSaleWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
@@ -124,5 +129,5 @@ URSTycoonOrderSlotWidget* URSTycoonSaleWidget::GetOrderSlotWidget(FFoodOrder Ord
 
 void URSTycoonSaleWidget::OnClickStopSales()
 {
-	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->EndSale();
+	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->EndSaleMode();
 }

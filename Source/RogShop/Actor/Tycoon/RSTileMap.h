@@ -24,6 +24,7 @@ public:
 	void SaveTileMap();
 	void ChangeTileSize(int32 NewWidth, int32 NewHeight);
 	void RotateTile(int32 Index, float YawValue);
+	void ResetAllTile();
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnActorInMap(UClass* ActorClass);

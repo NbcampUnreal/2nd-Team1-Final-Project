@@ -47,6 +47,23 @@ void ARSCookingTile::Interact(ACharacter* InteractCharacter)
 	}
 }
 
+void ARSCookingTile::ResetAll()
+{
+	Super::ResetAll();
+	
+	State = ECookingState::None;
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+
+	CookingFoodOrder.Customer = nullptr;
+	CookingFoodOrder.FoodKey = FName();
+
+	if (CookedFood)
+	{
+		CookedFood->Destroy();
+		CookedFood = nullptr;
+	}
+}
+
 void ARSCookingTile::OrderToCook()
 {
 	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();

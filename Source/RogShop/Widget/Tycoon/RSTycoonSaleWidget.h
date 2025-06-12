@@ -30,7 +30,8 @@ public:
 	void RemoveOrderSlot(FFoodOrder Order);
 	void StartOrderSlotAnimation(FFoodOrder Order, FTimerHandle CookTimer);
 	void StopOrderSlotAnimation(FFoodOrder Order);
-
+	void RemoveAllOrderSlots();
+	
 protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;

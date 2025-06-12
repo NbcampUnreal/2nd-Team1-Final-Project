@@ -39,6 +39,14 @@ void ARSBaseTile::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void ARSBaseTile::ResetAll()
+{
+}
+
+void ARSBaseTile::Interact(ACharacter* InteractCharacter)
+{
+}
+
 void ARSBaseTile::BeginPlay()
 {
 	Super::BeginPlay();

@@ -19,7 +19,8 @@ public:
 	ARSTycoonChefCharacter();
 
 	virtual void Tick(float DeltaSeconds) override;
-
+	virtual void StopAllAction() override;
+	
 	void FindCookingTile();
 	void LeaveCookingTile();
 

@@ -74,6 +74,16 @@ void ARSTycoonCustomerCharacter::Eat()
 	}
 }
 
+void ARSTycoonCustomerCharacter::StopAllAction()
+{
+	Super::StopAllAction();
+
+	State = ETycoonCustomerState::Move;
+	SitTableTile = nullptr;
+	
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+}
+
 void ARSTycoonCustomerCharacter::BeginPlay()
 {
 	Super::BeginPlay();

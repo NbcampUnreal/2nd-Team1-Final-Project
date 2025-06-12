@@ -15,7 +15,8 @@ UENUM()
 enum class ETycoonGameMode : uint8
 {
 	Wait,
-	Sales,
+	Sale,
+	EndSale,
 	Management
 };
 
@@ -33,7 +34,7 @@ public:
 	void RemoveOrder(FFoodOrder Order);
 	void RemoveCustomer(ARSTycoonCustomerCharacter* Customer);
 	void AddNPC(ARSTycoonNPC* NPC);
-	void EndSale();
+	void EndSaleMode();
 	void StartWaitMode();
 	void StartManagementMode();
 	
