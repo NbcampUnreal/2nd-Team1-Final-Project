@@ -3,6 +3,7 @@
 #include "RSPlayerInventoryWidget.h"
 
 #include "Components/Button.h"
+#include "Components/TextBlock.h"
 #include "RSDunPlayerController.h"
 
 void URSPlayerInventoryWidget::NativeConstruct()
@@ -12,6 +13,22 @@ void URSPlayerInventoryWidget::NativeConstruct()
     if (ExitBtn)
     {
         ExitBtn->OnClicked.AddDynamic(this, &URSPlayerInventoryWidget::OnExitBtnClicked);
+    }
+
+    ARSDunPlayerController* RSDunPlayerController = GetOwningPlayer<ARSDunPlayerController>();
+
+    if (RSDunPlayerController)
+    {
+        RSDunPlayerController->OnLifeEssenceChange.AddDynamic(this, &URSPlayerInventoryWidget::UpdateLifeEssence);
+    }
+}
+
+void URSPlayerInventoryWidget::UpdateLifeEssence(int32 NewLifeEssence)
+{
+    if (LifeEssenceQuantityText)
+    {
+        FText LifeEssenceText = FText::AsNumber(NewLifeEssence); // 정수 형태로 변환
+        LifeEssenceQuantityText->SetText(LifeEssenceText);
     }
 }
 
