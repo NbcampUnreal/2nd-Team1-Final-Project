@@ -158,7 +158,7 @@ void ARSTycoonPlayerController::SettingCamera()
 
 	MainCamera = Cast<ARSTycoonCamera>(TycoonCameras[MainCameraIndex]);
 	TopCamera = Cast<ARSTycoonCamera>(TycoonCameras[1 - MainCameraIndex]);
-	
+
 	SetViewTarget(MainCamera);
 	SetCameraLocationToCenter();
 
@@ -253,12 +253,12 @@ void ARSTycoonPlayerController::OnZoom(const FInputActionValue& Value)
 		// {
 		//		TopCamera->AttachPlayer();
 		// }
-		
+
 		if (OrthoWidth < MinOrthoWidth)
 		{
 			OrthoWidth = MinOrthoWidth;
 		}
-		
+
 		TopCamera->AttachPlayer();
 		TopCamera->GetCameraComponent()->SetOrthoWidth(OrthoWidth);
 	}
@@ -266,7 +266,7 @@ void ARSTycoonPlayerController::OnZoom(const FInputActionValue& Value)
 	{
 		//메인 카메라
 		float CameraLength = MainCamera->GetSpringArmComponent()->TargetArmLength + CameraMoveSensitivity * InputAction;
-		
+
 		//최댓값 설정에 너무 많은 시간을 뺏김. 제거
 		// if (PerspectiveFov >= MaxCameraLengthOfMainCamera)
 		// {
@@ -282,7 +282,7 @@ void ARSTycoonPlayerController::OnZoom(const FInputActionValue& Value)
 		{
 			CameraLength = MinLengthOfMainCamera;
 		}
-		
+
 		MainCamera->AttachPlayer();
 		MainCamera->GetSpringArmComponent()->TargetArmLength = CameraLength;
 	}
@@ -300,18 +300,8 @@ void ARSTycoonPlayerController::OnClickTile()
 		return;
 	}
 
-	check(ManagementWidget)
-	ManagementWidget->BuyTileBorderSlide();
-
-	//타일을 한번 선택한 후 어딜 누르든 타일 선택이 취소됨
-	if (SelectTileIndex != INDEX_NONE)
-	{
-		SelectTileIndex = INDEX_NONE;
-		return;
-	}
-
 	FHitResult HitResult;
-	if (GetHitResultUnderCursor(ECC_WorldDynamic, true, HitResult))
+	if (GetHitResultUnderCursor(ECC_Visibility, true, HitResult))
 	{
 		//디버그
 		RS_DRAW_DEBUG_SPHERE(GetWorld(), HitResult.Location, 40, 20, FColor::Blue, false, 5, 0, 1.0f);
@@ -333,7 +323,15 @@ void ARSTycoonPlayerController::OnClickTile()
 			}
 
 			RS_LOG_F("%s 타일이 선택됬습니다", *HitActor->GetName());
+			ManagementWidget->OpenBuyTileLayout();
 		}
+	}
+	//타일을 한번 선택한 후 어딜 누르든 타일 선택이 취소됨
+	else if (SelectTileIndex != INDEX_NONE)
+	{
+		SelectTileIndex = INDEX_NONE;
+		ManagementWidget->CloseBuyTileLayout();
+		ManagementWidget->CloseBuyNPCLayout();
 	}
 }
 

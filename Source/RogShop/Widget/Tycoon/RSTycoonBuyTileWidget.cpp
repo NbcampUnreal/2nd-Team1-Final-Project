@@ -20,9 +20,9 @@ void URSTycoonBuyTileWidget::SetInfo(ARSBaseTile* Tile)
 	PriceText->SetText(FText::FromString(FString::FromInt(Tile->GetPrice())));
 }
 
-void URSTycoonBuyTileWidget::NativeConstruct()
+void URSTycoonBuyTileWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 
 	Button->OnClicked.AddDynamic(this, &URSTycoonBuyTileWidget::OnClickButton);
 }
