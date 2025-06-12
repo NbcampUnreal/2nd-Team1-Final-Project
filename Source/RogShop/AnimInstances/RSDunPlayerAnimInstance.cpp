@@ -56,8 +56,6 @@ void URSDunPlayerAnimInstance::PlayFootstepSound() //발소리 재생 함수
 
 	if (Character->GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params))
 	{
-		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.0f, 0, 2.0f);
-
 		UPhysicalMaterial* PhysMat = HitResult.PhysMaterial.Get();
 		if (!PhysMat)
 		{
