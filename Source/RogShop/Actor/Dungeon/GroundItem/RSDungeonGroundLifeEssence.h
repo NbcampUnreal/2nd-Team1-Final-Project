@@ -17,6 +17,8 @@ class ROGSHOP_API ARSDungeonGroundLifeEssence : public ARSDungeonGroundItem
 public:
 	ARSDungeonGroundLifeEssence();
 
+	virtual void Tick(float DeltaTime) override;
+
 // 상호작용
 public:
 	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
@@ -25,11 +27,12 @@ public:
 	void SetQuantity(int32 NewQuantity);
 
 private:
-	// 플레이어 캐릭터 추적 타이머 및 딜레이 타임
-	FTimerHandle CharacterFollowTimer;
+	int32 Quantity;
 
-	float CharacterFollowTime;
-
+private:
+	// 추적 대상
+	TObjectPtr<ARSDunPlayerCharacter> TargetActor;
+	
 	// 추적 속도
 	float CharacterFollowSpeed;
 
@@ -37,6 +40,4 @@ private:
 	FTimerHandle InteractDelayTimer;
 
 	float InteractDelayTime;
-
-	int32 Quantity;
 };
