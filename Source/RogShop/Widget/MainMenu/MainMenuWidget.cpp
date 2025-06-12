@@ -29,9 +29,10 @@ void UMainMenuWidget::NativeConstruct()
 		if (SaveGameSubsystem)
 		{
 			bool bDungeonSaveFileExists = SaveGameSubsystem->DoesDungeonSaveFileExist();
+			bool bTycoonSaveFileExists = SaveGameSubsystem->DoesTycoonSaveFileExist();
 
-			// 던전에 대한 세이브 파일이 모두 존재 하는 경우
-			if (bDungeonSaveFileExists)
+			// 던전이나 타이쿤에 대한 세이브 파일이 존재 하는 경우
+			if (bDungeonSaveFileExists || bTycoonSaveFileExists)
 			{
 				LoadButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnLoadButtonClicked);
 			}
