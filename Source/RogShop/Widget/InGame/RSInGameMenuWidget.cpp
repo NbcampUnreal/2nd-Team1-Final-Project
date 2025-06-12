@@ -5,6 +5,7 @@
 #include "Components/Button.h"
 #include "RSGameInstance.h"
 #include "RSLevelSubsystem.h"
+#include "RSSaveGameSubsystem.h"
 
 void URSInGameMenuWidget::NativeConstruct()
 {
@@ -42,7 +43,16 @@ void URSInGameMenuWidget::OnMainMenuButtonClicked()
 
 void URSInGameMenuWidget::OnBaseAreaButtonClicked()
 {
-	// TODO : 던전에서는 기존 던전 세이브 제거
+	// 던전 세이브 파일 제거
+	UGameInstance* CurGameInstance = GetGameInstance();
+	if (CurGameInstance)
+	{
+		URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+		if (SaveGameSubsystem)
+		{
+			SaveGameSubsystem->DeleteDungeonSaveFile();
+		}
+	}
 
 	// 레벨 이동
 	URSGameInstance* RSGameInstance = Cast<URSGameInstance>(GetWorld()->GetGameInstance());
