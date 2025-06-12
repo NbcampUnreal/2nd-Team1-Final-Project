@@ -324,6 +324,9 @@ void ARSTycoonPlayerController::OnClickTile()
 
 			RS_LOG_F("%s 타일이 선택됬습니다", *HitActor->GetName());
 			ManagementWidget->OpenBuyTileLayout();
+
+			SelectTileActor->SetActorHiddenInGame(false);
+			SelectTileActor->SetActorLocation(Tile->GetActorLocation());
 		}
 	}
 	//타일을 한번 선택한 후 어딜 누르든 타일 선택이 취소됨
@@ -332,6 +335,8 @@ void ARSTycoonPlayerController::OnClickTile()
 		SelectTileIndex = INDEX_NONE;
 		ManagementWidget->CloseBuyTileLayout();
 		ManagementWidget->CloseBuyNPCLayout();
+		
+		SelectTileActor->SetActorHiddenInGame(true);
 	}
 }
 
@@ -353,6 +358,12 @@ void ARSTycoonPlayerController::OnRotateTile(const FInputActionValue& Value)
 	Yaw += 90 * Sign;
 
 	TileMap->RotateTile(SelectTileIndex, Yaw);
+}
+
+void ARSTycoonPlayerController::SettingChangeTile()
+{
+	SelectTileActor = GetWorld()->SpawnActor(SelectTileActorClass);
+	SelectTileActor->SetActorHiddenInGame(true);
 }
 #pragma endregion
 
@@ -377,4 +388,5 @@ void ARSTycoonPlayerController::BeginPlay()
 	SettingInput();
 	SettingCamera();
 	SettingWidget();
+	SettingChangeTile();
 }

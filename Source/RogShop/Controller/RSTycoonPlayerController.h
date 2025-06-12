@@ -156,8 +156,15 @@ private:
 	void OnClickTile();
 	UFUNCTION()
 	void OnRotateTile(const FInputActionValue& Value);
+
+	void SettingChangeTile();
 	
 private:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AActor> SelectTileActorClass;
+	UPROPERTY()
+	TObjectPtr<AActor> SelectTileActor;
+	
 	int32 SelectTileIndex = INDEX_NONE;
 #pragma endregion 
 	
