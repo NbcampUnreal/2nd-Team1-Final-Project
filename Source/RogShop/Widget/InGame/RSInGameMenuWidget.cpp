@@ -6,6 +6,7 @@
 #include "RSGameInstance.h"
 #include "RSLevelSubsystem.h"
 #include "RSSaveGameSubsystem.h"
+#include "RSDunPlayerController.h"
 
 void URSInGameMenuWidget::NativeConstruct()
 {
@@ -72,13 +73,10 @@ void URSInGameMenuWidget::OnCloseButtonClicked()
 	// 메뉴 닫기
 	if (GetWorld())
 	{
-		SetVisibility(ESlateVisibility::Hidden);
-
-		if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+		ARSDunPlayerController* PC = GetOwningPlayer<ARSDunPlayerController>();
+		if (PC)
 		{
-			FInputModeGameOnly InputMode;
-			PC->SetInputMode(InputMode);
-			PC->bShowMouseCursor = false;
+			PC->ToggleInGameMenuWidget();
 		}
 	}
 }
