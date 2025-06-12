@@ -20,16 +20,17 @@ class ROGSHOP_API URSTycoonManagementWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-public:
+protected:
+	virtual void NativeOnInitialized() override;
+	
+private:
 	UFUNCTION()
-	void BuyTileBorderSlide();
+	void OnClickExpandTile();
 
 	UFUNCTION()
-	void BuyNPCBorderSlide();
+	void OnClickWaitMode();
 
 protected:
-	virtual void NativeConstruct() override;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UTextBlock> GoldText;
 	
@@ -45,29 +46,26 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UButton> ReturnBaseAreaButton;
 
+#pragma region UI Animation, NPC Buy
+public:
+	void OpenBuyTileLayout();
+	void CloseBuyTileLayout();
+	UFUNCTION()
+	void OpenBuyNPCLayout();
+	void CloseBuyNPCLayout();
+	
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UVerticalBox> BuyTileParent;
-
+	
+	
+private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<URSTycoonBuyTileWidget> BuyTileWidgetType;
 
-	TArray<URSTycoonBuyTileWidget> BuyTileWidgets;
-
-#pragma region UI Animation, NPC Buy
-
-	UFUNCTION(BlueprintCallable)
-	void HandleWaiterClick();
-
-	UFUNCTION(BlueprintCallable)
-	void HandleChefClick();
-
-	// BP 노드 실행용 함수, BP 빠지면 이 함수도 필요없음
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnWaiterClicked_BP();
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnChefClicked_BP();
-
+	UPROPERTY()
+	TArray<URSTycoonBuyTileWidget*> BuyTileWidgets;
+	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UBorder> BuyTileParentBorder;
 
@@ -89,21 +87,7 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> CreateNPCButton;
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<URSTycoonBuyNPCWidget> BuyNPCWidget_Waiter;
-
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<URSTycoonBuyNPCWidget> BuyNPCWidget_Chef;
-
+	bool bOpenBuyTileLayout = false;
+	bool bOpenBuyNPCLayout = false;
 #pragma endregion
-
-private:
-	UFUNCTION()
-	void OnClickExpandTile();
-
-	UFUNCTION()
-	void OnClickWaitMode();
-
-	bool bIsBuyTileBorderValid = false;
-	bool bIsBuyNPCBorderValid = false;
 };

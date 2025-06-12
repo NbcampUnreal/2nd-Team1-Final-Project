@@ -49,6 +49,9 @@ void ARSDungeonGroundLifeEssence::Interact(ARSDunPlayerCharacter* Interactor)
 				Interactor->IncreaseLifeEssence(Quantity);
 			}
 
+			GetWorld()->GetTimerManager().ClearTimer(CharacterFollowTimer);
+			GetWorld()->GetTimerManager().ClearTimer(InteractDelayTimer);
+
 			Destroy();
 		}),
 		InteractDelayTime,

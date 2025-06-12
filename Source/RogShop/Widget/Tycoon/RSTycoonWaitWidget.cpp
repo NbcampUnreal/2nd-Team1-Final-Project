@@ -8,7 +8,7 @@
 #include "RSTycoonGameModeBase.h"
 #include "Components/Button.h"
 
-void URSTycoonWaitWidget::NativeConstruct()
+void URSTycoonWaitWidget::NativeOnInitialized()
 {
 	Super::NativeConstruct();
 

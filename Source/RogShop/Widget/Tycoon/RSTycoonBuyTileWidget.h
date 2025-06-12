@@ -22,7 +22,7 @@ public:
 	void SetInfo(ARSBaseTile* Tile);
 
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
 	
 private:
 	UFUNCTION()

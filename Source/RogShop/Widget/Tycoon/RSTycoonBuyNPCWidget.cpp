@@ -3,26 +3,25 @@
 
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
+#include "Kismet/GameplayStatics.h"
+#include "RogShop/Actor/Tycoon/RSTileMap.h"
+#include "Tycoon/NPC/RSTycoonNPC.h"
 
-void URSTycoonBuyNPCWidget::NativeConstruct()
+void URSTycoonBuyNPCWidget::NativeOnInitialized()
 {
 	Super::NativeConstruct();
 
-	if (NPCButton)
-	{
-		NPCButton->OnClicked.AddDynamic(this, &URSTycoonBuyNPCWidget::HandleButtonClicked);
-	}
+	ARSTycoonNPC* SpawnNPC = SpawnNPCClass.GetDefaultObject();
+	NPCNameText->SetText(FText::FromString(SpawnNPC->GetDisplayName()));
+	PriceText->SetText(FText::FromString(FString::FromInt(SpawnNPC->GetPrice())));
+	
+	Button->OnClicked.AddDynamic(this, &URSTycoonBuyNPCWidget::OnClickButton);
 }
 
-void URSTycoonBuyNPCWidget::HandleButtonClicked()
+void URSTycoonBuyNPCWidget::OnClickButton()
 {
-	OnClick.Broadcast(); // 부모에서 바인딩한 함수 실행
-}
+	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
+	check(TileMap)
 
-void URSTycoonBuyNPCWidget::SetNPCName(const FText& NewText)
-{
-	if (NPCName)
-	{
-		NPCName->SetText(NewText);
-	}
+	TileMap->SpawnActorInMap(SpawnNPCClass);
 }

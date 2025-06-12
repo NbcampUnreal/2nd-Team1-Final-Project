@@ -8,7 +8,7 @@
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 
-void URSTycoonSaleResultWidget::NativeConstruct()
+void URSTycoonSaleResultWidget::NativeOnInitialized()
 {
 	Super::NativeConstruct();
 

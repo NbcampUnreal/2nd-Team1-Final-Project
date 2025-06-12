@@ -32,6 +32,7 @@ public:
 	void StopOrderSlotAnimation(FFoodOrder Order);
 
 protected:
+	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 	
