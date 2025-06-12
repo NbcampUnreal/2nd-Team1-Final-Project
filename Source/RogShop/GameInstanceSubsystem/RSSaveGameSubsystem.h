@@ -20,7 +20,11 @@ public:
 
 	void DeleteDungeonSaveFile();
 
+	// 던전에 대한 세이브 파일이 모두 존재하는 경우 true 반환
 	bool DoesDungeonSaveFileExist();
+
+	// 타이쿤에 대한 세이브 파일이 1개라도 존재하는 경우 true 반환
+	bool DoesTycoonSaveFileExist();
 
 public:
 	UPROPERTY(BlueprintAssignable)
