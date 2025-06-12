@@ -4,6 +4,7 @@
 #include "RSPlayerDeathWidget.h"
 #include "Components/Button.h"
 #include "RSGameInstance.h"
+#include "RSLevelSubsystem.h"
 
 void URSPlayerDeathWidget::NativeConstruct()
 {
@@ -36,6 +37,11 @@ void URSPlayerDeathWidget::OnBaseAreaButtonClicked()
 	URSGameInstance* RSGameInstance = Cast<URSGameInstance>(GetWorld()->GetGameInstance());
 	if (RSGameInstance)
 	{
-		RSGameInstance->TravelToLevel(BaseAreaLevelAsset);
+		URSLevelSubsystem* LevelSubsystem = RSGameInstance->GetSubsystem<URSLevelSubsystem>();
+
+		if (LevelSubsystem)
+		{
+			LevelSubsystem->TravelToLevel(ERSLevelCategory::BaseArea);
+		}
 	}
 }

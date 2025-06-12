@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RSGameInstance.h"
 #include "RSSaveGameSubsystem.h"
+#include "RSLevelSubsystem.h"
 
 
 void UMainMenuWidget::NativeConstruct()
@@ -20,9 +21,27 @@ void UMainMenuWidget::NativeConstruct()
 
 	// TODO : 만약 불러올 세이브 파일이 하나도 없는 경우 해당 버튼이 보이거나 위치하면 안된다.
 	// 해당 버튼을 숨기고 로드 버튼의 위치에 StartButton을 위치하게 한다.
-	if (LoadButton)
+	URSGameInstance* RSGameInstance = Cast<URSGameInstance>(GetWorld()->GetGameInstance());
+	if (LoadButton && RSGameInstance)
 	{
-		LoadButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnLoadButtonClicked);
+		// 던전에 대한 모든 세이브 파일이 있는지 확인한다.
+		URSSaveGameSubsystem* SaveGameSubsystem = RSGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+		if (SaveGameSubsystem)
+		{
+			bool bDungeonSaveFileExists = SaveGameSubsystem->DoesDungeonSaveFileExist();
+
+			// 던전에 대한 세이브 파일이 모두 존재 하는 경우
+			if (bDungeonSaveFileExists)
+			{
+				LoadButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnLoadButtonClicked);
+			}
+			// 존재하지 않는 경우
+			else
+			{
+				LoadButton->SetVisibility(ESlateVisibility::Hidden);
+				
+			}
+		}
 	}
 
 	if (OptionButton)
@@ -50,7 +69,11 @@ void UMainMenuWidget::OnStartButtonClicked()
 		}
 
 		// 레벨 이동
-		RSGameInstance->TravelToLevel(NewGameTargetLevelAsset);
+		URSLevelSubsystem* LevelSubsystem = RSGameInstance->GetSubsystem<URSLevelSubsystem>();
+		if (LevelSubsystem)
+		{
+			LevelSubsystem->TravelToLevel(ERSLevelCategory::BaseArea);
+		}
 	}
 }
 
@@ -69,13 +92,21 @@ void UMainMenuWidget::OnLoadButtonClicked()
 			if (bDungeonSaveFileExists)
 			{
 				// 던전으로 레벨 이동
-				//RSGameInstance->TravelToLevel(NewGameTargetLevelAsset);
+				URSLevelSubsystem* LevelSubsystem = RSGameInstance->GetSubsystem<URSLevelSubsystem>();
+				if (LevelSubsystem)
+				{
+					LevelSubsystem->TravelToLevel(ERSLevelCategory::Dungeon);
+				}
 			}
 			// 존재하지 않는 경우
 			else
 			{
 				// 거점으로 레벨 이동
-				//RSGameInstance->TravelToLevel(NewGameTargetLevelAsset);
+				URSLevelSubsystem* LevelSubsystem = RSGameInstance->GetSubsystem<URSLevelSubsystem>();
+				if (LevelSubsystem)
+				{
+					LevelSubsystem->TravelToLevel(ERSLevelCategory::BaseArea);
+				}
 			}
 		}
 	}
