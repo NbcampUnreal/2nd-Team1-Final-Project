@@ -51,122 +51,36 @@ void URSDunShopWidget::UpdateLifeEssence(int NewLifeEssence)
     }
 }
 
-EItemRarity URSDunShopWidget::GetRandomRarity()
-{
-    int32 Roll = FMath::RandRange(1, 100); // 1 ~ 100 사이 정수
-
-    if (Roll <= 60)
-    {
-        return EItemRarity::Common;
-    }
-    else if (Roll <= 85) // 60 + 25
-    {
-        return EItemRarity::Rare;
-    }
-    else if (Roll <= 95) // 85 + 10
-    {
-        return EItemRarity::Epic;
-    }
-    else
-    {
-        return EItemRarity::Legendary;
-    }
-}
-
-TPair<FName, FItemInfoData*> URSDunShopWidget::GetRandomItemFromDataTable(UDataTable* WeaponDataTable, UDataTable* RelicDataTable)
-{
-    if (!WeaponDataTable || !RelicDataTable)
-    {
-        return TPair<FName, FItemInfoData*>(FName("Invalid"), nullptr);
-    }
-
-    // 추출할 아이템 등급 선정
-    EItemRarity SelectedRarity = GetRandomRarity();
-    TArray<TPair<FName, FItemInfoData*>> AllItems;
-
-    // 무기 데이터 테이블 값 추출
-    const TMap<FName, uint8*>& WeaponMapRaw = WeaponDataTable->GetRowMap();
-    for (const auto& Elem : WeaponMapRaw)
-    {
-        FItemInfoData* ItemData = reinterpret_cast<FItemInfoData*>(Elem.Value);
-        if (ItemData && ItemData->ItemRarity == SelectedRarity)
-        {
-            AllItems.Add({ Elem.Key, ItemData });
-        }
-    }
-
-    // 유물 데이터 테이블 값 추출
-    const TMap<FName, uint8*>& RelicMapRaw = RelicDataTable->GetRowMap();
-    for (const auto& Elem : RelicMapRaw)
-    {
-        FItemInfoData* ItemData = reinterpret_cast<FItemInfoData*>(Elem.Value);
-        if (ItemData && ItemData->ItemRarity == SelectedRarity)
-        {
-            AllItems.Add({ Elem.Key, ItemData });
-        }
-    }
-
-    // 뽑힌 아이템 중에서 동일 확률로 1개 반환
-    if (AllItems.Num() > 0)
-    {
-        int32 RandomIndex = FMath::RandRange(0, AllItems.Num() - 1);
-        return AllItems[RandomIndex];
-    }
-
-    return TPair<FName, FItemInfoData*>(FName("Invalid"), nullptr);
-}
-
 void URSDunShopWidget::PopulateShopItems()
 {
-    URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
+    URSGameInstance* GI = Cast<URSGameInstance>(GetGameInstance());
 
-    if (!DataSubsystem || !DataSubsystem->WeaponInfo || !DataSubsystem->RelicInfo)
+    if (!GI)
     {
-        RS_LOG_DEBUG("DataSubsystem or DataTables are null");
         return;
     }
 
-    TSet<FName> AlreadySpawnedIDs;
-    const int32 AddItemCount = 5;
+    const TArray<TPair<FName, FItemInfoData*>>& ShopItems = GI->GetCachedDunShopItems();
 
-    for (int32 i = 0; i < AddItemCount; ++i)
+    for (const auto& ItemPair : ShopItems)
     {
-        TPair<FName, FItemInfoData*> RandomItem = GetRandomItemFromDataTable(DataSubsystem->WeaponInfo, DataSubsystem->RelicInfo);
-
-        FName FoundRowName = RandomItem.Key;
-        FItemInfoData* ItemData = RandomItem.Value;
+        const FName RowName = ItemPair.Key;
+        const FItemInfoData* ItemData = ItemPair.Value;
 
         if (!ItemData)
         {
-            RS_LOG_DEBUG("ItemData is Null");
             continue;
         }
-
-        // 중복 랜덤 생성 방지
-        if (AlreadySpawnedIDs.Contains(FoundRowName))
-        {
-            continue;
-        }
-
-        // 이미 구매한 아이템 생성 방지
-        URSGameInstance* GI = Cast<URSGameInstance>(GetGameInstance());
-        if (!GI || GI->PurchasedItemIDs.Contains(FoundRowName))
-        {
-            continue;
-        }
-
-        AlreadySpawnedIDs.Add(FoundRowName);
 
         if (RSDunShopItemWidgetClass && ItemHorizontalBox)
         {
-            URSDunItemWidget* NewRSDunItemWidget = CreateWidget<URSDunItemWidget>(this, RSDunShopItemWidgetClass);
-
-            if (NewRSDunItemWidget)
+            URSDunItemWidget* NewItemWidget = CreateWidget<URSDunItemWidget>(this, RSDunShopItemWidgetClass);
+            if (NewItemWidget)
             {
-                NewRSDunItemWidget->SetItemData(*ItemData);
-                NewRSDunItemWidget->SetItemRowName(FoundRowName);
+                NewItemWidget->SetItemData(*ItemData);
+                NewItemWidget->SetItemRowName(RowName);
 
-                ItemHorizontalBox->AddChild(NewRSDunItemWidget);
+                ItemHorizontalBox->AddChild(NewItemWidget);
             }
         }
     }
