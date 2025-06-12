@@ -101,6 +101,16 @@ void ARSTycoonCustomerCharacter::InteractTarget(AActor* TargetActor)
 			if (AnimInstance)
 			{
 				PlayAnimMontage(SitMontage);
+
+				if (SitSound)
+				{
+					UGameplayStatics::SpawnSoundAtLocation(
+						this,
+						SitSound,
+						GetActorLocation(),
+						FRotator::ZeroRotator
+					);
+				}
 			}
 		}
 	}
@@ -130,4 +140,14 @@ void ARSTycoonCustomerCharacter::Leave()
 	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->AddGold(Data->Price);
 
 	OnFinishEat.Broadcast(this);
+
+	if (ExitSound)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(
+			this,
+			ExitSound,
+			GetActorLocation(),
+			FRotator::ZeroRotator
+		);
+	}
 }

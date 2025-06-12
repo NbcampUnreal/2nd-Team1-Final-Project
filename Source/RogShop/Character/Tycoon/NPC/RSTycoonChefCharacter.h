@@ -44,4 +44,14 @@ private:
 	// 애님 몽타주
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> CookingMontage;
+
+	// 사운드
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	TObjectPtr<USoundBase> CookingSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	TObjectPtr<USoundBase> CookingFinishSound;
+
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> CookingAudioComponent;
 };
