@@ -2,15 +2,16 @@
 
 
 #include "RSWeaponInventoryWidget.h"
-
-#include "RSDunPlayerController.h"
-#include "RSDunPlayerCharacter.h"
-#include "RSPlayerWeaponComponent.h"
 #include "RSDataSubsystem.h"
 #include "ItemInfoData.h"
 #include "RogShop/UtilDefine.h"
 
 #include "Components/Image.h"
+#include "Components/Button.h"
+#include "RSInventorySlotWidget.h"
+#include "RSDunPlayerController.h"
+#include "RSDunPlayerCharacter.h"
+#include "RSPlayerWeaponComponent.h"
 
 void URSWeaponInventoryWidget::NativeConstruct()
 {
@@ -22,108 +23,121 @@ void URSWeaponInventoryWidget::NativeConstruct()
     {
         RSDunPlayerController->OnWeaponSlotChange.AddDynamic(this, &URSWeaponInventoryWidget::UpdateWeaponSlot);
     }
-}
 
-FReply URSWeaponInventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
-{
-    // 좌클릭 키다운
-    if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+    if (WeaponSlot1)
     {
-        if (WeaponSlot1 && WeaponSlot1->IsHovered())
+        UButton* SlotButton = WeaponSlot1->GetSlotButton();
+        if (SlotButton)
         {
-            HeldSlotType = EWeaponSlotType::Slot1;
+            WeaponSlot1->OnSlotClicked.AddDynamic(this, &URSWeaponInventoryWidget::SetClickWeaponName);
+            SlotButton->OnPressed.AddDynamic(this, &URSWeaponInventoryWidget::WeaponSlotPress);
+            SlotButton->OnReleased.AddDynamic(this, &URSWeaponInventoryWidget::WeaponSlotRelease);
         }
-        else if (WeaponSlot2 && WeaponSlot2->IsHovered())
-        {
-            HeldSlotType = EWeaponSlotType::Slot2;
-        }
-        else
-        {
-            RS_LOG_DEBUG("Invalid slot on mouse down");
-            return FReply::Unhandled();
-        }
-
-        GetWorld()->GetTimerManager().SetTimer(HoldTimerHandle, this, &URSWeaponInventoryWidget::HandleLongPress, HoldThreshold, false);
-
-        return FReply::Handled();
     }
 
-    return FReply::Unhandled();
-}
-
-FReply URSWeaponInventoryWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
-{
-    if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+    if (WeaponSlot2)
     {
-        GetWorld()->GetTimerManager().ClearTimer(HoldTimerHandle);
-        HeldSlotType = EWeaponSlotType::None;
-
-        return FReply::Handled();
+        UButton* SlotButton = WeaponSlot2->GetSlotButton();
+        if (SlotButton)
+        {
+            WeaponSlot2->OnSlotClicked.AddDynamic(this, &URSWeaponInventoryWidget::SetClickWeaponName);
+            SlotButton->OnPressed.AddDynamic(this, &URSWeaponInventoryWidget::WeaponSlotPress);
+            SlotButton->OnReleased.AddDynamic(this, &URSWeaponInventoryWidget::WeaponSlotRelease);
+        }
     }
 
-    return FReply::Unhandled();
+
+    HoldThreshold = 0.5f;
+    ClickWeaponName = NAME_None;
 }
 
-void URSWeaponInventoryWidget::HandleLongPress()
+void URSWeaponInventoryWidget::WeaponSlotPress()
 {
-    RS_LOG_DEBUG("Long Press Detected on URSWeaponInventoryWidget Index: %d", (int32)HeldSlotType);
+    GetWorld()->GetTimerManager().SetTimer(HoldTimerHandle, this, &URSWeaponInventoryWidget::WeaponDrop, HoldThreshold, false);
+}
 
-    // 추가 작업 필요
-    ARSDunPlayerCharacter* DunPlayerChar = GetOwningPlayerPawn<ARSDunPlayerCharacter>();
-    if (!DunPlayerChar)
+void URSWeaponInventoryWidget::WeaponSlotRelease()
+{
+    GetWorld()->GetTimerManager().ClearTimer(HoldTimerHandle);
+
+    ClickWeaponName = NAME_None;
+}
+
+void URSWeaponInventoryWidget::WeaponDrop()
+{
+    ARSDunPlayerCharacter* CurCharacter = GetOwningPlayerPawn<ARSDunPlayerCharacter>();
+    if (!CurCharacter)
     {
         return;
     }
 
-    URSPlayerWeaponComponent* PlayerWeaponComp = DunPlayerChar->GetRSPlayerWeaponComponent();
-    if (PlayerWeaponComp)
+    URSPlayerWeaponComponent* WeaponComp = CurCharacter->GetRSPlayerWeaponComponent();
+    if (!WeaponComp)
     {
-        PlayerWeaponComp->DropWeaponToSlot(static_cast<EWeaponSlot>(HeldSlotType));
+        return;
     }
+
+    EWeaponSlot ClickWeaponSlot = EWeaponSlot::NONE;
+
+    if (WeaponSlot1->GetItemDataTableKey() == ClickWeaponName)
+    {
+        ClickWeaponSlot = EWeaponSlot::FirstWeaponSlot;
+    }
+    else
+    {
+        ClickWeaponSlot = EWeaponSlot::SecondWeaponSlot;
+    }
+
+    WeaponComp->DropWeaponToSlot(ClickWeaponSlot);
+}
+
+void URSWeaponInventoryWidget::SetClickWeaponName(FName NewClickWeaponName)
+{
+    ClickWeaponName = NewClickWeaponName;
 }
 
 void URSWeaponInventoryWidget::UpdateWeaponSlot(int8 WeaponSlotIndex, FName WeaponKey)
 {
     if (URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>())
     {
-        if (DataSubsystem->WeaponInfo)
+        UDataTable* WeaponInfoDatable = DataSubsystem->WeaponInfo;
+        if (WeaponInfoDatable)
         {
-            const FItemInfoData* FoundData = DataSubsystem->WeaponInfo->FindRow<FItemInfoData>(
-                WeaponKey,
-                TEXT("WeaponInfo Data Lookup") // 디버깅용 Context
-            );
+            const FItemInfoData* FoundItemInfoDataRow = WeaponInfoDatable->FindRow<FItemInfoData>(WeaponKey, TEXT("Get ItemInfoData"));
 
-            if (FoundData)
+            if (FoundItemInfoDataRow)
             {
-                if (WeaponSlot1->Brush.GetResourceObject() == nullptr)
+                UObject* CurItemIcon = FoundItemInfoDataRow->ItemIcon;
+
+                if (WeaponSlot1->GetItemIcon() == nullptr)
                 {
-                    WeaponSlot1->SetBrushResourceObject(FoundData->ItemIcon);
+                    WeaponSlot1->SetSlotItemInfo(WeaponKey, CurItemIcon, "");
                 }
-                else if (WeaponSlot2->Brush.GetResourceObject() == nullptr)
+                else if (WeaponSlot2->GetItemIcon() == nullptr)
                 {
-                    WeaponSlot2->SetBrushResourceObject(FoundData->ItemIcon);
+                    WeaponSlot2->SetSlotItemInfo(WeaponKey, CurItemIcon, "");
                 }
                 else
                 {
                     if (WeaponSlotIndex == 0 || WeaponSlotIndex == 1)
                     {
-                        WeaponSlot1->SetBrushResourceObject(FoundData->ItemIcon);
+                        WeaponSlot1->SetSlotItemInfo(WeaponKey, CurItemIcon, "");
                     }
                     else
                     {
-                        WeaponSlot2->SetBrushResourceObject(FoundData->ItemIcon);
+                        WeaponSlot2->SetSlotItemInfo(WeaponKey, CurItemIcon, "");
                     }
                 }
             }
             else
             {
-                if (WeaponSlotIndex == 1)
+                if (WeaponSlotIndex == 0 || WeaponSlotIndex == 1)
                 {
-                    WeaponSlot1->SetBrushFromTexture(nullptr);
+                    WeaponSlot1->SetSlotItemInfo(NAME_None, nullptr, "");
                 }
-                else if (WeaponSlotIndex == 2)
+                else
                 {
-                    WeaponSlot2->SetBrushFromTexture(nullptr);
+                    WeaponSlot2->SetSlotItemInfo(NAME_None, nullptr, "");
                 }
             }
         }

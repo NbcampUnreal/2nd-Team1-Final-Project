@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"            
 #include "DungeonLevelData.h"
 #include "GameFramework/CharacterMovementComponent.h"  
+#include "RSDunPlayerController.h"
 #include "RSDataSubsystem.h"
 #include "Engine/World.h"                             
 #include "TimerManager.h"                             
@@ -186,6 +187,14 @@ void ARSDungeonGameModeBase::OnMapReady()// 맵 로딩이 완료되었을 때 �
             GameMode->SpawnManager->SpawnShopNPCInLevel();
             GameMode->SpawnManager->SpawnBossPortal(GameMode->MapGeneratorInstance->BossWorldLocation);
             GameMode->SpawnManager->SpawnBossMonster();
+
+            APlayerController* PC = UGameplayStatics::GetPlayerController(GameMode, 0);
+            ARSDunPlayerController* DunPC = Cast<ARSDunPlayerController>(PC);
+
+            if (DunPC)
+            {
+                DunPC->HideLoadingUI();
+            }
         }
     });
 }

@@ -131,8 +131,6 @@ void URSIngredientInventoryWidget::IngredientDrop()
 	}
 
 	IngredientInventoryComp->DropItem(ClickIngredientName);
-
-	RS_LOG("UI 클릭");
 }
 
 void URSIngredientInventoryWidget::SetClickIngredientName(FName NewClickIngredientName)
