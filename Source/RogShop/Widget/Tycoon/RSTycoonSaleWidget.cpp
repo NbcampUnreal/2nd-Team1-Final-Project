@@ -57,13 +57,18 @@ void URSTycoonSaleWidget::StopOrderSlotAnimation(FFoodOrder Order)
 	}
 }
 
+void URSTycoonSaleWidget::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+
+	StopSalesButton->OnClicked.AddDynamic(this, &URSTycoonSaleWidget::OnClickStopSales);
+}
+
 void URSTycoonSaleWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
+	
 	GetWorld()->GetTimerManager().SetTimer(TimeUIHandle, this, &URSTycoonSaleWidget::UpdateTimeUI, 0.1f, true);
-
-	StopSalesButton->OnClicked.AddDynamic(this, &URSTycoonSaleWidget::OnClickStopSales);
 }
 
 void URSTycoonSaleWidget::NativeDestruct()

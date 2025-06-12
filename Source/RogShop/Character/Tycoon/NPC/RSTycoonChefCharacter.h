@@ -40,4 +40,18 @@ private:
 	TObjectPtr<ARSCookingTile> PlacedCookingTile; //배치된 쿠킹 타일
 
 	bool bCooking;
+
+	// 애님 몽타주
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UAnimMontage> CookingMontage;
+
+	// 사운드
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	TObjectPtr<USoundBase> CookingSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	TObjectPtr<USoundBase> CookingFinishSound;
+
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> CookingAudioComponent;
 };

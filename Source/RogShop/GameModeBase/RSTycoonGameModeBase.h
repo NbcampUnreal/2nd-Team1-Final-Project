@@ -85,4 +85,9 @@ private:
 	ETycoonGameMode State; //현재 레벨이 어떤 모드인가
 	FTimerHandle CustomerTimerHandle; //손님 등장 타이머
 	FTimerHandle GameTimerHandle; //게임 경과 타이머
+
+	// 사운드
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	TObjectPtr<USoundBase> CustomerAddSound;
+
 };

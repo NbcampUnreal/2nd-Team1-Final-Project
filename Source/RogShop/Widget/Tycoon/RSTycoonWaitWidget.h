@@ -16,7 +16,7 @@ class ROGSHOP_API URSTycoonWaitWidget : public UUserWidget
 	GENERATED_BODY()
 
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
 
 private:
 	UFUNCTION()
@@ -38,7 +38,4 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UButton* OutButton;
-
-	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<UWorld> BaseAreaLevel;
 };

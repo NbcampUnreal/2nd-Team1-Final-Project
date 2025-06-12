@@ -67,9 +67,4 @@ private:
 	TArray<TObjectPtr<URSInventorySlotWidget>> PlayerIngredientSlots;	// 플레이어 재료를 보여줄 슬롯
 
 	FName ClickIngredientName;  // 클릭한 슬롯의 재료의 데이터 테이블 RowName
-
-// 레벨 이동
-private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level", meta = (AllowPrivateAccess = "true"))
-	TSoftObjectPtr<UWorld> TargetLevelAsset;
 };

@@ -34,6 +34,17 @@ void ARSTycoonWaiterCharacter::Pickup(AActor* Actor)
 
 	Actor->AttachToComponent(PickupLocation, FAttachmentTransformRules::KeepWorldTransform);
 	Actor->SetActorLocation(PickupLocation->GetComponentLocation());
+
+
+	if (GrabFoodMontage && GetMesh())
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+		if (AnimInstance)
+		{
+			PlayAnimMontage(GrabFoodMontage);
+		}
+	}
 }
 
 AActor* ARSTycoonWaiterCharacter::Drop(FVector DropLocation)

@@ -13,6 +13,7 @@
 #include "RogShop/Actor/Tycoon/Tile/RSBaseTile.h"
 #include "RogShop/Actor/Tycoon/Tile/RSCookingTile.h"
 #include "RogShop/Widget/Tycoon/RSTycoonFoodBubbleWidget.h"
+#include "Components/AudioComponent.h"
 
 
 ARSTycoonChefCharacter::ARSTycoonChefCharacter()
@@ -162,6 +163,28 @@ void ARSTycoonChefCharacter::TryCook()
 		FoodBubble->SetImage(GameMode->GetOrderToCook().FoodKey);
 		
 		PlacedCookingTile->Interact(this);
+
+		if (CookingMontage && GetMesh())
+		{
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+			if (AnimInstance)
+			{
+				PlayAnimMontage(CookingMontage);
+
+				if (CookingSound)
+				{
+					CookingAudioComponent = UGameplayStatics::SpawnSoundAttached(
+						CookingSound,
+						RootComponent,
+						NAME_None,
+						FVector::ZeroVector,
+						EAttachLocation::KeepRelativeOffset,
+						true
+					);
+				}
+			}
+		}
 	}
 }
 
@@ -171,5 +194,20 @@ void ARSTycoonChefCharacter::CheckFinish()
 	{
 		bCooking = false;
 		FoodBubbleWidgetComponent->SetVisibility(false);
+
+		if (CookingAudioComponent && CookingAudioComponent->IsPlaying())
+		{
+			CookingAudioComponent->Stop();
+		}
+
+		if (CookingFinishSound)
+		{
+			UGameplayStatics::SpawnSoundAtLocation(
+				this,
+				CookingFinishSound,
+				GetActorLocation(),
+				FRotator::ZeroRotator
+			);
+		}
 	}
 }

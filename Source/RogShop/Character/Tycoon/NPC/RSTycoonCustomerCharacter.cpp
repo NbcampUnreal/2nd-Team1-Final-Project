@@ -62,6 +62,16 @@ void ARSTycoonCustomerCharacter::Eat()
 
 	FTimerHandle Timer;
 	GetWorldTimerManager().SetTimer(Timer, this, &ARSTycoonCustomerCharacter::Leave, 5.f, false);
+
+	if (EatMontage && GetMesh())
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+		if (AnimInstance)
+		{
+			PlayAnimMontage(EatMontage);
+		}
+	}
 }
 
 void ARSTycoonCustomerCharacter::BeginPlay()
@@ -83,6 +93,26 @@ void ARSTycoonCustomerCharacter::InteractTarget(AActor* TargetActor)
 	if (ARSTableTile* TableTile = Cast<ARSTableTile>(TargetActor))
 	{
 		TableTile->Sit(this);
+
+		if (SitMontage && GetMesh())
+		{
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+			if (AnimInstance)
+			{
+				PlayAnimMontage(SitMontage);
+
+				if (SitSound)
+				{
+					UGameplayStatics::SpawnSoundAtLocation(
+						this,
+						SitSound,
+						GetActorLocation(),
+						FRotator::ZeroRotator
+					);
+				}
+			}
+		}
 	}
 
 	//문에 닿으면 삭제
@@ -110,4 +140,14 @@ void ARSTycoonCustomerCharacter::Leave()
 	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->AddGold(Data->Price);
 
 	OnFinishEat.Broadcast(this);
+
+	if (ExitSound)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(
+			this,
+			ExitSound,
+			GetActorLocation(),
+			FRotator::ZeroRotator
+		);
+	}
 }

@@ -14,13 +14,16 @@
 #include "Components/Border.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "RogShop/UtilDefine.h"
 #include "RogShop/Actor/Tycoon/RSTileMap.h"
 #include "RogShop/Actor/Tycoon/Tile/RSBaseTile.h"
+#include "Tycoon/NPC/RSTycoonChefCharacter.h"
+#include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
 
-void URSTycoonManagementWidget::NativeConstruct()
+void URSTycoonManagementWidget::NativeOnInitialized()
 {
 	Super::NativeConstruct();
-	
+
 	//구매 가능한 Tile들 생성
 	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
 	check(TileMap)
@@ -29,7 +32,7 @@ void URSTycoonManagementWidget::NativeConstruct()
 	{
 		URSTycoonBuyTileWidget* BuyTile = CreateWidget<URSTycoonBuyTileWidget>(GetOwningPlayer(), BuyTileWidgetType);
 		BuyTile->SetInfo(TileType->GetDefaultObject<ARSBaseTile>());
-		
+
 		UVerticalBoxSlot* BuyTileSlot = BuyTileParent->AddChildToVerticalBox(BuyTile);
 		BuyTileSlot->SetPadding(FMargin(0, 10));
 	}
@@ -37,40 +40,16 @@ void URSTycoonManagementWidget::NativeConstruct()
 	//골드 세팅
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(Controller)
-	
+
 	GoldText->SetText(FText::FromString(FString::FromInt(Controller->GetGold())));
-	
-	ExpandTileButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OnClickExpandTile);
-	ReturnBaseAreaButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OnClickWaitMode);
 
 	// 보더 초기 위치 세팅
-	if (BuyTileParentBorder)
-	{
-		BuyTileParentBorder->SetRenderTranslation(FVector2D(0.f, 0.f));
-	}
+	BuyTileParentBorder->SetRenderTranslation(FVector2D(0.f, 0.f));
+	BuyNPCBorder->SetRenderTranslation(FVector2D(0.f, 0.f));
 
-	if (BuyNPCBorder)
-	{
-		BuyNPCBorder->SetRenderTranslation(FVector2D(0.f, 0.f));
-	}
-
-	if (CreateNPCButton)
-	{
-		CreateNPCButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::BuyNPCBorderSlide);
-	}
-
-	// NPC 버튼 입력 세팅 (부모 WBP의 OnClick 라는 브로드캐스트를 받으면 밑에 함수를 실행)
-	if (BuyNPCWidget_Waiter)
-	{
-		BuyNPCWidget_Waiter->OnClick.AddDynamic(this, &URSTycoonManagementWidget::HandleWaiterClick);
-		BuyNPCWidget_Waiter->SetNPCName(FText::FromString(TEXT("Waiter")));
-	}
-
-	if (BuyNPCWidget_Chef)
-	{
-		BuyNPCWidget_Chef->OnClick.AddDynamic(this, &URSTycoonManagementWidget::HandleChefClick);
-		BuyNPCWidget_Chef->SetNPCName(FText::FromString(TEXT("Chef")));
-	}
+	ExpandTileButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OnClickExpandTile);
+	ReturnBaseAreaButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OnClickWaitMode);
+	CreateNPCButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OpenBuyNPCLayout);
 }
 
 void URSTycoonManagementWidget::OnClickExpandTile()
@@ -89,64 +68,48 @@ void URSTycoonManagementWidget::OnClickExpandTile()
 void URSTycoonManagementWidget::OnClickWaitMode()
 {
 	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->StartWaitMode();
-	
+
 	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
 	check(TileMap)
 	TileMap->SaveTileMap();
 }
 
-void URSTycoonManagementWidget::BuyTileBorderSlide()
+void URSTycoonManagementWidget::OpenBuyTileLayout()
 {
-	if (BuyTileBorderSlideAni)
+	CloseBuyNPCLayout();
+	
+	if (!bOpenBuyTileLayout)
 	{
-		if (bIsBuyTileBorderValid == false)
-		{
-			if (bIsBuyNPCBorderValid)
-			{
-				PlayAnimation(BuyNPCBorderCloseAni);
-				bIsBuyNPCBorderValid = false;
-			}
-
-			PlayAnimation(BuyTileBorderSlideAni);
-			bIsBuyTileBorderValid = true;
-		}
-		else
-		{
-			PlayAnimation(BuyTileBorderCloseAni);
-			bIsBuyTileBorderValid = false;
-		}
+		bOpenBuyTileLayout = true;
+		PlayAnimation(BuyTileBorderSlideAni);
 	}
 }
 
-void URSTycoonManagementWidget::BuyNPCBorderSlide()
+void URSTycoonManagementWidget::CloseBuyTileLayout()
 {
-	if (BuyNPCBorderSlideAni)
+	if (bOpenBuyTileLayout)
 	{
-		if (bIsBuyNPCBorderValid == false)
-		{
-			if (bIsBuyTileBorderValid)
-			{
-				PlayAnimation(BuyTileBorderCloseAni);
-				bIsBuyTileBorderValid = false;
-			}
-
-			PlayAnimation(BuyNPCBorderSlideAni);
-			bIsBuyNPCBorderValid = true;
-		}
-		else
-		{
-			PlayAnimation(BuyNPCBorderCloseAni);
-			bIsBuyNPCBorderValid = false;
-		}
+		bOpenBuyTileLayout = false;
+		PlayAnimation(BuyTileBorderCloseAni);
 	}
 }
 
-void URSTycoonManagementWidget::HandleWaiterClick()
+void URSTycoonManagementWidget::OpenBuyNPCLayout()
 {
-	OnWaiterClicked_BP();
+	CloseBuyTileLayout();
+	
+	if (!bOpenBuyNPCLayout)
+	{
+		bOpenBuyNPCLayout = true;
+		PlayAnimation(BuyNPCBorderSlideAni);
+	}
 }
 
-void URSTycoonManagementWidget::HandleChefClick()
+void URSTycoonManagementWidget::CloseBuyNPCLayout()
 {
-	OnChefClicked_BP();
+	if (bOpenBuyNPCLayout)
+	{
+		PlayAnimation(BuyNPCBorderCloseAni);
+		bOpenBuyNPCLayout = false;
+	}
 }

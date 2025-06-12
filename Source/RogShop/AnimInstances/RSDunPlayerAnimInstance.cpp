@@ -48,15 +48,23 @@ void URSDunPlayerAnimInstance::PlayFootstepSound() //발소리 재생 함수
 	}
 
 	FVector Start = Character->GetActorLocation();
-	FVector End = Start - FVector(0, 0, 50);
+	FVector End = Start - FVector(0, 0, 200);
 
-	FHitResult HitResult;
+	FHitResult HitResult;		
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(Character);
 
 	if (Character->GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params))
 	{
 		UPhysicalMaterial* PhysMat = HitResult.PhysMaterial.Get();
+		if (!PhysMat)
+		{
+			if (UMaterialInterface* Mat = HitResult.GetComponent()->GetMaterial(0))
+			{
+				PhysMat = Mat->GetPhysicalMaterial();
+			}
+		}
+
 		if (PhysMat)
 		{
 			EPhysicalSurface SurfaceType = UPhysicalMaterial::DetermineSurfaceType(PhysMat);

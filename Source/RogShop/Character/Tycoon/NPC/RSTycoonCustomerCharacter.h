@@ -68,4 +68,18 @@ private:
 	// 스켈레탈 메시 관련
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SkeletalMesh", meta = (AllowPrivateAccess = true))
 	FSkeletalMeshMergeParams SkeletalMeshMergeParams;
+
+	// 애님 몽타주
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UAnimMontage> SitMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UAnimMontage> EatMontage;
+
+	// 사운드
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	TObjectPtr<USoundBase> SitSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	TObjectPtr<USoundBase> ExitSound;
 };

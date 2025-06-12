@@ -13,9 +13,6 @@ UCLASS()
 class ROGSHOP_API URSGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
-	
-public:
-	void TravelToLevel(const TSoftObjectPtr<UWorld>& TargetLevelAsset) const;
 
 public:
 	bool GetDebugLogEnabled() const;

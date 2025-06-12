@@ -36,12 +36,4 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
 	TObjectPtr<UButton> CloseButton;
-
-// 버튼 클릭으로 이동 할 레벨
-private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level", meta = (AllowPrivateAccess = "true"))
-	TSoftObjectPtr<UWorld> MainMenuLevelAsset;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level", meta = (AllowPrivateAccess = "true"))
-	TSoftObjectPtr<UWorld> BaseAreaLevelAsset;
 };

@@ -4,6 +4,9 @@
 #include "RSInGameMenuWidget.h"
 #include "Components/Button.h"
 #include "RSGameInstance.h"
+#include "RSLevelSubsystem.h"
+#include "RSSaveGameSubsystem.h"
+#include "RSDunPlayerController.h"
 
 void URSInGameMenuWidget::NativeConstruct()
 {
@@ -30,19 +33,38 @@ void URSInGameMenuWidget::OnMainMenuButtonClicked()
 	URSGameInstance* RSGameInstance = Cast<URSGameInstance>(GetWorld()->GetGameInstance());
 	if (RSGameInstance)
 	{
-		RSGameInstance->TravelToLevel(MainMenuLevelAsset);
+		URSLevelSubsystem* LevelSubsystem = RSGameInstance->GetSubsystem<URSLevelSubsystem>();
+
+		if (LevelSubsystem)
+		{
+			LevelSubsystem->TravelToLevel(ERSLevelCategory::MainMenu);
+		}
 	}
 }
 
 void URSInGameMenuWidget::OnBaseAreaButtonClicked()
 {
-	// TODO : 던전에서는 기존 던전 세이브 제거
+	// 던전 세이브 파일 제거
+	UGameInstance* CurGameInstance = GetGameInstance();
+	if (CurGameInstance)
+	{
+		URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+		if (SaveGameSubsystem)
+		{
+			SaveGameSubsystem->DeleteDungeonSaveFile();
+		}
+	}
 
 	// 레벨 이동
 	URSGameInstance* RSGameInstance = Cast<URSGameInstance>(GetWorld()->GetGameInstance());
 	if (RSGameInstance)
 	{
-		RSGameInstance->TravelToLevel(BaseAreaLevelAsset);
+		URSLevelSubsystem* LevelSubsystem = RSGameInstance->GetSubsystem<URSLevelSubsystem>();
+
+		if (LevelSubsystem)
+		{
+			LevelSubsystem->TravelToLevel(ERSLevelCategory::BaseArea);
+		}
 	}
 }
 
@@ -51,13 +73,10 @@ void URSInGameMenuWidget::OnCloseButtonClicked()
 	// 메뉴 닫기
 	if (GetWorld())
 	{
-		SetVisibility(ESlateVisibility::Hidden);
-
-		if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+		ARSDunPlayerController* PC = GetOwningPlayer<ARSDunPlayerController>();
+		if (PC)
 		{
-			FInputModeGameOnly InputMode;
-			PC->SetInputMode(InputMode);
-			PC->bShowMouseCursor = false;
+			PC->ToggleInGameMenuWidget();
 		}
 	}
 }
