@@ -3,6 +3,7 @@
 
 #include "MainMenuWidget.h"
 #include "Components/Button.h"
+#include "Components/CanvasPanelSlot.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
 #include "RSGameInstance.h"
@@ -19,10 +20,9 @@ void UMainMenuWidget::NativeConstruct()
 		StartButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnStartButtonClicked);
 	}
 
-	// TODO : 만약 불러올 세이브 파일이 하나도 없는 경우 해당 버튼이 보이거나 위치하면 안된다.
-	// 해당 버튼을 숨기고 로드 버튼의 위치에 StartButton을 위치하게 한다.
+	// 불러올 세이브 파일이 하나도 없는 경우 불러오기 버튼을 숨기고 해당 버튼의 위치에 StartButton을 위치하게 한다.
 	URSGameInstance* RSGameInstance = Cast<URSGameInstance>(GetWorld()->GetGameInstance());
-	if (LoadButton && RSGameInstance)
+	if (LoadButton && StartButton && RSGameInstance)
 	{
 		// 던전에 대한 모든 세이브 파일이 있는지 확인한다.
 		URSSaveGameSubsystem* SaveGameSubsystem = RSGameInstance->GetSubsystem<URSSaveGameSubsystem>();
@@ -39,7 +39,18 @@ void UMainMenuWidget::NativeConstruct()
 			else
 			{
 				LoadButton->SetVisibility(ESlateVisibility::Hidden);
-				
+
+				UCanvasPanelSlot* LoadButtonSlot = Cast<UCanvasPanelSlot>(LoadButton->Slot);
+				if (LoadButtonSlot)
+				{
+					FVector2D LoadButtonPosition = LoadButtonSlot->GetPosition();
+
+					UCanvasPanelSlot* StartButtonSlot = Cast<UCanvasPanelSlot>(StartButton->Slot);
+					if (StartButtonSlot)
+					{
+						StartButtonSlot->SetPosition(LoadButtonPosition);
+					}
+				}
 			}
 		}
 	}
