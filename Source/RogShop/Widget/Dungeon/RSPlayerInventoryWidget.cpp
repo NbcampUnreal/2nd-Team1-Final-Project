@@ -3,6 +3,7 @@
 #include "RSPlayerInventoryWidget.h"
 
 #include "Components/Button.h"
+#include "RSDunPlayerController.h"
 
 void URSPlayerInventoryWidget::NativeConstruct()
 {
@@ -16,9 +17,15 @@ void URSPlayerInventoryWidget::NativeConstruct()
 
 void URSPlayerInventoryWidget::OnExitBtnClicked()
 {
-    SetMouseMode(false);
-
-    SetVisibility(ESlateVisibility::Hidden);
+    // 인벤토리 닫기
+    if (GetWorld())
+    {
+        ARSDunPlayerController* PC = GetOwningPlayer<ARSDunPlayerController>();
+        if (PC)
+        {
+            PC->TogglePlayerInventoryWidget();
+        }
+    }
 }
 
 void URSPlayerInventoryWidget::SetMouseMode(bool bEnable)
