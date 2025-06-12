@@ -71,3 +71,91 @@ void URSSaveGameSubsystem::AddIngredientDungeonToTycoon(FName IngredientKey, int
 		RS_LOG_C("재료를 추가하지 못했습니다.", FColor::Red);
 	}
 }
+
+void URSSaveGameSubsystem::DeleteAllSaveFile()
+{
+	DeleteDungeonSaveFile();
+
+	if (UGameplayStatics::DoesSaveGameExist(TycoonSaveSlot, 0))
+	{
+		UGameplayStatics::DeleteGameInSlot(TycoonSaveSlot, 0);
+	}
+
+	if (UGameplayStatics::DoesSaveGameExist(TycoonTileMapSaveSlot, 0))
+	{
+		UGameplayStatics::DeleteGameInSlot(TycoonTileMapSaveSlot, 0);
+	}
+}
+
+void URSSaveGameSubsystem::DeleteDungeonSaveFile()
+{
+	if (UGameplayStatics::DoesSaveGameExist(IngredientInventorySaveSlotName, 0))
+	{
+		UGameplayStatics::DeleteGameInSlot(IngredientInventorySaveSlotName, 0);
+	}
+
+	if (UGameplayStatics::DoesSaveGameExist(WeaponSaveSlotName, 0))
+	{
+		UGameplayStatics::DeleteGameInSlot(WeaponSaveSlotName, 0);
+	}
+
+	if (UGameplayStatics::DoesSaveGameExist(RelicSaveSlotName, 0))
+	{
+		UGameplayStatics::DeleteGameInSlot(RelicSaveSlotName, 0);
+	}
+
+	if (UGameplayStatics::DoesSaveGameExist(StatusSaveSlotName, 0))
+	{
+		UGameplayStatics::DeleteGameInSlot(StatusSaveSlotName, 0);
+	}
+
+	if (UGameplayStatics::DoesSaveGameExist(DungeonInfoSaveSlotName, 0))
+	{
+		UGameplayStatics::DeleteGameInSlot(DungeonInfoSaveSlotName, 0);
+	}
+}
+
+bool URSSaveGameSubsystem::DoesDungeonSaveFileExist()
+{
+	if (!UGameplayStatics::DoesSaveGameExist(IngredientInventorySaveSlotName, 0))
+	{
+		return false;
+	}
+
+	if (!UGameplayStatics::DoesSaveGameExist(WeaponSaveSlotName, 0))
+	{
+		return false;
+	}
+
+	if (!UGameplayStatics::DoesSaveGameExist(RelicSaveSlotName, 0))
+	{
+		return false;
+	}
+
+	if (!UGameplayStatics::DoesSaveGameExist(StatusSaveSlotName, 0))
+	{
+		return false;
+	}
+
+	if (!UGameplayStatics::DoesSaveGameExist(DungeonInfoSaveSlotName, 0))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool URSSaveGameSubsystem::DoesTycoonSaveFileExist()
+{
+	if (UGameplayStatics::DoesSaveGameExist(TycoonSaveSlot, 0))
+	{
+		return true;
+	}
+
+	if (UGameplayStatics::DoesSaveGameExist(TycoonTileMapSaveSlot, 0))
+	{
+		return true;
+	}
+
+	return false;
+}

@@ -3,7 +3,7 @@
 
 #include "RSDataSubsystem.h"
 
-#include "RogShop/RSDataSubsystemSettings.h"
+#include "RSDataSubsystemSettings.h"
 #include "RogShop/UtilDefine.h"
 
 void URSDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)

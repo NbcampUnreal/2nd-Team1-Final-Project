@@ -162,6 +162,16 @@ void ARSTycoonChefCharacter::TryCook()
 		FoodBubble->SetImage(GameMode->GetOrderToCook().FoodKey);
 		
 		PlacedCookingTile->Interact(this);
+
+		if (CookingMontage && GetMesh())
+		{
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+			if (AnimInstance)
+			{
+				PlayAnimMontage(CookingMontage);
+			}
+		}
 	}
 }
 
