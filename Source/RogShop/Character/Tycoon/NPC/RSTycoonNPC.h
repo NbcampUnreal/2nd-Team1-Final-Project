@@ -22,6 +22,8 @@ public:
 	void MoveToTarget(FVector Location, AActor* Target);
 
 	bool HasTarget() const { return MoveTarget != nullptr; }
+	FString GetDisplayName() const { return DisplayName; }
+	int32 GetPrice() const { return Price; }
 	
 protected:
 	virtual void BeginPlay() override;
@@ -40,4 +42,10 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<AActor> MoveTarget;
+
+	UPROPERTY(EditAnywhere)
+	FString DisplayName = TEXT("NPC");
+	
+	UPROPERTY(EditAnywhere)
+	int32 Price = 10;
 };
