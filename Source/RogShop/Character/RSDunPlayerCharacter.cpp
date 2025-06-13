@@ -22,6 +22,8 @@
 #include "RSSaveGameSubsystem.h"
 #include "RSDungeonStatusSaveGame.h"
 #include "RogShop/UtilDefine.h"
+#include "Animation/AnimNotifies/AnimNotifyState.h"
+
 
 // Sets default values
 ARSDunPlayerCharacter::ARSDunPlayerCharacter()
@@ -48,9 +50,11 @@ ARSDunPlayerCharacter::ARSDunPlayerCharacter()
     // 캐릭터가 컨트롤러 Yaw를 따르지 않도록 설정
     bUseControllerRotationYaw = false;
 
-    // 구르기 및 사망 시 재생하는 애니메이션 몽타주
+    // 플레이어 캐릭터가 가지는 애니메이션 몽타주 및 관련 변수
     DodgeMontage = nullptr;
     DeathMontage = nullptr;
+
+    bIsMontageSkippable = true;
 
     // 던전 재화
     LifeEssence = 0;
@@ -338,14 +342,11 @@ void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
         }
     }
 
-    // 몽타주를 재생중이지 않은 경우 구르기 실행
-    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-    if (AnimInstance && DodgeMontage)
+    // TODO : TrySkipMontage을 호출하고 반환값이 true인 경우 구르기 실행
+
+    if (TrySkipMontage())
     {
-        if (!AnimInstance->IsAnyMontagePlaying())
-        {
-            PlayAnimMontage(DodgeMontage);
-        }
+        PlayAnimMontage(DodgeMontage);
     }
 }
 
@@ -412,6 +413,74 @@ void ARSDunPlayerCharacter::ToggleInGameMenuUI(const FInputActionValue& value)
     }
 
     RS_LOG_DEBUG("ToggleInGameMenuUI Activated");
+}
+
+void ARSDunPlayerCharacter::SetIsMontageSkippable(bool NewbIsMontageSkippable)
+{
+    bIsMontageSkippable = NewbIsMontageSkippable;
+}
+
+bool ARSDunPlayerCharacter::IsSkippingMontage() const
+{
+    return bIsSkippingMontage;
+}
+
+bool ARSDunPlayerCharacter::TrySkipMontage()
+{
+    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+    // 애니메이션 인스턴스가 유효하고 스킵 가능한 상태인 경우
+    if (AnimInstance && bIsMontageSkippable)
+    {
+        // 몽타주를 재생 중인 경우
+        if (AnimInstance->IsAnyMontagePlaying())
+        {
+            UAnimMontage* CurrentMontage = AnimInstance->GetCurrentActiveMontage();
+
+            if (CurrentMontage)
+            {
+                // 스킵 로직 시작
+                bIsSkippingMontage = true;
+
+                // 현재 몽타주의 재생 시간을 가져온다.
+                float CurrentPostion = AnimInstance->Montage_GetPosition(CurrentMontage);
+                // 현재 몽타주의 총 재생 시간을 가져온다.
+                float CurrentPlayLength = CurrentMontage->GetPlayLength();
+                // 현재 재생 시간으로부터 총 재생 시간까지 남은 시간을 구한다.
+                float DeltaTime = CurrentPlayLength - CurrentPostion;
+
+                // 현재 재생 시간으로부터 DeltaTime까지의 위치에 존재하는 노티파이를 모두 가져온다.
+                TArray<const FAnimNotifyEvent*> SkippedNotifies;
+                CurrentMontage->GetAnimNotifies(CurrentPostion, DeltaTime, false, SkippedNotifies);
+
+                // 노티파이를 순회한다.
+                for (const FAnimNotifyEvent* NotifyState : SkippedNotifies)
+                {
+                    // 노티파이 스테이트인 경우에만 NotifyEnd를 호출한다.
+                    if (NotifyState && NotifyState->NotifyStateClass)
+                    {
+                        NotifyState->NotifyStateClass->NotifyEnd(GetMesh(), CurrentMontage);
+                    }
+                }
+
+                // 몽타주를 스킵한다.
+                AnimInstance->Montage_Stop(0.f, CurrentMontage);
+
+                // 스킵 로직 끝
+                bIsSkippingMontage = false;
+
+                // 몽타주를 스킵한 경우
+                return true;
+            }
+        }
+        else
+        {
+            // 몽타주 재생 중이 아닌 상태다.
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void ARSDunPlayerCharacter::SetLifeEssence(int32 Amount)

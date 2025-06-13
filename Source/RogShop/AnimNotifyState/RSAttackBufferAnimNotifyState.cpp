@@ -4,6 +4,7 @@
 #include "RSAttackBufferAnimNotifyState.h"
 #include "RSDunPlayerCharacter.h"
 #include "RSPlayerWeaponComponent.h"
+#include "RogShop/UtilDefine.h"
 
 URSAttackBufferAnimNotifyState::URSAttackBufferAnimNotifyState()
 {
@@ -13,6 +14,8 @@ URSAttackBufferAnimNotifyState::URSAttackBufferAnimNotifyState()
 void URSAttackBufferAnimNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
 	Super::NotifyBegin(MeshComp, Animation, TotalDuration);
+
+	RS_LOG_C("RSAttackBufferAnimNotifyState Begin", FColor::Blue);
 
 	bNextAnimStart = false;
 }
@@ -43,10 +46,7 @@ void URSAttackBufferAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp,
 {
 	Super::NotifyEnd(MeshComp, Animation);
 
-	if (bNextAnimStart)
-	{
-		return;
-	}
+	RS_LOG_C("RSAttackBufferAnimNotifyState End", FColor::Blue);
 
 	if (!MeshComp)
 	{
@@ -55,6 +55,12 @@ void URSAttackBufferAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp,
 
 	ARSDunPlayerCharacter* PlayerCharacter = MeshComp->GetOwner<ARSDunPlayerCharacter>();
 	if (!PlayerCharacter)
+	{
+		return;
+	}
+
+	// 다음 콤보 공격을 진행해야하며, 몽타주를 스킵한 상태가 아닌 경우
+	if (bNextAnimStart && !PlayerCharacter->IsSkippingMontage())
 	{
 		return;
 	}

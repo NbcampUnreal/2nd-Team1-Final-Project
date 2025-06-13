@@ -95,6 +95,7 @@ void URSPlayerWeaponComponent::HandleNormalAttackInput()
 
 bool URSPlayerWeaponComponent::ContinueComboAttack()
 {
+	// 공격에 대한 입력 버퍼가 설정된 경우
 	if (bComboInputBuffered)
 	{
 		int8 Index = static_cast<int8>(WeaponSlot) - 1;
