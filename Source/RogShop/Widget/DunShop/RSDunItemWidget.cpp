@@ -24,6 +24,7 @@ void URSDunItemWidget::NativeConstruct()
 
     if (BuyBtn)
     {
+        BuyBtn->OnClicked.RemoveDynamic(this, &URSDunItemWidget::OnBuyClicked);
         BuyBtn->OnClicked.AddDynamic(this, &URSDunItemWidget::OnBuyClicked);
     }
 }

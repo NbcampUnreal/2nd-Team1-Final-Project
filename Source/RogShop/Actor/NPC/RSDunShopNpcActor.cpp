@@ -14,20 +14,30 @@ ARSDunShopNpcActor::ARSDunShopNpcActor()
 void ARSDunShopNpcActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ARSDunShopNpcActor::Interact(ARSDunPlayerCharacter* Interactor)
 {
-	if (!Interactor || !StoreWidgetClass) return;
+	if (!Interactor || !StoreWidgetClass)
+	{
+		return;
+	}
 
 	APlayerController* PC = Cast<APlayerController>(Interactor->GetController());
-	if (!PC) return;
+	if (!PC)
+	{
+		return;
+	}
 
-	UUserWidget* StoreWidget = CreateWidget<UUserWidget>(PC, StoreWidgetClass);
-	if (!StoreWidget) return;
+	if (!CachedStoreWidget)
+	{
+		CachedStoreWidget = CreateWidget<UUserWidget>(PC, StoreWidgetClass);
+	}
 
-	StoreWidget->AddToViewport();
+	if (CachedStoreWidget && !CachedStoreWidget->IsInViewport())
+	{
+		CachedStoreWidget->AddToViewport();
+	}
 }
 
 FText ARSDunShopNpcActor::GetInteractName() const
