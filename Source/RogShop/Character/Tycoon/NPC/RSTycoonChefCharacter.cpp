@@ -45,6 +45,14 @@ void ARSTycoonChefCharacter::Tick(float DeltaSeconds)
 	}
 }
 
+void ARSTycoonChefCharacter::StopAllAction()
+{
+	Super::StopAllAction();
+	
+	bCooking = false;
+	FoodBubbleWidgetComponent->SetVisibility(false);
+}
+
 void ARSTycoonChefCharacter::FindCookingTile()
 {
 	if (PlacedCookingTile)

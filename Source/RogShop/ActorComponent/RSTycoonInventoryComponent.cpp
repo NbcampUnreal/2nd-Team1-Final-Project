@@ -31,10 +31,7 @@ void URSTycoonInventoryComponent::Open()
 	URSIngredientInventoryWidget* InventoryWidget = Controller->GetInventoryWidget();
 	InventoryWidget->AddToViewport();
 
-	for (int32 i = 0; i < ItemList.Num(); i++)
-	{
-		InventoryWidget->UpdateSlots(i, ItemList[i]);
-	}
+	UpdateInventoryWidget();
 }
 
 void URSTycoonInventoryComponent::Close()
@@ -46,23 +43,42 @@ void URSTycoonInventoryComponent::Close()
 	Controller->GetInventoryWidget()->RemoveFromParent();
 }
 
+void URSTycoonInventoryComponent::UpdateInventoryWidget()
+{
+	ARSTycoonPlayerController* Controller = Cast<ARSTycoonPlayerController>(GetOwner());
+	check(Controller)
+
+	URSIngredientInventoryWidget* InventoryWidget = Controller->GetInventoryWidget();
+	check(InventoryWidget)
+
+	if (InventoryWidget->GetSlotNum() != ItemList.Num())
+	{
+		InventoryWidget->CreateSlots(ItemList.Num(), 5);
+	}
+
+	for (int i = 0; i < ItemList.Num(); i++)
+	{
+		InventoryWidget->UpdateSlots(i, ItemList[i]);
+	}
+}
+
 void URSTycoonInventoryComponent::SaveItemData()
 {
 	Super::SaveItemData();
 
+	const FString& SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonSaveSlot;
 	URSTycoonSaveGame* SaveGame =
-		Cast<URSTycoonSaveGame>(UGameplayStatics::CreateSaveGameObject(URSTycoonSaveGame::StaticClass()));
+		Cast<URSTycoonSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
 
 	SaveGame->Ingredients = ItemList;
 
-	const FString& SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonSaveSlot;
 	UGameplayStatics::SaveGameToSlot(SaveGame, SlotName, 0);
 }
 
 void URSTycoonInventoryComponent::LoadItemData()
 {
 	Super::LoadItemData();
-	
+
 	const FString& SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonSaveSlot;
 	URSTycoonSaveGame* SaveGame = Cast<URSTycoonSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
 	if (SaveGame)
@@ -71,16 +87,10 @@ void URSTycoonInventoryComponent::LoadItemData()
 	}
 }
 
-void URSTycoonInventoryComponent::SetInventorySlot(int32 Value)
+void URSTycoonInventoryComponent::BeginPlay()
 {
-	ARSTycoonPlayerController* Controller = Cast<ARSTycoonPlayerController>(GetOwner());
-	check(Controller)
+	Super::BeginPlay();
 
-	URSIngredientInventoryWidget* InventoryWidget = Controller->GetInventoryWidget();
-	InventoryWidget->CreateSlots(Value, 5);
-
-	for (int i = 0; i < ItemList.Num(); i++)
-	{
-		InventoryWidget->UpdateSlots(i, ItemList[i]);
-	}
+	GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->
+	            OnSaveRequested.AddDynamic(this, &URSTycoonInventoryComponent::SaveItemData);
 }

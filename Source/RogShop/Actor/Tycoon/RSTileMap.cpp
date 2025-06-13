@@ -12,6 +12,7 @@
 #include "RogShop/UtilDefine.h"
 #include "RogShop/SaveGame/Tycoon/RSTycoonTileMapSaveGame.h"
 #include "Tile/RSBaseTile.h"
+#include "Tile/RSCookingTile.h"
 #include "Tycoon/NPC/RSTycoonChefCharacter.h"
 #include "Tycoon/NPC/RSTycoonNPC.h"
 #include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
@@ -40,41 +41,6 @@ void ARSTileMap::ChangeTile(int32 Index, FName TileKey)
 
 	TileActors[Index] = CreateTile(TileType, Row, Column);
 	TileName2DMap[Row].Tiles[Column] = TileKey;
-}
-
-void ARSTileMap::SaveTileMap()
-{
-	// SaveGame 오브젝트 생성
-	URSTycoonTileMapSaveGame* SaveGameInstance = Cast<URSTycoonTileMapSaveGame>(
-		UGameplayStatics::CreateSaveGameObject(URSTycoonTileMapSaveGame::StaticClass()));
-
-	SaveGameInstance->Tile2DMap = TileName2DMap;
-	SaveGameInstance->Width = Width;
-	SaveGameInstance->Height = Height;
-
-	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
-	check(GameMode)
-
-	int32 WaiterCount = 0, ChefCount = 0;
-	for (ARSTycoonNPC* NPC : GameMode->GetNPCs())
-	{
-		if (NPC->IsA<ARSTycoonWaiterCharacter>())
-		{
-			WaiterCount++;
-		}
-
-		if (NPC->IsA<ARSTycoonChefCharacter>())
-		{
-			ChefCount++;
-		}
-	}
-
-	SaveGameInstance->WaiterCount = WaiterCount;
-	SaveGameInstance->ChefCount = ChefCount;
-
-	// 저장
-	FString SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
-	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SlotName, 0);
 }
 
 void ARSTileMap::ChangeTileSize(int32 NewWidth, int32 NewHeight)
@@ -115,6 +81,14 @@ void ARSTileMap::RotateTile(int32 Index, float YawValue)
 	TileName2DMap[Row].YawValues[Column] = YawValue;
 }
 
+void ARSTileMap::ResetAllTile()
+{
+	for (auto& Tile : TileActors)
+	{
+		Tile->ResetAll();
+	}
+}
+
 void ARSTileMap::SpawnActorInMap(UClass* ActorClass)
 {
 	FVector HalfTileSize = DefaultTileType->GetDefaultObject<ARSBaseTile>()->GetTileSize() * 0.5f;
@@ -127,6 +101,41 @@ void ARSTileMap::SpawnActorInMap(UClass* ActorClass)
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	GetWorld()->SpawnActor(ActorClass, &SpawnLocation, &FRotator::ZeroRotator, SpawnParams);
+}
+
+void ARSTileMap::SaveTileMap()
+{
+	// SaveGame 오브젝트 생성
+	URSTycoonTileMapSaveGame* SaveGameInstance = Cast<URSTycoonTileMapSaveGame>(
+		UGameplayStatics::CreateSaveGameObject(URSTycoonTileMapSaveGame::StaticClass()));
+
+	SaveGameInstance->Tile2DMap = TileName2DMap;
+	SaveGameInstance->Width = Width;
+	SaveGameInstance->Height = Height;
+
+	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
+	check(GameMode)
+
+	int32 WaiterCount = 0, ChefCount = 0;
+	for (ARSTycoonNPC* NPC : GameMode->GetNPCs())
+	{
+		if (NPC->IsA<ARSTycoonWaiterCharacter>())
+		{
+			WaiterCount++;
+		}
+
+		if (NPC->IsA<ARSTycoonChefCharacter>())
+		{
+			ChefCount++;
+		}
+	}
+
+	SaveGameInstance->WaiterCount = WaiterCount;
+	SaveGameInstance->ChefCount = ChefCount;
+
+	// 저장
+	FString SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
+	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SlotName, 0);
 }
 
 FVector ARSTileMap::GetMapCenter()
@@ -158,6 +167,8 @@ void ARSTileMap::BeginPlay()
 	LoadTileMap();
 	CreateTiles();
 	ActiveNPC();
+
+	GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->OnSaveRequested.AddDynamic(this, &ARSTileMap::SaveTileMap);
 }
 
 void ARSTileMap::LoadTileMap()

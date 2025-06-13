@@ -27,8 +27,9 @@ public:
 	ARSCookingTile();
 
 	GENERATED_TILE()
-
+	
 	virtual void Interact(ACharacter* InteractCharacter) override;
+	virtual void ResetAll() override;
 
 	FTransform GetChefTransform() const { return ChefLocation->GetComponentTransform(); }
 	ECookingState GetState() const { return State; }

@@ -24,8 +24,8 @@ public:
 	virtual FName GetTileKey() const { return GetStaticTileKey(); }
 	
 	virtual void Tick(float DeltaTime) override;
-
-	virtual void Interact(ACharacter* InteractCharacter) { }
+	virtual void ResetAll();
+	virtual void Interact(ACharacter* InteractCharacter);
 
 	FVector GetTileSize();
 	FString GetTileDisplayName() const { return TileDisplayName; }

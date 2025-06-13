@@ -39,6 +39,7 @@ void ARSTycoonPlayerController::StartWaitMode()
 	SetViewTargetWithBlend(MainCamera, 1.f);
 
 	SelectTileIndex = INDEX_NONE;
+	SelectTileActor->SetActorHiddenInGame(true);
 }
 
 void ARSTycoonPlayerController::StartSaleMode()
@@ -46,6 +47,11 @@ void ARSTycoonPlayerController::StartSaleMode()
 	FInputModeGameAndUI InputMode;
 	SetInputMode(InputMode);
 	ChangeMainWidget(SaleWidget);
+	
+	CustomerCount = 0;
+
+	SaleWidget->SetGold(Gold);
+	SaleWidget->SetCustomerCount(0);
 }
 
 void ARSTycoonPlayerController::EndSaleMode()
@@ -53,6 +59,8 @@ void ARSTycoonPlayerController::EndSaleMode()
 	FInputModeUIOnly InputMode;
 	SetInputMode(InputMode);
 	ChangeMainWidget(SaleResultWidget);
+
+	SaleWidget->RemoveAllOrderSlots();
 }
 
 void ARSTycoonPlayerController::StartManagementMode()
@@ -369,13 +377,23 @@ void ARSTycoonPlayerController::SettingChangeTile()
 
 void ARSTycoonPlayerController::AddGold(int32 Value)
 {
-	Gold += Value;
-	SaleWidget->SetGold(Gold);
+	SetGold(Gold + Value);
 }
 
 void ARSTycoonPlayerController::AddCustomerCount(int32 Value)
 {
-	CustomerCount += Value;
+	SetCustomerCount(CustomerCount + Value);
+}
+
+void ARSTycoonPlayerController::SetGold(int32 Value)
+{
+	Gold = Value;
+	SaleWidget->SetGold(Gold);
+}
+
+void ARSTycoonPlayerController::SetCustomerCount(int32 Value)
+{
+	CustomerCount = Value;
 	SaleWidget->SetCustomerCount(CustomerCount);
 }
 

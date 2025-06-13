@@ -20,6 +20,8 @@ public:
 
 	virtual void Pickup(AActor* Actor) override;
 	virtual AActor* Drop(FVector DropLocation) override;
+	virtual void StopAllAction() override;
+	
 	virtual AActor* GetPickupActor() override { return PickupActor; }
 	
 protected:

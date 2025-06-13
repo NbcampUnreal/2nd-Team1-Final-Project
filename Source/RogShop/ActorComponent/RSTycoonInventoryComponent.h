@@ -17,17 +17,23 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void Open();
+	
 	UFUNCTION(BlueprintCallable)
 	void Close();
-	UFUNCTION(BlueprintCallable, CallInEditor)
-	virtual void SaveItemData() override;
 	
+	void UpdateInventoryWidget();
+	
+	UFUNCTION()
+	virtual void SaveItemData() override;
 	virtual void LoadItemData() override;
 	
-	void SetInventorySlot(int32 Value);
+
 	
 	bool IsOpen() const { return bIsOpen; };
 
+protected:
+	virtual void BeginPlay() override;
+	
 private:
 	bool bIsOpen;
 };

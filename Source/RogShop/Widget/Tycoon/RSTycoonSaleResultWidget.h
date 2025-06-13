@@ -18,7 +18,8 @@ class ROGSHOP_API URSTycoonSaleResultWidget : public UUserWidget
 
 protected:
 	virtual void NativeOnInitialized() override;
-
+	virtual void NativeConstruct() override;
+	
 private:
 	UFUNCTION()
 	void ReturnWaitMode();

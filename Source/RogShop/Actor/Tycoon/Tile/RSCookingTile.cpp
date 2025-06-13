@@ -47,6 +47,23 @@ void ARSCookingTile::Interact(ACharacter* InteractCharacter)
 	}
 }
 
+void ARSCookingTile::ResetAll()
+{
+	Super::ResetAll();
+
+	State = ECookingState::None;
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+
+	CookingFoodOrder.Customer = nullptr;
+	CookingFoodOrder.FoodKey = FName();
+
+	if (CookedFood)
+	{
+		CookedFood->Destroy();
+		CookedFood = nullptr;
+	}
+}
+
 void ARSCookingTile::OrderToCook()
 {
 	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
@@ -74,7 +91,7 @@ void ARSCookingTile::Cook(FFoodOrder Order)
 	FCookFoodData* Data = GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Food
 	                                       ->FindRow<FCookFoodData>(Order.FoodKey, TEXT("Get FoodData"));
 
-	
+
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(Controller)
 	//사용한 재료 제거
@@ -82,11 +99,12 @@ void ARSCookingTile::Cook(FFoodOrder Order)
 	{
 		Controller->GetInventoryComponent()->RemoveItem(Need.Key, Need.Value);
 	}
-	
+	Controller->GetInventoryComponent()->UpdateInventoryWidget();
+
 	//5초 후 완성
 	FTimerHandle Timer;
 	GetWorldTimerManager().SetTimer(Timer, this, &ARSCookingTile::FinishCook, 5.f, false);
-	
+
 	Controller->ActiveOrderSlot(Order, Timer);
 }
 
@@ -100,13 +118,13 @@ void ARSCookingTile::FinishCook()
 	ARSBaseFood* Food = GetWorld()->SpawnActor<ARSBaseFood>(Data->ActorType);
 	Food->SetActorLocation(FoodLocation->GetComponentLocation());
 	Food->Order = CookingFoodOrder;
-	
+
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(Controller)
 	Controller->FinishOrderSlot(CookingFoodOrder);
-	
+
 	CookedFood = Food;
-	CookingFoodOrder = FFoodOrder();	//초기화
+	CookingFoodOrder = FFoodOrder(); //초기화
 }
 
 void ARSCookingTile::TakeFood(ACharacter* InteractCharacter)
@@ -115,11 +133,11 @@ void ARSCookingTile::TakeFood(ACharacter* InteractCharacter)
 	{
 		//오더 슬롯 제거
 		GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->RemoveOrderSlot(CookedFood->Order);
-		
+
 		IRSCanPickup* CanPickupCharacter = Cast<IRSCanPickup>(InteractCharacter);
 		check(CanPickupCharacter)
 		CanPickupCharacter->Pickup(CookedFood);
-		
+
 		CookedFood = nullptr;
 		State = ECookingState::None;
 	}

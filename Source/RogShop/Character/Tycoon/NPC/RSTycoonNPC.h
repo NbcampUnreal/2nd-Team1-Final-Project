@@ -20,14 +20,16 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void MoveToTarget(FVector Location, AActor* Target);
-
+	
+	virtual void StopAllAction();
+	
 	bool HasTarget() const { return MoveTarget != nullptr; }
 	FString GetDisplayName() const { return DisplayName; }
 	int32 GetPrice() const { return Price; }
 	
 protected:
 	virtual void BeginPlay() override;
-	virtual void InteractTarget(AActor* TargetActor) {}
+	virtual void InteractTarget(AActor* TargetActor);
 	
 private:
 	UFUNCTION()

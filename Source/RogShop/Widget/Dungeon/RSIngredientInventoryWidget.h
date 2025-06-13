@@ -26,6 +26,8 @@ public:
     UFUNCTION()
     void UpdateSlots(int32 IngredientSlotIndex, FItemSlot IngredientItemSlot);
 
+    int32 GetSlotNum() const { return InvecntorySlots.Num(); }
+    
 private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<UUniformGridPanel> IngredientSlots;

@@ -64,6 +64,28 @@ AActor* ARSTycoonWaiterCharacter::Drop(FVector DropLocation)
 	return Temp;
 }
 
+void ARSTycoonWaiterCharacter::StopAllAction()
+{
+	Super::StopAllAction();
+
+	const FName TileKey = FName(TEXT("TargetTile"));
+	const FName CustomerKey = FName(TEXT("Customer"));
+	
+	AAIController* AIController = Cast<AAIController>(GetController());
+	check(AIController)
+	
+	AIController->GetBlackboardComponent()->SetValueAsObject(TileKey, nullptr);
+	AIController->GetBlackboardComponent()->SetValueAsObject(CustomerKey, nullptr);
+	AIController->StopMovement();
+	
+	if (PickupActor)
+	{
+		PickupActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		PickupActor->Destroy();
+		PickupActor = nullptr;
+	}
+}
+
 
 void ARSTycoonWaiterCharacter::InteractTarget(AActor* TargetActor)
 {
