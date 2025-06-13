@@ -22,7 +22,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-// ÄÄÆ÷³ÍÆ®
+// ì»´í¬ë„ŒíŠ¸
 public:
 	UBoxComponent* GetBoxComp() const;
 
@@ -32,9 +32,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
 	TObjectPtr<USkeletalMeshComponent> MeshComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
-	TObjectPtr<UBoxComponent> BoxComp;	// µ¥¹ÌÁö ·ÎÁ÷À» À§ÇÑ Äİ¸®Àü ¿ëµµÀÇ ÄÄÆ÷³ÍÆ®
+	TObjectPtr<UBoxComponent> BoxComp;	// ë°ë¯¸ì§€ ë¡œì§ì„ ìœ„í•œ ì½œë¦¬ì „ ìš©ë„ì˜ ì»´í¬ë„ŒíŠ¸
 
-// ¾Ö´Ï¸ŞÀÌ¼Ç
+// ì• ë‹ˆë©”ì´ì…˜
 public:
 	TSubclassOf<UAnimInstance> GetWeaponAnimInstnace() const;
 	UAnimMontage* GetNormalAttack(int32 Index) const;
@@ -42,25 +42,27 @@ public:
 		
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = true))
-	TSubclassOf<UAnimInstance> WeaponAnimInstnace; // ¹«±âÀÇ ±âº» ÀÌµ¿ ¾Ö´Ô ÀÎ½ºÅÏ½º
+	TSubclassOf<UAnimInstance> WeaponAnimInstnace; // ë¬´ê¸°ì˜ ê¸°ë³¸ ì´ë™ ì• ë‹˜ ì¸ìŠ¤í„´ìŠ¤
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = true))
-	TArray<TObjectPtr<UAnimMontage>> NormalAttacks; // ¹«±âÀÇ ±âº» °ø°İ ¸ùÅ¸ÁÖ
+	TArray<TObjectPtr<UAnimMontage>> NormalAttacks; // ë¬´ê¸°ì˜ ê¸°ë³¸ ê³µê²© ëª½íƒ€ì£¼
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = true))
-	TArray<TObjectPtr<UAnimMontage>> StrongAttacks; // ¹«±âÀÇ °­ °ø°İ ¸ùÅ¸ÁÖ
+	TArray<TObjectPtr<UAnimMontage>> StrongAttacks; // ë¬´ê¸°ì˜ ê°• ê³µê²© ëª½íƒ€ì£¼
 
-// Ãæµ¹
+// ì¶©ëŒ
 public:
+	// íŠ¸ë ˆì´ìŠ¤ ì±„ë„ì„ ì‚¬ìš©í•˜ê¸° ë•Œë¬¸ì— ë”ì´ìƒ ì‚¬ìš©í•˜ì§€ ì•ŠëŠ” ê¸°ëŠ¥
 	void StartOverlap();
+	// íŠ¸ë ˆì´ìŠ¤ ì±„ë„ì„ ì‚¬ìš©í•˜ê¸° ë•Œë¬¸ì— ë”ì´ìƒ ì‚¬ìš©í•˜ì§€ ì•ŠëŠ” ê¸°ëŠ¥
 	void EndOverlap();
 
 	float GetWeaponDamage() const;
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Status", meta = (AllowPrivateAccess = true))
-	float WeaponDamage;	// ¿À¹ö·¦ ½Ã °¡ÇÒ ¹«±â µ¥¹ÌÁö
+	float WeaponDamage;	// ì˜¤ë²„ë© ì‹œ ê°€í•  ë¬´ê¸° ë°ë¯¸ì§€
 
-// µ¥ÀÌÅÍ Å×ÀÌºíÀÇ RowNameÀ» ID°ªÀ¸·Î »ç¿ëÇÑ´Ù.
+// ë°ì´í„° í…Œì´ë¸”ì˜ RowNameì„ IDê°’ìœ¼ë¡œ ì‚¬ìš©í•œë‹¤.
 public:
 	FName GetDataTableKey() const;
 	void SetDataTableKey(FName NewDataTableKey);
