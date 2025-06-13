@@ -10,6 +10,7 @@ class URSWeaponInventoryWidget;
 class URSRelicInventoryWidget;
 class URSIngredientInventoryWidget;
 class UButton;
+class UTextBlock;
 
 UCLASS()
 class ROGSHOP_API URSPlayerInventoryWidget : public UUserWidget
@@ -31,10 +32,17 @@ private:
 
 private:
 	UFUNCTION()
+	void UpdateLifeEssence(int32 NewLifeEssenceQuantity);
+
+	UFUNCTION()
 	void OnExitBtnClicked();
 
 	void SetMouseMode(bool bEnable);
 
-	UPROPERTY(meta = (BindWidget))
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
+	TObjectPtr<UTextBlock> LifeEssenceQuantityText;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
 	TObjectPtr<UButton> ExitBtn;
 };

@@ -12,6 +12,7 @@
 
 #include "ItemInfoData.h"
 #include "RSDataSubsystem.h"
+#include "RSInventorySlotWidget.h"
 
 void URSPlayerStatusWidget::NativeOnInitialized()
 {
@@ -24,7 +25,6 @@ void URSPlayerStatusWidget::NativeOnInitialized()
         RSDunPlayerController->OnWeaponSlotChange.AddDynamic(this, &URSPlayerStatusWidget::UpdateWeaponSlot);
         RSDunPlayerController->OnHPChange.AddDynamic(this, &URSPlayerStatusWidget::UpdateHP);
         RSDunPlayerController->OnMaxHPChange.AddDynamic(this, &URSPlayerStatusWidget::UpdateMaxHP);
-        RSDunPlayerController->OnLifeEssenceChange.AddDynamic(this, &URSPlayerStatusWidget::UpdateLifeEssence);
     }
 }
 
@@ -40,32 +40,32 @@ void URSPlayerStatusWidget::UpdateWeaponSlot(int8 WeaponSlotIndex, FName WeaponK
 {
     if (URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>())
     {
-        if (DataSubsystem->WeaponInfo)
+        UDataTable* WeaponInfoDatable = DataSubsystem->WeaponInfo;
+        if (WeaponInfoDatable)
         {
-            const FItemInfoData* FoundData = DataSubsystem->WeaponInfo->FindRow<FItemInfoData>(
-                WeaponKey,
-                TEXT("WeaponInfo Data Lookup") // 디버깅용 Context
-            );
+            const FItemInfoData* FoundItemInfoDataRow = WeaponInfoDatable->FindRow<FItemInfoData>(WeaponKey, TEXT("Get ItemInfoData"));
 
-            if (FoundData)
+            if (FoundItemInfoDataRow)
             {
-                if (WeaponSlot1->Brush.GetResourceObject() == nullptr)
+                UObject* CurItemIcon = FoundItemInfoDataRow->ItemIcon;
+
+                if (WeaponSlot1->GetItemIcon() == nullptr)
                 {
-                    WeaponSlot1->SetBrushResourceObject(FoundData->ItemIcon);
+                    WeaponSlot1->SetSlotItemInfo(WeaponKey, CurItemIcon, "");
                 }
-                else if (WeaponSlot2->Brush.GetResourceObject() == nullptr)
+                else if (WeaponSlot2->GetItemIcon() == nullptr)
                 {
-                    WeaponSlot2->SetBrushResourceObject(FoundData->ItemIcon);
+                    WeaponSlot2->SetSlotItemInfo(WeaponKey, CurItemIcon, "");
                 }
                 else
                 {
                     if (WeaponSlotIndex == 0 || WeaponSlotIndex == 1)
                     {
-                        WeaponSlot1->SetBrushResourceObject(FoundData->ItemIcon);
+                        WeaponSlot1->SetSlotItemInfo(WeaponKey, CurItemIcon, "");
                     }
                     else
                     {
-                        WeaponSlot2->SetBrushResourceObject(FoundData->ItemIcon);
+                        WeaponSlot2->SetSlotItemInfo(WeaponKey, CurItemIcon, "");
                     }
                 }
             }
@@ -73,11 +73,11 @@ void URSPlayerStatusWidget::UpdateWeaponSlot(int8 WeaponSlotIndex, FName WeaponK
             {
                 if (WeaponSlotIndex == 0 || WeaponSlotIndex == 1)
                 {
-                    WeaponSlot1->SetBrushFromTexture(nullptr);
+                    WeaponSlot1->SetSlotItemInfo(NAME_None, nullptr, "");
                 }
                 else
                 {
-                    WeaponSlot2->SetBrushFromTexture(nullptr);
+                    WeaponSlot2->SetSlotItemInfo(NAME_None, nullptr, "");
                 }
             }
         }
@@ -103,14 +103,5 @@ void URSPlayerStatusWidget::UpdateMaxHP()
     {
         FString MaxHPString = FString::Printf(TEXT("%.0f"), PlayerChar->GetMaxHP()); // 소수점 없는 정수 형태로 변환
         MaxHPText->SetText(FText::FromString(MaxHPString));
-    }
-}
-
-void URSPlayerStatusWidget::UpdateLifeEssence(int NewLifeEssence)
-{
-    if (LifeEssenceText)
-    {
-        FString LifeEssenceString = FString::Printf(TEXT("%d"), NewLifeEssence); // 정수 형태로 변환
-        LifeEssenceText->SetText(FText::FromString(LifeEssenceString));
     }
 }

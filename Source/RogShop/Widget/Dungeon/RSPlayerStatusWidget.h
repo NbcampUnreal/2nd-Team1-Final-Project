@@ -7,7 +7,7 @@
 #include "RSPlayerStatusWidget.generated.h"
 
 class UTextBlock;
-class UImage;
+class URSInventorySlotWidget;
 
 UCLASS()
 class ROGSHOP_API URSPlayerStatusWidget : public UUserWidget
@@ -24,17 +24,11 @@ public:
     UFUNCTION()
     void UpdateMaxHP();
 
-    UFUNCTION()
-    void UpdateLifeEssence(int NewLifeEssence);
-
 protected:
     virtual void NativeOnInitialized() override;
     virtual void NativeConstruct() override;
 
 private:
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
-    TObjectPtr<UTextBlock> LifeEssenceText;
-
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<UTextBlock> MaxHPText;
 
@@ -42,8 +36,8 @@ private:
     TObjectPtr<UTextBlock> HPText;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
-    TObjectPtr<UImage> WeaponSlot1;
+    TObjectPtr<URSInventorySlotWidget> WeaponSlot1;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
-    TObjectPtr<UImage> WeaponSlot2;
+    TObjectPtr<URSInventorySlotWidget> WeaponSlot2;
 };
