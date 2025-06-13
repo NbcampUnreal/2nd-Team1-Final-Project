@@ -12,6 +12,7 @@
 #include "TimerManager.h"
 #include "Animation/AnimInstance.h"
 #include "MonsterData.h"
+#include "MonsterProjectileBase.h"
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
@@ -132,6 +133,9 @@ protected:
 	float DrawDebugLineThickness;	 // 디버그 라인의 두께
 
 	FTimerHandle detectDelayTimer;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<AActor> projectile;//원거리 투사체
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ActionData")
 	float meleeAtkRange;
