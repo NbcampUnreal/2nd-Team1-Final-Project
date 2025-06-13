@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "RSTycoonWaitWidget.generated.h"
 
+class UBorder;
+class UTextBlock;
 class UButton;
 /**
  * 
@@ -17,6 +19,7 @@ class ROGSHOP_API URSTycoonWaitWidget : public UUserWidget
 
 protected:
 	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
 
 private:
 	UFUNCTION()
@@ -38,4 +41,19 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UButton* OutButton;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UTextBlock* GoldText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UBorder* TutorialBorder;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UTextBlock* InDoorTileText;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UTextBlock* InTableTileText;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UTextBlock* InCookingTileText;
 };

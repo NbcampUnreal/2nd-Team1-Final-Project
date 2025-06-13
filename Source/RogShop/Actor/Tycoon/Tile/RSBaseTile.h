@@ -50,5 +50,6 @@ protected:
 	TObjectPtr<UTexture2D> Thumbnail;
 	
 protected:
+	UPROPERTY(EditDefaultsOnly)
 	FString TileDisplayName = TEXT("기본");
 };

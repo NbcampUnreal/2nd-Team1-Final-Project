@@ -62,6 +62,8 @@ const TArray<UAnimMontage*>& ARSBaseWeapon::GetNormalAttacks() const
 
 void ARSBaseWeapon::StartOverlap()
 {
+	// 트레이스 채널을 사용하기 때문에 더이상 사용하지 않는 기능
+
 	// 콜리전과 오버랩 이벤트를 켠다.
 	SetActorEnableCollision(true);
 	BoxComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -70,6 +72,8 @@ void ARSBaseWeapon::StartOverlap()
 
 void ARSBaseWeapon::EndOverlap()
 {
+	// 트레이스 채널을 사용하기 때문에 더이상 사용하지 않는 기능
+
 	// 콜리전과 오버랩 이벤트를 끈다.
 	SetActorEnableCollision(false);
 	BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);

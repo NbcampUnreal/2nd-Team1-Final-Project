@@ -7,7 +7,6 @@
 #include "RSDoorTile.generated.h"
 
 class ARSTableTile;
-struct FCookFoodData;
 class ARSTycoonCustomerCharacter;
 
 UCLASS()
