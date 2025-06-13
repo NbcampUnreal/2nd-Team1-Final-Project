@@ -19,21 +19,10 @@ public:
 	// 로그 입출력 관리
 	bool GetDebugLogEnabled() const;
 	void SetDebugLogEnabled(bool bEnable);
-	
-	const TArray<TPair<FName, FItemInfoData*>>& GetCachedDunShopItems() const;
 
 	// 구매한 아이템의 아이디 저장
 	TArray<FName> PurchasedItemIDs;
 
 private:
-	virtual void Init() override;
-
 	bool bEnableDebugLog = false;
-
-	// 상점 아이템 한 번만 추출하는 함수
-	void PopulateShopItemsOneTime();
-	EItemRarity GetRandomRarity();
-	TPair<FName, struct FItemInfoData*> GetRandomItemFromDataTable(UDataTable* WeaponDataTable, UDataTable* RelicDataTable);
-
-	TArray<TPair<FName, FItemInfoData*>> CachedDunShopItems;
 };

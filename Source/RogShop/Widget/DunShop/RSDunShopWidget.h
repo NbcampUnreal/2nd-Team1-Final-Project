@@ -29,7 +29,11 @@ private:
     void OnExitClicked();
 
     void SetMouseMode(bool bEnable);
-    void PopulateShopItems();
+    void ShowShopItems();
+    void PopulateShopItemsOneTime();
+
+    EItemRarity GetRandomRarity();
+    TPair<FName, struct FItemInfoData*> GetRandomItemFromDataTable(UDataTable* WeaponDataTable, UDataTable* RelicDataTable);
 
     UPROPERTY(EditDefaultsOnly)
     TSubclassOf<UUserWidget> RSDunShopItemWidgetClass;
@@ -42,4 +46,6 @@ private:
 
     UPROPERTY(meta = (BindWidget))
     TObjectPtr<UHorizontalBox> ItemHorizontalBox;
+
+    TArray<TPair<FName, FItemInfoData*>> CachedDunShopItems;
 };
