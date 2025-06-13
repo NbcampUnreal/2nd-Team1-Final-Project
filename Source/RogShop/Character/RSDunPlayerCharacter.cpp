@@ -379,7 +379,25 @@ void ARSDunPlayerCharacter::FirstWeaponSlot(const FInputActionValue& value)
     // 추후에 해당 무기로 전환되는 기능 구현해야한다.
     RS_LOG_DEBUG("FirstWeaponSlot Activated");
 
-    WeaponComp->EquipWeaponToCharacter(EWeaponSlot::FirstWeaponSlot);
+    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+    if (!AnimInstance)
+    {
+        return;
+    }
+
+    // 무기 교체 애니메이션을 재생 중이지 않으며, 스킵이 가능한 경우
+    if (!AnimInstance->Montage_IsPlaying(ChangeWeaponMontage) && TrySkipMontage())
+    {
+        // 타겟 슬롯을 변경
+        WeaponComp->SetChangeTargetSlot(EWeaponSlot::FirstWeaponSlot);
+
+        // 변경한 타겟 슬롯으로 무기 교체가 가능한지 확인
+        if (WeaponComp->CanChangeTargetSlot())
+        {
+            // 무기 교체 몽타주 재생
+            PlayAnimMontage(ChangeWeaponMontage);
+        }
+    }
 }
 
 void ARSDunPlayerCharacter::SecondWeaponSlot(const FInputActionValue& value)
@@ -388,7 +406,25 @@ void ARSDunPlayerCharacter::SecondWeaponSlot(const FInputActionValue& value)
     // 추후에 해당 무기로 전환되는 기능 구현해야한다.
     RS_LOG_DEBUG("SecondWeaponSlot Activated");
 
-    WeaponComp->EquipWeaponToCharacter(EWeaponSlot::SecondWeaponSlot);
+    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+    if (!AnimInstance)
+    {
+        return;
+    }
+
+    // 무기 교체 애니메이션을 재생 중이지 않으며, 스킵이 가능한 경우
+    if (!AnimInstance->Montage_IsPlaying(ChangeWeaponMontage) && TrySkipMontage())
+    {
+        // 타겟 슬롯을 변경
+        WeaponComp->SetChangeTargetSlot(EWeaponSlot::SecondWeaponSlot);
+
+        // 변경한 타겟 슬롯으로 무기 교체가 가능한지 확인
+        if (WeaponComp->CanChangeTargetSlot())
+        {
+            // 무기 교체 몽타주 재생
+            PlayAnimMontage(ChangeWeaponMontage);
+        }
+    }
 }
 
 void ARSDunPlayerCharacter::ToggleInventoryUI(const FInputActionValue& value)

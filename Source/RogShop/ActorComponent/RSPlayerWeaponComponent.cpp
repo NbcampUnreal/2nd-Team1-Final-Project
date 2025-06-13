@@ -232,7 +232,8 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 
 		EWeaponSlot TempWeaponSlot = WeaponSlot;
 		WeaponSlot = EWeaponSlot::NONE;
-		EquipWeaponToCharacter(TempWeaponSlot);
+		ChangeTargetSlot = TempWeaponSlot;
+		EquipWeaponToCharacter();
 
 		// UI 갱신되도록 이벤트 디스패처 호출
 		FName NewWeaponKey = NewWeaponActor->GetDataTableKey();
@@ -306,63 +307,6 @@ void URSPlayerWeaponComponent::DropWeaponToSlot(EWeaponSlot TargetWeaponSlot)
 	}
 }
 
-void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSlot)
-{
-	// 잘못된 값이 들어왔는지 확인
-	if (EWeaponSlot::NONE == TargetWeaponSlot)
-	{
-		return;
-	}
-
-	// 바꾸려는 슬롯이 비어있는 경우 취소
-	int8 TargetIndex = static_cast<int8>(TargetWeaponSlot) - 1;
-	if (!WeaponActors.IsValidIndex(TargetIndex) || !WeaponActors[TargetIndex])
-	{
-		return;
-	}
-	
-	// 바꾸려는 슬롯이 현재 슬롯인 경우 취소
-	int8 CurrentIndex = static_cast<int8>(WeaponSlot) - 1;
-	if (CurrentIndex == TargetIndex)
-	{
-		return;
-	}
-
-	// 기존에 착용하고 있던 무기가 유효한 경우
-	if (WeaponActors.IsValidIndex(CurrentIndex) && WeaponActors[CurrentIndex])
-	{
-		// 장착 중인 무기를 제거한다.
-		UnEquipWeaponToCharacter();
-	}
-
-	// 새로 착용할 무기가 유효한 경우
-	if (WeaponActors.IsValidIndex(TargetIndex) && WeaponActors[TargetIndex])
-	{
-		ARSBaseWeapon* TargetEquipWeapon = WeaponActors[TargetIndex];
-		if (TargetEquipWeapon)
-		{
-			// 새로 착용할 무기의 숨김 처리를 끈다.
-			TargetEquipWeapon->SetActorHiddenInGame(false);
-
-			// 무기의 애님 레이어를 적용한다.
-			TSubclassOf<UAnimInstance> TargetAnimInstance = TargetEquipWeapon->GetWeaponAnimInstnace();
-
-			ACharacter* CurCharacter = GetOwner<ACharacter>();
-			if (CurCharacter)
-			{
-				USkeletalMeshComponent* SkeletalMeshComp = CurCharacter->GetMesh();
-				if (SkeletalMeshComp)
-				{
-					SkeletalMeshComp->LinkAnimClassLayers(TargetAnimInstance);
-				}
-			}
-
-			// 현재 슬롯을 변경한다.
-			WeaponSlot = TargetWeaponSlot;
-		}
-	}
-}
-
 void URSPlayerWeaponComponent::UnEquipWeaponToCharacter()
 {
 	// 잘못된 값이 들어왔는지 확인
@@ -395,6 +339,85 @@ void URSPlayerWeaponComponent::UnEquipWeaponToCharacter()
 
 		// 현재 슬롯을 변경한다.
 		WeaponSlot = EWeaponSlot::NONE;
+	}
+}
+
+void URSPlayerWeaponComponent::SetChangeTargetSlot(EWeaponSlot TargetWeaponSlot)
+{
+	ChangeTargetSlot = TargetWeaponSlot;
+}
+
+bool URSPlayerWeaponComponent::CanChangeTargetSlot()
+{
+	// 잘못된 값이 들어왔는지 확인
+	if (EWeaponSlot::NONE == ChangeTargetSlot)
+	{
+		return false;
+	}
+
+	// 바꾸려는 슬롯이 비어있는 경우 취소
+	int8 TargetIndex = static_cast<int8>(ChangeTargetSlot) - 1;
+	if (!WeaponActors.IsValidIndex(TargetIndex) || !WeaponActors[TargetIndex])
+	{
+		return false;
+	}
+
+	// 바꾸려는 슬롯이 현재 슬롯인 경우 취소
+	int8 CurrentIndex = static_cast<int8>(WeaponSlot) - 1;
+	if (CurrentIndex == TargetIndex)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void URSPlayerWeaponComponent::EquipWeaponToCharacter()
+{
+	bool bCanChangeSlot = CanChangeTargetSlot();
+	if (!bCanChangeSlot)
+	{
+		return;
+	}
+
+	int8 TargetIndex = static_cast<int8>(ChangeTargetSlot) - 1;
+
+	int8 CurrentIndex = static_cast<int8>(WeaponSlot) - 1;
+
+	// 기존에 착용하고 있던 무기가 유효한 경우
+	if (WeaponActors.IsValidIndex(CurrentIndex) && WeaponActors[CurrentIndex])
+	{
+		// 장착 중인 무기를 제거한다.
+		UnEquipWeaponToCharacter();
+	}
+
+	// 새로 착용할 무기가 유효한 경우
+	if (WeaponActors.IsValidIndex(TargetIndex) && WeaponActors[TargetIndex])
+	{
+		ARSBaseWeapon* TargetEquipWeapon = WeaponActors[TargetIndex];
+		if (TargetEquipWeapon)
+		{
+			// 새로 착용할 무기의 숨김 처리를 끈다.
+			TargetEquipWeapon->SetActorHiddenInGame(false);
+
+			// 무기의 애님 레이어를 적용한다.
+			TSubclassOf<UAnimInstance> TargetAnimInstance = TargetEquipWeapon->GetWeaponAnimInstnace();
+
+			ACharacter* CurCharacter = GetOwner<ACharacter>();
+			if (CurCharacter)
+			{
+				USkeletalMeshComponent* SkeletalMeshComp = CurCharacter->GetMesh();
+				if (SkeletalMeshComp)
+				{
+					SkeletalMeshComp->LinkAnimClassLayers(TargetAnimInstance);
+				}
+			}
+
+			// 현재 슬롯을 변경한다.
+			WeaponSlot = ChangeTargetSlot;
+
+			ChangeTargetSlot = EWeaponSlot::NONE;
+		}
 	}
 }
 
@@ -589,5 +612,6 @@ void URSPlayerWeaponComponent::LoadRequested()
 
 	// 장착 해야하는 슬롯을 가져오고 무기를 장착한다.
 	EWeaponSlot TargetWeaponSlot = static_cast<EWeaponSlot>(WeaponLoadGame->WeaponSlot);
-	EquipWeaponToCharacter(TargetWeaponSlot);
+	ChangeTargetSlot = TargetWeaponSlot;
+	EquipWeaponToCharacter();
 }
