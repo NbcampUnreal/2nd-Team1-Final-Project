@@ -51,7 +51,7 @@ public://Function
 	bool IsFocusing(FVector lookFor);
 
 	UFUNCTION(BlueprintCallable)
-	void RotateToFocus(FVector lookFor);
+	void RotateToFocus(FVector lookFor, float deltaSecond);
 
 	//Patrol
 	UFUNCTION(BlueprintCallable)

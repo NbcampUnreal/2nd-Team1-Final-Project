@@ -6,9 +6,12 @@
 #include "GameFramework/Actor.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "CollisionQueryParams.h"
 #include "MonsterData.h"
 #include "RSDunPlayerCharacter.h"
-#include "Kismet/GameplayStatics.h"
+#include "RogShop/UtilDefine.h"
+#include "RogShop/RSMonsterAttackTraceDefine.h"
 #include "MonsterProjectileBase.generated.h"
 
 UCLASS()
@@ -21,11 +24,16 @@ public:
 	AMonsterProjectileBase();
 
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+	void BulletOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
 	void Fire(const FVector& shootDir);
+
+//	virtual void Tick(float DeltaTime)override;
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	USceneComponent* Scene;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	USphereComponent* CollisionComponent;
 
@@ -34,4 +42,16 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	float damage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	float bulletRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	float bulletInitSpeed;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	float bulletMaxSpeed;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	float bulletGravity;
 };

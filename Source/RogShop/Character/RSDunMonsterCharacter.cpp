@@ -140,7 +140,7 @@ void ARSDunMonsterCharacter::OnEveryMontageEnded(UAnimMontage* montage, bool bIn
 			Destroy();
 		}
 		bIsPlayingAnim = false;
-	}	
+	}
 }
 
 float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

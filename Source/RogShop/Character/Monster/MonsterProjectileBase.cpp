@@ -2,29 +2,35 @@
 
 
 #include "MonsterProjectileBase.h"
+#include "Engine/EngineTypes.h"
 
 // Sets default values
 AMonsterProjectileBase::AMonsterProjectileBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-    CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
-    CollisionComponent->InitSphereRadius(5.0f);
-    CollisionComponent->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
-    CollisionComponent->OnComponentHit.AddDynamic(this, &AMonsterProjectileBase::OnHit);
-    RootComponent = CollisionComponent;
+    bulletRadius = 25.0f;
+    bulletInitSpeed = 1000.f;
+    bulletMaxSpeed = 1000.f;
+    bulletGravity = 1.f;
 
-//    ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh"));
-//    ProjectileMesh->SetupAttachment(RootComponent);
+    Scene= CreateDefaultSubobject<USceneComponent>(TEXT("RootScene"));
+    SetRootComponent(Scene);
+
+    CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("BulletCollision"));
+    CollisionComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+    CollisionComponent->SetupAttachment(Scene);
+
+    CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AMonsterProjectileBase::BulletOverlapBegin);
 
     // 이동 컴포넌트 생성
     ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
     ProjectileMovement->UpdatedComponent = CollisionComponent;
-    ProjectileMovement->InitialSpeed = 2000.f;
-    ProjectileMovement->MaxSpeed = 2000.f;
+    ProjectileMovement->InitialSpeed = bulletInitSpeed;
+    ProjectileMovement->MaxSpeed = bulletMaxSpeed;
     ProjectileMovement->bRotationFollowsVelocity = false;
     ProjectileMovement->bShouldBounce = false;
-    ProjectileMovement->ProjectileGravityScale = 1.f;
+    ProjectileMovement->ProjectileGravityScale = bulletGravity;
 
     // 수명 설정
     InitialLifeSpan = 3.0f;
@@ -32,21 +38,17 @@ AMonsterProjectileBase::AMonsterProjectileBase()
     damage = 5.f;
 }
 
-void AMonsterProjectileBase::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+void AMonsterProjectileBase::BulletOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (OtherActor && OtherActor != this && OtherComponent)
+    if (OtherActor && OtherActor != this)
     {
-        FHitResult HitResult;
-        AActor* HitActor = HitResult.GetActor();
-        bool bPlayerHit = IsValid(HitActor) && HitActor->IsA(ARSDunPlayerCharacter::StaticClass());
-        
-        if (bPlayerHit)
-        {
-            UGameplayStatics::ApplyDamage(HitActor, damage, GetInstigator()->GetController(), this, nullptr);
-        }
+        bool bPlayerOverlap = IsValid(OtherActor) && OtherActor->IsA(ARSDunPlayerCharacter::StaticClass());
 
-        // 투사체 제거
-        Destroy();
+        if (bPlayerOverlap)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("원거리 피격"));
+            UGameplayStatics::ApplyDamage(OtherActor, damage, GetInstigator()->GetController(), this, nullptr);
+        }
     }
 }
 
