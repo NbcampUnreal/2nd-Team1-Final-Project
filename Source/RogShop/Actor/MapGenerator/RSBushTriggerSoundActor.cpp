@@ -51,19 +51,17 @@ void ARSBushTriggerSoundActor::OnOverlapBegin(
 
     if (ACharacter* Player = Cast<ACharacter>(OtherActor))
     {
-        if (OtherActor->ActorHasTag("Player"))
-        {
             UGameplayStatics::PlaySoundAtLocation(this, SoundToPlay, Player->GetActorLocation()); // 처음 들어왔을때 1회 재생
 
             OverlappingCharacter = Player;
             LastKnownPlayerLocation = Player->GetActorLocation();
+            UE_LOG(LogTemp, Warning, TEXT("부쉬 재생"));
 
             GetWorldTimerManager().SetTimer(
                 MovementCheckTimerHandle, this,
                 &ARSBushTriggerSoundActor::CheckMovementAndPlaySound,
                 0.25, true
             ); // 0.25초마다 플레이어의 움직임을 체크하는 타이머를 설정
-        }
     }
 }
 
@@ -74,7 +72,7 @@ void ARSBushTriggerSoundActor::OnOverlapEnd(
     int32 OtherBodyIndex
 )
 {
-    if (Cast<ACharacter>(OtherActor) && OtherActor->ActorHasTag("Player"))
+    if (Cast<ACharacter>(OtherActor))
     {
 		GetWorldTimerManager().ClearTimer(MovementCheckTimerHandle); // 타이머를 정지시킴
 		OverlappingCharacter = nullptr; // 현재 범위에 있는 플레이어 캐릭터에 대한 약한 참조를 해제
