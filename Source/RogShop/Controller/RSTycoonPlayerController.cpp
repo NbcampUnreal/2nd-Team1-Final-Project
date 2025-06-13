@@ -39,6 +39,7 @@ void ARSTycoonPlayerController::StartWaitMode()
 	SetViewTargetWithBlend(MainCamera, 1.f);
 
 	SelectTileIndex = INDEX_NONE;
+	SelectTileActor->SetActorHiddenInGame(true);
 }
 
 void ARSTycoonPlayerController::StartSaleMode()
