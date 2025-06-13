@@ -29,12 +29,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void HandleNormalAttackInput();
-
-	bool ContinueComboAttack();
-
-	void ResetCombo();
-
 	// 슬롯에 무기를 추가한다.
 	UFUNCTION(BlueprintCallable)
 	void EquipWeaponToSlot(ARSBaseWeapon* WeaponActor);
@@ -42,11 +36,18 @@ public:
 	// 특정 슬롯의 무기를 버린다.
 	void DropWeaponToSlot(EWeaponSlot TargetWeaponSlot);
 
-	// 특정 슬롯의 무기를 장착한다.
-	void EquipWeaponToCharacter(EWeaponSlot TargetWeaponSlot);
-
 	// 장착 중인 무기를 장착 해제한다.
 	void UnEquipWeaponToCharacter();
+
+	// 무기 교체시 변경할 슬롯을 미리 저장한다.
+	// 교체 애니메이션 재생 중 특정 노티파이에서 교체된다.
+	void SetChangeTargetSlot(EWeaponSlot TargetWeaponSlot);
+
+	// 현재 설정된 슬롯으로 무기 교체가 가능한지 반환
+	bool CanChangeTargetSlot();
+
+	// 특정 슬롯의 무기를 장착한다.
+	void EquipWeaponToCharacter();
 
 private:
 	// 무기
@@ -59,6 +60,18 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
 	int32 WeaponSlotSize;	// 최대 슬롯 수
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
+	EWeaponSlot ChangeTargetSlot;
+
+// 공격 관련
+public:
+	void HandleNormalAttackInput();
+
+	bool ContinueComboAttack();
+
+	void ResetCombo();
+
+private:
 	// 애니메이션을 위한 상태
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
 	bool bIsAttack;	// 공격 중인 상태
