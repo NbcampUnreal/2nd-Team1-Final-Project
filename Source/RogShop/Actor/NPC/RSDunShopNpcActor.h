@@ -35,4 +35,7 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UUserWidget> StoreWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<UUserWidget> CachedStoreWidget;
 };

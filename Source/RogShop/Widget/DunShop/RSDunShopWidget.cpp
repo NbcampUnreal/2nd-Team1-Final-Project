@@ -24,22 +24,24 @@ void URSDunShopWidget::NativeOnInitialized()
 
     if (RSDunPlayerController)
     {
+        RSDunPlayerController->OnLifeEssenceChange.RemoveDynamic(this, &URSDunShopWidget::UpdateLifeEssence);
         RSDunPlayerController->OnLifeEssenceChange.AddDynamic(this, &URSDunShopWidget::UpdateLifeEssence);
     }
+
+    if (ExitBtn)
+    {
+        ExitBtn->OnClicked.RemoveDynamic(this, &URSDunShopWidget::OnExitClicked);
+        ExitBtn->OnClicked.AddDynamic(this, &URSDunShopWidget::OnExitClicked);
+    }
+
+    PopulateShopItemsOneTime();
 }
 
 void URSDunShopWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    if (ExitBtn)
-    {
-        ExitBtn->OnClicked.AddDynamic(this, &URSDunShopWidget::OnExitClicked);
-    }
-
     SetMouseMode(true);
-
-    PopulateShopItems();
 }
 
 void URSDunShopWidget::UpdateLifeEssence(int NewLifeEssence)
@@ -48,6 +50,83 @@ void URSDunShopWidget::UpdateLifeEssence(int NewLifeEssence)
     {
         FString LifeEssenceString = FString::Printf(TEXT("%d"), NewLifeEssence); // 정수 형태로 변환
         LifeEssenceText->SetText(FText::FromString(LifeEssenceString));
+    }
+}
+
+void URSDunShopWidget::PopulateShopItemsOneTime()
+{
+    URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
+
+    if (!DataSubsystem || !DataSubsystem->WeaponInfo || !DataSubsystem->RelicInfo)
+    {
+        return;
+    }
+
+    TArray<TPair<FName, FItemInfoData*>> Result;
+    TSet<FName> AlreadySpawnedIDs;
+
+    // 원하는 아이템 출력 개수
+    const int32 DesiredCount = 5;
+
+    int32 WeaponRowCount = DataSubsystem->WeaponInfo ? DataSubsystem->WeaponInfo->GetRowNames().Num() : 0;
+    int32 RelicRowCount = DataSubsystem->RelicInfo ? DataSubsystem->RelicInfo->GetRowNames().Num() : 0;
+
+    int32 TotalRowCount = WeaponRowCount + RelicRowCount;
+
+    // 원하는 아이템 출력 개수가 데이터 테이블의 모든 아이템을 합친 개수보다 많은 경우의 무한 루프 방지
+    int32 MaxCount = FMath::Min(DesiredCount, TotalRowCount);
+
+    while (Result.Num() < MaxCount)
+    {
+        TPair<FName, FItemInfoData*> RandomItem = GetRandomItemFromDataTable(DataSubsystem->WeaponInfo, DataSubsystem->RelicInfo);
+        FName RowName = RandomItem.Key;
+        FItemInfoData* ItemData = RandomItem.Value;
+
+        // 이미 구매한 아이템 생성 방지
+        URSGameInstance* GI = Cast<URSGameInstance>(GetGameInstance());
+
+        if (!GI || GI->PurchasedItemIDs.Contains(RowName))
+        {
+            continue;
+        }
+
+        if (!ItemData || AlreadySpawnedIDs.Contains(RowName))
+        {
+            continue;
+        }
+
+        AlreadySpawnedIDs.Add(RowName);
+        Result.Add(RandomItem);
+    }
+
+    CachedDunShopItems = Result;
+
+    ShowShopItems();
+}
+
+void URSDunShopWidget::ShowShopItems()
+{
+    for (const auto& ItemPair : CachedDunShopItems)
+    {
+        const FName RowName = ItemPair.Key;
+        const FItemInfoData* ItemData = ItemPair.Value;
+
+        if (!ItemData)
+        {
+            continue;
+        }
+
+        if (RSDunShopItemWidgetClass && ItemHorizontalBox)
+        {
+            URSDunItemWidget* NewItemWidget = CreateWidget<URSDunItemWidget>(this, RSDunShopItemWidgetClass);
+            if (NewItemWidget)
+            {
+                NewItemWidget->SetItemData(*ItemData);
+                NewItemWidget->SetItemRowName(RowName);
+
+                ItemHorizontalBox->AddChild(NewItemWidget);
+            }
+        }
     }
 }
 
@@ -73,7 +152,7 @@ EItemRarity URSDunShopWidget::GetRandomRarity()
     }
 }
 
-TPair<FName, FItemInfoData*> URSDunShopWidget::GetRandomItemFromDataTable(UDataTable* WeaponDataTable, UDataTable* RelicDataTable)
+TPair<FName, struct FItemInfoData*> URSDunShopWidget::GetRandomItemFromDataTable(UDataTable* WeaponDataTable, UDataTable* RelicDataTable)
 {
     if (!WeaponDataTable || !RelicDataTable)
     {
@@ -114,62 +193,6 @@ TPair<FName, FItemInfoData*> URSDunShopWidget::GetRandomItemFromDataTable(UDataT
     }
 
     return TPair<FName, FItemInfoData*>(FName("Invalid"), nullptr);
-}
-
-void URSDunShopWidget::PopulateShopItems()
-{
-    URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
-
-    if (!DataSubsystem || !DataSubsystem->WeaponInfo || !DataSubsystem->RelicInfo)
-    {
-        RS_LOG_DEBUG("DataSubsystem or DataTables are null");
-        return;
-    }
-
-    TSet<FName> AlreadySpawnedIDs;
-    const int32 AddItemCount = 5;
-
-    for (int32 i = 0; i < AddItemCount; ++i)
-    {
-        TPair<FName, FItemInfoData*> RandomItem = GetRandomItemFromDataTable(DataSubsystem->WeaponInfo, DataSubsystem->RelicInfo);
-
-        FName FoundRowName = RandomItem.Key;
-        FItemInfoData* ItemData = RandomItem.Value;
-
-        if (!ItemData)
-        {
-            RS_LOG_DEBUG("ItemData is Null");
-            continue;
-        }
-
-        // 중복 랜덤 생성 방지
-        if (AlreadySpawnedIDs.Contains(FoundRowName))
-        {
-            continue;
-        }
-
-        // 이미 구매한 아이템 생성 방지
-        URSGameInstance* GI = Cast<URSGameInstance>(GetGameInstance());
-        if (!GI || GI->PurchasedItemIDs.Contains(FoundRowName))
-        {
-            continue;
-        }
-
-        AlreadySpawnedIDs.Add(FoundRowName);
-
-        if (RSDunShopItemWidgetClass && ItemHorizontalBox)
-        {
-            URSDunItemWidget* NewRSDunItemWidget = CreateWidget<URSDunItemWidget>(this, RSDunShopItemWidgetClass);
-
-            if (NewRSDunItemWidget)
-            {
-                NewRSDunItemWidget->SetItemData(*ItemData);
-                NewRSDunItemWidget->SetItemRowName(FoundRowName);
-
-                ItemHorizontalBox->AddChild(NewRSDunItemWidget);
-            }
-        }
-    }
 }
 
 void URSDunShopWidget::OnExitClicked()

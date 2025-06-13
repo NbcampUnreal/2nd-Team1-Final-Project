@@ -29,15 +29,12 @@ private:
     void OnExitClicked();
 
     void SetMouseMode(bool bEnable);
-    void PopulateShopItems();
+    void ShowShopItems();
+    void PopulateShopItemsOneTime();
 
-    // 희귀도 랜덤 추출 함수
     EItemRarity GetRandomRarity();
-
-    // 데이터 테이블에서 확률 기반 아이템 랜덤 추출 함수
     TPair<FName, struct FItemInfoData*> GetRandomItemFromDataTable(UDataTable* WeaponDataTable, UDataTable* RelicDataTable);
 
-    // BP 할당 필요
     UPROPERTY(EditDefaultsOnly)
     TSubclassOf<UUserWidget> RSDunShopItemWidgetClass;
 
@@ -49,4 +46,6 @@ private:
 
     UPROPERTY(meta = (BindWidget))
     TObjectPtr<UHorizontalBox> ItemHorizontalBox;
+
+    TArray<TPair<FName, FItemInfoData*>> CachedDunShopItems;
 };
