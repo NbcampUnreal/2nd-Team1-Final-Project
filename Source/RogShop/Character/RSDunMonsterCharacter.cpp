@@ -46,8 +46,8 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	// 몬스터 캡슐 컴포넌트에 몬스터 공격을 받지 않도록 무시하는 함수
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_MonsterAttackTrace, ECR_Ignore);
 
-	// 캡슐 컴포넌트의 오버랩 이벤트는 끄고 스켈레탈 메시의 오버랩 이벤트는 켜기  << 플레이어의 공격 판정 처리
-	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
+	// 캡슐컴포넌트와 스켈레탈 메시의 오버렙 이벤트를 킨다
+	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
 	GetMesh()->SetGenerateOverlapEvents(true);
 
 	DrawDebugLineSeconds = 5.0f;
