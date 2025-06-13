@@ -21,13 +21,15 @@ public:
 	ARSTileMap();
 
 	void ChangeTile(int32 Index, FName TileKey);
-	void SaveTileMap();
 	void ChangeTileSize(int32 NewWidth, int32 NewHeight);
 	void RotateTile(int32 Index, float YawValue);
 	void ResetAllTile();
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnActorInMap(UClass* ActorClass);
+
+	UFUNCTION()
+	void SaveTileMap();
 	
 	FVector GetMapCenter();
 	FVector GetMapSize();

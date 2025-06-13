@@ -29,13 +29,21 @@ public:
 	ARSTycoonGameModeBase();
 
 	void StartSaleMode();
+	
 	void SettingGame();
+	
 	void AddOrder(FFoodOrder Order);
+	
 	void RemoveOrder(FFoodOrder Order);
+	
 	void RemoveCustomer(ARSTycoonCustomerCharacter* Customer);
+	
 	void AddNPC(ARSTycoonNPC* NPC);
+	
 	void EndSaleMode();
+	
 	void StartWaitMode();
+	
 	void StartManagementMode();
 	
 	float GetGameTime() const; //게임 경과 시간을 반환해줌
@@ -54,6 +62,10 @@ protected:
 private:
 	void CreateCustomer();
 	bool CanOrder(FName& OutOrderFood);
+	void LoadGameData();
+
+	UFUNCTION()
+	void SaveGameData();
 
 	int32 GetCurrentCustomerCount() const { return Customers.Num(); }
 
