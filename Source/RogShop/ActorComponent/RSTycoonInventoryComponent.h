@@ -21,13 +21,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Close();
 	
-	void UpdateInventoryWidget();
+	void UpdateInventoryWidget(int32 Index = INDEX_NONE);
 	
 	UFUNCTION()
 	virtual void SaveItemData() override;
 	virtual void LoadItemData() override;
-	
-
+	virtual int32 AddItem(FName ItemKey, int32 Amount = 1) override;
+	virtual int32 RemoveItem(FName ItemKey, int32 Amount = 1) override;
 	
 	bool IsOpen() const { return bIsOpen; };
 

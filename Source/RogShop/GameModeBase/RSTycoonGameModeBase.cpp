@@ -303,6 +303,7 @@ void ARSTycoonGameModeBase::LoadGameData()
 	}
 	
 	Controller->GetInventoryComponent()->LoadItemData();
+	Controller->GetInventoryComponent()->UpdateInventoryWidget();
 	Controller->SetGold(SaveGame->Money);
 }
 

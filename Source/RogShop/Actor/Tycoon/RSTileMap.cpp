@@ -13,6 +13,8 @@
 #include "RogShop/SaveGame/Tycoon/RSTycoonTileMapSaveGame.h"
 #include "Tile/RSBaseTile.h"
 #include "Tile/RSCookingTile.h"
+#include "Tile/RSDoorTile.h"
+#include "Tile/RSTableTile.h"
 #include "Tycoon/NPC/RSTycoonChefCharacter.h"
 #include "Tycoon/NPC/RSTycoonNPC.h"
 #include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
@@ -309,7 +311,7 @@ void ARSTileMap::ActiveNPC()
 void ARSTileMap::DeleteTileData()
 {
 	RS_LOG_C("저장 데이터 삭제", FColor::Orange);
-	
+
 	FString SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
 	UGameplayStatics::DeleteGameInSlot(SlotName, 0);
 }
@@ -317,7 +319,7 @@ void ARSTileMap::DeleteTileData()
 
 TSubclassOf<ARSBaseTile> ARSTileMap::GetTileClass(const FName& TileKey)
 {
-	for (TSubclassOf<ARSBaseTile> TileType : TileTypes)
+	for (TSubclassOf<ARSBaseTile> TileType : TileClasses)
 	{
 		if (TileType->GetDefaultObject<ARSBaseTile>()->GetTileKey() == TileKey)
 		{

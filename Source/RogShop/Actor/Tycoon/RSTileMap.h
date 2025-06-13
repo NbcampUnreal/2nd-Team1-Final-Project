@@ -34,7 +34,7 @@ public:
 	FVector GetMapCenter();
 	FVector GetMapSize();
 	const TArray<TObjectPtr<ARSBaseTile>>& GetTiles() const { return TileActors; }
-	const TArray<TSubclassOf<ARSBaseTile>>& GetTileTypes() const { return TileTypes; };
+	const TArray<TSubclassOf<ARSBaseTile>>& GetTileTypes() const { return TileClasses; };
 	int32 GetWidth() const { return Width; };
 	int32 GetHeight() const { return Height; };
 
@@ -64,7 +64,7 @@ private:
 	int32 DefaultHeight = 3;
 
 	UPROPERTY(EditDefaultsOnly, Category="TileMap")
-	TArray<TSubclassOf<ARSBaseTile>> TileTypes;
+	TArray<TSubclassOf<ARSBaseTile>> TileClasses;
 
 	UPROPERTY(EditAnywhere, Category="TileMap")
 	TObjectPtr<USceneComponent> TileParent;

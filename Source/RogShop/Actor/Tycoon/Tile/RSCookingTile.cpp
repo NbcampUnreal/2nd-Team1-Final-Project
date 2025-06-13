@@ -99,7 +99,6 @@ void ARSCookingTile::Cook(FFoodOrder Order)
 	{
 		Controller->GetInventoryComponent()->RemoveItem(Need.Key, Need.Value);
 	}
-	Controller->GetInventoryComponent()->UpdateInventoryWidget();
 
 	//5초 후 완성
 	FTimerHandle Timer;
