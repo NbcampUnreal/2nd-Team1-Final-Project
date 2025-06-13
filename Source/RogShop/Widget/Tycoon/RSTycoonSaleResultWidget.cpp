@@ -11,7 +11,7 @@
 
 void URSTycoonSaleResultWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 
 	SubmitButton->OnClicked.AddDynamic(this, &URSTycoonSaleResultWidget::ReturnWaitMode);
 }

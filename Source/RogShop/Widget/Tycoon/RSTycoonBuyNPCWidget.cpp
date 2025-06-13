@@ -9,7 +9,7 @@
 
 void URSTycoonBuyNPCWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 
 	ARSTycoonNPC* SpawnNPC = SpawnNPCClass.GetDefaultObject();
 	NPCNameText->SetText(FText::FromString(SpawnNPC->GetDisplayName()));

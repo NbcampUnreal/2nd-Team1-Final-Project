@@ -43,7 +43,7 @@ void URSTycoonInventoryComponent::Close()
 	Controller->GetInventoryWidget()->RemoveFromParent();
 }
 
-void URSTycoonInventoryComponent::UpdateInventoryWidget()
+void URSTycoonInventoryComponent::UpdateInventoryWidget(int32 Index)
 {
 	ARSTycoonPlayerController* Controller = Cast<ARSTycoonPlayerController>(GetOwner());
 	check(Controller)
@@ -56,20 +56,32 @@ void URSTycoonInventoryComponent::UpdateInventoryWidget()
 		InventoryWidget->CreateSlots(ItemList.Num(), 5);
 	}
 
-	for (int i = 0; i < ItemList.Num(); i++)
+	if (Index == INDEX_NONE)
 	{
-		InventoryWidget->UpdateSlots(i, ItemList[i]);
+		for (int i = 0; i < ItemList.Num(); i++)
+		{
+			InventoryWidget->UpdateSlots(i, ItemList[i]);
+		}
+	}
+	else
+	{
+		InventoryWidget->UpdateSlots(Index, ItemList[Index]);
 	}
 }
 
 void URSTycoonInventoryComponent::SaveItemData()
 {
 	Super::SaveItemData();
-
+	
 	const FString& SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonSaveSlot;
 	URSTycoonSaveGame* SaveGame =
 		Cast<URSTycoonSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
 
+	for (auto& a : ItemList)
+	{
+		RS_LOG_F("%s %d", *a.ItemKey.ToString(), a.Quantity)
+	}
+	
 	SaveGame->Ingredients = ItemList;
 
 	UGameplayStatics::SaveGameToSlot(SaveGame, SlotName, 0);
@@ -85,6 +97,22 @@ void URSTycoonInventoryComponent::LoadItemData()
 	{
 		ItemList = SaveGame->Ingredients;
 	}
+}
+
+int32 URSTycoonInventoryComponent::AddItem(FName ItemKey, int32 Amount)
+{
+	int Result = Super::AddItem(ItemKey, Amount);
+	UpdateInventoryWidget(Result);
+	
+	return Result;
+}
+
+int32 URSTycoonInventoryComponent::RemoveItem(FName ItemKey, int32 Amount)
+{
+	int Result = Super::RemoveItem(ItemKey, Amount);
+	UpdateInventoryWidget(Result);
+	
+	return Result;
 }
 
 void URSTycoonInventoryComponent::BeginPlay()
