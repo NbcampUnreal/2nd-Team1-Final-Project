@@ -71,12 +71,9 @@ private:
 
 // 충돌 로직 관리
 public:
-	void StartAttackOverlap();
-	void EndAttackOverlap();
+	void PerformBoxSweepAttack();
 
-protected:
-	UFUNCTION()
-	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void ResetDamagedActors();
 
 private:
 	UPROPERTY()
