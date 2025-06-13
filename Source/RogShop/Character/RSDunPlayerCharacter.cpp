@@ -4,6 +4,7 @@
 #include "RSDunPlayerCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "RSDunPlayerController.h"
+#include "RSDunMonsterCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
@@ -325,6 +326,16 @@ void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
     {
         FRotator DesiredRotation = LastInput.Rotation();
         SetActorRotation(DesiredRotation);
+    }
+
+    // 구르기 전 몬스터 HP바가 플레이어를 바라보도록 하기
+    // 1. 모든 몬스터 HP 바 회전
+    for (ARSDunMonsterCharacter* Monster : ARSDunMonsterCharacter::GetAllMonsters())
+    {
+        if (IsValid(Monster))
+        {
+            Monster->UpdateEnemyHealthBarRotation();
+        }
     }
 
     // 몽타주를 재생중이지 않은 경우 구르기 실행

@@ -15,6 +15,7 @@
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
+class UWidgetComponent;
 
 UCLASS()
 class ROGSHOP_API ARSDunMonsterCharacter : public ARSDunBaseCharacter
@@ -25,10 +26,7 @@ public:
 	ARSDunMonsterCharacter();
 
 	virtual void BeginPlay()override;
-
-	// 애니메이션 실행 함수
-	void PlayAttackAnim();
-	void PlaySpawnAnim();
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	UFUNCTION(BlueprintCallable)
 	void PlayAction(int32 actionIdx, FVector interestedPos);
@@ -80,6 +78,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void InitMonsterData();
 
+public:
+	// 애니메이션 실행 함수
+	void PlayAttackAnim();
+	void PlaySpawnAnim();
+
+	void UpdateEnemyHealthBarRotation();				// 몬스터 HP바 회전 함수
+	void UpdateOverheadEnemyHP(float const damage);		// 몬스터 HP 업데이트 함수
+
 protected:
 	// 애니메이션 몽타주
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -89,6 +95,10 @@ protected:
 	int32 skillActionIdx;//어떤 스킬을 시전하는 중인지 저장, PerformActionTrace 에서 해당 변수를 참조해 행동하도록 함
 
 	bool bIsPlayingAnim;
+
+	// 오버헤드 위젯 관련
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enemy|UI")
+	UWidgetComponent* OverheadWidget;
 
 	//NavInvoker
 	UPROPERTY(BlueprintReadWrite, Category = Navigation, meta = (AllowPrivateAccess = "true"))//Navigation Invoker Setting
@@ -133,11 +143,21 @@ protected:
 	TArray<FMonsterAttackSkillData> MonsterAttackSkills;	// 몬스터 공격 스킬을 모아놓은 구조체를 배열로 저장
 	TArray<FMonsterAttackTraceData> CachedAttackTraceDataArray;	// 공격 트레이스를 캐싱해두고 다른 스킬 사용시 인덱스에서 꺼내 쓰는 용도
 
+public:
+	static TArray<ARSDunMonsterCharacter*> AllMonsters;
+
+	static const TArray<ARSDunMonsterCharacter*>& GetAllMonsters();
+
 private:
 	TObjectPtr<ARSMonsterAIController> AIController;  // TODO : 혹시나 캐싱해서 쓸 일 생길까봐 미리 만들어둠.
+
+	const FMonsterData* GetFMonsterData();	// 코드 중복 부분 정리용 함수
+
+	FTimerHandle MonsterHPBarRotationTimer;
 
 // 사망시 아이템 드롭
 private:
 	UFUNCTION()
 	void MonsterItemDrop();
+
 };
