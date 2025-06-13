@@ -37,6 +37,25 @@ void ARSTableTile::Interact(ACharacter* InteractCharacter)
 	}
 }
 
+void ARSTableTile::ResetAll()
+{
+	Super::ResetAll();
+
+	for (auto& FoodActor : FoodActors)
+	{
+		if (FoodActor->IsValidLowLevel())
+		{
+			FoodActor->Destroy();
+			FoodActor = nullptr;
+		}
+	}
+
+	for (auto& Customer : SittingCustomers)
+	{
+		Customer = nullptr;	//삭제는 GameMode에서 함
+	}
+}
+
 void ARSTableTile::Sit(ARSTycoonCustomerCharacter* Customer)
 {
 	int32 CanSitIndex = GetCanSitingLocationIndex();
@@ -45,9 +64,9 @@ void ARSTableTile::Sit(ARSTycoonCustomerCharacter* Customer)
 		RS_LOG_C("테이블에 앉을 수 없습니다", FColor::Red);
 		return;
 	}
-	
+
 	RS_LOG("손님이 앉음");
- 
+
 	SittingCustomers[CanSitIndex] = Customer;
 
 	Customer->Sit(this, SittingLocations[CanSitIndex]->GetComponentTransform());
@@ -61,7 +80,7 @@ void ARSTableTile::Sit(ARSTycoonCustomerCharacter* Customer)
 				Index = i;
 			}
 		}
-		
+
 		SittingCustomers[Index] = nullptr;
 
 		FoodActors[Index]->Destroy();

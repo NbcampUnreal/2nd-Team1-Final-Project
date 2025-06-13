@@ -95,6 +95,7 @@ void URSPlayerWeaponComponent::HandleNormalAttackInput()
 
 bool URSPlayerWeaponComponent::ContinueComboAttack()
 {
+	// 공격에 대한 입력 버퍼가 설정된 경우
 	if (bComboInputBuffered)
 	{
 		int8 Index = static_cast<int8>(WeaponSlot) - 1;
@@ -342,13 +343,6 @@ void URSPlayerWeaponComponent::EquipWeaponToCharacter(EWeaponSlot TargetWeaponSl
 		{
 			// 새로 착용할 무기의 숨김 처리를 끈다.
 			TargetEquipWeapon->SetActorHiddenInGame(false);
-			
-			// 오버랩 이벤트 바인딩
-			UBoxComponent* CurWeaponBoxComp = TargetEquipWeapon->GetBoxComp();
-			if (CurWeaponBoxComp)
-			{
-				CurWeaponBoxComp->OnComponentBeginOverlap.AddDynamic(this, &URSPlayerWeaponComponent::OnBeginOverlap);
-			}
 
 			// 무기의 애님 레이어를 적용한다.
 			TSubclassOf<UAnimInstance> TargetAnimInstance = TargetEquipWeapon->GetWeaponAnimInstnace();
@@ -386,9 +380,6 @@ void URSPlayerWeaponComponent::UnEquipWeaponToCharacter()
 		// 숨김 처리
 		CurEquipWeapon->SetActorHiddenInGame(true);
 
-		// 오버랩 이벤트 바인딩 해제
-		WeaponActors[CurrentIndex]->GetBoxComp()->OnComponentBeginOverlap.RemoveDynamic(this, &URSPlayerWeaponComponent::OnBeginOverlap);
-
 		// 무기의 애님 레이어를 해제한다.
 		TSubclassOf<UAnimInstance> CurAnimInstance = CurEquipWeapon->GetWeaponAnimInstnace();
 
@@ -407,53 +398,80 @@ void URSPlayerWeaponComponent::UnEquipWeaponToCharacter()
 	}
 }
 
-void URSPlayerWeaponComponent::StartAttackOverlap()
+void URSPlayerWeaponComponent::ResetDamagedActors()
 {
-	// 콜리전을 켠다.
-	int8 Index = static_cast<int8>(WeaponSlot) - 1;
-	if (WeaponActors.IsValidIndex(Index))
-	{
-		WeaponActors[Index]->StartOverlap();
-	}
-}
-
-void URSPlayerWeaponComponent::EndAttackOverlap()
-{
-	// 콜리전을 끈다.
-	int8 Index = static_cast<int8>(WeaponSlot) - 1;
-	if (WeaponActors.IsValidIndex(Index))
-	{
-		WeaponActors[Index]->EndOverlap();
-	}
-
 	// 해당 무기로 피해를 입은 액터들의 목록을 초기화한다.
 	DamagedActors.Empty();
 }
 
-void URSPlayerWeaponComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void URSPlayerWeaponComponent::PerformBoxSweepAttack()
 {
-	// 오버랩 된 액터에게 데미지를 가한다.
+	// 무기 슬롯의 인덱스 값
+	int8 Index = static_cast<int8>(WeaponSlot) - 1;
+
 	ARSDunPlayerCharacter* OwnerCharacter = GetOwner<ARSDunPlayerCharacter>();
 
-	AController* OwnerController = nullptr;
 	if (OwnerCharacter)
 	{
-		OwnerController = OwnerCharacter->GetInstigatorController();
-	}
+		AController* OwnerController = OwnerCharacter->GetInstigatorController();
 
-	if (OtherActor && OtherActor != OwnerCharacter && !DamagedActors.Contains(OtherActor))
-	{
-		int8 Index = static_cast<int8>(WeaponSlot) - 1;
-		float TotalDamage = 0.f;
-		if (WeaponActors.IsValidIndex(Index) && OwnerCharacter)
+		if (WeaponActors.IsValidIndex(Index))
 		{
-			float WeaponDamage = WeaponActors[Index]->GetWeaponDamage();
-			float AttackPower = OwnerCharacter->GetAttackPower();
-			TotalDamage = WeaponDamage + AttackPower;
-		}
+			ARSBaseWeapon* CurWeapon = WeaponActors[Index];
 
-		UGameplayStatics::ApplyDamage(OtherActor, TotalDamage, OwnerController, WeaponActors[Index], UDamageType::StaticClass());
-		DamagedActors.Add(OtherActor);
+			UBoxComponent* WeaponBoxComp = CurWeapon->GetBoxComp();
+			if (WeaponBoxComp)
+			{
+				FVector BoxLocation = WeaponBoxComp->GetComponentLocation();
+				FVector BoxExtent = WeaponBoxComp->GetUnscaledBoxExtent() * WeaponBoxComp->GetComponentScale();
+				FQuat BoxRotation = WeaponBoxComp->GetComponentQuat();
+
+				FVector Start = BoxLocation;
+				FVector End = BoxLocation + BoxRotation.RotateVector(FVector(BoxExtent.X * 2.f, 0.f, 0.f));
+
+				FCollisionShape BoxShape = FCollisionShape::MakeBox(BoxExtent);
+				FCollisionQueryParams Params;
+				Params.AddIgnoredActor(GetOwner());
+
+				TArray<FHitResult> HitResults;
+				bool bHit = GetWorld()->SweepMultiByChannel(HitResults, Start, End, BoxRotation, ECC_GameTraceChannel8, BoxShape, Params);
+
+				// 시작 위치 박스 디버그
+				RS_DRAW_DEBUG_BOX(GetWorld(), Start, BoxExtent, BoxRotation, FColor::Green, false, 2.0f, 0, 1.0f);
+
+				// 끝 위치 박스 디버그
+				RS_DRAW_DEBUG_BOX(GetWorld(), End, BoxExtent, BoxRotation, FColor::Blue, false, 2.0f, 0, 1.0f);
+
+				if (bHit)
+				{
+					for (const FHitResult& Hit : HitResults)
+					{
+						AActor* HitActor = Hit.GetActor();
+						if (HitActor && HitActor != GetOwner() && !DamagedActors.Contains(HitActor))
+						{
+							// 총 데미지를 구합니다.
+							float TotalDamage = 0.f;
+
+							float WeaponDamage = WeaponActors[Index]->GetWeaponDamage();
+							float AttackPower = OwnerCharacter->GetAttackPower();
+							TotalDamage = WeaponDamage + AttackPower;
+
+							// 피격 방향 계산
+							FVector HitDirection = HitActor->GetActorLocation() - Hit.ImpactPoint;
+							HitDirection.Normalize();
+
+							UGameplayStatics::ApplyPointDamage(HitActor, TotalDamage, HitDirection, Hit, OwnerController, WeaponActors[Index], UDamageType::StaticClass());
+
+							// 무기 데미지를 중복으로 주는 경우를 방지하기 위한 배열에 값 추가
+							DamagedActors.Add(HitActor);
+
+							// 데미지가 발생한 포인트에 대해 디버그
+							RS_DRAW_DEBUG_POINT(GetWorld(), Hit.ImpactPoint, 10.f, FColor::Red, false, 2.0f, 0);
+						}
+					}
+				}
+			}
+		}
 	}
 }
 

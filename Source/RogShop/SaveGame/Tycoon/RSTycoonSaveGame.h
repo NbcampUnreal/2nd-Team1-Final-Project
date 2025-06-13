@@ -19,4 +19,7 @@ class ROGSHOP_API URSTycoonSaveGame : public USaveGame
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FItemSlot> Ingredients;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Money;
 };

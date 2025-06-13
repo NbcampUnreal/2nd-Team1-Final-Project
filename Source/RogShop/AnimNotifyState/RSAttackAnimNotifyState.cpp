@@ -2,6 +2,7 @@
 
 
 #include "RSAttackAnimNotifyState.h"
+#include "RogShop/UtilDefine.h"
 #include "RSDunPlayerCharacter.h"
 #include "RSPlayerWeaponComponent.h"
 #include "RSBaseWeapon.h"
@@ -10,32 +11,14 @@ void URSAttackAnimNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAn
 {
 	Super::NotifyBegin(MeshComp, Animation, TotalDuration);
 
-	// Ãæµ¹ ÄÝ¸®Àü ¼³Á¤
-	ARSDunPlayerCharacter* PlayerCharacter = MeshComp->GetOwner<ARSDunPlayerCharacter>();
-	if (!PlayerCharacter)
-	{
-		return;
-	}
+	RS_LOG_C("RSAttackAnimNotifyState Begin", FColor::Blue);
 
-	URSPlayerWeaponComponent* WeaponComp = PlayerCharacter->GetRSPlayerWeaponComponent();
-	if (WeaponComp)
-	{
-		WeaponComp->StartAttackOverlap();
-	}
 }
 
 void URSAttackAnimNotifyState::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)
 {
 	Super::NotifyTick(MeshComp, Animation, FrameDeltaTime);
 
-	
-}
-
-void URSAttackAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
-{
-	Super::NotifyEnd(MeshComp, Animation);
-
-	// Ãæµ¹ ÄÝ¸®Àü ¼³Á¤ ÇØÁ¦
 	ARSDunPlayerCharacter* PlayerCharacter = MeshComp->GetOwner<ARSDunPlayerCharacter>();
 	if (!PlayerCharacter)
 	{
@@ -45,6 +28,26 @@ void URSAttackAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnim
 	URSPlayerWeaponComponent* WeaponComp = PlayerCharacter->GetRSPlayerWeaponComponent();
 	if (WeaponComp)
 	{
-		WeaponComp->EndAttackOverlap();
+		WeaponComp->PerformBoxSweepAttack();
+	}
+}
+
+void URSAttackAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+{
+	Super::NotifyEnd(MeshComp, Animation);
+
+	RS_LOG_C("RSAttackAnimNotifyState End", FColor::Orange);
+
+	// ë°ë¯¸ì§€ë¥¼ ê°€í–ˆë˜ ì•¡í„°ë“¤ì„ ì €ìž¥í•œ ë°°ì—´ ì´ˆê¸°í™”
+	ARSDunPlayerCharacter* PlayerCharacter = MeshComp->GetOwner<ARSDunPlayerCharacter>();
+	if (!PlayerCharacter)
+	{
+		return;
+	}
+
+	URSPlayerWeaponComponent* WeaponComp = PlayerCharacter->GetRSPlayerWeaponComponent();
+	if (WeaponComp)
+	{
+		WeaponComp->ResetDamagedActors();
 	}
 }

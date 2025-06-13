@@ -21,17 +21,20 @@ public:
 	ARSTileMap();
 
 	void ChangeTile(int32 Index, FName TileKey);
-	void SaveTileMap();
 	void ChangeTileSize(int32 NewWidth, int32 NewHeight);
 	void RotateTile(int32 Index, float YawValue);
+	void ResetAllTile();
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnActorInMap(UClass* ActorClass);
+
+	UFUNCTION()
+	void SaveTileMap();
 	
 	FVector GetMapCenter();
 	FVector GetMapSize();
 	const TArray<TObjectPtr<ARSBaseTile>>& GetTiles() const { return TileActors; }
-	const TArray<TSubclassOf<ARSBaseTile>>& GetTileTypes() const { return TileTypes; };
+	const TArray<TSubclassOf<ARSBaseTile>>& GetTileTypes() const { return TileClasses; };
 	int32 GetWidth() const { return Width; };
 	int32 GetHeight() const { return Height; };
 
@@ -61,7 +64,7 @@ private:
 	int32 DefaultHeight = 3;
 
 	UPROPERTY(EditDefaultsOnly, Category="TileMap")
-	TArray<TSubclassOf<ARSBaseTile>> TileTypes;
+	TArray<TSubclassOf<ARSBaseTile>> TileClasses;
 
 	UPROPERTY(EditAnywhere, Category="TileMap")
 	TObjectPtr<USceneComponent> TileParent;

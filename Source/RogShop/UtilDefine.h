@@ -93,3 +93,9 @@ inline bool IsDebugLogEnabled(UWorld* World)
 	{ \
 		DrawDebugLine(World, LineStart, LineEnd, Color, bPersistent, LifeTime, DepthPriority, Thickness); \
 	}
+
+#define RS_DRAW_DEBUG_POINT(World, Position, Size, Color, bPersistent, LifeTime, DepthPriority) \
+	if (IsDebugLogEnabled(World)) \
+	{ \
+		DrawDebugPoint(World, Position, Size, Color, bPersistent, LifeTime, DepthPriority); \
+	}

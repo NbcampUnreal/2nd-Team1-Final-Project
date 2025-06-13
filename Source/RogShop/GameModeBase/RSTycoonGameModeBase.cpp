@@ -14,6 +14,9 @@
 #include "Tycoon/NPC/RSTycoonCustomerCharacter.h"
 #include "ItemSlot.h"
 #include "RSIngredientInventoryWidget.h"
+#include "RSSaveGameSubsystem.h"
+#include "RSTycoonSaveGame.h"
+#include "RogShop/Actor/Tycoon/RSTileMap.h"
 #include "RogShop/Actor/Tycoon/Tile/RSIceBoxTile.h"
 
 
@@ -21,21 +24,20 @@ ARSTycoonGameModeBase::ARSTycoonGameModeBase()
 {
 	//어차피 1개라 성능을 많이 안 잡아 먹을거 같아서 true
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 void ARSTycoonGameModeBase::StartSaleMode()
 {
-	State = ETycoonGameMode::Sales;
+	State = ETycoonGameMode::Sale;
 
 	SettingGame();
 
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(Controller)
 	Controller->StartSaleMode();
-	
+
 	GetWorldTimerManager().SetTimer(CustomerTimerHandle, this, &ARSTycoonGameModeBase::CreateCustomer, 5.f, true);
-	GetWorldTimerManager().SetTimer(GameTimerHandle, this, &ARSTycoonGameModeBase::EndSale, SalePlayMinute * 60, false);
+	GetWorldTimerManager().SetTimer(GameTimerHandle, this, &ARSTycoonGameModeBase::EndSaleMode, SalePlayMinute * 60, false);
 }
 
 void ARSTycoonGameModeBase::SettingGame()
@@ -51,19 +53,13 @@ void ARSTycoonGameModeBase::SettingGame()
 		MaxCustomerCount += Tile->GetMaxPlace();
 	}
 
-	//인벤 크기 설정
-	TArray<AActor*> IceBoxTiles;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSIceBoxTile::StaticClass(), IceBoxTiles);
-	
-	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
-	check(Controller)
-	Controller->GetInventoryComponent()->SetInventorySlot(ARSIceBoxTile::AddInventorySlot * (IceBoxTiles.Num() + 1));
+	LoadGameData();
 }
 
 void ARSTycoonGameModeBase::AddOrder(FFoodOrder Order)
 {
 	FoodOrders.Add(Order);
-	
+
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(Controller)
 	Controller->AddOrderSlot(Order);
@@ -74,6 +70,85 @@ void ARSTycoonGameModeBase::RemoveOrder(FFoodOrder Order)
 	FoodOrders.RemoveSingle(Order);
 }
 
+void ARSTycoonGameModeBase::RemoveCustomer(ARSTycoonCustomerCharacter* Customer)
+{
+	Customers.RemoveSingle(Customer);
+
+	//게임 종료
+	FName OrderFoodKey;
+	if (Customers.Num() == 0 && !CanOrder(OrderFoodKey))
+	{
+		EndSaleMode();
+	}
+}
+
+void ARSTycoonGameModeBase::AddNPC(ARSTycoonNPC* NPC)
+{
+	//손님은 추가하지 않음. GameMode에서 생성을 전반해서 맡아야하기 때문
+	if (NPC->IsA<ARSTycoonCustomerCharacter>())
+	{
+		return;
+	}
+
+	NPCs.Add(NPC);
+}
+
+void ARSTycoonGameModeBase::EndSaleMode()
+{
+	RS_LOG_C("게임 끝", FColor::Orange);
+
+	State = ETycoonGameMode::EndSale;
+
+	//리셋
+	GetWorldTimerManager().ClearTimer(CustomerTimerHandle);
+	GetWorldTimerManager().ClearTimer(GameTimerHandle);
+
+	for (auto& NPC : NPCs)
+	{
+		NPC->StopAllAction();
+	}
+
+	for (auto& Customer : Customers)
+	{
+		Customer->StopAllAction();
+		Customer->Destroy();
+	}
+
+	Customers.Empty();
+	FoodOrders.Empty();
+
+	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
+	check(TileMap)
+	TileMap->ResetAllTile();
+
+	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->EndSaleMode();
+}
+
+void ARSTycoonGameModeBase::StartWaitMode()
+{
+	State = ETycoonGameMode::Wait;
+
+	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->StartWaitMode();
+}
+
+void ARSTycoonGameModeBase::StartManagementMode()
+{
+	State = ETycoonGameMode::Management;
+
+	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->StartManagementMode();
+}
+
+float ARSTycoonGameModeBase::GetGameTime() const
+{
+	return GetWorldTimerManager().GetTimerElapsed(GameTimerHandle);
+}
+
+FFoodOrder ARSTycoonGameModeBase::GetOrderToCook()
+{
+	//제일 처음 주문을 반환
+	return FoodOrders[0];
+}
+
 void ARSTycoonGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -81,7 +156,10 @@ void ARSTycoonGameModeBase::BeginPlay()
 #if WITH_EDITOR
 	GetGameInstance<URSGameInstance>()->SetDebugLogEnabled(true);
 #endif
-	
+
+	URSSaveGameSubsystem* SaveSubsystem = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
+	SaveSubsystem->OnSaveRequested.AddDynamic(this, &ARSTycoonGameModeBase::SaveGameData);
+
 	GetWorldTimerManager().SetTimerForNextTick([&]()
 	{
 		//최초 한번 게임 세팅을 해줌
@@ -117,8 +195,7 @@ void ARSTycoonGameModeBase::CreateCustomer()
 	{
 		int32 RandomTableIndex = FMath::RandRange(0, TableTiles.Num() - 1);
 		TargetTableTile = Cast<ARSTableTile>(TableTiles[RandomTableIndex]);
-	}
-	while (!TargetTableTile->CanSit());
+	} while (!TargetTableTile->CanSit());
 
 	//손님을 스폰할 문 결정
 	TArray<AActor*> DoorTiles;
@@ -142,30 +219,6 @@ void ARSTycoonGameModeBase::CreateCustomer()
 	}
 }
 
-void ARSTycoonGameModeBase::RemoveCustomer(ARSTycoonCustomerCharacter* Customer)
-{
-	Customers.RemoveSingle(Customer);
-	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->AddCustomerCount(1);
-
-	//게임 종료
-	FName OrderFoodKey;
-	if (Customers.Num() == 0 && !CanOrder(OrderFoodKey))
-	{
-		EndSale();
-	}
-}
-
-void ARSTycoonGameModeBase::AddNPC(ARSTycoonNPC* NPC)
-{
-	//손님은 추가하지 않음. GameMode에서 생성을 전반해서 맡아야하기 때문
-	if (NPC->IsA<ARSTycoonCustomerCharacter>())
-	{
-		return;
-	}
-
-	NPCs.Add(NPC);
-}
-
 //남은 재료중에 요리가 가능한지 반환
 //OutOrderFood : true로 통과된다면 해야할 요리
 bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
@@ -173,7 +226,7 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 	URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(Controller)
-	
+
 	//1. 이미 들어와있는 손님들이 시키는 음식들이 사용하는 재료를 남은 재료 목록에서 제외 시켜야함
 	TArray<FItemSlot> Ingredients = Controller->GetInventoryComponent()->GetItems(); //재료 있는 것들 복사
 	for (auto& Customer : Customers)
@@ -225,41 +278,45 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 	return bResult;
 }
 
-void ARSTycoonGameModeBase::EndSale()
+void ARSTycoonGameModeBase::LoadGameData()
 {
-	RS_LOG_C("게임 끝", FColor::Orange);
+	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	check(Controller)
 
-	GetWorldTimerManager().ClearTimer(CustomerTimerHandle);
-	GetWorldTimerManager().ClearTimer(GameTimerHandle);
+	URSSaveGameSubsystem* SaveSubsystem = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
+	FString TycoonSaveSlot = SaveSubsystem->TycoonSaveSlot;
+	URSTycoonSaveGame* SaveGame = Cast<URSTycoonSaveGame>(UGameplayStatics::LoadGameFromSlot(TycoonSaveSlot, 0));
 
-	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->EndSaleMode();
-}
+	if (SaveGame == nullptr)
+	{
+		//최초 파일 생성
+		SaveGame = Cast<URSTycoonSaveGame>(UGameplayStatics::CreateSaveGameObject(URSTycoonSaveGame::StaticClass()));
 
-void ARSTycoonGameModeBase::StartWaitMode()
-{
-	State = ETycoonGameMode::Wait;
+		TArray<AActor*> IceBoxTiles;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSIceBoxTile::StaticClass(), IceBoxTiles);
+
+		//인벤 크기 설정
+		SaveGame->Ingredients.SetNum(ARSIceBoxTile::AddInventorySlot * (IceBoxTiles.Num() + 1));
+
+		//최초 파일 저장
+		UGameplayStatics::SaveGameToSlot(SaveGame, TycoonSaveSlot, 0);
+	}
 	
-	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->StartWaitMode();
-
-	//리셋 
-	
-	FoodOrders.Empty();
+	Controller->GetInventoryComponent()->LoadItemData();
+	Controller->GetInventoryComponent()->UpdateInventoryWidget();
+	Controller->SetGold(SaveGame->Money);
 }
 
-void ARSTycoonGameModeBase::StartManagementMode()
+void ARSTycoonGameModeBase::SaveGameData()
 {
-	State = ETycoonGameMode::Management;
+	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	check(Controller)
 
-	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->StartManagementMode();
-}
+	FString SaveSlot = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonSaveSlot;
+	URSTycoonSaveGame* SaveGame =
+		Cast<URSTycoonSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlot, 0));
 
-float ARSTycoonGameModeBase::GetGameTime() const
-{
-	return GetWorldTimerManager().GetTimerElapsed(GameTimerHandle);
-}
+	SaveGame->Money = Controller->GetGold();
 
-FFoodOrder ARSTycoonGameModeBase::GetOrderToCook()
-{
-	//제일 처음 주문을 반환
-	return FoodOrders[0];
+	UGameplayStatics::SaveGameToSlot(SaveGame, SaveSlot, 0);
 }

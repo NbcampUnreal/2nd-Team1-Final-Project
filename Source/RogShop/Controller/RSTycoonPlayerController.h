@@ -171,6 +171,8 @@ private:
 public:
 	void AddGold(int32 Value);
 	void AddCustomerCount(int32 Value);
+	void SetGold(int32 Value);
+	void SetCustomerCount(int32 Value);
 
 	int32 GetGold() const { return Gold; }
 	int32 GetCustomerCount() const { return CustomerCount; }

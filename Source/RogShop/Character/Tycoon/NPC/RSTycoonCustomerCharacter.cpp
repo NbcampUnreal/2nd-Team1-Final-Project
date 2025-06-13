@@ -74,6 +74,16 @@ void ARSTycoonCustomerCharacter::Eat()
 	}
 }
 
+void ARSTycoonCustomerCharacter::StopAllAction()
+{
+	Super::StopAllAction();
+
+	State = ETycoonCustomerState::Move;
+	SitTableTile = nullptr;
+	
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+}
+
 void ARSTycoonCustomerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -137,7 +147,9 @@ void ARSTycoonCustomerCharacter::Leave()
 	ARSDoorTile* DoorTile = Cast<ARSDoorTile>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSDoorTile::StaticClass()));
 	MoveToTarget(DoorTile->GetSpawnPoint(), DoorTile);
 
-	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->AddGold(Data->Price);
+	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	PlayerController->AddGold(Data->Price);
+	PlayerController->AddCustomerCount(1);
 
 	OnFinishEat.Broadcast(this);
 

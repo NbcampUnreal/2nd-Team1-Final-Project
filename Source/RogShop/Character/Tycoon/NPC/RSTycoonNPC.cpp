@@ -63,6 +63,15 @@ void ARSTycoonNPC::MoveToTarget(FVector Location, AActor* Target)
 	}
 }
 
+void ARSTycoonNPC::StopAllAction()
+{
+	MoveTarget = nullptr;
+}
+
+void ARSTycoonNPC::InteractTarget(AActor* TargetActor)
+{
+}
+
 void ARSTycoonNPC::BeginPlay()
 {
 	Super::BeginPlay();

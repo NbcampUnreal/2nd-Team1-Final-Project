@@ -6,12 +6,16 @@
 #include "RogShop/RSMonsterAttackTraceDefine.h"
 #include "RogShop/UtilDefine.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Components/ProgressBar.h"
 #include "RSDataSubsystem.h"
 #include "ItemInfoData.h"
 #include "DungeonObjectData.h"
 #include "RSDungeonGameModeBase.h"
 #include "RSDungeonGroundIngredient.h"
 #include "RSDungeonGroundLifeEssence.h"
+
+TArray<ARSDunMonsterCharacter*> ARSDunMonsterCharacter::AllMonsters;
 
 ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 {
@@ -27,14 +31,23 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	navInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("NavInvoker"));	
 	navInvoker->SetGenerationRadii(navGenerationRadius, navRemovalRadius);
 
+	// 몬스터 머리 위 체력 바 위젯
+	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
+	OverheadWidget->SetupAttachment(GetMesh());
+	OverheadWidget->SetWidgetSpace(EWidgetSpace::World);
+	OverheadWidget->SetDrawSize(FVector2D(1920.f, 500.f));
+	OverheadWidget->SetRelativeLocation(FVector(0.f, 0.f, 250.f)); // 필요 시 위치 조정
+	OverheadWidget->SetTwoSided(true);	// 양면 설정<< 이거 될까?
+	OverheadWidget->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
+
 	//Patrol
 	maxDetectPatrolRoute = 2000.f;
 
 	// 몬스터 캡슐 컴포넌트에 몬스터 공격을 받지 않도록 무시하는 함수
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_MonsterAttackTrace, ECR_Ignore);
 
-	// 캡슐 컴포넌트의 오버랩 이벤트는 끄고 스켈레탈 메시의 오버랩 이벤트는 켜기  << 플레이어의 공격 판정 처리
-	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
+	// 캡슐컴포넌트와 스켈레탈 메시의 오버렙 이벤트를 킨다
+	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
 	GetMesh()->SetGenerateOverlapEvents(true);
 
 	DrawDebugLineSeconds = 5.0f;
@@ -43,6 +56,8 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	meleeAtkRange = 150.0f;
 	strafeRange = 500.0f;
 	bIsPlayingAnim = false;
+
+	
 }
 
 void ARSDunMonsterCharacter::BeginPlay()
@@ -50,6 +65,8 @@ void ARSDunMonsterCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	GetWorld()->GetTimerManager().SetTimer(detectDelayTimer, this, &ARSDunMonsterCharacter::FindNearPatrolPoint, 0.5f, false);	
+	GetWorld()->GetTimerManager().SetTimer(MonsterHPBarRotationTimer, this, &ARSDunMonsterCharacter::UpdateEnemyHealthBarRotation, 0.1f, true);
+
 	if (UAnimInstance* animInstance = GetMesh()->GetAnimInstance())
 	{
 		animInstance->OnMontageEnded.AddDynamic(this, &ARSDunMonsterCharacter::OnEveryMontageEnded);
@@ -57,7 +74,22 @@ void ARSDunMonsterCharacter::BeginPlay()
 
 	OnCharacterDied.AddDynamic(this, &ARSDunMonsterCharacter::MonsterItemDrop);
 
-	//InitMonsterData();
+	// 보스 몬스터만 머리 위 HP바 삭제
+	const FMonsterData* Data = GetFMonsterData();
+	if (Data && Data->MonsterType == EMonsterType::Boss)
+	{
+		OverheadWidget->DestroyComponent();	// 보스는 HP 바 삭제
+	}
+
+	AllMonsters.Add(this);	// 새로운 몬스터는 몬스터 배열에 추가 < 이유는 모든 몬스터의 HP바 회전을 위함.
+
+}
+
+void ARSDunMonsterCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	AllMonsters.Remove(this);
 }
 
 void ARSDunMonsterCharacter::PlayAttackAnim()
@@ -154,6 +186,7 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	DecreaseHP(Damage);
+	UpdateOverheadEnemyHP(Damage);
 
 	// 데미지 받으면 로그에 추가!
 	RS_LOG_F("[%s] 몬스터가 [%s] 에게 %f 데미지를 받았습니다. 체력 : %f / %f",
@@ -330,29 +363,10 @@ void ARSDunMonsterCharacter::OnDeath()
 		ctrl->Destroy();
 	}
 
-	UGameInstance* CurGameInstance = GetGameInstance();
-	if (!CurGameInstance)
-	{
-		return;
-	}
-
-	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
-	if (!DataSubsystem)
-	{
-		return;
-	}
-
-	UDataTable* MonsterDataTable = DataSubsystem->Monster;
-	if (!MonsterDataTable)
-	{
-		return;
-	}
-
-	FMonsterData* Data = MonsterDataTable->FindRow<FMonsterData>(MonsterRowName, TEXT("Get MonsterData"));
-	if (Data)
+	if (GetFMonsterData())
 	{
 		// 몬스터의 타입이 보스인 경우 게임모드에 보스가 죽었다고 알린다.
-		EMonsterType CurMonsterType = Data->MonsterType;
+		EMonsterType CurMonsterType = GetFMonsterData()->MonsterType;
 		if (CurMonsterType == EMonsterType::Boss)
 		{
 			ARSDungeonGameModeBase* DungeonGameMode = Cast<ARSDungeonGameModeBase>(GetWorld()->GetAuthGameMode());
@@ -366,55 +380,21 @@ void ARSDunMonsterCharacter::OnDeath()
 
 void ARSDunMonsterCharacter::InitMonsterData()
 {
-	// TODO : 아래 방법의 초기화가 맘에 안들면 다시 주석 풀거나 삭제할 코드
-	/*static const FString DataTablePath = TEXT("/Game/Datas/MonsterDataTable.MonsterDataTable");
-
-	UDataTable* LoadedTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DataTablePath));
-
-	if (LoadedTable)
+	if (GetFMonsterData())
 	{
-		MonsterDataTable = LoadedTable;
-	}
-	else
+		MonsterAttackSkills = GetFMonsterData()->MonsterAttackSkills;
 
-	}*/
-
-	UGameInstance* CurGameInstance = GetGameInstance();
-	if (!CurGameInstance)
-	{
-		return;
-	}
-
-	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
-	if (!DataSubsystem)
-	{
-		return;
-	}
-
-	UDataTable* MonsterDataTable = DataSubsystem->Monster;
-	if (!MonsterDataTable)
-	{
-		RS_LOG("몬스터 데이터테이블 로딩 실패");
-		return;
-	}
-	
-	FMonsterData* Row = MonsterDataTable->FindRow<FMonsterData>(MonsterRowName, TEXT("Set MonsterRowName"));
-
-	if (Row)
-	{
-		MonsterAttackSkills = Row->MonsterAttackSkills;
-
-		ChangeMaxHP(Row->MaxHP);
-		ChangeHP(Row->MaxHP);	// TODO : 이거 뭔가 비효율적인데 InitMaxHP() 함수에 MaxHP랑 HP둘다 조정하는거 만들어주세용 선국님
-		ChangeMoveSpeed(Row->MoveSpeed);
+		ChangeMaxHP(GetFMonsterData()->MaxHP);
+		ChangeHP(GetFMonsterData()->MaxHP);	// TODO : 이거 뭔가 비효율적인데 InitMaxHP() 함수에 MaxHP랑 HP둘다 조정하는거 만들어주세용 선국님
+		ChangeMoveSpeed(GetFMonsterData()->MoveSpeed);
 
 		for (const FMonsterAttackSkillData& Skill : MonsterAttackSkills)
 		{
 			CachedAttackTraceDataArray.Add(Skill.AttackTrace);
 		}
 
-		RS_LOG_F("MaxHP가 잘 적용 되었습니다! MaxHP : %f", Row->MaxHP);
-		RS_LOG_F("MoveSpeed가 잘 적용 되었습니다! MoveSpeed : %f", Row->MoveSpeed);
+		RS_LOG_F("MaxHP가 잘 적용 되었습니다! MaxHP : %f", GetFMonsterData()->MaxHP);
+		RS_LOG_F("MoveSpeed가 잘 적용 되었습니다! MoveSpeed : %f", GetFMonsterData()->MoveSpeed);
 	}
 	else
 	{
@@ -438,6 +418,12 @@ void ARSDunMonsterCharacter::MonsterItemDrop()
 	}
 
 	UDataTable* MonsterDataTable = DataSubsystem->Monster;
+	if (!MonsterDataTable)
+	{
+		RS_LOG("몬스터 데이터테이블 로딩 실패");
+		return;
+	}
+
 	UDataTable* IngredientInfoDataTable = DataSubsystem->IngredientInfo;
 	if (!MonsterDataTable || !IngredientInfoDataTable)
 	{
@@ -446,6 +432,7 @@ void ARSDunMonsterCharacter::MonsterItemDrop()
 	}
 
 	FMonsterData* MonsterDataRow = MonsterDataTable->FindRow<FMonsterData>(MonsterRowName, TEXT("Get MonsterDataRow"));
+
 	if (MonsterDataRow && MonsterDataRow->Ingredients.Num() >= 0)
 	{
 		for (const FMonsterIngredientsData& e : MonsterDataRow->Ingredients)
@@ -509,4 +496,80 @@ float ARSDunMonsterCharacter::GetAtkRange()
 float ARSDunMonsterCharacter::GetStrafeRange()
 {
 	return strafeRange;
+}
+
+const TArray<ARSDunMonsterCharacter*>& ARSDunMonsterCharacter::GetAllMonsters()
+{
+	return AllMonsters;
+}
+
+const FMonsterData* ARSDunMonsterCharacter::GetFMonsterData()
+{
+	UGameInstance* CurGameInstance = GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return nullptr;
+	}
+
+	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return nullptr;
+	}
+
+	UDataTable* MonsterDataTable = DataSubsystem->Monster;
+	if (!MonsterDataTable)
+	{
+		RS_LOG("몬스터 데이터테이블 로딩 실패");
+		return nullptr;
+	}
+
+	FMonsterData* MonsterDataRow = MonsterDataTable->FindRow<FMonsterData>(MonsterRowName, TEXT("Get MonsterDataRow"));
+	return MonsterDataRow;
+}
+
+// 적의 체력바가 항상 카메라를 바라보게 회전시키는 함수
+void ARSDunMonsterCharacter::UpdateEnemyHealthBarRotation()
+{
+	if (!OverheadWidget || !GetWorld()) return;
+
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (!PlayerController) return;
+
+	FVector CameraLocation;
+	FRotator CameraRotation;
+	PlayerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
+
+	FRotator NewRotation = FRotator(0, CameraRotation.Yaw + 180.0f, 0);
+
+	// 기존 회전값과 비교해서 변할 때만 업데이트 (불필요한 연산 방지)
+	if (!NewRotation.Equals(OverheadWidget->GetComponentRotation(), 0.1f))
+	{
+		OverheadWidget->SetWorldRotation(NewRotation);
+	}
+}
+
+void ARSDunMonsterCharacter::UpdateOverheadEnemyHP(float const damage)
+{
+	if (!OverheadWidget)
+	{
+		return;
+	}
+
+	// 1. 캐릭터 머리 위에 연결할 위젯의 실체 가져오기
+	UUserWidget* OverheadWidgetInstance = OverheadWidget->GetUserWidgetObject();
+	if (!OverheadWidgetInstance)
+	{
+		return;
+	}
+
+	// 2. 그 위젯의 실체에서 HPBar 프로그레스 바 부분 가져와서 퍼센트 업데이트 해주기
+	if (UProgressBar* HPBar = Cast<UProgressBar>(OverheadWidgetInstance->GetWidgetFromName(TEXT("Monster_HP_Bar"))))
+	{
+		// HPPercent = 0.0 ~ 1.0 범위의 값이 나오도록 설정
+		const float HPPercent = (GetMaxHP() > 0.f) ? (float)GetHP() / (float)GetMaxHP() : 0.f;
+		HPBar->SetPercent(HPPercent);
+		HPBar->SetFillColorAndOpacity(FLinearColor(1.f, 0.f, 0.f, 0.8f));	// 살짝 투명한 빨강
+
+	}
 }
