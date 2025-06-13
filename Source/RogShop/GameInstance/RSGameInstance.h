@@ -4,12 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "ItemInfoData.h"
 #include "RSGameInstance.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class ROGSHOP_API URSGameInstance : public UGameInstance
 {
