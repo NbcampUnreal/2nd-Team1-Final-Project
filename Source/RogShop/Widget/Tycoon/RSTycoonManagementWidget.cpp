@@ -3,6 +3,7 @@
 
 #include "RSTycoonManagementWidget.h"
 
+#include "RSSaveGameSubsystem.h"
 #include "RSTycoonGameModeBase.h"
 #include "RSTycoonPlayerController.h"
 
@@ -37,12 +38,6 @@ void URSTycoonManagementWidget::NativeOnInitialized()
 		BuyTileSlot->SetPadding(FMargin(0, 10));
 	}
 
-	//골드 세팅
-	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
-	check(Controller)
-
-	GoldText->SetText(FText::FromString(FString::FromInt(Controller->GetGold())));
-
 	// 보더 초기 위치 세팅
 	BuyTileParentBorder->SetRenderTranslation(FVector2D(0.f, 0.f));
 	BuyNPCBorder->SetRenderTranslation(FVector2D(0.f, 0.f));
@@ -50,6 +45,20 @@ void URSTycoonManagementWidget::NativeOnInitialized()
 	ExpandTileButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OnClickExpandTile);
 	ReturnBaseAreaButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OnClickWaitMode);
 	CreateNPCButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OpenBuyNPCLayout);
+
+	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	check(PlayerController)
+	PlayerController->OnChangeGold.AddDynamic(this, &URSTycoonManagementWidget::OnChangeGold);
+}
+
+void URSTycoonManagementWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	//골드 세팅
+	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	check(Controller)
+	OnChangeGold(Controller->GetGold());
 }
 
 void URSTycoonManagementWidget::OnClickExpandTile()
@@ -67,12 +76,16 @@ void URSTycoonManagementWidget::OnClickExpandTile()
 
 void URSTycoonManagementWidget::OnClickWaitMode()
 {
+	GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->OnSaveRequested.Broadcast();
+	
 	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->StartWaitMode();
-
-	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
-	check(TileMap)
-	TileMap->SaveTileMap();
 }
+
+void URSTycoonManagementWidget::OnChangeGold(int32 Value)
+{
+	GoldText->SetText(FText::FromString(FString::FromInt(Value)));
+}
+
 
 void URSTycoonManagementWidget::OpenBuyTileLayout()
 {

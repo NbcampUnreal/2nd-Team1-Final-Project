@@ -26,9 +26,12 @@ public:
 	bool HasTarget() const { return MoveTarget != nullptr; }
 	FString GetDisplayName() const { return DisplayName; }
 	int32 GetPrice() const { return Price; }
+	TObjectPtr<UTexture2D> GetThumbnail() const { return Thumbnail; }
 	
 protected:
 	virtual void BeginPlay() override;
+	virtual void Destroyed() override;
+	
 	virtual void InteractTarget(AActor* TargetActor);
 	
 private:
@@ -45,9 +48,12 @@ protected:
 	UPROPERTY()
 	TObjectPtr<AActor> MoveTarget;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Information")
 	FString DisplayName = TEXT("NPC");
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Information")
 	int32 Price = 10;
+
+	UPROPERTY(EditAnywhere, Category="Information")
+	TObjectPtr<UTexture2D> Thumbnail;
 };

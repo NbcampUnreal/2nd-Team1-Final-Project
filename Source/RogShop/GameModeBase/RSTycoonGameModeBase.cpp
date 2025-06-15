@@ -30,7 +30,7 @@ void ARSTycoonGameModeBase::StartSaleMode()
 {
 	State = ETycoonGameMode::Sale;
 
-	SettingGame();
+	SetMaxCustomerCount();
 
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(Controller)
@@ -40,7 +40,7 @@ void ARSTycoonGameModeBase::StartSaleMode()
 	GetWorldTimerManager().SetTimer(GameTimerHandle, this, &ARSTycoonGameModeBase::EndSaleMode, SalePlayMinute * 60, false);
 }
 
-void ARSTycoonGameModeBase::SettingGame()
+void ARSTycoonGameModeBase::SetMaxCustomerCount()
 {
 	//들어올 수 있는 최대 손님 갯수 설정 
 	TArray<AActor*> TableTiles;
@@ -52,8 +52,6 @@ void ARSTycoonGameModeBase::SettingGame()
 		ARSTableTile* Tile = Cast<ARSTableTile>(Element);
 		MaxCustomerCount += Tile->GetMaxPlace();
 	}
-
-	LoadGameData();
 }
 
 void ARSTycoonGameModeBase::AddOrder(FFoodOrder Order)
@@ -85,12 +83,18 @@ void ARSTycoonGameModeBase::RemoveCustomer(ARSTycoonCustomerCharacter* Customer)
 void ARSTycoonGameModeBase::AddNPC(ARSTycoonNPC* NPC)
 {
 	//손님은 추가하지 않음. GameMode에서 생성을 전반해서 맡아야하기 때문
-	if (NPC->IsA<ARSTycoonCustomerCharacter>())
+	if (!NPC->IsA<ARSTycoonCustomerCharacter>())
 	{
-		return;
+		NPCs.Add(NPC);
 	}
+}
 
-	NPCs.Add(NPC);
+void ARSTycoonGameModeBase::RemoveNPC(ARSTycoonNPC* NPC)
+{
+	if (!NPC->IsA<ARSTycoonCustomerCharacter>())
+	{
+		NPCs.RemoveSingle(NPC);
+	}
 }
 
 void ARSTycoonGameModeBase::EndSaleMode()
@@ -162,8 +166,7 @@ void ARSTycoonGameModeBase::BeginPlay()
 
 	GetWorldTimerManager().SetTimerForNextTick([&]()
 	{
-		//최초 한번 게임 세팅을 해줌
-		SettingGame();
+		LoadGameData();
 		StartWaitMode();
 	});
 }
@@ -291,13 +294,8 @@ void ARSTycoonGameModeBase::LoadGameData()
 	{
 		//최초 파일 생성
 		SaveGame = Cast<URSTycoonSaveGame>(UGameplayStatics::CreateSaveGameObject(URSTycoonSaveGame::StaticClass()));
-
-		TArray<AActor*> IceBoxTiles;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSIceBoxTile::StaticClass(), IceBoxTiles);
-
-		//인벤 크기 설정
-		SaveGame->Ingredients.SetNum(ARSIceBoxTile::AddInventorySlot * (IceBoxTiles.Num() + 1));
-
+		SaveGame->SetDefault();
+		
 		//최초 파일 저장
 		UGameplayStatics::SaveGameToSlot(SaveGame, TycoonSaveSlot, 0);
 	}

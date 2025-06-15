@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RSTycoonPlayerController.generated.h"
 
+class URSTycoonNPCInfoWidget;
 struct FInputActionValue;
 struct FFoodOrder;
 struct FItemSlot;
@@ -18,9 +19,9 @@ class URSTycoonSaleResultWidget;
 class URSTycoonWaitWidget;
 class UInputAction;
 class UInputMappingContext;
-/**
- * 
- */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeGold, int32, Value);
+
 UCLASS()
 class ROGSHOP_API ARSTycoonPlayerController : public APlayerController
 {
@@ -68,6 +69,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<URSIngredientInventoryWidget> InventoryWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<URSTycoonNPCInfoWidget> NPCInfoWidgetClass;
 	
 	UPROPERTY()
 	TObjectPtr<URSTycoonWaitWidget> WaitWidget;
@@ -83,6 +87,9 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<URSIngredientInventoryWidget> InventoryWidget;
+	
+	UPROPERTY()
+	TObjectPtr<URSTycoonNPCInfoWidget> NPCInfoWidget;
 #pragma endregion
 
 #pragma region Input
@@ -153,11 +160,11 @@ public:
 
 private:
 	UFUNCTION()
-	void OnClickTile();
-	UFUNCTION()
 	void OnRotateTile(const FInputActionValue& Value);
 
 	void SettingChangeTile();
+	
+	void DeactiveSelectTileWidget();
 	
 private:
 	UPROPERTY(EditDefaultsOnly)
@@ -169,7 +176,9 @@ private:
 #pragma endregion 
 	
 public:
+	UFUNCTION(BlueprintCallable)
 	void AddGold(int32 Value);
+	
 	void AddCustomerCount(int32 Value);
 	void SetGold(int32 Value);
 	void SetCustomerCount(int32 Value);
@@ -181,6 +190,13 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+private:
+	UFUNCTION()
+	void OnClickTileOrNPC();
+	
+public:
+	FOnChangeGold OnChangeGold;
+	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<URSTycoonInventoryComponent> InventoryComponent; //인벤토리
