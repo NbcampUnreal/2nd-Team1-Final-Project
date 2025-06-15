@@ -181,7 +181,7 @@ void ARSDungeonGameModeBase::OnMapReady()// 맵 로딩이 완료되었을 때 �
         if (!GameMode->SpawnManager)
         {
             RS_LOG_DEBUG("스폰 매니저 생성");
-            GameMode->SpawnManager = NewObject<URSSpawnManager>(GameMode, URSSpawnManager::StaticClass());
+            GameMode->SpawnManager = NewObject<URSSpawnManager>(GameMode, GameMode->SpawnManagerClass);
             GameMode->SpawnManager->Initialize(GameMode->GetWorld(), GameMode->GetGameInstance(), GameMode->TileIndex);
         
             GameMode->SpawnManager->SpawnPlayerAtStartPoint();

@@ -5,15 +5,10 @@
 #include "RSDunPlayerCharacter.h"
 #include "RogShop/RSMonsterAttackTraceDefine.h"
 #include "RogShop/UtilDefine.h"
-#include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Components/ProgressBar.h"
 #include "RSDataSubsystem.h"
-#include "ItemInfoData.h"
-#include "DungeonObjectData.h"
 #include "RSDungeonGameModeBase.h"
-#include "RSDungeonGroundIngredient.h"
-#include "RSDungeonGroundLifeEssence.h"
 
 TArray<ARSDunMonsterCharacter*> ARSDunMonsterCharacter::AllMonsters;
 
@@ -71,8 +66,6 @@ void ARSDunMonsterCharacter::BeginPlay()
 	{
 		animInstance->OnMontageEnded.AddDynamic(this, &ARSDunMonsterCharacter::OnEveryMontageEnded);
 	}
-
-	OnCharacterDied.AddDynamic(this, &ARSDunMonsterCharacter::MonsterItemDrop);
 
 	// 보스 몬스터만 머리 위 HP바 삭제
 	const FMonsterData* Data = GetFMonsterData();
@@ -403,76 +396,6 @@ void ARSDunMonsterCharacter::InitMonsterData()
 	}
 }
 
-void ARSDunMonsterCharacter::MonsterItemDrop()
-{
-	UGameInstance* CurGameInstance = GetGameInstance();
-	if (!CurGameInstance)
-	{
-		return;
-	}
-
-	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
-	if (!DataSubsystem)
-	{
-		return;
-	}
-
-	UDataTable* MonsterDataTable = DataSubsystem->Monster;
-	if (!MonsterDataTable)
-	{
-		RS_LOG("몬스터 데이터테이블 로딩 실패");
-		return;
-	}
-
-	UDataTable* IngredientInfoDataTable = DataSubsystem->IngredientInfo;
-	if (!MonsterDataTable || !IngredientInfoDataTable)
-	{
-		RS_LOG("몬스터 데이터테이블 혹은 재료 데이터테이블 로딩 실패");
-		return;
-	}
-
-	FMonsterData* MonsterDataRow = MonsterDataTable->FindRow<FMonsterData>(MonsterRowName, TEXT("Get MonsterDataRow"));
-
-	if (MonsterDataRow && MonsterDataRow->Ingredients.Num() >= 0)
-	{
-		for (const FMonsterIngredientsData& e : MonsterDataRow->Ingredients)
-		{
-			// TODO : 드랍 확률 적용하기
-
-			FItemInfoData* IngredientInfoDataRow = IngredientInfoDataTable->FindRow<FItemInfoData>(e.IngredientName, TEXT("Get IngredientDetailData"));
-			if (IngredientInfoDataRow)
-			{
-				ARSDungeonGroundIngredient* DungeonIngredient = GetWorld()->SpawnActor<ARSDungeonGroundIngredient>(ARSDungeonGroundIngredient::StaticClass(), GetActorTransform());
-
-				if (DungeonIngredient)
-				{
-					FText ItemName = IngredientInfoDataRow->ItemName;
-					UStaticMesh* ItemStaticMesh = IngredientInfoDataRow->ItemStaticMesh;
-
-					DungeonIngredient->InitGroundItemInfo(ItemName, false, e.IngredientName, ItemStaticMesh);
-					DungeonIngredient->SetQuantity(1);
-					DungeonIngredient->RandImpulse();
-				}
-			}
-		}
-	}
-
-	UDataTable* DungeonObjectDataTable = DataSubsystem->DungeonObject;
-	FDungeonObjectData* DungeonObjectDataRow = DungeonObjectDataTable->FindRow<FDungeonObjectData>(FName("LifeEssence"), TEXT("Get DungeonObjectDataTable"));;
-	if (MonsterDataRow && DungeonObjectDataRow && DungeonObjectDataRow->ObjectClass)
-	{
-		ARSDungeonGroundLifeEssence* DungeonLifeEssence = GetWorld()->SpawnActor<ARSDungeonGroundLifeEssence>(DungeonObjectDataRow->ObjectClass, GetActorTransform());
-
-		if (DungeonLifeEssence)
-		{
-			int32 LifeEssenceQuantity = MonsterDataRow->DropLifeEssenceQuantity;
-
-			DungeonLifeEssence->RandImpulse();
-			DungeonLifeEssence->SetQuantity(LifeEssenceQuantity);
-		}
-	}
-}
-
 int32 ARSDunMonsterCharacter::GetActionLength()
 {
 	return MonsterAttackSkills.Num();
@@ -572,4 +495,9 @@ void ARSDunMonsterCharacter::UpdateOverheadEnemyHP(float const damage)
 		HPBar->SetFillColorAndOpacity(FLinearColor(1.f, 0.f, 0.f, 0.8f));	// 살짝 투명한 빨강
 
 	}
+}
+
+FName ARSDunMonsterCharacter::GetMonsterRowName() const
+{
+	return MonsterRowName;
 }
