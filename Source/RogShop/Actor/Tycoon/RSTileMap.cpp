@@ -93,12 +93,7 @@ void ARSTileMap::ResetAllTile()
 
 void ARSTileMap::SpawnActorInMap(UClass* ActorClass)
 {
-	FVector HalfTileSize = DefaultTileType->GetDefaultObject<ARSBaseTile>()->GetTileSize() * 0.5f;
-	FVector MapSize = GetMapSize();
-	FVector RandomLocation = FVector(FMath::FRand()) * MapSize;
-	FVector SpawnLocation = GetActorLocation() + RandomLocation - HalfTileSize;
-	SpawnLocation.Z = GetActorLocation().Z + 100;
-
+	FVector SpawnLocation = GetRandomLocationInMap();
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
@@ -226,22 +221,17 @@ void ARSTileMap::CreateTiles()
 
 	RS_LOG_F("%d x %d Tile 생성", Width, Height);
 
-	//배치되어 있는 타일 전체 삭제
-	if (TileActors.Num() > 0)
+	//붙어있는 엑터들 (타일, 벽 등) 전체 삭제
+	TArray<AActor*> AttachedActors;
+	GetAttachedActors(AttachedActors);
+	for (AActor* AttachedActor : AttachedActors)
 	{
-		for (auto& Tile : TileActors)
-		{
-			if (Tile.Get())
-			{
-				Tile->Destroy();
-			}
-		}
-
-		TileActors.Empty();
+		AttachedActor->Destroy();
 	}
 
-	FVector TileSize = DefaultTileType.GetDefaultObject()->GetTileSize();
+	TileActors.Empty();
 
+	//타일 생성
 	for (int32 i = 0; i < Height; i++)
 	{
 		for (int32 j = 0; j < Width; j++)
@@ -252,11 +242,12 @@ void ARSTileMap::CreateTiles()
 		}
 	}
 
+	//=== 네비게이션 볼륨 설정 ===
 	NavVolume = Cast<ANavMeshBoundsVolume>(UGameplayStatics::GetActorOfClass(GetWorld(), ANavMeshBoundsVolume::StaticClass()));
 	check(NavVolume)
-
 	NavVolume->SetActorLocation(GetMapCenter());
 
+	FVector TileSize = DefaultTileType.GetDefaultObject()->GetTileSize();
 	FVector NavMeshSize = FVector(TileSize.X * (Height + 1), TileSize.Y * (Width + 1), 100);
 	UBrushComponent* BrushComp = NavVolume->GetBrushComponent();
 
@@ -269,6 +260,20 @@ void ARSTileMap::CreateTiles()
 	{
 		NavSystem->OnNavigationBoundsUpdated(NavVolume);
 	}
+
+	//NPC, 플레이어 위치를 옮김
+	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
+	check(GameMode)
+
+	for (auto& NPC : GameMode->GetNPCs())
+	{
+		FVector Location = GetRandomLocationInMap();
+		NPC->SetActorLocation(Location);
+	}
+	ActiveNPC();
+
+	FVector PlayerRandomLocation = GetRandomLocationInMap();
+	GetWorld()->GetFirstPlayerController()->GetCharacter()->SetActorLocation(PlayerRandomLocation);
 }
 
 ARSBaseTile* ARSTileMap::CreateTile(const TSubclassOf<ARSBaseTile>& TileClass, int32 Row, int32 Column)
@@ -290,7 +295,70 @@ ARSBaseTile* ARSTileMap::CreateTile(const TSubclassOf<ARSBaseTile>& TileClass, i
 	TileActor->SetActorLocation(Location);
 	TileActor->SetActorRelativeRotation(FRotator(0, TileName2DMap[Row].YawValues[Column], 0));
 
+	CreateWalls(Location, Row, Column);
+
 	return TileActor;
+}
+
+void ARSTileMap::CreateWalls(const FVector& Location, int32 Row, int32 Column)
+{
+	//벽, 문 타일이 있다면 설치하지 않음
+	if (TileName2DMap[Row].Tiles[Column] != ARSDoorTile::GetStaticTileKey())
+	{
+		//위
+		if (Row == Height - 1)
+		{
+			CreateWall(WallClass, Location, 0.f);
+		}
+		//아래
+		if (Row == 0)
+		{
+			CreateWall(WallClass, Location, 180.f);
+		}
+		//왼쪽
+		if (Column == 0)
+		{
+			CreateWall(WallClass, Location, 270.f);
+		}
+		//오른쪽
+		if (Column == Width - 1)
+		{
+			CreateWall(WallClass, Location, 90.f);
+		}
+	}
+
+	//기둥
+	//왼쪽 위
+	if (Row == Height - 1 && Column == 0)
+	{
+		CreateWall(PillarClass, Location, 0.f);
+	}
+	//오른쪽 위
+	if (Row == Height - 1 && Column == Width - 1)
+	{
+		CreateWall(PillarClass, Location, 90.f);
+	}
+	//왼쪽 아래
+	if (Row == 0 && Column == 0)
+	{
+		CreateWall(PillarClass, Location, 270.f);
+	}
+	//오른쪽 아래
+	if (Row == 0 && Column == Width - 1)
+	{
+		CreateWall(PillarClass, Location, 180.f);
+	}
+}
+
+void ARSTileMap::CreateWall(TSubclassOf<AActor> WallActorClass, const FVector& Location, float Yaw)
+{
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AActor* WallActor = GetWorld()->SpawnActor<AActor>(WallActorClass, SpawnParams);
+	WallActor->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+	WallActor->SetActorLocation(Location);
+	WallActor->SetActorRelativeRotation(FRotator(0, Yaw, 0));
 }
 
 void ARSTileMap::ActiveNPC()
@@ -330,4 +398,15 @@ TSubclassOf<ARSBaseTile> ARSTileMap::GetTileClass(const FName& TileKey)
 	//아무것도 매치되지 않음
 	checkf(false, TEXT("%s에 매칭되는 타일이 없습니다."), *TileKey.ToString());
 	return nullptr;
+}
+
+FVector ARSTileMap::GetRandomLocationInMap()
+{
+	FVector HalfTileSize = DefaultTileType->GetDefaultObject<ARSBaseTile>()->GetTileSize() * 0.5f;
+	FVector MapSize = GetMapSize();
+	FVector RandomLocation = FVector(FMath::FRand()) * MapSize;
+	FVector SpawnLocation = GetActorLocation() + RandomLocation - HalfTileSize;
+	SpawnLocation.Z = GetActorLocation().Z + 100;
+
+	return SpawnLocation;
 }
