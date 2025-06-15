@@ -73,3 +73,8 @@ bool ARSDunNextStagePortal::GetIsAutoInteract() const
 {
 	return bIsAutoInteract;
 }
+
+UAnimMontage* ARSDunNextStagePortal::GetInteractAnimMontage() const
+{
+	return nullptr;
+}
