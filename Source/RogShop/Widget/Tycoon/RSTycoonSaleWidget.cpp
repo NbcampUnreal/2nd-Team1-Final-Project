@@ -5,6 +5,7 @@
 
 #include "RSTycoonGameModeBase.h"
 #include "RSTycoonOrderSlotWidget.h"
+#include "RSTycoonPlayerController.h"
 #include "Components/Button.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
@@ -13,11 +14,6 @@
 #include "Tycoon/NPC/RSTycoonChefCharacter.h"
 #include "Tycoon/NPC/RSTycoonCustomerCharacter.h"
 #include "Tycoon/NPC/RSTycoonWaiterCharacter.h"
-
-void URSTycoonSaleWidget::SetGold(int32 Value)
-{
-	GoldText->SetText(FText::AsNumber(Value));
-}
 
 void URSTycoonSaleWidget::SetCustomerCount(int32 Value)
 {
@@ -67,6 +63,10 @@ void URSTycoonSaleWidget::NativeOnInitialized()
 	Super::NativeOnInitialized();
 
 	StopSalesButton->OnClicked.AddDynamic(this, &URSTycoonSaleWidget::OnClickStopSales);
+	
+	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	check(PlayerController)
+	PlayerController->OnChangeGold.AddDynamic(this, &URSTycoonSaleWidget::OnChangeGold);
 }
 
 void URSTycoonSaleWidget::NativeConstruct()
@@ -131,3 +131,9 @@ void URSTycoonSaleWidget::OnClickStopSales()
 {
 	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->EndSaleMode();
 }
+
+void URSTycoonSaleWidget::OnChangeGold(int32 Value)
+{
+	GoldText->SetText(FText::AsNumber(Value));
+}
+

@@ -19,9 +19,11 @@
 #include "RogShop/Actor/Tycoon/RSTycoonCamera.h"
 #include "RogShop/Actor/Tycoon/Tile/RSBaseTile.h"
 #include "RogShop/Widget/Tycoon/RSTycoonManagementWidget.h"
+#include "RogShop/Widget/Tycoon/RSTycoonNPCInfoWidget.h"
 #include "RogShop/Widget/Tycoon/RSTycoonSaleResultWidget.h"
 #include "RogShop/Widget/Tycoon/RSTycoonSaleWidget.h"
 #include "RogShop/Widget/Tycoon/RSTycoonWaitWidget.h"
+#include "Tycoon/NPC/RSTycoonNPC.h"
 
 
 #pragma region Mode
@@ -47,11 +49,9 @@ void ARSTycoonPlayerController::StartSaleMode()
 	FInputModeGameAndUI InputMode;
 	SetInputMode(InputMode);
 	ChangeMainWidget(SaleWidget);
-	
-	CustomerCount = 0;
 
-	SaleWidget->SetGold(Gold);
-	SaleWidget->SetCustomerCount(0);
+	CustomerCount = 0;
+	SaleWidget->SetCustomerCount(CustomerCount);
 }
 
 void ARSTycoonPlayerController::EndSaleMode()
@@ -115,6 +115,7 @@ void ARSTycoonPlayerController::SettingWidget()
 
 	//SubWidget
 	InventoryWidget = CreateWidget<URSIngredientInventoryWidget>(this, InventoryWidgetClass.Get());
+	NPCInfoWidget = CreateWidget<URSTycoonNPCInfoWidget>(this, NPCInfoWidgetClass.Get());
 }
 #pragma endregion
 
@@ -128,7 +129,7 @@ void ARSTycoonPlayerController::SetupInputComponent()
 
 	if (TileClickAction)
 	{
-		EnhancedInput->BindAction(TileClickAction, ETriggerEvent::Triggered, this, &ARSTycoonPlayerController::OnClickTile);
+		EnhancedInput->BindAction(TileClickAction, ETriggerEvent::Triggered, this, &ARSTycoonPlayerController::OnClickTileOrNPC);
 	}
 
 	if (ZoomAction)
@@ -298,7 +299,80 @@ void ARSTycoonPlayerController::OnZoom(const FInputActionValue& Value)
 #pragma endregion
 
 #pragma region TileChange
-void ARSTycoonPlayerController::OnClickTile()
+void ARSTycoonPlayerController::OnRotateTile(const FInputActionValue& Value)
+{
+	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
+	check(GameMode)
+
+	if (GameMode->GetState() != ETycoonGameMode::Management || SelectTileIndex == INDEX_NONE)
+	{
+		return;
+	}
+
+	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
+	check(TileMap)
+
+	float Yaw = TileMap->GetTiles()[SelectTileIndex]->GetActorRotation().Yaw;
+	const float Sign = Value.Get<float>();
+	Yaw += 90 * Sign;
+
+	TileMap->RotateTile(SelectTileIndex, Yaw);
+}
+
+void ARSTycoonPlayerController::SettingChangeTile()
+{
+	SelectTileActor = GetWorld()->SpawnActor(SelectTileActorClass);
+	SelectTileActor->SetActorHiddenInGame(true);
+}
+
+void ARSTycoonPlayerController::DeactiveSelectTileWidget()
+{
+	if (SelectTileIndex != INDEX_NONE)
+	{
+		SelectTileIndex = INDEX_NONE;
+		ManagementWidget->CloseBuyTileLayout();
+		ManagementWidget->CloseBuyNPCLayout();
+
+		SelectTileActor->SetActorHiddenInGame(true);
+	}
+}
+#pragma endregion
+
+void ARSTycoonPlayerController::AddGold(int32 Value)
+{
+	SetGold(Gold + Value);
+}
+
+void ARSTycoonPlayerController::AddCustomerCount(int32 Value)
+{
+	SetCustomerCount(CustomerCount + Value);
+}
+
+void ARSTycoonPlayerController::SetGold(int32 Value)
+{
+	Gold = Value;
+	OnChangeGold.Broadcast(Gold);
+}
+
+void ARSTycoonPlayerController::SetCustomerCount(int32 Value)
+{
+	CustomerCount = Value;
+	SaleWidget->SetCustomerCount(CustomerCount);
+}
+
+void ARSTycoonPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	SetShowMouseCursor(true);
+
+	SettingInput();
+	SettingCamera();
+	SettingWidget();
+	SettingChangeTile();
+}
+
+void ARSTycoonPlayerController::OnClickTileOrNPC()
 {
 	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
 	check(GameMode)
@@ -308,8 +382,13 @@ void ARSTycoonPlayerController::OnClickTile()
 		return;
 	}
 
+	if (NPCInfoWidget->IsInViewport())
+	{
+		NPCInfoWidget->RemoveFromParent();
+	}
+
 	FHitResult HitResult;
-	if (GetHitResultUnderCursor(ECC_Visibility, true, HitResult))
+	if (GetHitResultUnderCursor(ECC_WorldDynamic, true, HitResult))
 	{
 		//디버그
 		RS_DRAW_DEBUG_SPHERE(GetWorld(), HitResult.Location, 40, 20, FColor::Blue, false, 5, 0, 1.0f);
@@ -336,75 +415,24 @@ void ARSTycoonPlayerController::OnClickTile()
 			SelectTileActor->SetActorHiddenInGame(false);
 			SelectTileActor->SetActorLocation(Tile->GetActorLocation());
 		}
+		else if (ARSTycoonNPC* NPC = Cast<ARSTycoonNPC>(HitActor))
+		{
+			RS_LOG_F("%s NPC가 선택됬습니다", *HitActor->GetName());
+
+			DeactiveSelectTileWidget();
+
+			NPCInfoWidget->SetNPC(NPC);
+			NPCInfoWidget->AddToViewport();
+
+			FVector2D MousePosition;
+			GetMousePosition(MousePosition.X, MousePosition.Y);
+
+			NPCInfoWidget->SetPositionInViewport(MousePosition);
+		}
 	}
 	//타일을 한번 선택한 후 어딜 누르든 타일 선택이 취소됨
-	else if (SelectTileIndex != INDEX_NONE)
+	else
 	{
-		SelectTileIndex = INDEX_NONE;
-		ManagementWidget->CloseBuyTileLayout();
-		ManagementWidget->CloseBuyNPCLayout();
-		
-		SelectTileActor->SetActorHiddenInGame(true);
+		DeactiveSelectTileWidget();
 	}
-}
-
-void ARSTycoonPlayerController::OnRotateTile(const FInputActionValue& Value)
-{
-	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
-	check(GameMode)
-
-	if (GameMode->GetState() != ETycoonGameMode::Management || SelectTileIndex == INDEX_NONE)
-	{
-		return;
-	}
-
-	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
-	check(TileMap)
-
-	float Yaw = TileMap->GetTiles()[SelectTileIndex]->GetActorRotation().Yaw;
-	const float Sign = Value.Get<float>();
-	Yaw += 90 * Sign;
-
-	TileMap->RotateTile(SelectTileIndex, Yaw);
-}
-
-void ARSTycoonPlayerController::SettingChangeTile()
-{
-	SelectTileActor = GetWorld()->SpawnActor(SelectTileActorClass);
-	SelectTileActor->SetActorHiddenInGame(true);
-}
-#pragma endregion
-
-void ARSTycoonPlayerController::AddGold(int32 Value)
-{
-	SetGold(Gold + Value);
-}
-
-void ARSTycoonPlayerController::AddCustomerCount(int32 Value)
-{
-	SetCustomerCount(CustomerCount + Value);
-}
-
-void ARSTycoonPlayerController::SetGold(int32 Value)
-{
-	Gold = Value;
-	SaleWidget->SetGold(Gold);
-}
-
-void ARSTycoonPlayerController::SetCustomerCount(int32 Value)
-{
-	CustomerCount = Value;
-	SaleWidget->SetCustomerCount(CustomerCount);
-}
-
-void ARSTycoonPlayerController::BeginPlay()
-{
-	Super::BeginPlay();
-
-	SetShowMouseCursor(true);
-
-	SettingInput();
-	SettingCamera();
-	SettingWidget();
-	SettingChangeTile();
 }

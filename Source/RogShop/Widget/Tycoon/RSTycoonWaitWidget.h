@@ -30,6 +30,9 @@ private:
 	
 	UFUNCTION()
 	void OnClickOutButton();
+
+	UFUNCTION()
+	void OnChangeGold(int32 Value);
 	
 	
 protected:

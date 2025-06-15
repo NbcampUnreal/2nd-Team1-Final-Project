@@ -14,7 +14,7 @@
 ARSTycoonNPC::ARSTycoonNPC()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	InteractSphere = CreateDefaultSubobject<USphereComponent>("InteractSphere");
@@ -44,7 +44,7 @@ void ARSTycoonNPC::MoveToTarget(FVector Location, AActor* Target)
 	);
 
 	RS_DRAW_DEBUG_SPHERE(GetWorld(), Location, 50, 30, FColor::Red, false, 5, 0, 1.0f);
-	
+
 	if (Result == EPathFollowingRequestResult::Type::Failed)
 	{
 		RS_LOG_C("NPC 이동 실패", FColor::Red);
@@ -80,6 +80,14 @@ void ARSTycoonNPC::BeginPlay()
 	InteractSphere->OnComponentBeginOverlap.AddDynamic(this, &ARSTycoonNPC::OnInteract);
 }
 
+void ARSTycoonNPC::Destroyed()
+{
+	if (GetWorld()->IsGameWorld())
+		GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->RemoveNPC(this);
+
+	Super::Destroyed();
+}
+
 void ARSTycoonNPC::OnInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                               UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                               const FHitResult& SweepResult)
@@ -98,4 +106,3 @@ void ARSTycoonNPC::OnInteract(UPrimitiveComponent* OverlappedComponent, AActor* 
 	InteractTarget(OtherActor);
 	OnInteractTarget.Broadcast(OtherActor);
 }
-

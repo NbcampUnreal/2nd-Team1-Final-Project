@@ -77,11 +77,6 @@ void URSTycoonInventoryComponent::SaveItemData()
 	URSTycoonSaveGame* SaveGame =
 		Cast<URSTycoonSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
 
-	for (auto& a : ItemList)
-	{
-		RS_LOG_F("%s %d", *a.ItemKey.ToString(), a.Quantity)
-	}
-	
 	SaveGame->Ingredients = ItemList;
 
 	UGameplayStatics::SaveGameToSlot(SaveGame, SlotName, 0);

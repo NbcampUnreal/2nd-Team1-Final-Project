@@ -30,7 +30,7 @@ public:
 
 	void StartSaleMode();
 	
-	void SettingGame();
+	void SetMaxCustomerCount();
 	
 	void AddOrder(FFoodOrder Order);
 	
@@ -39,6 +39,8 @@ public:
 	void RemoveCustomer(ARSTycoonCustomerCharacter* Customer);
 	
 	void AddNPC(ARSTycoonNPC* NPC);
+
+	void RemoveNPC(ARSTycoonNPC* NPC);
 	
 	void EndSaleMode();
 	
