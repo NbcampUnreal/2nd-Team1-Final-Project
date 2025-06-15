@@ -294,13 +294,8 @@ void ARSTycoonGameModeBase::LoadGameData()
 	{
 		//최초 파일 생성
 		SaveGame = Cast<URSTycoonSaveGame>(UGameplayStatics::CreateSaveGameObject(URSTycoonSaveGame::StaticClass()));
-
-		TArray<AActor*> IceBoxTiles;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSIceBoxTile::StaticClass(), IceBoxTiles);
-
-		//인벤 크기 설정
-		SaveGame->Ingredients.SetNum(ARSIceBoxTile::AddInventorySlot * (IceBoxTiles.Num() + 1));
-
+		SaveGame->SetDefault();
+		
 		//최초 파일 저장
 		UGameplayStatics::SaveGameToSlot(SaveGame, TycoonSaveSlot, 0);
 	}
