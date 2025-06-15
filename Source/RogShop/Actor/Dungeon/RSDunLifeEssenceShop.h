@@ -5,15 +5,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "RSInteractable.h" // 인터페이스 헤더
-#include "RSDunShopNpcActor.generated.h"
+#include "RSDunLifeEssenceShop.generated.h"
 
 UCLASS()
-class ROGSHOP_API ARSDunShopNpcActor : public AActor, public IRSInteractable
+class ROGSHOP_API ARSDunLifeEssenceShop : public AActor, public IRSInteractable
 {
 	GENERATED_BODY()
 	
 public:	
-	ARSDunShopNpcActor();
+	ARSDunLifeEssenceShop();
 
 protected:
 	virtual void BeginPlay() override;

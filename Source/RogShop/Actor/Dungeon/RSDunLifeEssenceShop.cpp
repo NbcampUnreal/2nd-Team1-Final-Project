@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-#include "RSDunShopNpcActor.h"
+#include "RSDunLifeEssenceShop.h"
 #include "RSDunPlayerCharacter.h"
 #include "Blueprint/UserWidget.h"
 
-ARSDunShopNpcActor::ARSDunShopNpcActor()
+ARSDunLifeEssenceShop::ARSDunLifeEssenceShop()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -11,12 +11,12 @@ ARSDunShopNpcActor::ARSDunShopNpcActor()
 	bIsAutoInteract = false;
 }
 
-void ARSDunShopNpcActor::BeginPlay()
+void ARSDunLifeEssenceShop::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void ARSDunShopNpcActor::Interact(ARSDunPlayerCharacter* Interactor)
+void ARSDunLifeEssenceShop::Interact(ARSDunPlayerCharacter* Interactor)
 {
 	if (!Interactor || !StoreWidgetClass)
 	{
@@ -40,12 +40,12 @@ void ARSDunShopNpcActor::Interact(ARSDunPlayerCharacter* Interactor)
 	}
 }
 
-FText ARSDunShopNpcActor::GetInteractName() const
+FText ARSDunLifeEssenceShop::GetInteractName() const
 {
 	return InteractName;
 }
 
-bool ARSDunShopNpcActor::GetIsAutoInteract() const
+bool ARSDunLifeEssenceShop::GetIsAutoInteract() const
 {
 	return bIsAutoInteract;
 }

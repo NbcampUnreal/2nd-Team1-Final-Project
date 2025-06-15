@@ -110,7 +110,7 @@ void ARSDunPlayerController::ShowLoadingUI()
     }
 }
 
-void ARSDunPlayerController::ShowPlayerDeathWidget()
+void ARSDunPlayerController::ShowPlayerDeathWidget(ARSDunBaseCharacter* DiedCharacter)
 {
     if (RSDeathWidgetClass)
     {

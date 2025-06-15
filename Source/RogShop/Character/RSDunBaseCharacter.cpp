@@ -121,7 +121,7 @@ bool ARSDunBaseCharacter::GetIsDead()
 
 void ARSDunBaseCharacter::OnDeath()
 {
-	OnCharacterDied.Broadcast();
+	OnCharacterDied.Broadcast(this);
 
 	bIsDead = true;
 

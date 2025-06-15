@@ -87,6 +87,8 @@ public:
 	void UpdateEnemyHealthBarRotation();				// 몬스터 HP바 회전 함수
 	void UpdateOverheadEnemyHP(float const damage);		// 몬스터 HP 업데이트 함수
 
+	FName GetMonsterRowName() const;
+
 protected:
 	// 애니메이션 몽타주
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -158,10 +160,4 @@ private:
 	const FMonsterData* GetFMonsterData();	// 코드 중복 부분 정리용 함수
 
 	FTimerHandle MonsterHPBarRotationTimer;
-
-// 사망시 아이템 드롭
-private:
-	UFUNCTION()
-	void MonsterItemDrop();
-
 };
