@@ -30,7 +30,7 @@ public:
 
 	UFUNCTION()
 	void SaveTileMap();
-	
+
 	FVector GetMapCenter();
 	FVector GetMapSize();
 	const TArray<TObjectPtr<ARSBaseTile>>& GetTiles() const { return TileActors; }
@@ -40,18 +40,21 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	
+
 private:
 	void LoadTileMap();
 	void SetDefaultSettings();
 	void CreateTiles();
 	ARSBaseTile* CreateTile(const TSubclassOf<ARSBaseTile>& TileClass, int32 Row, int32 Column);
+	void CreateWalls(const FVector& Location, int32 Row, int32 Column);
+	void CreateWall(TSubclassOf<AActor> WallActorClass, const FVector& Location, float Yaw);
 	void ActiveNPC();
-	
+
 	UFUNCTION(CallInEditor)
 	void DeleteTileData();
 
 	TSubclassOf<ARSBaseTile> GetTileClass(const FName& TileKey);
+	FVector GetRandomLocationInMap();
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category="TileMap")
@@ -73,17 +76,23 @@ private:
 	UPROPERTY(EditAnywhere, Category="TileMap")
 	TArray<FTileRow> TileName2DMap;
 
+	UPROPERTY(EditDefaultsOnly, Category="TileMap")
+	TSubclassOf<AActor> WallClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category="TileMap")
+	TSubclassOf<AActor> PillarClass;
+
 	UPROPERTY(EditDefaultsOnly, Category="NPC")
 	TSubclassOf<ARSTycoonWaiterCharacter> WaiterType;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category="NPC")
 	TSubclassOf<ARSTycoonChefCharacter> ChefType;
-	
+
 	UPROPERTY()
 	TObjectPtr<ANavMeshBoundsVolume> NavVolume;
 
 	UPROPERTY()
-	TArray<TObjectPtr<ARSBaseTile>> TileActors;	//실제 타일들 Actor
+	TArray<TObjectPtr<ARSBaseTile>> TileActors; //실제 타일들 Actor
 
 	int32 Width, Height;
 };

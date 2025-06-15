@@ -39,6 +39,7 @@ void ARSTycoonPlayerController::StartWaitMode()
 	ChangeMainWidget(WaitWidget);
 
 	SetViewTargetWithBlend(MainCamera, 1.f);
+	SetCameraLocationToCenter();
 
 	SelectTileIndex = INDEX_NONE;
 	SelectTileActor->SetActorHiddenInGame(true);
@@ -70,6 +71,7 @@ void ARSTycoonPlayerController::StartManagementMode()
 	ChangeMainWidget(ManagementWidget);
 
 	SetViewTargetWithBlend(TopCamera, 1.f);
+	SetCameraLocationToCenter();
 }
 
 #pragma endregion
