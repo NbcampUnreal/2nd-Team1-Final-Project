@@ -68,6 +68,8 @@ void URSPlayerWeaponComponent::HandleAttackInput(EAttackType TargetAttackType)
 			ResetCombo();
 
 			AttackType = TargetAttackType;
+			bIsAttack = true;
+			bComboInputBuffered = true;
 		}
 	}
 	// 공격 중이지 않은 경우
@@ -108,8 +110,8 @@ void URSPlayerWeaponComponent::HandleAttackInput(EAttackType TargetAttackType)
 				CurAttackMontage = WeaponActors[Index]->GetStrongAttackMontage(ComboIndex);
 			}
 
-			// 몽타주와 애님인스턴스가 유효한 경우
-			if (CurAttackMontage && AnimInstance)
+			// 몽타주와 애님인스턴스가 유효하고 몽타주를 재생할 수 있는 상태일 경우
+			if (CurAttackMontage && AnimInstance && CurCharacter->TrySkipMontage())
 			{
 				float AttackSpeed = CurCharacter->GetAttackSpeed();
 
@@ -178,6 +180,7 @@ bool URSPlayerWeaponComponent::ContinueComboAttack()
 				CurAttackMontage = CurStrongAttacks[ComboIndex];
 			}
 
+			// 몽타주와 애님인스턴스가 유효하고 몽타주를 재생할 수 있는 상태일 경우
 			if (CurAttackMontage && AnimInstance)
 			{
 				float AttackSpeed = CurCharacter->GetAttackSpeed();
