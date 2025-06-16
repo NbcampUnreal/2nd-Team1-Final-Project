@@ -19,6 +19,7 @@
 #include "RSDunNextStagePortal.h"
 #include "RSDunLifeEssenceShop.h"
 #include "ItemInfoData.h"
+#include "RSDungeonGroundWeapon.h"
 #include "RSDungeonGroundIngredient.h"
 #include "RSDungeonGroundLifeEssence.h"
 
@@ -250,6 +251,43 @@ void URSSpawnManager::SpawnShopNPCInLevel()
 	RS_LOG_DEBUG("상점 생성 성공");
 }
 
+void URSSpawnManager::SpawnGroundWeapon(FName TargetName, FTransform TargetTransform)
+{
+	URSGameInstance* RSGameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
+	if (!RSGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = RSGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	FItemInfoData* WeaponData = DataSubsystem->WeaponInfo->FindRow<FItemInfoData>(TargetName, TEXT("Get ItemInfoData"));
+	FDungeonWeaponData* WeaponClassData = DataSubsystem->WeaponDetail->FindRow<FDungeonWeaponData>(TargetName, TEXT("Get ItemInfoData"));
+
+	if (WeaponData && WeaponClassData)
+	{
+		UStaticMesh* ItemStaticMesh = WeaponData->ItemStaticMesh;;
+		TSubclassOf<ARSDungeonItemBase> WeaponClass = WeaponClassData->WeaponClass;
+
+		if (ItemStaticMesh && WeaponClass)
+		{
+			ARSDungeonGroundWeapon* GroundWeapon = GetWorld()->SpawnActor<ARSDungeonGroundWeapon>(DungeonGroundWeaponClass, TargetTransform);
+
+			FText ItemName = WeaponData->ItemName;
+
+			if (GroundWeapon)
+			{
+				GroundWeapon->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
+				GroundWeapon->SetWeaponClass(WeaponClassData->WeaponClass);
+			}
+		}
+	}
+}
+
 void URSSpawnManager::SpawnGroundIngredient(ARSDunBaseCharacter* DiedCharacter)
 {
 	ARSDunMonsterCharacter* MonsterCharacter = Cast<ARSDunMonsterCharacter>(DiedCharacter);
@@ -300,7 +338,7 @@ void URSSpawnManager::SpawnGroundIngredient(ARSDunBaseCharacter* DiedCharacter)
 			FItemInfoData* IngredientInfoDataRow = IngredientInfoDataTable->FindRow<FItemInfoData>(e.IngredientName, TEXT("Get IngredientDetailData"));
 			if (IngredientInfoDataRow)
 			{
-				ARSDungeonGroundIngredient* DungeonIngredient = GetWorld()->SpawnActor<ARSDungeonGroundIngredient>(ARSDungeonGroundIngredient::StaticClass(), MonsterCharacter->GetTransform());
+				ARSDungeonGroundIngredient* DungeonIngredient = GetWorld()->SpawnActor<ARSDungeonGroundIngredient>(DungeonGroundIngredientClass, MonsterCharacter->GetTransform());
 
 				if (DungeonIngredient)
 				{

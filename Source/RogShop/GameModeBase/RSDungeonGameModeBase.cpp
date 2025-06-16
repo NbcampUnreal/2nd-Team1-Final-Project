@@ -85,6 +85,11 @@ void ARSDungeonGameModeBase::SpawnMap()// 선택된 맵 타입에 따라 맵 생
     MapGeneratorInstance->StartMapGenerator();
 }
 
+URSSpawnManager* ARSDungeonGameModeBase::GetSpawnManager() const
+{
+    return SpawnManager;
+}
+
 int32 ARSDungeonGameModeBase::GetSeed() const
 {
     return Seed;

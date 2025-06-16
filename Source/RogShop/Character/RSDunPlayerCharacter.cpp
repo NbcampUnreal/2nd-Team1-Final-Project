@@ -324,29 +324,27 @@ void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
         }
     }
 
+    // 구르기 전 몬스터 HP바가 플레이어를 바라보도록 하기
+    // 1. 모든 몬스터 위젯 컴포넌트 회전
+    for (ARSDunMonsterCharacter* Monster : ARSDunMonsterCharacter::GetAllMonsters())
+    {
+        if (IsValid(Monster))
+        {
+            Monster->UpdateEnemyWidgetComponentRotation();
+        }
+    }
+
+    if (TrySkipMontage())
+    {
+        PlayAnimMontage(DodgeMontage);
+    }
+
     FVector LastInput = GetLastMovementInputVector();
 
     if (!LastInput.IsNearlyZero())
     {
         FRotator DesiredRotation = LastInput.Rotation();
         SetActorRotation(DesiredRotation);
-    }
-
-    // 구르기 전 몬스터 HP바가 플레이어를 바라보도록 하기
-    // 1. 모든 몬스터 HP 바 회전
-    for (ARSDunMonsterCharacter* Monster : ARSDunMonsterCharacter::GetAllMonsters())
-    {
-        if (IsValid(Monster))
-        {
-            Monster->UpdateEnemyHealthBarRotation();
-        }
-    }
-
-    // TODO : TrySkipMontage을 호출하고 반환값이 true인 경우 구르기 실행
-
-    if (TrySkipMontage())
-    {
-        PlayAnimMontage(DodgeMontage);
     }
 }
 
@@ -356,6 +354,15 @@ void ARSDunPlayerCharacter::Interaction(const FInputActionValue& value)
     if (Interactable)
     {
         Interactable->Interact(this);
+
+        UAnimMontage* InteractAnimMontage = Interactable->GetInteractAnimMontage();
+
+        UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+        if (InteractAnimMontage && AnimInstance && !AnimInstance->IsAnyMontagePlaying())
+        {
+            PlayAnimMontage(InteractAnimMontage);
+        }
     }
 }
 
@@ -363,14 +370,16 @@ void ARSDunPlayerCharacter::NormalAttack(const FInputActionValue& value)
 {
     if (WeaponComp)
     {
-        WeaponComp->HandleNormalAttackInput();
+        WeaponComp->HandleAttackInput(EAttackType::NormalAttack);
     }
 }
 
 void ARSDunPlayerCharacter::StrongAttack(const FInputActionValue& value)
 {
-    // 애니메이션이 아직 준비되지 않았으므로 디버깅용 출력
-    RS_LOG_DEBUG("StrongAttack Activated");
+    if (WeaponComp)
+    {
+        WeaponComp->HandleAttackInput(EAttackType::StrongAttack);
+    }
 }
 
 void ARSDunPlayerCharacter::FirstWeaponSlot(const FInputActionValue& value)

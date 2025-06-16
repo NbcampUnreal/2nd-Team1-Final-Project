@@ -26,10 +26,15 @@ public:
 
 	virtual bool GetIsAutoInteract() const override;
 
+	virtual UAnimMontage* GetInteractAnimMontage() const override;
+
 protected:
 	FText InteractName;
 
 	bool bIsAutoInteract;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim")
+	TObjectPtr<UAnimMontage> InteractAnimMontage;
 
 // 기본 정보
 public:
