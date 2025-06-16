@@ -5,6 +5,7 @@
 #include "RSDungeonGroundWeapon.h"
 #include "RSBaseAreaGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "RSSpawnManagerAccessor.h"
 #include "RSSpawnManager.h"
 
 ARSWeaponSpawnPadActor::ARSWeaponSpawnPadActor()
@@ -94,9 +95,13 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
     SpawnTransform.SetRotation(WeaponSpawnSceneComp->GetComponentQuat());
 
     // 선택한 키에 해당하는 무기 스폰
-    URSSpawnManager* RSSpawnManager = GameMode->GetSpawnManager();
-    if (RSSpawnManager)
+    IRSSpawnManagerAccessor* SpawnManagerAccessor = Cast<IRSSpawnManagerAccessor>(GameMode);
+    if (SpawnManagerAccessor)
     {
-        RSSpawnManager->SpawnGroundWeapon(RandomRowName, SpawnTransform);
+        URSSpawnManager* RSSpawnManager = SpawnManagerAccessor->GetSpawnManager();
+        if (RSSpawnManager)
+        {
+            RSSpawnManager->SpawnGroundWeaponAtTransform(RandomRowName, SpawnTransform);
+        }
     }
 }

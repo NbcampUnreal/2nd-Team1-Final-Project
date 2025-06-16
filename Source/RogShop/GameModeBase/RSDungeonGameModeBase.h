@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "RSSpawnManager.h"
 #include "RSMapGenerator.h"
+#include "RSSpawnManagerAccessor.h"
 #include "RSDungeonGameModeBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBossDead);
@@ -14,7 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMapFullyLoaded);
 
 // 던전 게임모드 클래스 정의
 UCLASS()
-class ROGSHOP_API ARSDungeonGameModeBase : public AGameModeBase
+class ROGSHOP_API ARSDungeonGameModeBase : public AGameModeBase, public IRSSpawnManagerAccessor
 {
 	GENERATED_BODY()
 
@@ -53,7 +54,7 @@ private:
 
 #pragma region SpawnManager
 public:
-	URSSpawnManager* GetSpawnManager() const;
+	virtual URSSpawnManager* GetSpawnManager() const override;
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dungeon", meta = (AllowPrivateAccess = "true"))

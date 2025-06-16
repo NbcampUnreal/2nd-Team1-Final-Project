@@ -13,6 +13,8 @@
 #include "RSDunPlayerController.h"
 #include "RSSaveGameSubsystem.h"
 #include "RSDungeonWeaponSaveGame.h"
+#include "GameFramework/GameModeBase.h"
+#include "RSSpawnManagerAccessor.h"
 
 URSPlayerWeaponComponent::URSPlayerWeaponComponent()
 {
@@ -328,26 +330,21 @@ void URSPlayerWeaponComponent::DropWeaponToSlot(EWeaponSlot TargetWeaponSlot)
 	}
 
 	// 땅에 버려질 액터 생성
-	ARSDungeonGroundWeapon* GroundWeapon = GetWorld()->SpawnActor<ARSDungeonGroundWeapon>(ARSDungeonGroundWeapon::StaticClass(), CurCharacter->GetActorTransform());
+	IRSSpawnManagerAccessor* SpawnManagerAccessor = GetWorld()->GetAuthGameMode<IRSSpawnManagerAccessor>();
+	if (!SpawnManagerAccessor)
+	{
+		return;
+	}
 
-	// 땅에 버려질 액터에 세팅할 값을 데이터 테이블에 가져와 세팅한다.
+	URSSpawnManager* SpawnManager = SpawnManagerAccessor->GetSpawnManager();
+	if (!SpawnManager)
+	{
+		return;
+	}
+
 	FName WeaponKey = WeaponActors[TargetIndex]->GetDataTableKey();
 
-	FItemInfoData* ItemInfoData = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponInfo->FindRow<FItemInfoData>(WeaponKey, TEXT("Get WeaponData"));
-	FDungeonWeaponData* WeaponData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponDetail->FindRow<FDungeonWeaponData>(WeaponKey, TEXT("Get WeaponData"));
-	if (ItemInfoData && WeaponData)
-	{
-		FText ItemName = ItemInfoData->ItemName;
-		UStaticMesh* ItemStaticMesh = ItemInfoData->ItemStaticMesh;
-		TSubclassOf<ARSDungeonItemBase> WeaponClass = WeaponData->WeaponClass;
-
-		if (GroundWeapon && ItemStaticMesh && WeaponClass)
-		{
-			GroundWeapon->InitGroundItemInfo(ItemName, false, WeaponKey, ItemStaticMesh);
-			GroundWeapon->SetWeaponClass(WeaponClass);
-			GroundWeapon->RandImpulse();
-		}
-	}
+	SpawnManager->SpawnGroundWeaponAtTransform(WeaponKey, CurCharacter->GetActorTransform());
 
 	// 장착 중이었을 경우 무기 장착 해제
 	if (TargetWeaponSlot == WeaponSlot)

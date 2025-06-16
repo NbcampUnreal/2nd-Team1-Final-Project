@@ -12,6 +12,8 @@
 #include "RSSaveGameSubsystem.h"
 #include "RSDungeonIngredientSaveGame.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/GameModeBase.h"
+#include "RSSpawnManagerAccessor.h"
 
 void URSDungeonIngredientInventoryComponent::BeginPlay()
 {
@@ -112,26 +114,21 @@ void URSDungeonIngredientInventoryComponent::DropItem(FName ItemKey)
 		return;
 	}
 
-	ARSDungeonGroundIngredient* DungeonGroundItem = World->SpawnActor<ARSDungeonGroundIngredient>(ARSDungeonGroundIngredient::StaticClass(), CurCharacter->GetActorTransform());
-
-	FItemInfoData* Data = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->IngredientInfo->FindRow<FItemInfoData>(ItemKey, TEXT("Get IngredientInfo"));
-
-	int32 ItemIndex = -1;
-
-	if (Data)
+	IRSSpawnManagerAccessor* SpawnManagerAccessor = Cast<IRSSpawnManagerAccessor>(World->GetAuthGameMode());
+	if (!SpawnManagerAccessor)
 	{
-		FText ItemName = Data->ItemName;
-		UStaticMesh* ItemStaticMesh = Data->ItemStaticMesh;
-
-		if (DungeonGroundItem && ItemStaticMesh)
-		{
-			DungeonGroundItem->InitGroundItemInfo(ItemName, false, ItemKey, ItemStaticMesh);
-			DungeonGroundItem->SetQuantity(CurItemQuantity);
-			DungeonGroundItem->RandImpulse();
-
-			ItemIndex = RemoveItem(ItemKey, INT32_MAX);
-		}
+		return;
 	}
+
+	URSSpawnManager* SpawnManager = SpawnManagerAccessor->GetSpawnManager();
+	if (!SpawnManager)
+	{
+		return;
+	}
+
+	SpawnManager->SpawnGroundIngredientAtTransform(ItemKey, CurCharacter->GetActorTransform());
+
+	int32 ItemIndex = RemoveItem(ItemKey, INT32_MAX);
 
 	// UI 갱신되도록 이벤트 디스패처 호출
 	ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(CurCharacter->GetController());
