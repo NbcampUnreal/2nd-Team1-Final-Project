@@ -164,9 +164,4 @@ private:
 
 	FTimerHandle MonsterWidgetComponentRotationTimer;
 
-// 사망시 아이템 드롭
-private:
-	UFUNCTION()
-	void MonsterItemDrop();
-
 };

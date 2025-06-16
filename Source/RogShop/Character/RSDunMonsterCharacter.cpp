@@ -6,6 +6,7 @@
 #include "RogShop/RSMonsterAttackTraceDefine.h"
 #include "RogShop/UtilDefine.h"
 #include "Components/WidgetComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/ProgressBar.h"
 #include "RSDataSubsystem.h"
 #include "RSDungeonGameModeBase.h"

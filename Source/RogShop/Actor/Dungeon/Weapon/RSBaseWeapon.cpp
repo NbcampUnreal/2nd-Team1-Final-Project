@@ -26,7 +26,7 @@ ARSBaseWeapon::ARSBaseWeapon()
 
 	SetActorEnableCollision(false);
 
-	WeaponDamage = 0.f;
+	//WeaponDamage = 0.f; TODO : 여기 WeaponDamage 안 쓰이고 있는데 임시 주석 처리했습니다.
 }
 
 // Called when the game starts or when spawned
