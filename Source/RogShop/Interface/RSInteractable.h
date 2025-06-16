@@ -29,4 +29,6 @@ public:
 	virtual FText GetInteractName() const = 0;
 
 	virtual bool GetIsAutoInteract() const = 0;
+
+	virtual UAnimMontage* GetInteractAnimMontage() const = 0;
 };

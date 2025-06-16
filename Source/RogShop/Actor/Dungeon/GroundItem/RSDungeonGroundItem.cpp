@@ -45,6 +45,11 @@ bool ARSDungeonGroundItem::GetIsAutoInteract() const
 	return bIsAutoInteract;
 }
 
+UAnimMontage* ARSDungeonGroundItem::GetInteractAnimMontage() const
+{
+	return InteractAnimMontage;
+}
+
 void ARSDungeonGroundItem::InitGroundItemInfo(FText NewInteractName, bool NewbIsAutoInteract, FName NewDataTableKey, UStaticMesh* NewMesh)
 {
 	InteractName = NewInteractName;

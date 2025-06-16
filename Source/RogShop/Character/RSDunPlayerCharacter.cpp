@@ -354,6 +354,15 @@ void ARSDunPlayerCharacter::Interaction(const FInputActionValue& value)
     if (Interactable)
     {
         Interactable->Interact(this);
+
+        UAnimMontage* InteractAnimMontage = Interactable->GetInteractAnimMontage();
+
+        UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+        if (InteractAnimMontage && AnimInstance && !AnimInstance->IsAnyMontagePlaying())
+        {
+            PlayAnimMontage(InteractAnimMontage);
+        }
     }
 }
 
