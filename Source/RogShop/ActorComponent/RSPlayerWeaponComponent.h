@@ -17,6 +17,14 @@ enum class EWeaponSlot : uint8
 	SecondWeaponSlot,
 };
 
+UENUM(BlueprintType)
+enum class EAttackType : uint8
+{
+	NONE,
+	NormalAttack,
+	StrongAttack,
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ROGSHOP_API URSPlayerWeaponComponent : public UActorComponent
 {
@@ -65,7 +73,7 @@ private:
 
 // 공격 관련
 public:
-	void HandleNormalAttackInput();
+	void HandleAttackInput(EAttackType TargetAttackType);
 
 	bool ContinueComboAttack();
 
@@ -73,13 +81,16 @@ public:
 
 private:
 	// 애니메이션을 위한 상태
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	EAttackType AttackType;	// 현재 공격 종류
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	bool bIsAttack;	// 공격 중인 상태
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	bool bComboInputBuffered;	// 공격 중일 때 들어온 입력 버퍼
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	int32 ComboIndex;	// 콤보 공격을 위한 인덱스 값
 
 // 충돌 로직 관리

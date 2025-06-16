@@ -370,14 +370,16 @@ void ARSDunPlayerCharacter::NormalAttack(const FInputActionValue& value)
 {
     if (WeaponComp)
     {
-        WeaponComp->HandleNormalAttackInput();
+        WeaponComp->HandleAttackInput(EAttackType::NormalAttack);
     }
 }
 
 void ARSDunPlayerCharacter::StrongAttack(const FInputActionValue& value)
 {
-    // 애니메이션이 아직 준비되지 않았으므로 디버깅용 출력
-    RS_LOG_DEBUG("StrongAttack Activated");
+    if (WeaponComp)
+    {
+        WeaponComp->HandleAttackInput(EAttackType::StrongAttack);
+    }
 }
 
 void ARSDunPlayerCharacter::FirstWeaponSlot(const FInputActionValue& value)
