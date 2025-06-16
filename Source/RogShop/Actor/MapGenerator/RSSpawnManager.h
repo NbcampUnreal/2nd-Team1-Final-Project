@@ -18,6 +18,7 @@ class ARSDunBossRoomPortal;
 class ARSDunNextStagePortal;
 class ARSDunLifeEssenceShop;
 class ARSDunBaseCharacter;
+class ARSDungeonGroundWeapon;
 class ARSDungeonGroundIngredient;
 class ARSDungeonGroundLifeEssence;
 
@@ -100,6 +101,10 @@ private:
 #pragma endregion
 
 #pragma region GroundItem
+public:
+	UFUNCTION()
+	void SpawnGroundWeapon(FName TargetName, FTransform TargetTransform);
+
 private:
 	UFUNCTION()
 	void SpawnGroundIngredient(ARSDunBaseCharacter* DiedCharacter);
@@ -108,6 +113,9 @@ private:
 	void SpawnGroundLifeEssence(ARSDunBaseCharacter* DiedCharacter);
 
 private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ARSDungeonGroundWeapon> DungeonGroundWeaponClass; // 아이템으로 드랍되는 무기 클래스
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ARSDungeonGroundIngredient> DungeonGroundIngredientClass; // 아이템으로 드랍되는 요리 재료 클래스
 

@@ -52,6 +52,9 @@ private:
 #pragma endregion
 
 #pragma region SpawnManager
+public:
+	URSSpawnManager* GetSpawnManager() const;
+
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dungeon", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<URSSpawnManager> SpawnManagerClass; // 던전 오브젝트 매니저 클래스

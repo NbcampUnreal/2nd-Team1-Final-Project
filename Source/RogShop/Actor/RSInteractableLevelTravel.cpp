@@ -73,3 +73,8 @@ bool ARSInteractableLevelTravel::GetIsAutoInteract() const
 {
 	return bIsAutoInteract;
 }
+
+UAnimMontage* ARSInteractableLevelTravel::GetInteractAnimMontage() const
+{
+	return nullptr;
+}

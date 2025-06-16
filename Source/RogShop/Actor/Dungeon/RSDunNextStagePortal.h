@@ -35,6 +35,8 @@ public:
 
 	virtual bool GetIsAutoInteract() const override;
 
+	virtual UAnimMontage* GetInteractAnimMontage() const override;
+
 protected:
 	FText InteractName;
 

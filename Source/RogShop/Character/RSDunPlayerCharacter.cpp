@@ -324,14 +324,6 @@ void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
         }
     }
 
-    FVector LastInput = GetLastMovementInputVector();
-
-    if (!LastInput.IsNearlyZero())
-    {
-        FRotator DesiredRotation = LastInput.Rotation();
-        SetActorRotation(DesiredRotation);
-    }
-
     // 구르기 전 몬스터 HP바가 플레이어를 바라보도록 하기
     // 1. 모든 몬스터 HP 바 회전
     for (ARSDunMonsterCharacter* Monster : ARSDunMonsterCharacter::GetAllMonsters())
@@ -342,11 +334,17 @@ void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
         }
     }
 
-    // TODO : TrySkipMontage을 호출하고 반환값이 true인 경우 구르기 실행
-
     if (TrySkipMontage())
     {
         PlayAnimMontage(DodgeMontage);
+    }
+
+    FVector LastInput = GetLastMovementInputVector();
+
+    if (!LastInput.IsNearlyZero())
+    {
+        FRotator DesiredRotation = LastInput.Rotation();
+        SetActorRotation(DesiredRotation);
     }
 }
 
@@ -356,6 +354,15 @@ void ARSDunPlayerCharacter::Interaction(const FInputActionValue& value)
     if (Interactable)
     {
         Interactable->Interact(this);
+
+        UAnimMontage* InteractAnimMontage = Interactable->GetInteractAnimMontage();
+
+        UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+        if (InteractAnimMontage && AnimInstance && !AnimInstance->IsAnyMontagePlaying())
+        {
+            PlayAnimMontage(InteractAnimMontage);
+        }
     }
 }
 
