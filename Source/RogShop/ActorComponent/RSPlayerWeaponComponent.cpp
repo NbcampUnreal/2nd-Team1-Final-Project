@@ -115,6 +115,11 @@ void URSPlayerWeaponComponent::HandleAttackInput(EAttackType TargetAttackType)
 
 				AnimInstance->Montage_Play(CurAttackMontage, AttackSpeed);
 
+				// 플레이어 컨트롤러 방향으로 캐릭터 회전
+				FRotator ControlRotation = CurCharacter->GetControlRotation();
+				FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
+				CurCharacter->SetActorRotation(YawRotation);
+
 				// 다음 콤보 공격을 위한 값 수정
 				bIsAttack = true;
 				++ComboIndex;
@@ -178,6 +183,11 @@ bool URSPlayerWeaponComponent::ContinueComboAttack()
 				float AttackSpeed = CurCharacter->GetAttackSpeed();
 
 				AnimInstance->Montage_Play(CurAttackMontage, AttackSpeed);
+
+				// 플레이어 컨트롤러 방향으로 캐릭터 회전
+				FRotator ControlRotation = CurCharacter->GetControlRotation();
+				FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
+				CurCharacter->SetActorRotation(YawRotation);
 
 				// 다음 콤보 공격을 위한 값 수정
 				bComboInputBuffered = false;

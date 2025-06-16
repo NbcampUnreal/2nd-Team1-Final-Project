@@ -336,15 +336,15 @@ void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
 
     if (TrySkipMontage())
     {
+        FVector LastInput = GetLastMovementInputVector();
+
+        if (!LastInput.IsNearlyZero())
+        {
+            FRotator DesiredRotation = LastInput.Rotation();
+            SetActorRotation(DesiredRotation);
+        }
+
         PlayAnimMontage(DodgeMontage);
-    }
-
-    FVector LastInput = GetLastMovementInputVector();
-
-    if (!LastInput.IsNearlyZero())
-    {
-        FRotator DesiredRotation = LastInput.Rotation();
-        SetActorRotation(DesiredRotation);
     }
 }
 
