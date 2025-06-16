@@ -84,7 +84,7 @@ public:
 	void PlayAttackAnim();
 	void PlaySpawnAnim();
 
-	void UpdateEnemyHealthBarRotation();				// 몬스터 HP바 회전 함수
+	void UpdateEnemyWidgetComponentRotation();			// 몬스터 위젯 컴포넌트(체력바, 데미지 표시) 회전 함수
 	void UpdateOverheadEnemyHP(float const damage);		// 몬스터 HP 업데이트 함수
 
 	FName GetMonsterRowName() const;
@@ -99,9 +99,12 @@ protected:
 
 	bool bIsPlayingAnim;
 
-	// 오버헤드 위젯 관련
+	// 몬스터 컴포넌트 위젯 관련
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enemy|UI")
 	UWidgetComponent* OverheadWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enemy|UI")
+	UWidgetComponent* DamageTextWidget;
 
 	//NavInvoker
 	UPROPERTY(BlueprintReadWrite, Category = Navigation, meta = (AllowPrivateAccess = "true"))//Navigation Invoker Setting
@@ -159,5 +162,11 @@ private:
 
 	const FMonsterData* GetFMonsterData();	// 코드 중복 부분 정리용 함수
 
-	FTimerHandle MonsterHPBarRotationTimer;
+	FTimerHandle MonsterWidgetComponentRotationTimer;
+
+// 사망시 아이템 드롭
+private:
+	UFUNCTION()
+	void MonsterItemDrop();
+
 };
