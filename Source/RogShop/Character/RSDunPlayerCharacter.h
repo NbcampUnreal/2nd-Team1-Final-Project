@@ -87,7 +87,7 @@ public:
 	// 현재 몽타주를 스킵 중인지 반환
 	bool IsSkippingMontage() const;
 
-private:
+public:
 	// 현재 재생 중인 몽타주를 스킵 시도한다.
 	bool TrySkipMontage();
 
