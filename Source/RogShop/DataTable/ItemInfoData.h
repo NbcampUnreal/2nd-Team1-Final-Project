@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "RSDungeonItemBase.h"
+#include "WeaponAttackData.h"
 #include "ItemInfoData.generated.h"
 
 class URSBaseRelic;
@@ -66,6 +67,12 @@ struct ROGSHOP_API FDungeonWeaponData : public FTableRowBase
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<ARSDungeonItemBase> WeaponClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FWeaponAttackData> NormalAttackData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FWeaponAttackData> StrongAttackData;
 };
 
 USTRUCT(BlueprintType)

@@ -14,20 +14,16 @@
 #include "RSSaveGameSubsystem.h"
 #include "RSDungeonWeaponSaveGame.h"
 
-// Sets default values for this component's properties
 URSPlayerWeaponComponent::URSPlayerWeaponComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
+	AttackType = EAttackType::NONE;
 	WeaponSlotSize = 2;
 	WeaponActors.SetNum(WeaponSlotSize);
 	WeaponSlot = EWeaponSlot::NONE;
 }
 
-
-// Called when the game starts
 void URSPlayerWeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -55,95 +51,145 @@ void URSPlayerWeaponComponent::BeginPlay()
 
 }
 
-void URSPlayerWeaponComponent::HandleNormalAttackInput()
+void URSPlayerWeaponComponent::HandleAttackInput(EAttackType TargetAttackType)
 {
-    if (bIsAttack)
-    {
-        bComboInputBuffered = true;
-    }
-    else
-    {
-		int8 Index = static_cast<int8>(WeaponSlot) - 1;
-        if (WeaponActors.IsValidIndex(Index) && WeaponActors[Index] != nullptr)
-        {
-			ARSDunPlayerCharacter* CurCharacter = GetOwner<ARSDunPlayerCharacter>();
-            if (!CurCharacter)
-            {
-                return;
-            }
-
-            USkeletalMeshComponent* SkeletalMeshComp = CurCharacter->GetMesh();
-            if (!SkeletalMeshComp)
-            {
-                return;
-            }
-            
-            UAnimInstance* AnimInstance = SkeletalMeshComp->GetAnimInstance();
-            UAnimMontage* CurAttackMontage = WeaponActors[Index]->GetNormalAttack(ComboIndex);
-            
-            if (CurAttackMontage && AnimInstance)
-            {
-				float AttackSpeed = CurCharacter->GetAttackSpeed();
-
-                AnimInstance->Montage_Play(CurAttackMontage, AttackSpeed);
-                bIsAttack = true;
-                ++ComboIndex;
-            }
-        }
-    }
-}
-
-bool URSPlayerWeaponComponent::ContinueComboAttack()
-{
-	// 공격에 대한 입력 버퍼가 설정된 경우
-	if (bComboInputBuffered)
+	// 공격 중인 경우
+	if (bIsAttack)
 	{
+		// 같은 타입의 공격을 하라는 입력이 들어온 경우
+		if (AttackType == TargetAttackType)
+		{
+			bComboInputBuffered = true;
+		}
+		// 다른 타입의 공격을 하라는 입력이 들어온 경우
+		else
+		{
+			// 진행 중이던 공격 초기화 및 공격의 타입 변경
+			ResetCombo();
+
+			AttackType = TargetAttackType;
+		}
+	}
+	// 공격 중이지 않은 경우
+	else
+	{
+		// 공격 타입 설정
+		AttackType = TargetAttackType;
+
+		// 무기 인덱스를 가져온다.
 		int8 Index = static_cast<int8>(WeaponSlot) - 1;
+
+		// 유효한 인덱스인 경우
 		if (WeaponActors.IsValidIndex(Index) && WeaponActors[Index] != nullptr)
 		{
 			ARSDunPlayerCharacter* CurCharacter = GetOwner<ARSDunPlayerCharacter>();
 			if (!CurCharacter)
 			{
-				return false;
+				return;
 			}
 
 			USkeletalMeshComponent* SkeletalMeshComp = CurCharacter->GetMesh();
 			if (!SkeletalMeshComp)
 			{
-				return false;
+				return;
 			}
 
-			// 콤보 공격이 배열의 크기를 넘어서지 않게 해준다.
-			const TArray<UAnimMontage*>& CurNormalAttacks = WeaponActors[Index]->GetNormalAttacks();
-			if (CurNormalAttacks.Num() <= ComboIndex)
-			{
-				ComboIndex %= CurNormalAttacks.Num();
-			}
-
-			// 현재 재생해야하는 몽타주를 찾는다.
-			UAnimMontage* CurAttackMontage = CurNormalAttacks[ComboIndex];
 			UAnimInstance* AnimInstance = SkeletalMeshComp->GetAnimInstance();
+			UAnimMontage* CurAttackMontage = nullptr;
 
+			// 일반 공격
+			if (AttackType == EAttackType::NormalAttack)
+			{
+				CurAttackMontage = WeaponActors[Index]->GetNormalAttackMontage(ComboIndex);
+			}
+			// 강 공격
+			else if (AttackType == EAttackType::StrongAttack)
+			{
+				CurAttackMontage = WeaponActors[Index]->GetStrongAttackMontage(ComboIndex);
+			}
+
+			// 몽타주와 애님인스턴스가 유효한 경우
 			if (CurAttackMontage && AnimInstance)
 			{
-				// 몽타주를 재생시켜준다.
-				// 입력된 버퍼 값을 초기화하고, 다음 공격을 위해 콤보 인덱스를 증가시킨다.
-
 				float AttackSpeed = CurCharacter->GetAttackSpeed();
 
 				AnimInstance->Montage_Play(CurAttackMontage, AttackSpeed);
 
+				// 다음 콤보 공격을 위한 값 수정
+				bIsAttack = true;
+				++ComboIndex;
+			}
+		}
+	}
+}
+
+bool URSPlayerWeaponComponent::ContinueComboAttack()
+{
+	ARSDunPlayerCharacter* CurCharacter = GetOwner<ARSDunPlayerCharacter>();
+	if (!CurCharacter)
+	{
+		return false;
+	}
+
+	USkeletalMeshComponent* SkeletalMeshComp = CurCharacter->GetMesh();
+	if (!SkeletalMeshComp)
+	{
+		return false;
+	}
+
+	if (bComboInputBuffered)
+	{
+		// 무기 인덱스를 가져온다.
+		int8 Index = static_cast<int8>(WeaponSlot) - 1;
+
+		// 유효한 인덱스인 경우
+		if (WeaponActors.IsValidIndex(Index) && WeaponActors[Index] != nullptr)
+		{
+			UAnimInstance* AnimInstance = SkeletalMeshComp->GetAnimInstance();
+			UAnimMontage* CurAttackMontage = nullptr;
+
+			// 일반 공격
+			if (AttackType == EAttackType::NormalAttack)
+			{
+				// 콤보 공격의 인덱스 값이 배열의 크기를 넘어서지 않게 해준다.
+				const TArray<UAnimMontage*> CurNormalAttacks = WeaponActors[Index]->GetNormalAttackMontages();
+				if (CurNormalAttacks.Num() <= ComboIndex)
+				{
+					ComboIndex %= CurNormalAttacks.Num();
+				}
+
+				CurAttackMontage = CurNormalAttacks[ComboIndex];
+			}
+			// 강 공격
+			else if (AttackType == EAttackType::StrongAttack)
+			{
+				// 콤보 공격의 인덱스 값이 배열의 크기를 넘어서지 않게 해준다.
+				const TArray<UAnimMontage*> CurStrongAttacks = WeaponActors[Index]->GetStrongAttackMontages();
+				if (CurStrongAttacks.Num() <= ComboIndex)
+				{
+					ComboIndex %= CurStrongAttacks.Num();
+				}
+
+				CurAttackMontage = CurStrongAttacks[ComboIndex];
+			}
+
+			if (CurAttackMontage && AnimInstance)
+			{
+				float AttackSpeed = CurCharacter->GetAttackSpeed();
+
+				AnimInstance->Montage_Play(CurAttackMontage, AttackSpeed);
+
+				// 다음 콤보 공격을 위한 값 수정
 				bComboInputBuffered = false;
 				ComboIndex += 1;
 
-				if (CurNormalAttacks.Num() >= ComboIndex)
-				{
-					return true;
-				}
+				// 콤보 공격을 성공적으로 수행했다.
+				return true;
 			}
 		}
 	}
 
+	// 콤보 공격을 해내지 못했다.
 	return false;
 }
 
@@ -151,9 +197,10 @@ void URSPlayerWeaponComponent::ResetCombo()
 {
 	// 공격 애니메이션이 재생된 후 더이상 입력이 없을 때 호출된다.
 	// 공격에 대해 모두 기본값으로 설정
-	ComboIndex = 0;
-	bComboInputBuffered = false;
+	AttackType = EAttackType::NONE;
 	bIsAttack = false;
+	bComboInputBuffered = false;
+	ComboIndex = 0;
 }
 
 void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
@@ -573,7 +620,7 @@ void URSPlayerWeaponComponent::LoadRequested()
 
 	UDataTable* WeaponDataTable = DataSubsystem->WeaponInfo;
 	UDataTable* WeaponDetailDataTable = DataSubsystem->WeaponDetail;
-	if (!WeaponDataTable)
+	if (!WeaponDataTable || !WeaponDetailDataTable)
 	{
 		return;
 	}
@@ -604,6 +651,9 @@ void URSPlayerWeaponComponent::LoadRequested()
 
 			if (SpawnWeapon)
 			{
+				SpawnWeapon->SetNormalAttackDatas(WeaponData->NormalAttackData);
+				SpawnWeapon->SetStrongAttackDatas(WeaponData->StrongAttackData);
+
 				SpawnWeapon->SetDataTableKey(CurWeaponName);
 				EquipWeaponToSlot(SpawnWeapon);
 			}
