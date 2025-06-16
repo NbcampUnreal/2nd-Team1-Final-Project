@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "RSTycoonBuyNPCWidget.generated.h"
 
+class UImage;
 class ARSTycoonNPC;
 class UButton;
 class UTextBlock;
@@ -25,7 +26,10 @@ private:
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	TObjectPtr<UButton> Button;
-
+	
+	UPROPERTY(EditAnywhere, meta=(BindWidget))
+	TObjectPtr<UImage> NPCImage;
+	
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	TObjectPtr<UTextBlock> NPCNameText;
 	
@@ -34,4 +38,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ARSTycoonNPC> SpawnNPCClass;
+
+private:
+	int32 Price;
 };

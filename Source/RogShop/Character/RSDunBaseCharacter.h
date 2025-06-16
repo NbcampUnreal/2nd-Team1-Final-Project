@@ -6,7 +6,7 @@
 #include "GameFramework/Character.h"
 #include "RSDunBaseCharacter.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterDied);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterDied, ARSDunBaseCharacter*, DiedCharacter);
 
 UCLASS()
 class ROGSHOP_API ARSDunBaseCharacter : public ACharacter

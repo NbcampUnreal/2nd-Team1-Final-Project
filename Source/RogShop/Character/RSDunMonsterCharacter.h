@@ -12,6 +12,7 @@
 #include "TimerManager.h"
 #include "Animation/AnimInstance.h"
 #include "MonsterData.h"
+#include "MonsterProjectileBase.h"
 #include "RSDunMonsterCharacter.generated.h"
 
 class ARSMonsterAIController;
@@ -86,6 +87,8 @@ public:
 	void UpdateEnemyWidgetComponentRotation();			// 몬스터 위젯 컴포넌트(체력바, 데미지 표시) 회전 함수
 	void UpdateOverheadEnemyHP(float const damage);		// 몬스터 HP 업데이트 함수
 
+	FName GetMonsterRowName() const;
+
 protected:
 	// 애니메이션 몽타주
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -135,6 +138,9 @@ protected:
 	float DrawDebugLineThickness;	 // 디버그 라인의 두께
 
 	FTimerHandle detectDelayTimer;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<AActor> projectile;//원거리 투사체
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ActionData")
 	float meleeAtkRange;

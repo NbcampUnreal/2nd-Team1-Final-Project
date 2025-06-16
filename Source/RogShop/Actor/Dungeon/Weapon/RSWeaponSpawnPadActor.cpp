@@ -4,8 +4,8 @@
 #include "ItemInfoData.h"
 #include "RSDungeonGroundWeapon.h"
 #include "RSBaseAreaGameModeBase.h"
-
 #include "Kismet/GameplayStatics.h"
+#include "RSSpawnManager.h"
 
 ARSWeaponSpawnPadActor::ARSWeaponSpawnPadActor()
 {
@@ -86,30 +86,19 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
     // 선택된 무기 키 기록
     GameMode->AddSpawnedWeaponRowName(RandomRowName);
 
-    // 선택한 키에 해당하는 무기 스폰
     FVector Origin;
     FVector BoxExtent;
     GetActorBounds(true, Origin, BoxExtent);
     FVector SpawnLocation = Origin + FVector(0, 0, BoxExtent.Z + 50);
 
-    FItemInfoData* WeaponData = DataSubsystem->WeaponInfo->FindRow<FItemInfoData>(RandomRowName, TEXT("SpawnWeapon"));
-    FDungeonWeaponData* WeaponClassData = DataSubsystem->WeaponDetail->FindRow<FDungeonWeaponData>(RandomRowName, TEXT("SpawnWeapon"));
+    FTransform SpawnTransform;
+    SpawnTransform.SetLocation(SpawnLocation);
 
-    if (WeaponData && WeaponClassData && WeaponData->ItemStaticMesh && WeaponClassData->WeaponClass)
+    // 선택한 키에 해당하는 무기 스폰
+    URSSpawnManager* RSSpawnManager = GameMode->GetSpawnManager();
+    if (RSSpawnManager)
     {
-        ARSDungeonGroundWeapon* GroundWeapon = GetWorld()->SpawnActor<ARSDungeonGroundWeapon>(
-            ARSDungeonGroundWeapon::StaticClass(),
-            SpawnLocation,
-            FRotator::ZeroRotator
-        );
-
-        FText ItemName = WeaponData->ItemName;
-        UStaticMesh* ItemStaticMesh = WeaponData->ItemStaticMesh;
-
-        if (GroundWeapon)
-        {
-            GroundWeapon->InitGroundItemInfo(ItemName, false, RandomRowName, ItemStaticMesh);
-            GroundWeapon->SetWeaponClass(WeaponClassData->WeaponClass);
-        }
+        RSSpawnManager->SpawnGroundWeapon(RandomRowName, SpawnTransform);
     }
+
 }

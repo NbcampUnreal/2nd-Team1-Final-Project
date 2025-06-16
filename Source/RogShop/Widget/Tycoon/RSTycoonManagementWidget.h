@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -22,6 +22,7 @@ class ROGSHOP_API URSTycoonManagementWidget : public UUserWidget
 
 protected:
 	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
 	
 private:
 	UFUNCTION()
@@ -29,6 +30,9 @@ private:
 
 	UFUNCTION()
 	void OnClickWaitMode();
+
+	UFUNCTION()
+	void OnChangeGold(int32 Value);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))

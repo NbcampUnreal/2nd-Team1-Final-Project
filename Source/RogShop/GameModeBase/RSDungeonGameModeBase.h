@@ -40,24 +40,27 @@ public:
 	FOnMapFullyLoaded OnMapFullyLoaded;
 #pragma endregion
 
+#pragma region MapGenerator
 private:
-#pragma region 비공개 함수
 	void SpawnMap(); // 선택된 맵 타입에 따라 맵 생성
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dungeon", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ARSMapGenerator> MapGeneratorClass; // 맵 생성기 클래스
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<ARSMapGenerator> MapGeneratorInstance; // 인스턴스
 #pragma endregion
 
-protected:
-#pragma region 내부 변수
-	UPROPERTY()
-	TObjectPtr<URSSpawnManager> SpawnManager;// 플레이어 및 몬스터 생성 매니저
-
-	UPROPERTY()
-	TObjectPtr<ARSMapGenerator> MapGeneratorInstance; // 현재 활성화된 맵 제너레이터
-#pragma endregion
-
+#pragma region SpawnManager
 public:
-#pragma region 에디터 설정 값
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dungeon")
-	TSubclassOf<ARSMapGenerator> MapGeneratorClass; //맵 생성기 클래스
+	URSSpawnManager* GetSpawnManager() const;
+
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dungeon", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<URSSpawnManager> SpawnManagerClass; // 던전 오브젝트 매니저 클래스
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<URSSpawnManager> SpawnManager;// 인스턴스
 #pragma endregion
 
 #pragma region Dungeon Info

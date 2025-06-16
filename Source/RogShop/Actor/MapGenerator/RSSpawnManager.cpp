@@ -7,7 +7,6 @@
 #include "EngineUtils.h"
 #include "MonsterSpawnGroupData.h"
 #include "MonsterData.h"
-#include "DungeonObjectData.h"
 #include "Algo/RandomShuffle.h"
 #include "RSDungeonGameModeBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -16,6 +15,13 @@
 #include "Engine/World.h"
 #include "Components/CapsuleComponent.h"
 #include "RogShop/UtilDefine.h"
+#include "RSDunBossRoomPortal.h" 
+#include "RSDunNextStagePortal.h"
+#include "RSDunLifeEssenceShop.h"
+#include "ItemInfoData.h"
+#include "RSDungeonGroundWeapon.h"
+#include "RSDungeonGroundIngredient.h"
+#include "RSDungeonGroundLifeEssence.h"
 
 // 외부에서 전달받은 월드 및 테이블 초기화
 void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance,int32 TileIndex)
@@ -35,36 +41,30 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance,in
 	{
 	case 0:
 		// 숲 몬스터 그룹
-		MonsterRawTable = DataSubsystem->ForestMonsterSpawnGroup;
+		MonsterSpawnGroupDataTable = DataSubsystem->ForestMonsterSpawnGroup;
 		break;
 	case 1:
 		// 사막 몬스터 그룹
-		MonsterRawTable = DataSubsystem->DesertMonsterSpawnGroup;
+		MonsterSpawnGroupDataTable = DataSubsystem->DesertMonsterSpawnGroup;
 		break;
 	case 2:
 		// 동굴 몬스터 그룹
-		MonsterRawTable = DataSubsystem->CaveMonsterSpawnGroup;
+		MonsterSpawnGroupDataTable = DataSubsystem->CaveMonsterSpawnGroup;
 		break;
 	default:
 		return;
 		break;
 	}
-	MonsterStateTable = DataSubsystem->Monster;
-	DungeonObjectTable = DataSubsystem->DungeonObject;
+	MonsterDataTable = DataSubsystem->Monster;
 
-	if (!MonsterRawTable)
+	if (!MonsterSpawnGroupDataTable)
 	{
-		RS_LOG_DEBUG("Failed Update MonsterRawTable");
+		RS_LOG_DEBUG("Failed Update MonsterSpawnGroupDataTable");
 		return;
 	}
-	if (!MonsterStateTable)
+	if (!MonsterDataTable)
 	{
 		RS_LOG_DEBUG("Failed Update Monster");
-		return;
-	}
-	if (!DungeonObjectTable)
-	{
-		RS_LOG_DEBUG("Failed Update DungeonObject");
 		return;
 	}
 	
@@ -80,7 +80,7 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance,in
 // 레벨 내 Monster 태그가 있는 TargetPoint 위치에 몬스터 스폰
 void URSSpawnManager::SpawnMonstersInLevel()
 {
-	if (!World || !MonsterRawTable || !MonsterStateTable) //월드나 테이블이 초기화되지 않았으면 리턴
+	if (!World || !MonsterSpawnGroupDataTable || !MonsterDataTable) //월드나 테이블이 초기화되지 않았으면 리턴
 	{
 		RS_LOG_DEBUG("몬스터 스폰 실패: 월드 또는 테이블이 초기화되지 않음");
 		return;
@@ -109,7 +109,7 @@ void URSSpawnManager::SpawnMonstersInLevel()
 
 	// 모든 스폰 그룹 데이터 테이블에서 가져오기
 	TArray<FMonsterSpawnGroupData*> AllGroups;
-	MonsterRawTable->GetAllRows(TEXT("MonsterRawData"), AllGroups);
+	MonsterSpawnGroupDataTable->GetAllRows(TEXT("MonsterRawData"), AllGroups);
 
 	if (AllGroups.Num() == 0)
 	{
@@ -148,7 +148,7 @@ void URSSpawnManager::SpawnMonstersInLevel()
 		for (const FMonsterCount& Entry : Group->SpawnGroup)
 		{
 			// 몬스터 상태 정보 테이블에서 해당 몬스터 정보 조회
-			FMonsterData* StateRow = MonsterStateTable->FindRow<FMonsterData>(Entry.MonsterRowName, TEXT("MonsterStateLookup"));
+			FMonsterData* StateRow = MonsterDataTable->FindRow<FMonsterData>(Entry.MonsterRowName, TEXT("MonsterStateLookup"));
 
 			UE_LOG(LogTemp, Warning, TEXT("타일 (%d,%d) → 몬스터: %s x %d"),
 				Pair.Key.X, Pair.Key.Y,
@@ -206,6 +206,10 @@ void URSSpawnManager::SpawnMonstersInLevel()
 				Monster->IncreaseHP(StateRow->MaxHP);
 				Monster->ChangeMoveSpeed(StateRow->MoveSpeed);
 				TotalSpawned++;
+
+				// 사망 시 오브젝트 스폰 함수 바인딩
+				Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundIngredient);
+				Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundLifeEssence);
 			}
 		}
 		UE_LOG(LogTemp, Warning, TEXT("타일 (%d,%d) → 총 스폰 수: %d"), Pair.Key.X, Pair.Key.Y, TileSpawned);
@@ -229,7 +233,10 @@ void URSSpawnManager::SpawnShopNPCInLevel()
 			ShopPoints.Add(*It);
 	}
 
-	if (ShopPoints.Num() == 0) return;
+	if (ShopPoints.Num() == 0)
+	{
+		return;
+	}
 
 	int32 Index = FMath::RandRange(0, ShopPoints.Num() - 1);
 	ATargetPoint* ChosenPoint = ShopPoints[Index];
@@ -238,8 +245,149 @@ void URSSpawnManager::SpawnShopNPCInLevel()
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	World->SpawnActor<AActor>(DungeonObjectTable->FindRow<FDungeonObjectData>(FName("ShopNPC"), TEXT("SpawnActor"))->ObjectClass, SpawnTransform, SpawnParams);
+
+	DunLifeEssenceShopInstance = World->SpawnActor<ARSDunLifeEssenceShop>(DunLifeEssenceShopClass, SpawnTransform, SpawnParams);
+
 	RS_LOG_DEBUG("상점 생성 성공");
+}
+
+void URSSpawnManager::SpawnGroundWeapon(FName TargetName, FTransform TargetTransform)
+{
+	URSGameInstance* RSGameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
+	if (!RSGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = RSGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	FItemInfoData* WeaponData = DataSubsystem->WeaponInfo->FindRow<FItemInfoData>(TargetName, TEXT("Get ItemInfoData"));
+	FDungeonWeaponData* WeaponClassData = DataSubsystem->WeaponDetail->FindRow<FDungeonWeaponData>(TargetName, TEXT("Get ItemInfoData"));
+
+	if (WeaponData && WeaponClassData)
+	{
+		UStaticMesh* ItemStaticMesh = WeaponData->ItemStaticMesh;;
+		TSubclassOf<ARSDungeonItemBase> WeaponClass = WeaponClassData->WeaponClass;
+
+		if (ItemStaticMesh && WeaponClass)
+		{
+			ARSDungeonGroundWeapon* GroundWeapon = GetWorld()->SpawnActor<ARSDungeonGroundWeapon>(DungeonGroundWeaponClass, TargetTransform);
+
+			FText ItemName = WeaponData->ItemName;
+
+			if (GroundWeapon)
+			{
+				GroundWeapon->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
+				GroundWeapon->SetWeaponClass(WeaponClassData->WeaponClass);
+			}
+		}
+	}
+}
+
+void URSSpawnManager::SpawnGroundIngredient(ARSDunBaseCharacter* DiedCharacter)
+{
+	ARSDunMonsterCharacter* MonsterCharacter = Cast<ARSDunMonsterCharacter>(DiedCharacter);
+	FName MonsterRowName = NAME_None;
+	if (MonsterCharacter)
+	{
+		MonsterRowName = MonsterCharacter->GetMonsterRowName();
+	}
+
+	if (MonsterRowName.IsNone())
+	{
+		return;
+	}
+
+	UGameInstance* CurGameInstance = MonsterCharacter->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	UDataTable* IngredientInfoDataTable = DataSubsystem->IngredientInfo;
+	if (!IngredientInfoDataTable)
+	{
+		RS_LOG("재료 데이터테이블 nullptr");
+		return;
+	}
+
+	if (!MonsterDataTable)
+	{
+		RS_LOG("캐싱 된 데이터 테이블이 nullptr");
+		return;
+	}
+
+	FMonsterData* MonsterDataRow = MonsterDataTable->FindRow<FMonsterData>(MonsterRowName, TEXT("Get MonsterDataRow"));
+
+	if (MonsterDataRow && MonsterDataRow->Ingredients.Num() >= 0)
+	{
+		for (const FMonsterIngredientsData& e : MonsterDataRow->Ingredients)
+		{
+			// TODO : 드랍 확률 적용하기
+
+			FItemInfoData* IngredientInfoDataRow = IngredientInfoDataTable->FindRow<FItemInfoData>(e.IngredientName, TEXT("Get IngredientDetailData"));
+			if (IngredientInfoDataRow)
+			{
+				ARSDungeonGroundIngredient* DungeonIngredient = GetWorld()->SpawnActor<ARSDungeonGroundIngredient>(DungeonGroundIngredientClass, MonsterCharacter->GetTransform());
+
+				if (DungeonIngredient)
+				{
+					FText ItemName = IngredientInfoDataRow->ItemName;
+					UStaticMesh* ItemStaticMesh = IngredientInfoDataRow->ItemStaticMesh;
+
+					DungeonIngredient->InitGroundItemInfo(ItemName, false, e.IngredientName, ItemStaticMesh);
+					DungeonIngredient->SetQuantity(1);
+					DungeonIngredient->RandImpulse();
+				}
+			}
+		}
+	}
+}
+
+void URSSpawnManager::SpawnGroundLifeEssence(ARSDunBaseCharacter* DiedCharacter)
+{
+	if (!MonsterDataTable)
+	{
+		RS_LOG("캐싱 된 데이터 테이블이 nullptr");
+		return;
+	}
+
+	ARSDunMonsterCharacter* MonsterCharacter = Cast<ARSDunMonsterCharacter>(DiedCharacter);
+	FName MonsterRowName = NAME_None;
+	if (MonsterCharacter)
+	{
+		MonsterRowName = MonsterCharacter->GetMonsterRowName();
+	}
+
+	if (MonsterRowName.IsNone())
+	{
+		return;
+	}
+
+	FMonsterData* MonsterDataRow = MonsterDataTable->FindRow<FMonsterData>(MonsterRowName, TEXT("Get MonsterDataRow"));
+
+	if (MonsterDataRow)
+	{
+		ARSDungeonGroundLifeEssence* DungeonLifeEssence = GetWorld()->SpawnActor<ARSDungeonGroundLifeEssence>(DungeonGroundLifeEssenceClass, MonsterCharacter->GetTransform());
+
+		if (DungeonLifeEssence)
+		{
+			int32 LifeEssenceQuantity = MonsterDataRow->DropLifeEssenceQuantity;
+
+			DungeonLifeEssence->RandImpulse();
+			DungeonLifeEssence->SetQuantity(LifeEssenceQuantity);
+		}
+	}
 }
 
 // Player 태그가 있는 TargetPoint에 플레이어 이동 또는 스폰
@@ -359,10 +507,11 @@ AActor* URSSpawnManager::SpawnBossPortal(const FVector& BossWorldLocation) // �
 				FTransform SpawnTransform;
 				SpawnTransform.SetLocation(BossWorldLocation);
 				SpawnTransform.SetRotation(FQuat::Identity);
-				ARSDunBossRoomPortal* SpawnedPortal = World->SpawnActor<ARSDunBossRoomPortal>(DungeonObjectTable->FindRow<FDungeonObjectData>(FName("BossRoomPortal"), TEXT("SpawnActor"))->ObjectClass, SpawnTransform, Params);
+
+				DunBossRoomPortalInstance = World->SpawnActor<ARSDunBossRoomPortal>(DunBossRoomPortalClass, SpawnTransform, Params);
 				RS_LOG_DEBUG("보스포탈 생성 완료");
 
-				if (SpawnedPortal)
+				if (DunBossRoomPortalInstance)
 				{
 					FTransform BossArenaTransform;
 					FVector SpawnLocation = GetBossArenaLocation();
@@ -375,7 +524,7 @@ AActor* URSSpawnManager::SpawnBossPortal(const FVector& BossWorldLocation) // �
 					SpawnLocation.Z += HalfHeight;
 					BossArenaTransform.SetLocation(SpawnLocation);
 					BossArenaTransform.SetRotation(FQuat::Identity);
-					SpawnedPortal->SetTargetTransform(BossArenaTransform);
+					DunBossRoomPortalInstance->SetTargetTransform(BossArenaTransform);
 					RS_LOG_DEBUG("보스 아레나 위치 지정 완료");
 				}
 
@@ -413,7 +562,7 @@ FVector URSSpawnManager::GetNextStageLocation() const //다음 스테이지 포�
 
 void URSSpawnManager::SpawnDunNextStagePortal() // 다음 스테이지 포탈 생성 함수
 {
-	if (!World)
+	if (!World || !DunNextStagePortalClass)
 	{
 		RS_LOG_DEBUG("다음 스테이지 포탈 생성 실패: World 또는 PortalClass 누락");
 		return;
@@ -422,12 +571,12 @@ void URSSpawnManager::SpawnDunNextStagePortal() // 다음 스테이지 포탈 �
 	FTransform PortalTransform;
 	PortalTransform.SetLocation(GetNextStageLocation()); 
 
-	World->SpawnActor<AActor>(DungeonObjectTable->FindRow<FDungeonObjectData>(FName("NextStagePortal"), TEXT("SpawnActor"))->ObjectClass, PortalTransform);
+	DunNextStagePortalInstance = World->SpawnActor<ARSDunNextStagePortal>(DunNextStagePortalClass, PortalTransform);
 }
 
 void URSSpawnManager::SpawnBossMonster()
 {
-	if (!World || !MonsterStateTable)
+	if (!World || !MonsterDataTable)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("보스 몬스터 스폰 실패: World 또는 MonsterStateTable이 초기화되지 않음"));
 		return;
@@ -466,7 +615,7 @@ void URSSpawnManager::SpawnBossMonster()
 		BossMonsterRowName = NAME_None;
 		break;
 	}
-	FMonsterData* BossData = MonsterStateTable->FindRow<FMonsterData>(BossMonsterRowName, TEXT("SpawnBossMonster"));
+	FMonsterData* BossData = MonsterDataTable->FindRow<FMonsterData>(BossMonsterRowName, TEXT("SpawnBossMonster"));
 	if (!BossData || !BossData->MonsterClass)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("MonsterStateTable에서 MainFloor 보스 몬스터 정보를 찾을 수 없습니다."));

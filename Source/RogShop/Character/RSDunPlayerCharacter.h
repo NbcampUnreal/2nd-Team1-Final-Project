@@ -81,9 +81,28 @@ private:
 	TObjectPtr<UCameraComponent> CameraComp;
 
 // 애니메이션 몽타주 관련
+public:
+	void SetIsMontageSkippable(bool NewbIsMontageSkippable);
+
+	// 현재 몽타주를 스킵 중인지 반환
+	bool IsSkippingMontage() const;
+
 private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = true))
+	// 현재 재생 중인 몽타주를 스킵 시도한다.
+	bool TrySkipMontage();
+
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAnimMontage> DodgeMontage; // 구르기
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim Montage", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> ChangeWeaponMontage;	// 무기 교체
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Anim Montage", meta = (AllowPrivateAccess = "true"))
+	bool bIsMontageSkippable;	// 몽타주를 스킵 가능한 상태인지 저장
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "Anim Montage", meta = (AllowPrivateAccess = "true"))
+	bool bIsSkippingMontage;	// 현재 몽타주를 스킵 중인지 저장
 
 // 던전 재화 관련
 public:

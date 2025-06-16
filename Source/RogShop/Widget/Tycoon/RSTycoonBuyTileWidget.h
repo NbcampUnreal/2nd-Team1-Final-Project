@@ -43,4 +43,5 @@ protected:
 
 private:
 	FName TileKey;
+	int32 Price;
 };

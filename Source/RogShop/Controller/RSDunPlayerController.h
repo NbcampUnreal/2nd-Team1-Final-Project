@@ -11,6 +11,7 @@ class UInputMappingContext;
 class UInputAction;
 class URSDunMainHUDWidget;
 class URSPlayerInventoryWidget;
+class ARSDunBaseCharacter;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotChange, int8, WeaponSlotIndex, FName, WeaponKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnIngredientChange, int32, IngredientSlotIndex, FItemSlot, IngredientItemSlot);
@@ -71,7 +72,7 @@ public:
 	void ToggleInGameMenuWidget();
 
 	UFUNCTION()
-	void ShowPlayerDeathWidget();
+	void ShowPlayerDeathWidget(ARSDunBaseCharacter* DiedCharacter);
 
 	void ShowInteractWidget();
 	void HideInteractWidget();

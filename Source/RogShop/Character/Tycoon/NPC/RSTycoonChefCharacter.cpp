@@ -55,11 +55,8 @@ void ARSTycoonChefCharacter::StopAllAction()
 
 void ARSTycoonChefCharacter::FindCookingTile()
 {
-	if (PlacedCookingTile)
-	{
-		return;
-	}
-
+	PlacedCookingTile = nullptr;
+	
 	//쿠킹 타일 배열을 구함
 	TArray<AActor*> CookingTileActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSCookingTile::StaticClass(), CookingTileActors);
@@ -137,7 +134,7 @@ void ARSTycoonChefCharacter::BeginPlay()
 void ARSTycoonChefCharacter::InteractTarget(AActor* TargetActor)
 {
 	Super::InteractTarget(TargetActor);
-
+	
 	if (ARSCookingTile* CookingTile = Cast<ARSCookingTile>(TargetActor))
 	{
 		RS_LOG("요리사가 화구에 배치 되었습니다.");
@@ -145,8 +142,6 @@ void ARSTycoonChefCharacter::InteractTarget(AActor* TargetActor)
 		FTransform ChefTransform = PlacedCookingTile->GetChefTransform();
 		SetActorLocation(ChefTransform.GetLocation());
 		SetActorRotation(ChefTransform.GetRotation());
-		
-		InteractSphere->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 	}
 }
 

@@ -24,7 +24,6 @@ class ROGSHOP_API URSTycoonSaleWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void SetGold(int32 Value);
 	void SetCustomerCount(int32 Value);
 	void AddOrderSlot(FFoodOrder Order);
 	void RemoveOrderSlot(FFoodOrder Order);
@@ -40,6 +39,8 @@ protected:
 private:
 	UFUNCTION()
 	void OnClickStopSales();
+	UFUNCTION()
+	void OnChangeGold(int32 Value);
 	
 	void UpdateTimeUI();
 

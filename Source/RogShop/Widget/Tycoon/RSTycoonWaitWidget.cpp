@@ -24,16 +24,17 @@ void URSTycoonWaitWidget::NativeOnInitialized()
 	SaleStartButton->OnClicked.AddDynamic(this, &URSTycoonWaitWidget::OnClickSalesStartButton);
 	ManagementButton->OnClicked.AddDynamic(this, &URSTycoonWaitWidget::OnClickManagementButton);
 	OutButton->OnClicked.AddDynamic(this, &URSTycoonWaitWidget::OnClickOutButton);
+
+	
+	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	check(PlayerController)
+	PlayerController->OnChangeGold.AddDynamic(this, &URSTycoonWaitWidget::OnChangeGold);
 }
 
 void URSTycoonWaitWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
-	check(PlayerController)
-	GoldText->SetText(FText::FromString(FString::FromInt(PlayerController->GetGold())));
-	
 	//운영시 문, 화구, 테이블 타일이 한개 이상씩은 있어야함
 	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
 	check(TileMap)
@@ -96,4 +97,9 @@ void URSTycoonWaitWidget::OnClickOutButton()
 			LevelSubsystem->TravelToLevel(ERSLevelCategory::BaseArea);
 		}
 	}
+}
+
+void URSTycoonWaitWidget::OnChangeGold(int32 Value)
+{
+	GoldText->SetText(FText::FromString(FString::FromInt(Value)));
 }

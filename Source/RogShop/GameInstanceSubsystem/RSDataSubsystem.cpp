@@ -23,10 +23,10 @@ void URSDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	CaveMonsterSpawnGroup = DataSettings->CaveMonsterSpawnGroupDataTable.LoadSynchronous();
 	Monster = DataSettings->MonsterDataTable.LoadSynchronous();
 	DungeonLevel = DataSettings->DungeonLevelDataTable.LoadSynchronous();
-	DungeonObject = DataSettings->DungeonObjectDataTable.LoadSynchronous();
 
 	check(Food)
 	check(IngredientInfo)
+	check(IngredientDetail)
 	check(WeaponInfo)
 	check(WeaponDetail)
 	check(RelicInfo)
@@ -35,4 +35,5 @@ void URSDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	check(DesertMonsterSpawnGroup)
 	check(CaveMonsterSpawnGroup)
 	check(Monster)
+	check(DungeonLevel)
 }

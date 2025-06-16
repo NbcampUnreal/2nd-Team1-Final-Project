@@ -10,11 +10,10 @@
 #include "Navigation/PathFollowingComponent.h"
 #include "RogShop/UtilDefine.h"
 
-
 ARSTycoonNPC::ARSTycoonNPC()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	InteractSphere = CreateDefaultSubobject<USphereComponent>("InteractSphere");
@@ -37,17 +36,13 @@ void ARSTycoonNPC::MoveToTarget(FVector Location, AActor* Target)
 	EPathFollowingRequestResult::Type Result = Cast<AAIController>(GetController())->MoveToLocation
 	(
 		Location //타겟
-		// 30.f	// 도착 판정 반경
-		// true,	// 충돌 영역이 겹치면 도착으로 간주
-		// true,	// 경로 탐색 사용
-		// false	// 목적지를 네비게이션 메시에 투영(Projection)하지 않음
 	);
 
 	RS_DRAW_DEBUG_SPHERE(GetWorld(), Location, 50, 30, FColor::Red, false, 5, 0, 1.0f);
-	
+
 	if (Result == EPathFollowingRequestResult::Type::Failed)
 	{
-		RS_LOG_C("NPC 이동 실패", FColor::Red);
+		RS_LOG_C("NPC가 경로를 찾지 못해 이동 실패", FColor::Red);
 
 		//재시도
 		FTimerHandle TimerHandle;
@@ -60,6 +55,19 @@ void ARSTycoonNPC::MoveToTarget(FVector Location, AActor* Target)
 	{
 		MoveTarget = Target;
 		InteractSphere->SetCollisionEnabled(ECollisionEnabled::Type::QueryOnly);
+
+		//네비게이션이 빌드되는 순간 혹은 네비게이션이 Invoker를 인식해 빌드되기 전에 명령이 들어오면 멈춰버리는 버그가 있음
+		//해당 버그를 해결하기위해 성공해도 확인을 다시 해주게 제작
+		//재시도
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(TimerHandle, [&, Location, Target]()
+		{
+			if (MoveTarget != nullptr && GetCharacterMovement()->Velocity.SquaredLength() < 0.1f * 0.1f)
+			{
+				RS_LOG_C("NPC가 네비게이션 문제로 움직이지 않음", FColor::Red);
+				MoveToTarget(Location, Target);
+			}
+		}, 0.1f, false);
 	}
 }
 
@@ -80,6 +88,14 @@ void ARSTycoonNPC::BeginPlay()
 	InteractSphere->OnComponentBeginOverlap.AddDynamic(this, &ARSTycoonNPC::OnInteract);
 }
 
+void ARSTycoonNPC::Destroyed()
+{
+	if (GetWorld()->IsGameWorld())
+		GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->RemoveNPC(this);
+
+	Super::Destroyed();
+}
+
 void ARSTycoonNPC::OnInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                               UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                               const FHitResult& SweepResult)
@@ -98,4 +114,3 @@ void ARSTycoonNPC::OnInteract(UPrimitiveComponent* OverlappedComponent, AActor* 
 	InteractTarget(OtherActor);
 	OnInteractTarget.Broadcast(OtherActor);
 }
-

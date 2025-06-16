@@ -135,7 +135,7 @@ bool ARSMonsterAIController::IsFocusing(FVector lookFor)
 	return bIsLook;
 }
 
-void ARSMonsterAIController::RotateToFocus(FVector lookFor)
+void ARSMonsterAIController::RotateToFocus(FVector lookFor, float deltaSecond)
 {
 	APawn* ctrlPawn = GetPawn();
 	FVector chrPos;
@@ -154,8 +154,14 @@ void ARSMonsterAIController::RotateToFocus(FVector lookFor)
 
 		targetYaw = look.Rotation().Yaw;
 		currentYaw = chrRot.Yaw;
-		deltaYaw = FMath::FindDeltaAngleDegrees(currentYaw, targetYaw);
+		deltaYaw = FMath::Clamp(FMath::FindDeltaAngleDegrees(currentYaw, targetYaw),0.0f,1.0f);
 
-		newRot = chrRot + FRotator(0, deltaYaw*rotateSpeed, 0);
+		newRot = chrRot + FRotator(0, deltaYaw, 0) * rotateSpeed * deltaSecond;
+
+		ctrlPawn->SetActorRotation(newRot);
+	}
+	else
+	{
+		return;
 	}
 }
