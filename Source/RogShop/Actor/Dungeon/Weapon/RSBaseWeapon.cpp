@@ -120,9 +120,24 @@ void ARSBaseWeapon::EndOverlap()
 	BoxComp->SetGenerateOverlapEvents(false);
 }
 
-float ARSBaseWeapon::GetWeaponDamage() const
+float ARSBaseWeapon::GetNormalAttackMontageDamage(int32 MontageIndex) const
 {
-	return WeaponDamage;
+	if (NormalAttackDatas.IsValidIndex(MontageIndex))
+	{
+		return NormalAttackDatas[MontageIndex].WeaponDamage;
+	}
+
+	return 0.f;
+}
+
+float ARSBaseWeapon::GetStrongAttackMontageDamage(int32 MontageIndex) const
+{
+	if (StrongAttackDatas.IsValidIndex(MontageIndex))
+	{
+		return StrongAttackDatas[MontageIndex].WeaponDamage;
+	}
+
+	return 0.0f;
 }
 
 FName ARSBaseWeapon::GetDataTableKey() const

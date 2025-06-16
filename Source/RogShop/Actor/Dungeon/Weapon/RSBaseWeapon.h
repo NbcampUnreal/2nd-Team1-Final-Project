@@ -70,11 +70,9 @@ public:
 	// 트레이스 채널을 사용하기 때문에 더이상 사용하지 않는 기능
 	void EndOverlap();
 
-	float GetWeaponDamage() const;
+	float GetNormalAttackMontageDamage(int32 MontageIndex) const;
 
-private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Status", meta = (AllowPrivateAccess = "true"))
-	float WeaponDamage;	// 오버랩 시 가할 무기 데미지
+	float GetStrongAttackMontageDamage(int32 MontageIndex) const;
 
 // 데이터 테이블의 RowName을 ID값으로 사용한다.
 public:

@@ -485,7 +485,7 @@ void URSPlayerWeaponComponent::PerformBoxSweepAttack()
 	{
 		AController* OwnerController = OwnerCharacter->GetInstigatorController();
 
-		if (WeaponActors.IsValidIndex(Index))
+		if (WeaponActors.IsValidIndex(Index) && WeaponActors[Index] != nullptr)
 		{
 			ARSBaseWeapon* CurWeapon = WeaponActors[Index];
 
@@ -522,7 +522,20 @@ void URSPlayerWeaponComponent::PerformBoxSweepAttack()
 							// 총 데미지를 구합니다.
 							float TotalDamage = 0.f;
 
-							float WeaponDamage = WeaponActors[Index]->GetWeaponDamage();
+							// 무기 공격력
+							float WeaponDamage = 0.f;
+
+							// 일반 공격
+							if (AttackType == EAttackType::NormalAttack)
+							{
+								WeaponDamage = WeaponActors[Index]->GetNormalAttackMontageDamage(Index);
+							}
+							// 강 공격
+							else if (AttackType == EAttackType::StrongAttack)
+							{
+								WeaponDamage = WeaponActors[Index]->GetStrongAttackMontageDamage(Index);
+							}
+
 							float AttackPower = OwnerCharacter->GetAttackPower();
 							TotalDamage = WeaponDamage + AttackPower;
 
