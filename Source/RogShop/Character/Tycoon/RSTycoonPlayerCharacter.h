@@ -22,7 +22,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void Pickup(AActor* Actor) override;
-	virtual AActor* Drop(FVector DropLocation) override;
+	virtual AActor* Drop(FTransform DropTransform) override;
 	virtual AActor* GetPickupActor() override { return PickupActor; }
 
 protected:
@@ -38,10 +38,10 @@ private:
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<USphereComponent> InteractSphere;
-
-	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USceneComponent> PickupLocation;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<USphereComponent> InteractSphere;
 
 	UPROPERTY()
 	TObjectPtr<AActor> PickupActor;

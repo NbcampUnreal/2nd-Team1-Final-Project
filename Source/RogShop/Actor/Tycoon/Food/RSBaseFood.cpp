@@ -13,5 +13,6 @@ ARSBaseFood::ARSBaseFood()
 	RootComponent = Root;
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
+	Mesh->SetCollisionProfileName(TEXT("NoCollision"));
 	Mesh->SetupAttachment(RootComponent);
 }

@@ -117,6 +117,7 @@ void ARSCookingTile::FinishCook()
 	ARSBaseFood* Food = GetWorld()->SpawnActor<ARSBaseFood>(Data->ActorType);
 	Food->SetActorLocation(FoodLocation->GetComponentLocation());
 	Food->Order = CookingFoodOrder;
+	Food->SetActorEnableCollision(false);
 
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(Controller)
@@ -130,15 +131,23 @@ void ARSCookingTile::TakeFood(ACharacter* InteractCharacter)
 {
 	if (CookedFood)
 	{
-		//오더 슬롯 제거
-		GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->RemoveOrderSlot(CookedFood->Order);
-
 		IRSCanPickup* CanPickupCharacter = Cast<IRSCanPickup>(InteractCharacter);
 		check(CanPickupCharacter)
-		CanPickupCharacter->Pickup(CookedFood);
+		
+		if (CanPickupCharacter->GetPickupActor() == nullptr)
+		{
+			//오더 슬롯 제거
+			GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->RemoveOrderSlot(CookedFood->Order);
 
-		CookedFood = nullptr;
-		State = ECookingState::None;
+			CanPickupCharacter->Pickup(CookedFood);
+
+			CookedFood = nullptr;
+			State = ECookingState::None;
+		}
+		else
+		{
+			RS_LOG_C("이미 들고있는 음식이 있습니다", FColor::Red);
+		}
 	}
 	else
 	{
