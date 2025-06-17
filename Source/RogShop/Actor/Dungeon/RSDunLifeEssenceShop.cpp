@@ -50,4 +50,9 @@ bool ARSDunLifeEssenceShop::GetIsAutoInteract() const
 	return bIsAutoInteract;
 }
 
+UAnimMontage* ARSDunLifeEssenceShop::GetInteractAnimMontage() const
+{
+	return nullptr;
+}
+
 

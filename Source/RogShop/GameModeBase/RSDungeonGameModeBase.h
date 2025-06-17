@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "RSSpawnManager.h"
 #include "RSMapGenerator.h"
+#include "RSSpawnManagerAccessor.h"
 #include "RSDungeonGameModeBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBossDead);
@@ -14,7 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMapFullyLoaded);
 
 // 던전 게임모드 클래스 정의
 UCLASS()
-class ROGSHOP_API ARSDungeonGameModeBase : public AGameModeBase
+class ROGSHOP_API ARSDungeonGameModeBase : public AGameModeBase, public IRSSpawnManagerAccessor
 {
 	GENERATED_BODY()
 
@@ -52,6 +53,9 @@ private:
 #pragma endregion
 
 #pragma region SpawnManager
+public:
+	virtual URSSpawnManager* GetSpawnManager() const override;
+
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dungeon", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<URSSpawnManager> SpawnManagerClass; // 던전 오브젝트 매니저 클래스
@@ -65,15 +69,20 @@ public:
 	int32 GetSeed() const;
 	void InitRandSeed();
 
-	int32 GetTileIndex() const;
-	void IncrementAtTileIndex();
+	int32 GetLevelIndex() const;
+	void IncrementAtLevelIndex();
+
+	int32 GetMaxStageCount() const;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Info", meta = (AllowPrivateAccess = "true"))
 	int32 Seed;	// 해당 값을 기준으로 맵 생성
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Info", meta = (AllowPrivateAccess = "true"))
-	int32 TileIndex;
+	int32 LevelIndex;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dungeon Info", meta = (AllowPrivateAccess = "true"))
+	int32 MaxStageCount;
 #pragma endregion
 
 

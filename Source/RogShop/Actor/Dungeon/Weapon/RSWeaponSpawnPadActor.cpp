@@ -4,8 +4,9 @@
 #include "ItemInfoData.h"
 #include "RSDungeonGroundWeapon.h"
 #include "RSBaseAreaGameModeBase.h"
-
 #include "Kismet/GameplayStatics.h"
+#include "RSSpawnManagerAccessor.h"
+#include "RSSpawnManager.h"
 
 ARSWeaponSpawnPadActor::ARSWeaponSpawnPadActor()
 {
@@ -16,6 +17,9 @@ ARSWeaponSpawnPadActor::ARSWeaponSpawnPadActor()
 
     MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
     MeshComp->SetupAttachment(SceneComp);
+
+    WeaponSpawnSceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("WeaponSpawnScene"));
+    WeaponSpawnSceneComp->SetupAttachment(MeshComp);
 }
 
 void ARSWeaponSpawnPadActor::BeginPlay()
@@ -86,30 +90,18 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
     // 선택된 무기 키 기록
     GameMode->AddSpawnedWeaponRowName(RandomRowName);
 
+    FTransform SpawnTransform;
+    SpawnTransform.SetLocation(WeaponSpawnSceneComp->GetComponentLocation());
+    SpawnTransform.SetRotation(WeaponSpawnSceneComp->GetComponentQuat());
+
     // 선택한 키에 해당하는 무기 스폰
-    FVector Origin;
-    FVector BoxExtent;
-    GetActorBounds(true, Origin, BoxExtent);
-    FVector SpawnLocation = Origin + FVector(0, 0, BoxExtent.Z + 50);
-
-    FItemInfoData* WeaponData = DataSubsystem->WeaponInfo->FindRow<FItemInfoData>(RandomRowName, TEXT("SpawnWeapon"));
-    FDungeonWeaponData* WeaponClassData = DataSubsystem->WeaponDetail->FindRow<FDungeonWeaponData>(RandomRowName, TEXT("SpawnWeapon"));
-
-    if (WeaponData && WeaponClassData && WeaponData->ItemStaticMesh && WeaponClassData->WeaponClass)
+    IRSSpawnManagerAccessor* SpawnManagerAccessor = Cast<IRSSpawnManagerAccessor>(GameMode);
+    if (SpawnManagerAccessor)
     {
-        ARSDungeonGroundWeapon* GroundWeapon = GetWorld()->SpawnActor<ARSDungeonGroundWeapon>(
-            ARSDungeonGroundWeapon::StaticClass(),
-            SpawnLocation,
-            FRotator::ZeroRotator
-        );
-
-        FText ItemName = WeaponData->ItemName;
-        UStaticMesh* ItemStaticMesh = WeaponData->ItemStaticMesh;
-
-        if (GroundWeapon)
+        URSSpawnManager* RSSpawnManager = SpawnManagerAccessor->GetSpawnManager();
+        if (RSSpawnManager)
         {
-            GroundWeapon->InitGroundItemInfo(ItemName, false, RandomRowName, ItemStaticMesh);
-            GroundWeapon->SetWeaponClass(WeaponClassData->WeaponClass);
+            RSSpawnManager->SpawnGroundWeaponAtTransform(RandomRowName, SpawnTransform, false);
         }
     }
 }

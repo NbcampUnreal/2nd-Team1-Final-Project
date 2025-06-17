@@ -4,6 +4,7 @@
 #include "RSBaseWeapon.h"
 #include "GameFramework/Character.h"
 #include "Components/BoxComponent.h"
+#include "WeaponAttackData.h"
 
 // Sets default values
 ARSBaseWeapon::ARSBaseWeapon()
@@ -25,7 +26,7 @@ ARSBaseWeapon::ARSBaseWeapon()
 
 	SetActorEnableCollision(false);
 
-	WeaponDamage = 0.f;
+	//WeaponDamage = 0.f; TODO : 여기 WeaponDamage 안 쓰이고 있는데 임시 주석 처리했습니다.
 }
 
 // Called when the game starts or when spawned
@@ -45,19 +46,58 @@ TSubclassOf<UAnimInstance> ARSBaseWeapon::GetWeaponAnimInstnace() const
 	return WeaponAnimInstnace;
 }
 
-UAnimMontage* ARSBaseWeapon::GetNormalAttack(int32 Index) const
+UAnimMontage* ARSBaseWeapon::GetNormalAttackMontage(int32 Index) const
 {
-	if (NormalAttacks.Num() > Index)
+	if (NormalAttackDatas.Num() > Index)
 	{
-		return NormalAttacks[Index];
+		return NormalAttackDatas[Index].AttackMontage;
 	}
 
 	return nullptr;
 }
 
-const TArray<UAnimMontage*>& ARSBaseWeapon::GetNormalAttacks() const
+const TArray<UAnimMontage*> ARSBaseWeapon::GetNormalAttackMontages() const
 {
-	return NormalAttacks;
+	TArray<UAnimMontage*> NormalAttackMontages;
+
+	for (const auto& e : NormalAttackDatas)
+	{
+		NormalAttackMontages.Add(e.AttackMontage);
+	}
+
+	return NormalAttackMontages;
+}
+
+void ARSBaseWeapon::SetNormalAttackDatas(TArray<FWeaponAttackData> NewNormalAttackDatas)
+{
+	NormalAttackDatas = NewNormalAttackDatas;
+}
+
+UAnimMontage* ARSBaseWeapon::GetStrongAttackMontage(int32 Index) const
+{
+	if (StrongAttackDatas.Num() > Index)
+	{
+		return StrongAttackDatas[Index].AttackMontage;
+	}
+
+	return nullptr;
+}
+
+const TArray<UAnimMontage*> ARSBaseWeapon::GetStrongAttackMontages() const
+{
+	TArray<UAnimMontage*> StrongAttackMontages;
+
+	for (const auto& e : StrongAttackDatas)
+	{
+		StrongAttackMontages.Add(e.AttackMontage);
+	}
+
+	return StrongAttackMontages;
+}
+
+void ARSBaseWeapon::SetStrongAttackDatas(TArray<FWeaponAttackData> NewStrongAttackDatas)
+{
+	StrongAttackDatas = NewStrongAttackDatas;
 }
 
 void ARSBaseWeapon::StartOverlap()
@@ -80,9 +120,24 @@ void ARSBaseWeapon::EndOverlap()
 	BoxComp->SetGenerateOverlapEvents(false);
 }
 
-float ARSBaseWeapon::GetWeaponDamage() const
+float ARSBaseWeapon::GetNormalAttackMontageDamage(int32 MontageIndex) const
 {
-	return WeaponDamage;
+	if (NormalAttackDatas.IsValidIndex(MontageIndex))
+	{
+		return NormalAttackDatas[MontageIndex].WeaponDamage;
+	}
+
+	return 0.f;
+}
+
+float ARSBaseWeapon::GetStrongAttackMontageDamage(int32 MontageIndex) const
+{
+	if (StrongAttackDatas.IsValidIndex(MontageIndex))
+	{
+		return StrongAttackDatas[MontageIndex].WeaponDamage;
+	}
+
+	return 0.0f;
 }
 
 FName ARSBaseWeapon::GetDataTableKey() const

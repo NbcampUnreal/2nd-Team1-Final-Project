@@ -6,6 +6,7 @@
 #include "RogShop/RSMonsterAttackTraceDefine.h"
 #include "RogShop/UtilDefine.h"
 #include "Components/WidgetComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/ProgressBar.h"
 #include "RSDataSubsystem.h"
 #include "RSDungeonGameModeBase.h"
@@ -26,14 +27,18 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	navInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("NavInvoker"));	
 	navInvoker->SetGenerationRadii(navGenerationRadius, navRemovalRadius);
 
-	// 몬스터 머리 위 체력 바 위젯
+	// 몬스터 체력바랑 데미지 텍스트 위젯 생성 및 설정(BP랑 연결은 에디터의 위젯 클래스에서 설정)
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
 	OverheadWidget->SetupAttachment(GetMesh());
 	OverheadWidget->SetWidgetSpace(EWidgetSpace::World);
 	OverheadWidget->SetDrawSize(FVector2D(1920.f, 500.f));
 	OverheadWidget->SetRelativeLocation(FVector(0.f, 0.f, 250.f)); // 필요 시 위치 조정
-	OverheadWidget->SetTwoSided(true);	// 양면 설정<< 이거 될까?
 	OverheadWidget->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
+
+	DamageTextWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("DamageText"));
+	DamageTextWidget->SetupAttachment(GetMesh());
+	DamageTextWidget->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
+	DamageTextWidget->SetWidgetSpace(EWidgetSpace::Screen);
 
 	//Patrol
 	maxDetectPatrolRoute = 2000.f;
@@ -52,7 +57,6 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	strafeRange = 500.0f;
 	bIsPlayingAnim = false;
 
-	
 }
 
 void ARSDunMonsterCharacter::BeginPlay()
@@ -60,7 +64,7 @@ void ARSDunMonsterCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	GetWorld()->GetTimerManager().SetTimer(detectDelayTimer, this, &ARSDunMonsterCharacter::FindNearPatrolPoint, 0.5f, false);	
-	GetWorld()->GetTimerManager().SetTimer(MonsterHPBarRotationTimer, this, &ARSDunMonsterCharacter::UpdateEnemyHealthBarRotation, 0.1f, true);
+	GetWorld()->GetTimerManager().SetTimer(MonsterWidgetComponentRotationTimer, this, &ARSDunMonsterCharacter::UpdateEnemyWidgetComponentRotation, 0.1f, true);
 
 	if (UAnimInstance* animInstance = GetMesh()->GetAnimInstance())
 	{
@@ -451,10 +455,10 @@ const FMonsterData* ARSDunMonsterCharacter::GetFMonsterData()
 	return MonsterDataRow;
 }
 
-// 적의 체력바가 항상 카메라를 바라보게 회전시키는 함수
-void ARSDunMonsterCharacter::UpdateEnemyHealthBarRotation()
+// 적이 가진 위젯 컴포넌트가 항상 카메라를 바라보게 회전시키는 함수
+void ARSDunMonsterCharacter::UpdateEnemyWidgetComponentRotation()
 {
-	if (!OverheadWidget || !GetWorld()) return;
+	if (!OverheadWidget || !DamageTextWidget || !GetWorld()) return;
 
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	if (!PlayerController) return;
@@ -469,6 +473,7 @@ void ARSDunMonsterCharacter::UpdateEnemyHealthBarRotation()
 	if (!NewRotation.Equals(OverheadWidget->GetComponentRotation(), 0.1f))
 	{
 		OverheadWidget->SetWorldRotation(NewRotation);
+		DamageTextWidget->SetWorldRotation(NewRotation);
 	}
 }
 

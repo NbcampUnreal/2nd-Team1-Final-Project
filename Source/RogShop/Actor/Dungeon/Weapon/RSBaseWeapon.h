@@ -9,6 +9,8 @@
 
 class UBoxComponent;
 
+struct FWeaponAttackData;
+
 UCLASS()
 class ROGSHOP_API ARSBaseWeapon : public ARSDungeonItemBase
 {
@@ -27,27 +29,39 @@ public:
 	UBoxComponent* GetBoxComp() const;
 
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USceneComponent> SceneComp;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMeshComponent> MeshComp;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UBoxComponent> BoxComp;	// 데미지 로직을 위한 콜리전 용도의 컴포넌트
 
 // 애니메이션
 public:
 	TSubclassOf<UAnimInstance> GetWeaponAnimInstnace() const;
-	UAnimMontage* GetNormalAttack(int32 Index) const;
-	const TArray<UAnimMontage*>& GetNormalAttacks() const;
+	
+	UAnimMontage* GetNormalAttackMontage(int32 Index) const;
+
+	const TArray<UAnimMontage*> GetNormalAttackMontages() const;
+
+	void SetNormalAttackDatas(TArray<FWeaponAttackData> NewNormalAttackDatas);
+
+	UAnimMontage* GetStrongAttackMontage(int32 Index) const;
+
+	const TArray<UAnimMontage*> GetStrongAttackMontages() const;
+
+	void SetStrongAttackDatas(TArray<FWeaponAttackData> NewStrongAttackDatas);
 		
 private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = true))
+	// 애니메이션들을 캐싱한다.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UAnimInstance> WeaponAnimInstnace; // 무기의 기본 이동 애님 인스턴스
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = true))
-	TArray<TObjectPtr<UAnimMontage>> NormalAttacks; // 무기의 기본 공격 몽타주
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = true))
-	TArray<TObjectPtr<UAnimMontage>> StrongAttacks; // 무기의 강 공격 몽타주
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = "true"))
+	TArray<FWeaponAttackData> NormalAttackDatas; // 무기의 기본 공격 몽타주
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = "true"))
+	TArray<FWeaponAttackData> StrongAttackDatas; // 무기의 강 공격 몽타주
 
 // 충돌
 public:
@@ -56,11 +70,9 @@ public:
 	// 트레이스 채널을 사용하기 때문에 더이상 사용하지 않는 기능
 	void EndOverlap();
 
-	float GetWeaponDamage() const;
+	float GetNormalAttackMontageDamage(int32 MontageIndex) const;
 
-private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Status", meta = (AllowPrivateAccess = true))
-	float WeaponDamage;	// 오버랩 시 가할 무기 데미지
+	float GetStrongAttackMontageDamage(int32 MontageIndex) const;
 
 // 데이터 테이블의 RowName을 ID값으로 사용한다.
 public:
@@ -68,6 +80,6 @@ public:
 	void SetDataTableKey(FName NewDataTableKey);
 
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info", meta = (AllowPrivateAccess = "true"))
 	FName DataTableKey;
 };

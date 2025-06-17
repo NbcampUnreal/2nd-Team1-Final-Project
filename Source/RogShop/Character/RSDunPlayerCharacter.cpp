@@ -274,13 +274,14 @@ void ARSDunPlayerCharacter::DecreaseHP(float Amount)
     if (PC)
     {
         PC->OnHPChange.Broadcast();
+        PC->OnFloatDamage.Broadcast(Amount);
     }
 }
 
 void ARSDunPlayerCharacter::Move(const FInputActionValue& value)
 {
     // 카메라 시점을 기준하여 입력받은 방향으로 캐릭터 이동
-    if (Controller)
+    if (Controller && TrySkipMontage())
     {
         const FVector2D MoveInput = value.Get<FVector2D>();
         const FRotator MovementRotation(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
@@ -324,28 +325,26 @@ void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
         }
     }
 
-    FVector LastInput = GetLastMovementInputVector();
-
-    if (!LastInput.IsNearlyZero())
-    {
-        FRotator DesiredRotation = LastInput.Rotation();
-        SetActorRotation(DesiredRotation);
-    }
-
     // 구르기 전 몬스터 HP바가 플레이어를 바라보도록 하기
-    // 1. 모든 몬스터 HP 바 회전
+    // 1. 모든 몬스터 위젯 컴포넌트 회전
     for (ARSDunMonsterCharacter* Monster : ARSDunMonsterCharacter::GetAllMonsters())
     {
         if (IsValid(Monster))
         {
-            Monster->UpdateEnemyHealthBarRotation();
+            Monster->UpdateEnemyWidgetComponentRotation();
         }
     }
 
-    // TODO : TrySkipMontage을 호출하고 반환값이 true인 경우 구르기 실행
-
     if (TrySkipMontage())
     {
+        FVector LastInput = GetLastMovementInputVector();
+
+        if (!LastInput.IsNearlyZero())
+        {
+            FRotator DesiredRotation = LastInput.Rotation();
+            SetActorRotation(DesiredRotation);
+        }
+
         PlayAnimMontage(DodgeMontage);
     }
 }
@@ -356,6 +355,15 @@ void ARSDunPlayerCharacter::Interaction(const FInputActionValue& value)
     if (Interactable)
     {
         Interactable->Interact(this);
+
+        UAnimMontage* InteractAnimMontage = Interactable->GetInteractAnimMontage();
+
+        UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+        if (InteractAnimMontage && AnimInstance && !AnimInstance->IsAnyMontagePlaying())
+        {
+            PlayAnimMontage(InteractAnimMontage);
+        }
     }
 }
 
@@ -363,22 +371,20 @@ void ARSDunPlayerCharacter::NormalAttack(const FInputActionValue& value)
 {
     if (WeaponComp)
     {
-        WeaponComp->HandleNormalAttackInput();
+        WeaponComp->HandleAttackInput(EAttackType::NormalAttack);
     }
 }
 
 void ARSDunPlayerCharacter::StrongAttack(const FInputActionValue& value)
 {
-    // 애니메이션이 아직 준비되지 않았으므로 디버깅용 출력
-    RS_LOG_DEBUG("StrongAttack Activated");
+    if (WeaponComp)
+    {
+        WeaponComp->HandleAttackInput(EAttackType::StrongAttack);
+    }
 }
 
 void ARSDunPlayerCharacter::FirstWeaponSlot(const FInputActionValue& value)
 {
-    // 애니메이션이 아직 준비되지 않았으므로 디버깅용 출력
-    // 추후에 해당 무기로 전환되는 기능 구현해야한다.
-    RS_LOG_DEBUG("FirstWeaponSlot Activated");
-
     UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
     if (!AnimInstance)
     {
@@ -402,10 +408,6 @@ void ARSDunPlayerCharacter::FirstWeaponSlot(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::SecondWeaponSlot(const FInputActionValue& value)
 {
-    // 애니메이션이 아직 준비되지 않았으므로 디버깅용 출력
-    // 추후에 해당 무기로 전환되는 기능 구현해야한다.
-    RS_LOG_DEBUG("SecondWeaponSlot Activated");
-
     UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
     if (!AnimInstance)
     {
@@ -468,8 +470,10 @@ bool ARSDunPlayerCharacter::TrySkipMontage()
     // 애니메이션 인스턴스가 유효하고 스킵 가능한 상태인 경우
     if (AnimInstance && bIsMontageSkippable)
     {
-        // 몽타주를 재생 중인 경우
-        if (AnimInstance->IsAnyMontagePlaying())
+        // 상체만 재생하는 몽타주를 제외한 다른 몽타주를 재생 중인 경우
+        float UpperBodyLocalWeight = AnimInstance->GetSlotMontageLocalWeight(FName(TEXT("UpperBody")));
+        bool IsUpperBodySlotActive = UpperBodyLocalWeight > 0;
+        if (!IsUpperBodySlotActive && AnimInstance->IsAnyMontagePlaying())
         {
             UAnimMontage* CurrentMontage = AnimInstance->GetCurrentActiveMontage();
 

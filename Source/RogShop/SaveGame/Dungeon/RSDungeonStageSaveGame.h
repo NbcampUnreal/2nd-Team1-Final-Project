@@ -16,7 +16,7 @@ class ROGSHOP_API URSDungeonStageSaveGame : public USaveGame
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 TileIndex;
+	int32 LevelIndex;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Seed;

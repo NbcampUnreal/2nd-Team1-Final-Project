@@ -43,3 +43,8 @@ bool ARSDunBossRoomPortal::GetIsAutoInteract() const
 	return bIsAutoInteract;
 }
 
+UAnimMontage* ARSDunBossRoomPortal::GetInteractAnimMontage() const
+{
+	return nullptr;
+}
+
