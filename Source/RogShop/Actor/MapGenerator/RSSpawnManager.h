@@ -37,7 +37,7 @@ public:
 #pragma region 공개 함수
 
 	// 월드와 데이터테이블 초기화
-	void Initialize(UWorld* InWorld, UGameInstance* GameInstance,int32 TileIndex);
+	void Initialize(UWorld* InWorld, UGameInstance* GameInstance,int32 TargetLevelIndex);
 
 	// 몬스터들을 타겟포인트 위치에 스폰
 	void SpawnMonstersInLevel();
@@ -103,14 +103,17 @@ private:
 #pragma region GroundItem
 public:
 	UFUNCTION()
-	void SpawnGroundWeapon(FName TargetName, FTransform TargetTransform);
+	void SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform, bool AddImpulse);
+
+	UFUNCTION()
+	void SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform);
 
 private:
 	UFUNCTION()
-	void SpawnGroundIngredient(ARSDunBaseCharacter* DiedCharacter);
+	void SpawnGroundIngredientFromCharacter(ARSDunBaseCharacter* DiedCharacter);
 
 	UFUNCTION()
-	void SpawnGroundLifeEssence(ARSDunBaseCharacter* DiedCharacter);
+	void SpawnGroundLifeEssenceFromCharacter(ARSDunBaseCharacter* DiedCharacter);
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))

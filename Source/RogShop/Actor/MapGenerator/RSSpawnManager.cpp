@@ -24,10 +24,10 @@
 #include "RSDungeonGroundLifeEssence.h"
 
 // 외부에서 전달받은 월드 및 테이블 초기화
-void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance,int32 TileIndex)
+void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, int32 TargetLevelIndex)
 {
 	World = InWorld;
-	LevelIndex = TileIndex;
+	LevelIndex = TargetLevelIndex;
 
 	if (!GameInstance) return;
 
@@ -208,8 +208,8 @@ void URSSpawnManager::SpawnMonstersInLevel()
 				TotalSpawned++;
 
 				// 사망 시 오브젝트 스폰 함수 바인딩
-				Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundIngredient);
-				Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundLifeEssence);
+				Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundIngredientFromCharacter);
+				Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundLifeEssenceFromCharacter);
 			}
 		}
 		UE_LOG(LogTemp, Warning, TEXT("타일 (%d,%d) → 총 스폰 수: %d"), Pair.Key.X, Pair.Key.Y, TileSpawned);
@@ -251,7 +251,7 @@ void URSSpawnManager::SpawnShopNPCInLevel()
 	RS_LOG_DEBUG("상점 생성 성공");
 }
 
-void URSSpawnManager::SpawnGroundWeapon(FName TargetName, FTransform TargetTransform)
+void URSSpawnManager::SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform, bool AddImpulse)
 {
 	URSGameInstance* RSGameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
 	if (!RSGameInstance)
@@ -283,12 +283,61 @@ void URSSpawnManager::SpawnGroundWeapon(FName TargetName, FTransform TargetTrans
 			{
 				GroundWeapon->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
 				GroundWeapon->SetWeaponClass(WeaponClassData->WeaponClass);
+
+				if (AddImpulse)
+				{
+					GroundWeapon->RandImpulse();
+				}
 			}
 		}
 	}
 }
 
-void URSSpawnManager::SpawnGroundIngredient(ARSDunBaseCharacter* DiedCharacter)
+void URSSpawnManager::SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform)
+{
+	URSGameInstance* RSGameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
+	if (!RSGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = RSGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	UDataTable* IngredientInfoDataTable = DataSubsystem->IngredientInfo;
+	if (!IngredientInfoDataTable)
+	{
+		RS_LOG("재료 데이터테이블 nullptr");
+		return;
+	}
+
+	if (!MonsterDataTable)
+	{
+		RS_LOG("캐싱 된 데이터 테이블이 nullptr");
+		return;
+	}
+
+	FItemInfoData* IngredientInfoDataRow = IngredientInfoDataTable->FindRow<FItemInfoData>(TargetName, TEXT("Get IngredientDetailData"));
+	if (IngredientInfoDataRow)
+	{
+		ARSDungeonGroundIngredient* DungeonIngredient = GetWorld()->SpawnActor<ARSDungeonGroundIngredient>(DungeonGroundIngredientClass, TargetTransform);
+
+		if (DungeonIngredient)
+		{
+			FText ItemName = IngredientInfoDataRow->ItemName;
+			UStaticMesh* ItemStaticMesh = IngredientInfoDataRow->ItemStaticMesh;
+
+			DungeonIngredient->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
+			DungeonIngredient->SetQuantity(1);
+			DungeonIngredient->RandImpulse();
+		}
+	}
+}
+
+void URSSpawnManager::SpawnGroundIngredientFromCharacter(ARSDunBaseCharacter* DiedCharacter)
 {
 	ARSDunMonsterCharacter* MonsterCharacter = Cast<ARSDunMonsterCharacter>(DiedCharacter);
 	FName MonsterRowName = NAME_None;
@@ -354,7 +403,7 @@ void URSSpawnManager::SpawnGroundIngredient(ARSDunBaseCharacter* DiedCharacter)
 	}
 }
 
-void URSSpawnManager::SpawnGroundLifeEssence(ARSDunBaseCharacter* DiedCharacter)
+void URSSpawnManager::SpawnGroundLifeEssenceFromCharacter(ARSDunBaseCharacter* DiedCharacter)
 {
 	if (!MonsterDataTable)
 	{

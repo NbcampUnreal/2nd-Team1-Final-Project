@@ -5,6 +5,7 @@
 #include "RSDungeonGroundWeapon.h"
 #include "RSBaseAreaGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "RSSpawnManagerAccessor.h"
 #include "RSSpawnManager.h"
 
 ARSWeaponSpawnPadActor::ARSWeaponSpawnPadActor()
@@ -16,6 +17,9 @@ ARSWeaponSpawnPadActor::ARSWeaponSpawnPadActor()
 
     MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
     MeshComp->SetupAttachment(SceneComp);
+
+    WeaponSpawnSceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("WeaponSpawnScene"));
+    WeaponSpawnSceneComp->SetupAttachment(MeshComp);
 }
 
 void ARSWeaponSpawnPadActor::BeginPlay()
@@ -86,19 +90,18 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
     // 선택된 무기 키 기록
     GameMode->AddSpawnedWeaponRowName(RandomRowName);
 
-    FVector Origin;
-    FVector BoxExtent;
-    GetActorBounds(true, Origin, BoxExtent);
-    FVector SpawnLocation = Origin + FVector(0, 0, BoxExtent.Z + 50);
-
     FTransform SpawnTransform;
-    SpawnTransform.SetLocation(SpawnLocation);
+    SpawnTransform.SetLocation(WeaponSpawnSceneComp->GetComponentLocation());
+    SpawnTransform.SetRotation(WeaponSpawnSceneComp->GetComponentQuat());
 
     // 선택한 키에 해당하는 무기 스폰
-    URSSpawnManager* RSSpawnManager = GameMode->GetSpawnManager();
-    if (RSSpawnManager)
+    IRSSpawnManagerAccessor* SpawnManagerAccessor = Cast<IRSSpawnManagerAccessor>(GameMode);
+    if (SpawnManagerAccessor)
     {
-        RSSpawnManager->SpawnGroundWeapon(RandomRowName, SpawnTransform);
+        URSSpawnManager* RSSpawnManager = SpawnManagerAccessor->GetSpawnManager();
+        if (RSSpawnManager)
+        {
+            RSSpawnManager->SpawnGroundWeaponAtTransform(RandomRowName, SpawnTransform, false);
+        }
     }
-
 }

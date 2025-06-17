@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "RSSpawnManagerAccessor.h"
 #include "RSBaseAreaGameModeBase.generated.h"
 
 class URSSpawnManager;
 
 UCLASS()
-class ROGSHOP_API ARSBaseAreaGameModeBase : public AGameModeBase
+class ROGSHOP_API ARSBaseAreaGameModeBase : public AGameModeBase, public IRSSpawnManagerAccessor
 {
 	GENERATED_BODY()
 
@@ -29,7 +30,7 @@ private:
 
 #pragma region SpawnManager
 public:
-	URSSpawnManager* GetSpawnManager() const;
+	virtual URSSpawnManager* GetSpawnManager() const override;
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dungeon", meta = (AllowPrivateAccess = "true"))

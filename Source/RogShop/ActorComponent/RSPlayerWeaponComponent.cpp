@@ -13,6 +13,8 @@
 #include "RSDunPlayerController.h"
 #include "RSSaveGameSubsystem.h"
 #include "RSDungeonWeaponSaveGame.h"
+#include "GameFramework/GameModeBase.h"
+#include "RSSpawnManagerAccessor.h"
 
 URSPlayerWeaponComponent::URSPlayerWeaponComponent()
 {
@@ -68,6 +70,8 @@ void URSPlayerWeaponComponent::HandleAttackInput(EAttackType TargetAttackType)
 			ResetCombo();
 
 			AttackType = TargetAttackType;
+			bIsAttack = true;
+			bComboInputBuffered = true;
 		}
 	}
 	// 공격 중이지 않은 경우
@@ -108,12 +112,17 @@ void URSPlayerWeaponComponent::HandleAttackInput(EAttackType TargetAttackType)
 				CurAttackMontage = WeaponActors[Index]->GetStrongAttackMontage(ComboIndex);
 			}
 
-			// 몽타주와 애님인스턴스가 유효한 경우
-			if (CurAttackMontage && AnimInstance)
+			// 몽타주와 애님인스턴스가 유효하고 몽타주를 재생할 수 있는 상태일 경우
+			if (CurAttackMontage && AnimInstance && CurCharacter->TrySkipMontage())
 			{
 				float AttackSpeed = CurCharacter->GetAttackSpeed();
 
 				AnimInstance->Montage_Play(CurAttackMontage, AttackSpeed);
+
+				// 플레이어 컨트롤러 방향으로 캐릭터 회전
+				FRotator ControlRotation = CurCharacter->GetControlRotation();
+				FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
+				CurCharacter->SetActorRotation(YawRotation);
 
 				// 다음 콤보 공격을 위한 값 수정
 				bIsAttack = true;
@@ -173,11 +182,17 @@ bool URSPlayerWeaponComponent::ContinueComboAttack()
 				CurAttackMontage = CurStrongAttacks[ComboIndex];
 			}
 
+			// 몽타주와 애님인스턴스가 유효하고 몽타주를 재생할 수 있는 상태일 경우
 			if (CurAttackMontage && AnimInstance)
 			{
 				float AttackSpeed = CurCharacter->GetAttackSpeed();
 
 				AnimInstance->Montage_Play(CurAttackMontage, AttackSpeed);
+
+				// 플레이어 컨트롤러 방향으로 캐릭터 회전
+				FRotator ControlRotation = CurCharacter->GetControlRotation();
+				FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
+				CurCharacter->SetActorRotation(YawRotation);
 
 				// 다음 콤보 공격을 위한 값 수정
 				bComboInputBuffered = false;
@@ -315,26 +330,21 @@ void URSPlayerWeaponComponent::DropWeaponToSlot(EWeaponSlot TargetWeaponSlot)
 	}
 
 	// 땅에 버려질 액터 생성
-	ARSDungeonGroundWeapon* GroundWeapon = GetWorld()->SpawnActor<ARSDungeonGroundWeapon>(ARSDungeonGroundWeapon::StaticClass(), CurCharacter->GetActorTransform());
+	IRSSpawnManagerAccessor* SpawnManagerAccessor = GetWorld()->GetAuthGameMode<IRSSpawnManagerAccessor>();
+	if (!SpawnManagerAccessor)
+	{
+		return;
+	}
 
-	// 땅에 버려질 액터에 세팅할 값을 데이터 테이블에 가져와 세팅한다.
+	URSSpawnManager* SpawnManager = SpawnManagerAccessor->GetSpawnManager();
+	if (!SpawnManager)
+	{
+		return;
+	}
+
 	FName WeaponKey = WeaponActors[TargetIndex]->GetDataTableKey();
 
-	FItemInfoData* ItemInfoData = CurCharacter->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponInfo->FindRow<FItemInfoData>(WeaponKey, TEXT("Get WeaponData"));
-	FDungeonWeaponData* WeaponData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->WeaponDetail->FindRow<FDungeonWeaponData>(WeaponKey, TEXT("Get WeaponData"));
-	if (ItemInfoData && WeaponData)
-	{
-		FText ItemName = ItemInfoData->ItemName;
-		UStaticMesh* ItemStaticMesh = ItemInfoData->ItemStaticMesh;
-		TSubclassOf<ARSDungeonItemBase> WeaponClass = WeaponData->WeaponClass;
-
-		if (GroundWeapon && ItemStaticMesh && WeaponClass)
-		{
-			GroundWeapon->InitGroundItemInfo(ItemName, false, WeaponKey, ItemStaticMesh);
-			GroundWeapon->SetWeaponClass(WeaponClass);
-			GroundWeapon->RandImpulse();
-		}
-	}
+	SpawnManager->SpawnGroundWeaponAtTransform(WeaponKey, CurCharacter->GetActorTransform(), true);
 
 	// 장착 중이었을 경우 무기 장착 해제
 	if (TargetWeaponSlot == WeaponSlot)
