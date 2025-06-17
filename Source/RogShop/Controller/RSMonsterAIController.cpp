@@ -5,8 +5,8 @@
 
 ARSMonsterAIController::ARSMonsterAIController()
 {
-	avoidanceRadius = 100.0f;
-	avoidanceWeight = 100.0f;
+	avoidanceRadius = 500.0f;
+	avoidanceWeight = 500.0f;
 	currentPatrolIdx = 0;
 
 	rotateSpeed = 0.01f;
@@ -122,7 +122,7 @@ bool ARSMonsterAIController::IsFocusing(FVector lookFor)
 		direction = (lookFor - ctrlPawn->GetActorLocation()).GetSafeNormal();
 		dot = FVector::DotProduct(look, direction);
 
-		if (dot >= 0.99f)
+		if (dot >= 0.95f)
 		{
 			bIsLook = true;
 		}
@@ -156,7 +156,8 @@ void ARSMonsterAIController::RotateToFocus(FVector lookFor, float deltaSecond)
 		currentYaw = chrRot.Yaw;
 		deltaYaw = FMath::Clamp(FMath::FindDeltaAngleDegrees(currentYaw, targetYaw),0.0f,1.0f);
 
-		newRot = chrRot + FRotator(0, deltaYaw, 0) * rotateSpeed * deltaSecond;
+		//newRot = chrRot + FRotator(0, deltaYaw, 0) * rotateSpeed * deltaSecond;
+		newRot = FMath::RInterpTo(chrRot, look.Rotation(), 0.1f, 0.1f);
 
 		ctrlPawn->SetActorRotation(newRot);
 	}
