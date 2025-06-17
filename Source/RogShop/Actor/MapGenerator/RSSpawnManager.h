@@ -37,7 +37,7 @@ public:
 #pragma region 공개 함수
 
 	// 월드와 데이터테이블 초기화
-	void Initialize(UWorld* InWorld, UGameInstance* GameInstance,int32 TileIndex);
+	void Initialize(UWorld* InWorld, UGameInstance* GameInstance,int32 TargetLevelIndex);
 
 	// 몬스터들을 타겟포인트 위치에 스폰
 	void SpawnMonstersInLevel();

@@ -17,6 +17,7 @@
 
 ARSDungeonGameModeBase::ARSDungeonGameModeBase()
 {
+    MaxStageCount = 3;
 }
 
 
@@ -70,7 +71,7 @@ void ARSDungeonGameModeBase::SpawnMap()// 선택된 맵 타입에 따라 맵 생
         return;
     }
 
-    FDungeonLevelData* Level = AllGroups[TileIndex];
+    FDungeonLevelData* Level = AllGroups[LevelIndex];
 
     FActorSpawnParameters SpawnParams;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; //무슨일이 있어도 스폰// 충돌 무시하고 항상 스폰하도록 설정
@@ -100,14 +101,19 @@ void ARSDungeonGameModeBase::InitRandSeed()
     Seed = FMath::RandRange(1, INT32_MAX);
 }
 
-int32 ARSDungeonGameModeBase::GetTileIndex() const
+int32 ARSDungeonGameModeBase::GetLevelIndex() const
 {
-    return TileIndex;
+    return LevelIndex;
 }
 
-void ARSDungeonGameModeBase::IncrementAtTileIndex()
+void ARSDungeonGameModeBase::IncrementAtLevelIndex()
 {
-    TileIndex += 1;
+    LevelIndex += 1;
+}
+
+int32 ARSDungeonGameModeBase::GetMaxStageCount() const
+{
+    return MaxStageCount;
 }
 
 void ARSDungeonGameModeBase::SaveDungeonInfo()
@@ -120,7 +126,7 @@ void ARSDungeonGameModeBase::SaveDungeonInfo()
     }
 
     // 세이브
-    DungeonStageSaveGame->TileIndex = TileIndex;
+    DungeonStageSaveGame->LevelIndex = LevelIndex;
     DungeonStageSaveGame->Seed = Seed;
 
     // 저장
@@ -157,7 +163,7 @@ void ARSDungeonGameModeBase::LoadDungeonInfo()
     URSDungeonStageSaveGame* DungeonInfoLoadGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->DungeonInfoSaveSlotName, 0));
     if (DungeonInfoLoadGame)
     {
-        TileIndex = DungeonInfoLoadGame->TileIndex;
+        LevelIndex = DungeonInfoLoadGame->LevelIndex;
         Seed = DungeonInfoLoadGame->Seed;
     }
 
@@ -187,7 +193,7 @@ void ARSDungeonGameModeBase::OnMapReady()// 맵 로딩이 완료되었을 때 �
         {
             RS_LOG_DEBUG("스폰 매니저 생성");
             GameMode->SpawnManager = NewObject<URSSpawnManager>(GameMode, GameMode->SpawnManagerClass);
-            GameMode->SpawnManager->Initialize(GameMode->GetWorld(), GameMode->GetGameInstance(), GameMode->TileIndex);
+            GameMode->SpawnManager->Initialize(GameMode->GetWorld(), GameMode->GetGameInstance(), GameMode->LevelIndex);
         
             GameMode->SpawnManager->SpawnPlayerAtStartPoint();
             GameMode->SpawnManager->SpawnMonstersInLevel();
