@@ -101,7 +101,7 @@ void ARSWeaponSpawnPadActor::SpawnWeapons()
         URSSpawnManager* RSSpawnManager = SpawnManagerAccessor->GetSpawnManager();
         if (RSSpawnManager)
         {
-            RSSpawnManager->SpawnGroundWeaponAtTransform(RandomRowName, SpawnTransform);
+            RSSpawnManager->SpawnGroundWeaponAtTransform(RandomRowName, SpawnTransform, false);
         }
     }
 }

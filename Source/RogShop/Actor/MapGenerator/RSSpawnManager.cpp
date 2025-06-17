@@ -251,7 +251,7 @@ void URSSpawnManager::SpawnShopNPCInLevel()
 	RS_LOG_DEBUG("상점 생성 성공");
 }
 
-void URSSpawnManager::SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform)
+void URSSpawnManager::SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform, bool AddImpulse)
 {
 	URSGameInstance* RSGameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
 	if (!RSGameInstance)
@@ -283,7 +283,11 @@ void URSSpawnManager::SpawnGroundWeaponAtTransform(FName TargetName, FTransform 
 			{
 				GroundWeapon->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
 				GroundWeapon->SetWeaponClass(WeaponClassData->WeaponClass);
-				GroundWeapon->RandImpulse();
+
+				if (AddImpulse)
+				{
+					GroundWeapon->RandImpulse();
+				}
 			}
 		}
 	}

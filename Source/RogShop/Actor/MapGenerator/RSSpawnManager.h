@@ -103,7 +103,7 @@ private:
 #pragma region GroundItem
 public:
 	UFUNCTION()
-	void SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform);
+	void SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform, bool AddImpulse);
 
 	UFUNCTION()
 	void SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform);
