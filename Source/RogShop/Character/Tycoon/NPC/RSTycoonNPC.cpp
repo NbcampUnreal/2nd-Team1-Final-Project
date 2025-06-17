@@ -37,9 +37,9 @@ void ARSTycoonNPC::MoveToTarget(FVector Location, AActor* Target)
 	(
 		Location, //타겟
 		-1,
-		false,
 		true,
-		true
+		true,
+		false
 	);
 
 	RS_DRAW_DEBUG_SPHERE(GetWorld(), Location, 50, 30, FColor::Red, false, 5, 0, 1.0f);
@@ -62,16 +62,24 @@ void ARSTycoonNPC::MoveToTarget(FVector Location, AActor* Target)
 
 		//네비게이션이 빌드되는 순간 혹은 네비게이션이 Invoker를 인식해 빌드되기 전에 명령이 들어오면 멈춰버리는 버그가 있음
 		//해당 버그를 해결하기위해 성공해도 확인을 다시 해주게 제작
-		//재시도
-		FTimerHandle TimerHandle;
-		GetWorldTimerManager().SetTimer(TimerHandle, [&, Location, Target]()
+		//될 때 까지 재시도
+		if (!GetWorldTimerManager().TimerExists(MoveTargetTimer) || !GetWorldTimerManager().IsTimerActive(MoveTargetTimer))
 		{
-			if (MoveTarget != nullptr && GetCharacterMovement()->Velocity.SquaredLength() < 0.1f * 0.1f)
+			GetWorldTimerManager().SetTimer(MoveTargetTimer, [&, Location, Target]()
 			{
-				RS_LOG_C("NPC가 네비게이션 문제로 움직이지 않음", FColor::Red);
-				MoveToTarget(Location, Target);
-			}
-		}, 0.1f, false);
+				if (MoveTarget == nullptr)
+				{
+					GetWorldTimerManager().ClearTimer(MoveTargetTimer);
+					return;
+				}
+			
+				if (MoveTarget != nullptr && GetCharacterMovement()->Velocity.SquaredLength() < 0.1f * 0.1f)
+				{
+					RS_LOG_C("NPC가 네비게이션 문제로 움직이지 않음", FColor::Red);
+					MoveToTarget(Location, Target);
+				}
+			}, 0.1f, true);
+		}
 	}
 }
 

@@ -66,7 +66,7 @@ void ARSTycoonPlayerCharacter::Pickup(AActor* Actor)
 	PickupActor = Actor;
 	
 	Actor->AttachToComponent(PickupLocation, FAttachmentTransformRules::KeepWorldTransform);
-	Actor->SetActorLocation(PickupLocation->GetComponentLocation());
+	Actor->SetActorRelativeTransform(FTransform::Identity);
 }
 
 AActor* ARSTycoonPlayerCharacter::Drop(FTransform DropTransform)

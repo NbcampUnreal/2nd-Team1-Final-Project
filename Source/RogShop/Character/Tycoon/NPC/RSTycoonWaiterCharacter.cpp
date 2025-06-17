@@ -6,6 +6,7 @@
 #include "AIController.h"
 #include "RSTycoonCustomerCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "RogShop/UtilDefine.h"
 #include "RogShop/Actor/Tycoon/RSTileMap.h"
@@ -29,22 +30,12 @@ void ARSTycoonWaiterCharacter::Pickup(AActor* Actor)
 		RS_LOG_C("이미 음식을 들고 있습니다", FColor::Red);
 		return;
 	}
-
+	
 	PickupActor = Actor;
-
-	FAttachmentTransformRules param = FAttachmentTransformRules::KeepWorldTransform;
-	if (PickupParamIndex == 0)
-		param = FAttachmentTransformRules::KeepWorldTransform;
-	else if (PickupParamIndex == 1)
-		param = FAttachmentTransformRules::KeepRelativeTransform;
-	else if (PickupParamIndex == 2)
-		param = FAttachmentTransformRules::SnapToTargetIncludingScale;
-	else if (PickupParamIndex == 3)
-		param = FAttachmentTransformRules::SnapToTargetNotIncludingScale;
+	Actor->AttachToComponent(PickupLocation, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	Actor->SetActorRelativeTransform(FTransform::Identity);
 	
-	Actor->AttachToComponent(PickupLocation, param);
-	Actor->SetActorLocation(PickupLocation->GetComponentLocation());
-	
+	GetController<AAIController>()->StopMovement();
 	PlayAnimMontage(PickupFoodMontage);
 }
 
@@ -56,20 +47,16 @@ AActor* ARSTycoonWaiterCharacter::Drop(FTransform DropTransform)
 		return nullptr;
 	}
 
+	GetController<AAIController>()->StopMovement();
 	float DropTime = PlayAnimMontage(DropFoodMontage);
+	
 	FTimerHandle DropTimer;
 	GetWorldTimerManager().SetTimer(DropTimer, [&, DropTransform]()
 	{
-		FDetachmentTransformRules param = FDetachmentTransformRules::KeepWorldTransform;
-		if (DropParamIndex == 0)
-			param = FDetachmentTransformRules::KeepWorldTransform;
-		else if (DropParamIndex == 1)
-			param = FDetachmentTransformRules::KeepRelativeTransform;
-		
-		PickupActor->DetachFromActor(param);
+		PickupActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		PickupActor->SetActorTransform(DropTransform);
 		PickupActor = nullptr;
-	}, DropTime, false);
+	}, DropTime * 0.9f, false);
 	
 	return PickupActor;
 }
@@ -144,6 +131,8 @@ void ARSTycoonWaiterCharacter::InteractTable(ARSTableTile* Table)
 		AIController->GetBlackboardComponent()->SetValueAsObject(CustomerKey, nullptr);
 
 		Table->Interact(this);
+		
+		GetController<AAIController>()->StopMovement();
 		PlayAnimMontage(TakeOrderMontage);
 	}
 	else if (PickupActor)

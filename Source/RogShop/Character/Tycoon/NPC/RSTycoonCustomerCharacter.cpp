@@ -33,11 +33,10 @@ void ARSTycoonCustomerCharacter::Sit(ARSTableTile* Table, const FTransform& SitT
 
 	SetActorLocation(SitTransform.GetLocation());
 	SetActorRotation(SitTransform.GetRotation());
-
+	
+	FoodBubbleWidgetComponent->SetVisibility(true);
 	URSTycoonFoodBubbleWidget* BubbleWidget = Cast<URSTycoonFoodBubbleWidget>(FoodBubbleWidgetComponent->GetWidget());
 	check(BubbleWidget)
-
-	FoodBubbleWidgetComponent->SetVisibility(true);
 	BubbleWidget->SetImage(WantFoodKey);
 
 	PlayAnimMontage(SitMontage);

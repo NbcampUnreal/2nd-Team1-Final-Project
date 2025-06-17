@@ -40,12 +40,6 @@ private:
 	UPROPERTY()
 	TObjectPtr<AActor> PickupActor;
 
-	UPROPERTY(EditAnywhere, meta=(ClampMin=0, ClampMax=3))
-	int32 PickupParamIndex;
-
-	UPROPERTY(EditAnywhere, meta=(ClampMin=0, ClampMax=1))
-	int32 DropParamIndex;
-
 	// 스켈레탈 메시 관련
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SkeletalMesh", meta = (AllowPrivateAccess = true))
 	FSkeletalMeshMergeParams SkeletalMeshMergeParams;
