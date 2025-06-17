@@ -233,6 +233,17 @@ void ARSDunPlayerCharacter::OnDeath()
     }
 }
 
+void ARSDunPlayerCharacter::ChangeMaxHP(float Amount)
+{
+    Super::ChangeMaxHP(Amount);
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnMaxHPChange.Broadcast();
+    }
+}
+
 void ARSDunPlayerCharacter::IncreaseMaxHP(float Amount)
 {
     Super::IncreaseMaxHP(Amount);
@@ -252,6 +263,17 @@ void ARSDunPlayerCharacter::DecreaseMaxHP(float Amount)
     if (PC)
     {
         PC->OnMaxHPChange.Broadcast();
+    }
+}
+
+void ARSDunPlayerCharacter::ChangeHP(float Amount)
+{
+    Super::ChangeHP(Amount);
+
+    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+    if (PC)
+    {
+        PC->OnHPChange.Broadcast();
     }
 }
 
@@ -758,10 +780,14 @@ void ARSDunPlayerCharacter::LoadStatus()
     URSDungeonStatusSaveGame* StatusLoadGame = Cast<URSDungeonStatusSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->StatusSaveSlotName, 0));
     if (!StatusLoadGame)
     {
+        // 저장된 값이 없는 경우 기본값으로 설정
+        ChangeMaxHP(GetMaxHP());
+        ChangeHP(GetHP());
         return;
     }
     
     // 로드
+    ChangeMaxHP(GetMaxHP());
     ChangeHP(StatusLoadGame->HP);
     LifeEssence = StatusLoadGame->LifeEssence;
 }

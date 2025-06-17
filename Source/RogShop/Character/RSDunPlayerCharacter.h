@@ -40,9 +40,11 @@ public:
 
 	void OnDeath();
 
+	virtual void ChangeMaxHP(float Amount) override;
 	virtual void IncreaseMaxHP(float Amount) override;
 	virtual void DecreaseMaxHP(float Amount) override;
 
+	virtual void ChangeHP(float Amount) override;
 	virtual void IncreaseHP(float Amount) override;
 	virtual void DecreaseHP(float Amount) override;
 
