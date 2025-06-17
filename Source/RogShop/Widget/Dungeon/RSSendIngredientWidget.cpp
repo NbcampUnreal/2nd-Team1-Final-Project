@@ -90,18 +90,31 @@ void URSSendIngredientWidget::NextStageTravel()
 	{
 		return;
 	}
-	DungeonGameMode->IncrementAtTileIndex();
+	DungeonGameMode->IncrementAtLevelIndex();
 	DungeonGameMode->InitRandSeed();
-
-	// 데이터 세이브 이벤트 호출
-	SaveGameSubsystem->OnSaveRequested.Broadcast();
 
 	// 다음 스테이지로 레벨 이동
 	URSLevelSubsystem* LevelSubsystem = RSGameInstance->GetSubsystem<URSLevelSubsystem>();
 
 	if (LevelSubsystem)
 	{
-		LevelSubsystem->TravelToLevel(ERSLevelCategory::Dungeon);
+		// 모든 스테이지를 클리어 한 경우
+		int32 MaxStageCount = DungeonGameMode->GetMaxStageCount();
+		int32 LevelIndex = DungeonGameMode->GetLevelIndex();
+		if (MaxStageCount == LevelIndex)
+		{
+			SaveGameSubsystem->DeleteDungeonSaveFile();
+
+			LevelSubsystem->TravelToLevel(ERSLevelCategory::BaseArea);
+		}
+		// 남은 스테이지가 있는 경우
+		else
+		{
+			// 데이터 세이브 이벤트 호출
+			SaveGameSubsystem->OnSaveRequested.Broadcast();
+
+			LevelSubsystem->TravelToLevel(ERSLevelCategory::Dungeon);
+		}
 	}
 }
 
