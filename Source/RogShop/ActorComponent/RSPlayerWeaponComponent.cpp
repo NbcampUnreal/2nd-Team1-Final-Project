@@ -344,7 +344,7 @@ void URSPlayerWeaponComponent::DropWeaponToSlot(EWeaponSlot TargetWeaponSlot)
 
 	FName WeaponKey = WeaponActors[TargetIndex]->GetDataTableKey();
 
-	SpawnManager->SpawnGroundWeaponAtTransform(WeaponKey, CurCharacter->GetActorTransform());
+	SpawnManager->SpawnGroundWeaponAtTransform(WeaponKey, CurCharacter->GetActorTransform(), true);
 
 	// 장착 중이었을 경우 무기 장착 해제
 	if (TargetWeaponSlot == WeaponSlot)
