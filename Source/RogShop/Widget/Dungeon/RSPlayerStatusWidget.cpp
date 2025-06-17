@@ -32,8 +32,6 @@ void URSPlayerStatusWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
     
-    UpdateHP();
-    UpdateMaxHP();
 }
 
 void URSPlayerStatusWidget::UpdateWeaponSlot(int8 WeaponSlotIndex, FName WeaponKey)
