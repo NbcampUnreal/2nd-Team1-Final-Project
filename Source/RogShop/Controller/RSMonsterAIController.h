@@ -30,6 +30,16 @@ protected://Value
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float rotateSpeed;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float chaseLength;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float moveDistance;
+
+	bool bIsChase;
+	FVector priviousPos;
+	FVector curPos;
 public://Function
 	ARSMonsterAIController();
 
@@ -52,6 +62,18 @@ public://Function
 
 	UFUNCTION(BlueprintCallable)
 	void RotateToFocus(FVector lookFor, float deltaSecond);
+
+	UFUNCTION(BlueprintCallable)
+	void CalculateMoveLength();
+
+	UFUNCTION(BlueprintCallable)
+	void SetIsChase(bool bIsValid);
+
+	UFUNCTION(BlueprintCallable)
+	bool IsStillChase();
+
+	UFUNCTION(BlueprintCallable)
+	void SetPriviousPos();
 
 	//Patrol
 	UFUNCTION(BlueprintCallable)
