@@ -19,7 +19,7 @@ ARSTycoonWaiterCharacter::ARSTycoonWaiterCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	PickupLocation = CreateDefaultSubobject<USceneComponent>("FoodLocation");
-	PickupLocation->SetupAttachment(RootComponent);
+	PickupLocation->SetupAttachment(GetMesh(), TEXT("PickupSocket"));
 }
 
 void ARSTycoonWaiterCharacter::Pickup(AActor* Actor)
@@ -32,22 +32,23 @@ void ARSTycoonWaiterCharacter::Pickup(AActor* Actor)
 
 	PickupActor = Actor;
 
-	Actor->AttachToComponent(PickupLocation, FAttachmentTransformRules::KeepWorldTransform);
+	FAttachmentTransformRules param = FAttachmentTransformRules::KeepWorldTransform;
+	if (PickupParamIndex == 0)
+		param = FAttachmentTransformRules::KeepWorldTransform;
+	else if (PickupParamIndex == 1)
+		param = FAttachmentTransformRules::KeepRelativeTransform;
+	else if (PickupParamIndex == 2)
+		param = FAttachmentTransformRules::SnapToTargetIncludingScale;
+	else if (PickupParamIndex == 3)
+		param = FAttachmentTransformRules::SnapToTargetNotIncludingScale;
+	
+	Actor->AttachToComponent(PickupLocation, param);
 	Actor->SetActorLocation(PickupLocation->GetComponentLocation());
-
-
-	if (GrabFoodMontage && GetMesh())
-	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-		if (AnimInstance)
-		{
-			PlayAnimMontage(GrabFoodMontage);
-		}
-	}
+	
+	PlayAnimMontage(PickupFoodMontage);
 }
 
-AActor* ARSTycoonWaiterCharacter::Drop(FVector DropLocation)
+AActor* ARSTycoonWaiterCharacter::Drop(FTransform DropTransform)
 {
 	if (PickupActor == nullptr)
 	{
@@ -55,13 +56,22 @@ AActor* ARSTycoonWaiterCharacter::Drop(FVector DropLocation)
 		return nullptr;
 	}
 
-	AActor* Temp = PickupActor;
-
-	PickupActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	PickupActor->SetActorLocation(DropLocation);
-	PickupActor = nullptr;
-
-	return Temp;
+	float DropTime = PlayAnimMontage(DropFoodMontage);
+	FTimerHandle DropTimer;
+	GetWorldTimerManager().SetTimer(DropTimer, [&, DropTransform]()
+	{
+		FDetachmentTransformRules param = FDetachmentTransformRules::KeepWorldTransform;
+		if (DropParamIndex == 0)
+			param = FDetachmentTransformRules::KeepWorldTransform;
+		else if (DropParamIndex == 1)
+			param = FDetachmentTransformRules::KeepRelativeTransform;
+		
+		PickupActor->DetachFromActor(param);
+		PickupActor->SetActorTransform(DropTransform);
+		PickupActor = nullptr;
+	}, DropTime, false);
+	
+	return PickupActor;
 }
 
 void ARSTycoonWaiterCharacter::StopAllAction()
@@ -80,7 +90,7 @@ void ARSTycoonWaiterCharacter::StopAllAction()
 	
 	if (PickupActor)
 	{
-		PickupActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		PickupActor->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
 		PickupActor->Destroy();
 		PickupActor = nullptr;
 	}
@@ -134,6 +144,7 @@ void ARSTycoonWaiterCharacter::InteractTable(ARSTableTile* Table)
 		AIController->GetBlackboardComponent()->SetValueAsObject(CustomerKey, nullptr);
 
 		Table->Interact(this);
+		PlayAnimMontage(TakeOrderMontage);
 	}
 	else if (PickupActor)
 	{

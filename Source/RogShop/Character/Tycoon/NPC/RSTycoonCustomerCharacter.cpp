@@ -29,7 +29,6 @@ ARSTycoonCustomerCharacter::ARSTycoonCustomerCharacter()
 void ARSTycoonCustomerCharacter::Sit(ARSTableTile* Table, const FTransform& SitTransform)
 {
 	State = ETycoonCustomerState::OrderWaiting;
-
 	SitTableTile = Table;
 
 	SetActorLocation(SitTransform.GetLocation());
@@ -40,6 +39,8 @@ void ARSTycoonCustomerCharacter::Sit(ARSTableTile* Table, const FTransform& SitT
 
 	FoodBubbleWidgetComponent->SetVisibility(true);
 	BubbleWidget->SetImage(WantFoodKey);
+
+	PlayAnimMontage(SitMontage);
 }
 
 void ARSTycoonCustomerCharacter::WaitFood()
@@ -57,21 +58,11 @@ void ARSTycoonCustomerCharacter::WaitFood()
 void ARSTycoonCustomerCharacter::Eat()
 {
 	State = ETycoonCustomerState::Eat;
-	
+
 	FoodBubbleWidgetComponent->SetVisibility(false);
 
 	FTimerHandle Timer;
 	GetWorldTimerManager().SetTimer(Timer, this, &ARSTycoonCustomerCharacter::Leave, 5.f, false);
-
-	if (EatMontage && GetMesh())
-	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-		if (AnimInstance)
-		{
-			PlayAnimMontage(EatMontage);
-		}
-	}
 }
 
 void ARSTycoonCustomerCharacter::StopAllAction()
@@ -80,7 +71,7 @@ void ARSTycoonCustomerCharacter::StopAllAction()
 
 	State = ETycoonCustomerState::Move;
 	SitTableTile = nullptr;
-	
+
 	GetWorldTimerManager().ClearAllTimersForObject(this);
 }
 
@@ -138,14 +129,10 @@ void ARSTycoonCustomerCharacter::InteractTarget(AActor* TargetActor)
 void ARSTycoonCustomerCharacter::Leave()
 {
 	State = ETycoonCustomerState::Move;
-
 	FCookFoodData* Data = GetGameInstance()->GetSubsystem<URSDataSubsystem>()->Food->
 	                                         FindRow<FCookFoodData>(WantFoodKey, TEXT("Get Price Of Food"));
 
 	RS_LOG_F_C("손님이 식사를 다 했습니다, 골드 +%d", FColor::Yellow, Data->Price);
-
-	ARSDoorTile* DoorTile = Cast<ARSDoorTile>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSDoorTile::StaticClass()));
-	MoveToTarget(DoorTile->GetSpawnPoint(), DoorTile);
 
 	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	PlayerController->AddGold(Data->Price);
@@ -155,11 +142,15 @@ void ARSTycoonCustomerCharacter::Leave()
 
 	if (ExitSound)
 	{
-		UGameplayStatics::SpawnSoundAtLocation(
-			this,
-			ExitSound,
-			GetActorLocation(),
-			FRotator::ZeroRotator
-		);
+		UGameplayStatics::SpawnSoundAtLocation(this, ExitSound, GetActorLocation(), FRotator::ZeroRotator);
 	}
+
+	float PlayTime = PlayAnimMontage(StandMontage);
+	FTimerHandle StandTimer;
+	GetWorldTimerManager().SetTimer(StandTimer, [&]()
+	{
+		ARSDoorTile* DoorTile = Cast<ARSDoorTile>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSDoorTile::StaticClass()));
+		MoveToTarget(DoorTile->GetSpawnPoint(), DoorTile);
+	}, PlayTime, false);
+
 }

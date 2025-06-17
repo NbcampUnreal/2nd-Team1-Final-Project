@@ -19,13 +19,13 @@ void URSTycoonSaveGame::SetDefault(bool bSetToFile)
 
 	if (bSetToFile)
 	{
-		FString TycoonTileMapSaveSlot = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
 		//배치된 아이스박스의 갯수만큼 인벤토리 크기를 추가해줌
-		URSTycoonTileMapSaveGame* TycoonTileMapSaveGame =
-			Cast<URSTycoonTileMapSaveGame>(UGameplayStatics::LoadGameFromSlot(TycoonTileMapSaveSlot, 0));
-	
-		if (TycoonTileMapSaveGame)
+		FString TycoonTileMapSaveSlot = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
+		USaveGame* SaveGame = UGameplayStatics::LoadGameFromSlot(TycoonTileMapSaveSlot, 0);
+		
+		if (SaveGame)
 		{
+			URSTycoonTileMapSaveGame* TycoonTileMapSaveGame = Cast<URSTycoonTileMapSaveGame>(SaveGame);
 			for (auto& Row : TycoonTileMapSaveGame->Tile2DMap)
 			{
 				for (auto& Column : Row.Tiles)
@@ -47,5 +47,5 @@ void URSTycoonSaveGame::SetDefault(bool bSetToFile)
 	}
 	
 	Ingredients.SetNum(InventoryNum);
-	Money = 100;
+	Money = 250;
 }

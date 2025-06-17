@@ -35,7 +35,11 @@ void ARSTycoonNPC::MoveToTarget(FVector Location, AActor* Target)
 	// 타겟 액터를 향해 이동
 	EPathFollowingRequestResult::Type Result = Cast<AAIController>(GetController())->MoveToLocation
 	(
-		Location //타겟
+		Location, //타겟
+		-1,
+		false,
+		true,
+		true
 	);
 
 	RS_DRAW_DEBUG_SPHERE(GetWorld(), Location, 50, 30, FColor::Red, false, 5, 0, 1.0f);

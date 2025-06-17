@@ -15,6 +15,7 @@
 #include "RogShop/Actor/Tycoon/Tile/RSBaseTile.h"
 #include "RogShop/Actor/Tycoon/Tile/RSCookingTile.h"
 #include "RogShop/Actor/Tycoon/Tile/RSDoorTile.h"
+#include "RogShop/Actor/Tycoon/Tile/RSIceBoxTile.h"
 #include "RogShop/Actor/Tycoon/Tile/RSTableTile.h"
 
 void URSTycoonWaitWidget::NativeOnInitialized()
@@ -39,7 +40,7 @@ void URSTycoonWaitWidget::NativeConstruct()
 	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
 	check(TileMap)
 
-	int32 DoorCount = 0, CookingCount = 0, TableCount = 0;
+	int32 DoorCount = 0, CookingCount = 0, TableCount = 0, IceBoxCount = 0;
 	for (auto& Tile : TileMap->GetTiles())
 	{
 		 if (Tile->IsA<ARSDoorTile>())
@@ -56,13 +57,19 @@ void URSTycoonWaitWidget::NativeConstruct()
 		{
 			TableCount++;
 		}
+
+		if (Tile->IsA<ARSIceBoxTile>())
+		{
+			IceBoxCount++;
+		}
 	}
 
 	InDoorTileText->SetText(FText::FromString(FString::FromInt(DoorCount)));
 	InCookingTileText->SetText(FText::FromString(FString::FromInt(CookingCount)));
 	InTableTileText->SetText(FText::FromString(FString::FromInt(TableCount)));
+	InIceBoxTileText->SetText(FText::FromString(FString::FromInt(IceBoxCount)));
 
-	if (DoorCount < 1 || CookingCount < 1 || TableCount < 1)
+	if (DoorCount < 1 || CookingCount < 1 || TableCount < 1 || IceBoxCount < 1)
 	{
 		TutorialBorder->SetVisibility(ESlateVisibility::Visible);
 		SaleStartButton->SetIsEnabled(false);

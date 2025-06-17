@@ -20,7 +20,7 @@ ARSTycoonPlayerCharacter::ARSTycoonPlayerCharacter()
 	InteractSphere->SetupAttachment(RootComponent);
 
 	PickupLocation = CreateDefaultSubobject<USceneComponent>("FoodLocation");
-	PickupLocation->SetupAttachment(RootComponent);
+	PickupLocation->SetupAttachment(GetMesh(), TEXT("PickupSocket"));
 
 	// 컨트롤러 회전 사용 비활성화
 	bUseControllerRotationYaw = false;
@@ -59,7 +59,8 @@ void ARSTycoonPlayerCharacter::Pickup(AActor* Actor)
 {
 	if (PickupActor)
 	{
-		Drop(Actor->GetActorLocation());
+		RS_LOG_C("이미 들고있는 음식이 있습니다.", FColor::Red)
+		return;
 	}
 	
 	PickupActor = Actor;
@@ -68,7 +69,7 @@ void ARSTycoonPlayerCharacter::Pickup(AActor* Actor)
 	Actor->SetActorLocation(PickupLocation->GetComponentLocation());
 }
 
-AActor* ARSTycoonPlayerCharacter::Drop(FVector DropLocation)
+AActor* ARSTycoonPlayerCharacter::Drop(FTransform DropTransform)
 {
 	if (PickupActor == nullptr)
 	{
@@ -79,7 +80,7 @@ AActor* ARSTycoonPlayerCharacter::Drop(FVector DropLocation)
 	AActor* Temp = PickupActor.Get();
 	
 	PickupActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	PickupActor->SetActorLocation(DropLocation);
+	PickupActor->SetActorTransform(DropTransform);
 	PickupActor = nullptr;
 
 	return Temp;

@@ -19,6 +19,8 @@ void URSTycoonBuyNPCWidget::NativeOnInitialized()
 	NPCNameText->SetText(FText::FromString(SpawnNPC->GetDisplayName()));
 	PriceText->SetText(FText::FromString(FString::FromInt(SpawnNPC->GetPrice())));
 	NPCImage->SetBrushFromTexture(SpawnNPC->GetThumbnail());
+
+	Price = SpawnNPC->GetPrice();
 	
 	Button->OnClicked.AddDynamic(this, &URSTycoonBuyNPCWidget::OnClickButton);
 }
