@@ -69,15 +69,20 @@ public:
 	int32 GetSeed() const;
 	void InitRandSeed();
 
-	int32 GetTileIndex() const;
-	void IncrementAtTileIndex();
+	int32 GetLevelIndex() const;
+	void IncrementAtLevelIndex();
+
+	int32 GetMaxStageCount() const;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Info", meta = (AllowPrivateAccess = "true"))
 	int32 Seed;	// 해당 값을 기준으로 맵 생성
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Info", meta = (AllowPrivateAccess = "true"))
-	int32 TileIndex;
+	int32 LevelIndex;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dungeon Info", meta = (AllowPrivateAccess = "true"))
+	int32 MaxStageCount;
 #pragma endregion
 
 
