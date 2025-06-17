@@ -15,9 +15,12 @@ class ARSDunBaseCharacter;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotChange, int8, WeaponSlotIndex, FName, WeaponKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnIngredientChange, int32, IngredientSlotIndex, FItemSlot, IngredientItemSlot);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteractableFound, FText, InteractName);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRelicAdded, FName, RelicKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLifeEssenceChange, int32, NewLifeEssence);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFloatDamage, float, DamageAmount);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHPChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMaxHPChange);
 
@@ -125,4 +128,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnMaxHPChange OnMaxHPChange;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnFloatDamage OnFloatDamage;
 };
