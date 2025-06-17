@@ -21,6 +21,7 @@
 #include "ItemInfoData.h"
 #include "RSDungeonGroundWeapon.h"
 #include "RSDungeonGroundIngredient.h"
+#include "RSTileBlocker.h"
 #include "RSDungeonGroundLifeEssence.h"
 
 // 외부에서 전달받은 월드 및 테이블 초기화
@@ -75,146 +76,9 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance,in
 			DungeonGM->OnBossDead.AddDynamic(this, &URSSpawnManager::SpawnDunNextStagePortal);
 		}
 	}
-}
 
-// 레벨 내 Monster 태그가 있는 TargetPoint 위치에 몬스터 스폰
-void URSSpawnManager::SpawnMonstersInLevel()
-{
-	if (!World || !MonsterSpawnGroupDataTable || !MonsterDataTable) //월드나 테이블이 초기화되지 않았으면 리턴
-	{
-		RS_LOG_DEBUG("몬스터 스폰 실패: 월드 또는 테이블이 초기화되지 않음");
-		return;
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("SpawnMonstersInLevel 시작됨"));
-
-	TMap<FIntPoint, TArray<AActor*>> TileToTargets; // 타일별로 타겟 포인트들을 저장할 맵
-
-
-	for (TActorIterator<ATargetPoint> It(World); It; ++It) // 월드 내의 모든 TargetPoint 중에서 Monster 태그를 가진 것들을 타일별로 분류
-	{
-		if (It->Tags.Contains(FName("Monster")))
-		{
-			ATargetPoint* Target = *It;
-			FVector Location = Target->GetActorLocation();
-
-			// 위치 기반 타일 좌표 계산 (맵 생성기 기준과 동일하게)
-			int32 TileX = FMath::RoundToInt(Location.X / 4000.f); // 타일사이즈 4000.0f
-			int32 TileY = FMath::RoundToInt(Location.Y / 4000.f);
-			FIntPoint TileCoord(TileX, TileY);
-
-			TileToTargets.FindOrAdd(TileCoord).Add(Target); //해당 타일 좌표에 타겟포인트 추가
-		}
-	}
-
-	// 모든 스폰 그룹 데이터 테이블에서 가져오기
-	TArray<FMonsterSpawnGroupData*> AllGroups;
-	MonsterSpawnGroupDataTable->GetAllRows(TEXT("MonsterRawData"), AllGroups);
-
-	if (AllGroups.Num() == 0)
-	{
-		RS_LOG_DEBUG("MonsterRawTable에 데이터가 없습니다.");
-		return;
-	}
-
-	int32 TotalSpawned = 0;
-
-	// 각 타일마다 반복하면서 몬스터 스폰시도
-	for (const TPair<FIntPoint, TArray<AActor*>>& Pair : TileToTargets)
-	{
-		if (FMath::Abs(Pair.Key.X) <= 0 && FMath::Abs(Pair.Key.Y) <= 0) //플레이어 스폰 타일에는 스폰 안되게
-		{
-			continue;
-		}
-
-		const TArray<AActor*>& TilePoints = Pair.Value;
-
-		// 타겟포인트가 없다면 경고로그 출력후 건너뜀
-		if (TilePoints.Num() == 0)
-		{
-			RS_LOG_DEBUG("타일 %s 에 타겟포인트가 없습니다.", *Pair.Key.ToString());
-			continue;
-		}
-
-		FMonsterSpawnGroupData* Group = AllGroups[FMath::RandRange(0, AllGroups.Num() - 1)];// 타일마다 그룹 하나를 랜덤으로 선택
-
-		// 타겟 포인트 순서를 랜덤 섞기
-		TArray<AActor*> ShuffledPoints = TilePoints;
-		Algo::RandomShuffle(ShuffledPoints);
-		int32 TargetIndex = 0;
-
-		// 그룹 내에 정의된 몬스터 수 만큼 생성
-		int TileSpawned = 0;
-		for (const FMonsterCount& Entry : Group->SpawnGroup)
-		{
-			// 몬스터 상태 정보 테이블에서 해당 몬스터 정보 조회
-			FMonsterData* StateRow = MonsterDataTable->FindRow<FMonsterData>(Entry.MonsterRowName, TEXT("MonsterStateLookup"));
-
-			UE_LOG(LogTemp, Warning, TEXT("타일 (%d,%d) → 몬스터: %s x %d"),
-				Pair.Key.X, Pair.Key.Y,
-				*Entry.MonsterRowName.ToString(), Entry.Count);
-
-			TileSpawned += Entry.Count;
-			if (!StateRow || !StateRow->MonsterClass)
-			{
-				continue;
-			}
-
-			// 몬스터 수 만큼 반복 생성
-			for (int32 i = 0; i < Entry.Count; ++i)
-			{
-				// 타겟포인트가 비어있다면 스폰 일부 생략
-				if (ShuffledPoints.Num() == 0)
-				{
-					RS_LOG_DEBUG("스폰할 타겟포인트가 부족하여 몬스터 일부는 생략됩니다.");
-					break;
-				}
-
-				// 타겟 포인트 순환적으로 사용
-				AActor* Target = ShuffledPoints[TargetIndex % ShuffledPoints.Num()];
-				TargetIndex++;
-				//위치 약간 분산되게 조정
-				float OffsetRadius = 100.f;
-				float Angle = FMath::DegreesToRadians((i * 360.f) / Entry.Count);
-				FVector Offset = FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0) * OffsetRadius;
-				FVector FinalLocation = Target->GetActorLocation() + Offset + FVector(0, 0, 50.f);
-
-				FTransform SpawnTransform;
-				SpawnTransform.SetLocation(FinalLocation);
-				SpawnTransform.SetRotation(FQuat::Identity);
-
-				FActorSpawnParameters Params;
-				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-				// 몬스터 생성
-				ARSDunMonsterCharacter* Monster = World->SpawnActor<ARSDunMonsterCharacter>(
-					StateRow->MonsterClass, SpawnTransform, Params);
-
-				//생성 실패시 로그 출력
-				if (!Monster)
-				{
-					RS_LOG_DEBUG("몬스터 스폰 실패: %s", *StateRow->MonsterClass->GetName());
-					continue;
-				}
-
-				// 충돌 캡슐 반영해 위치 미세 조정
-				FVector SpawnLocation = SpawnTransform.GetLocation();
-				SpawnLocation.Z += Monster->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
-				Monster->SetActorLocation(SpawnLocation);
-
-				//몬스터 능력치 초기화
-				Monster->IncreaseHP(StateRow->MaxHP);
-				Monster->ChangeMoveSpeed(StateRow->MoveSpeed);
-				TotalSpawned++;
-
-				// 사망 시 오브젝트 스폰 함수 바인딩
-				Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundIngredientFromCharacter);
-				Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundLifeEssenceFromCharacter);
-			}
-		}
-		UE_LOG(LogTemp, Warning, TEXT("타일 (%d,%d) → 총 스폰 수: %d"), Pair.Key.X, Pair.Key.Y, TileSpawned);
-	}
-	UE_LOG(LogTemp, Warning, TEXT("총 스폰된 몬스터 수: %d"), TotalSpawned);
+	TileToTargets = BuildTileToTargets();
+	RegisterAllTileBlockers();
 }
 
 // NPC 태그가 있는 TargetPoint 중 하나에 상점 NPC 스폰
@@ -627,7 +491,6 @@ void URSSpawnManager::SpawnBossMonster()
 {
 	if (!World || !MonsterDataTable)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("보스 몬스터 스폰 실패: World 또는 MonsterStateTable이 초기화되지 않음"));
 		return;
 	}
 
@@ -644,7 +507,6 @@ void URSSpawnManager::SpawnBossMonster()
 
 	if (!BossTarget)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Boss 태그를 가진 TargetPoint를 찾을 수 없습니다."));
 		return;
 	}
 	FName BossMonsterRowName;
@@ -667,7 +529,6 @@ void URSSpawnManager::SpawnBossMonster()
 	FMonsterData* BossData = MonsterDataTable->FindRow<FMonsterData>(BossMonsterRowName, TEXT("SpawnBossMonster"));
 	if (!BossData || !BossData->MonsterClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MonsterStateTable에서 MainFloor 보스 몬스터 정보를 찾을 수 없습니다."));
 		return;
 	}
 
@@ -684,7 +545,6 @@ void URSSpawnManager::SpawnBossMonster()
 
 	if (!BossMonster)
 	{
-		UE_LOG(LogTemp, Error, TEXT("보스 몬스터 스폰 실패: %s"), *BossData->MonsterClass->GetName());
 		return;
 	}
 
@@ -696,6 +556,187 @@ void URSSpawnManager::SpawnBossMonster()
 	BossMonster->IncreaseHP(BossData->MaxHP);
 	BossMonster->ChangeMoveSpeed(BossData->MoveSpeed);
 
-	UE_LOG(LogTemp, Warning, TEXT("보스 몬스터 '%s'가 스폰되었습니다."), *BossMonster->GetName());
 
+}
+
+void URSSpawnManager::SpawnMonstersAtTile(FIntPoint TileCoord) // 특정 타일 좌표에 몬스터 스폰하는 함수
+{
+	if (!World || !MonsterSpawnGroupDataTable || !MonsterDataTable)
+	{
+		return;
+	}
+
+	if (SpawnedTiles.Contains(TileCoord) || ClearedTiles.FindRef(TileCoord)) // 이미 스폰된 타일이거나 클리어된 타일이면 생략
+	{
+		return;
+	}
+
+	const TArray<AActor*>* Targets = TileToTargets.Find(TileCoord); // 타일 좌표에 해당하는 타겟 포인트 배열 찾기
+	if (!Targets || Targets->Num() == 0) 
+	{
+		return;
+	}
+
+	TArray<FMonsterSpawnGroupData*> AllGroups; // 모든 몬스터 스폰 그룹 데이터 테이블에서 가져오기
+	MonsterSpawnGroupDataTable->GetAllRows(TEXT("MonsterData"), AllGroups);
+	if (AllGroups.Num() == 0)
+	{
+		return;
+	}
+
+	FMonsterSpawnGroupData* Group = AllGroups[FMath::RandRange(0, AllGroups.Num() - 1)]; // 랜덤으로 그룹 선택
+	TArray<AActor*> ShuffledPoints = *Targets; // 해당 타일 좌표의 타겟 포인트 배열을 복사
+	Algo::RandomShuffle(ShuffledPoints); // 타겟 포인트 순서를 랜덤 섞기
+
+	int32 TargetIndex = 0;
+	int32 TotalSpawned = 0;
+
+	for (const FMonsterCount& Entry : Group->SpawnGroup) // 그룹 내에 정의된 몬스터 수 만큼 생성
+	{
+		FMonsterData* StateRow = MonsterDataTable->FindRow<FMonsterData>(Entry.MonsterRowName, TEXT("MonsterState")); 
+		if (!StateRow || !StateRow->MonsterClass)
+		{
+			continue;
+		}
+
+		for (int32 i = 0; i < Entry.Count; ++i)
+		{
+			if (ShuffledPoints.Num() == 0)
+			{
+				break;
+			}
+
+			AActor* Target = ShuffledPoints[TargetIndex % ShuffledPoints.Num()]; 
+			TargetIndex++; 
+
+			FVector FinalLoc = Target->GetActorLocation() + FVector(FMath::FRandRange(-100.0f, 100.0f), FMath::FRandRange(-100.0f, 100.0f), 50); // 위치 약간 분산되게 조정
+			FTransform SpawnTransform(FinalLoc); 
+			FActorSpawnParameters Params; 
+			Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+			ARSDunMonsterCharacter* Monster = World->SpawnActor<ARSDunMonsterCharacter>(StateRow->MonsterClass, SpawnTransform, Params);
+			if (!Monster)
+			{
+				continue;
+			}
+
+			Monster->IncreaseHP(StateRow->MaxHP); 
+			Monster->ChangeMoveSpeed(StateRow->MoveSpeed); 
+			Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::OnMonsterDiedFromTile); // 몬스터 사망 시 호출될 델리게이트 바인딩
+
+			AliveMonstersPerTile.FindOrAdd(TileCoord) += 1;
+			TotalSpawned++;
+		}
+	}
+
+	if (TotalSpawned > 0) // 타일에 몬스터가 스폰되었다면
+	{
+		SpawnedTiles.Add(TileCoord); // 몬스터가 스폰된 타일로 등록
+	}
+
+	if (TileToBlockers.Contains(TileCoord)) // 타일 좌표에 해당하는 블로커가 있다면
+	{
+		for (ARSTileBlocker* Blocker : TileToBlockers[TileCoord]) 
+		{
+			if (Blocker)
+			{
+				Blocker->RaiseBlocker(); // 블로커를 올린다
+			}
+		}
+	}
+}
+
+void URSSpawnManager::OnMonsterDiedFromTile(ARSDunBaseCharacter* DiedCharacter) // 몬스터가 타일에서 죽었을 때 호출되는 함수
+{
+	if (!DiedCharacter)
+	{
+		return;
+	}
+
+	FVector Loc = DiedCharacter->GetActorLocation(); 
+	FIntPoint TileCoord = FIntPoint(FMath::RoundToInt(Loc.X / 4000.f), FMath::RoundToInt(Loc.Y / 4000.f)); 
+
+	if (!AliveMonstersPerTile.Contains(TileCoord))
+	{
+		return;
+	}
+
+	AliveMonstersPerTile[TileCoord]--; // 해당 타일의 몬스터 수 감소
+
+	if (AliveMonstersPerTile[TileCoord] <= 0) // 몬스터가 모두 죽었을 때
+	{
+		ClearedTiles.Add(TileCoord, true); // 타일 클리어 상태로 등록
+
+		if (TileToBlockers.Contains(TileCoord)) //블로커를 내린다
+		{
+			for (ARSTileBlocker* Blocker : TileToBlockers[TileCoord])
+			{
+				if (Blocker)
+				{
+					Blocker->LowerBlocker();
+				}
+			}
+		}
+
+		if (TileCoord == BossTileCoord)
+		{
+			SpawnBossPortal(BossPotalLoaction);
+		}
+		// TODO: 타일 클리어시 실행할 이벤트 처리
+	}
+}
+
+TMap<FIntPoint, TArray<AActor*>> URSSpawnManager::BuildTileToTargets() // 타일 좌표별로 타겟 포인트를 매핑하는 함수
+{
+	TMap<FIntPoint, TArray<AActor*>> Result; // 타일 좌표와 타겟 포인트 배열을 매핑할 맵
+
+	if (!World)
+	{
+		return Result;
+	}
+
+	for (TActorIterator<ATargetPoint> It(World); It; ++It)
+	{
+		if (It->Tags.Contains(FName("Monster")))
+		{
+			FVector Location = It->GetActorLocation();
+
+			// 타일 위치 좌표화 (4000단위 기준)
+			int32 TileX = FMath::RoundToInt(Location.X / 4000.f); // 4000 단위로 나누어 타일 좌표 계산
+			int32 TileY = FMath::RoundToInt(Location.Y / 4000.f); // 4000 단위로 나누어 타일 좌표 계산
+			FIntPoint TileCoord(TileX, TileY);
+
+			Result.FindOrAdd(TileCoord).Add(*It);
+		}
+	}
+
+	return Result;
+}
+
+void URSSpawnManager::SetBossTileCoord(const FVector& BossWorldLocation)
+{
+	int32 TileX = FMath::RoundToInt(BossWorldLocation.X / 4000.f);
+	int32 TileY = FMath::RoundToInt(BossWorldLocation.Y / 4000.f);
+	BossPotalLoaction = BossWorldLocation;
+	BossTileCoord = FIntPoint(TileX, TileY);
+}
+
+void URSSpawnManager::RegisterAllTileBlockers()
+{
+	if (!World)
+	{
+		return;
+	}
+
+	TileToBlockers.Empty(); // 중복 방지용
+
+	for (TActorIterator<ARSTileBlocker> It(World); It; ++It)
+	{
+		ARSTileBlocker* Blocker = *It;
+		if (Blocker)
+		{
+			FIntPoint Coord = Blocker->GetLinkedTileCoord();
+			TileToBlockers.FindOrAdd(Coord).Add(Blocker);
+		}
+	}
 }

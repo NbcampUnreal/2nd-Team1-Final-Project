@@ -19,6 +19,7 @@ class ARSDunNextStagePortal;
 class ARSDunLifeEssenceShop;
 class ARSDunBaseCharacter;
 class ARSDungeonGroundWeapon;
+class ARSTileBlocker;
 class ARSDungeonGroundIngredient;
 class ARSDungeonGroundLifeEssence;
 
@@ -32,15 +33,11 @@ class ROGSHOP_API URSSpawnManager : public UObject
 {
 	GENERATED_BODY()
 
+#pragma region SpawnCharacter
 public:
-
-#pragma region 공개 함수
 
 	// 월드와 데이터테이블 초기화
 	void Initialize(UWorld* InWorld, UGameInstance* GameInstance,int32 TileIndex);
-
-	// 몬스터들을 타겟포인트 위치에 스폰
-	void SpawnMonstersInLevel();
 
 	// 플레이어를 시작 위치에 스폰 또는 이동
 	void SpawnPlayerAtStartPoint();
@@ -48,15 +45,36 @@ public:
 	// 보스몬스터 스폰 함수
 	void SpawnBossMonster();
 
-#pragma endregion
+	// 특정 타일에 몬스터 스폰을 위한 함수
+	void SpawnMonstersAtTile(FIntPoint TileCoord); 
+
 
 private:
-#pragma region 내부 변수
+	UFUNCTION()
+	void OnMonsterDiedFromTile(ARSDunBaseCharacter* DiedCharacter); // 타일에서 몬스터가 죽었을 때 호출되는 함수
+	TMap<FIntPoint, TArray<AActor*>> BuildTileToTargets(); // 빌드 타일에 대한 타겟 포인트를 생성하는 함수
+
 	// 현재 게임 월드 참조
 	UWorld* World;
+
+	// 타일별 몬스터 스폰 관련
+	TMap<FIntPoint, TArray<AActor*>> TileToTargets; // 타일 → 몬스터 스폰 위치
+	TMap<FIntPoint, int32> AliveMonstersPerTile; // 타일 → 살아있는 몬스터 수
+
+	
+	TSet<FIntPoint> SpawnedTiles; // 타일별로 몬스터가 한 번이라도 스폰됐는지	
+	TMap<FIntPoint, bool> ClearedTiles; // 타일별로 클리어(= 몬스터 전멸) 여부
 #pragma endregion
 
-#pragma endregion BossPortal
+#pragma region Wall
+	TMap<FIntPoint, TArray<ARSTileBlocker*>> TileToBlockers; // 타일 좌표 → 해당 타일의 블로커 배열 매핑
+	void RegisterAllTileBlockers(); // 모든 타일 블로커를 등록하는 함수
+#pragma endregion
+
+
+//포탈 관련 함수
+#pragma region Portal
+
 public:
 	FVector GetNextStageLocation() const;
 
@@ -68,13 +86,16 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<ARSDunBossRoomPortal> DunBossRoomPortalInstance; // 인스턴스
-#pragma endregion
 
-#pragma endregion NextStagePortal
+	FIntPoint BossTileCoord; // 보스포탈 생성될 좌표
+	FVector BossPotalLoaction;
+
 public:
 	// 보스 아레나 위치를 반환하는 함수
 	UFUNCTION(BlueprintCallable)
 	FVector GetBossArenaLocation() const;
+
+	void SetBossTileCoord(const FVector& BossWorldLocation);
 
 	UFUNCTION()
 	void SpawnDunNextStagePortal(); // 던전 다음 스테이지로 가는 포탈을 소환하는 함수
@@ -134,6 +155,7 @@ private:
 
 	// 몬스터 상태 데이터 테이블
 	UDataTable* MonsterDataTable;
+
 #pragma endregion
 
 #pragma region StageClear
