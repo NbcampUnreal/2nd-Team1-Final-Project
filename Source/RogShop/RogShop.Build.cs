@@ -42,7 +42,7 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "DeveloperSettings"),
         });
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule", "NavigationSystem", "DeveloperSettings", "SkeletalMerging", "UMG", "PhysicsCore" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule", "NavigationSystem", "DeveloperSettings", "SkeletalMerging", "UMG", "PhysicsCore", "Niagara" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
