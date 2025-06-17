@@ -56,4 +56,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Information")
 	TObjectPtr<UTexture2D> Thumbnail;
+
+private:
+	FTimerHandle MoveTargetTimer;
 };

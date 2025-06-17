@@ -48,7 +48,7 @@ void ARSTycoonChefCharacter::Tick(float DeltaSeconds)
 void ARSTycoonChefCharacter::StopAllAction()
 {
 	Super::StopAllAction();
-	
+
 	bCooking = false;
 	FoodBubbleWidgetComponent->SetVisibility(false);
 }
@@ -56,7 +56,7 @@ void ARSTycoonChefCharacter::StopAllAction()
 void ARSTycoonChefCharacter::FindCookingTile()
 {
 	PlacedCookingTile = nullptr;
-	
+
 	//쿠킹 타일 배열을 구함
 	TArray<AActor*> CookingTileActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSCookingTile::StaticClass(), CookingTileActors);
@@ -111,7 +111,7 @@ void ARSTycoonChefCharacter::FindCookingTile()
 		RS_LOG_C("배치될 화구가 없습니다!", FColor::Red);
 		return;
 	}
-	
+
 	//화구로 이동하는 와중에 쉐프가 생길 수 있기 때문에 여기서 바로 설정해줌
 	PlacedCookingTile = TargetCookingTile;
 	MoveToTarget(TargetCookingTile->GetChefTransform().GetLocation(), TargetCookingTile);
@@ -127,14 +127,14 @@ void ARSTycoonChefCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	FindCookingTile();
-	
+
 	FoodBubbleWidgetComponent->SetVisibility(false);
 }
 
 void ARSTycoonChefCharacter::InteractTarget(AActor* TargetActor)
 {
 	Super::InteractTarget(TargetActor);
-	
+
 	if (ARSCookingTile* CookingTile = Cast<ARSCookingTile>(TargetActor))
 	{
 		RS_LOG("요리사가 화구에 배치 되었습니다.");
@@ -164,29 +164,20 @@ void ARSTycoonChefCharacter::TryCook()
 
 		FoodBubbleWidgetComponent->SetVisibility(true);
 		FoodBubble->SetImage(GameMode->GetOrderToCook().FoodKey);
-		
+
 		PlacedCookingTile->Interact(this);
 
-		if (CookingMontage && GetMesh())
+		check(CookingMontage)
+		PlayAnimMontage(CookingMontage);
+		
+		check(CookingSound)
+		if (CookingAudioComponent)
 		{
-			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-			if (AnimInstance)
-			{
-				PlayAnimMontage(CookingMontage);
-
-				if (CookingSound)
-				{
-					CookingAudioComponent = UGameplayStatics::SpawnSoundAttached(
-						CookingSound,
-						RootComponent,
-						NAME_None,
-						FVector::ZeroVector,
-						EAttachLocation::KeepRelativeOffset,
-						true
-					);
-				}
-			}
+			CookingAudioComponent->Play();
+		}
+		else
+		{
+			CookingAudioComponent = UGameplayStatics::SpawnSoundAttached(CookingSound, RootComponent);
 		}
 	}
 }
@@ -203,14 +194,7 @@ void ARSTycoonChefCharacter::CheckFinish()
 			CookingAudioComponent->Stop();
 		}
 
-		if (CookingFinishSound)
-		{
-			UGameplayStatics::SpawnSoundAtLocation(
-				this,
-				CookingFinishSound,
-				GetActorLocation(),
-				FRotator::ZeroRotator
-			);
-		}
+		check(CookingFinishSound)
+		UGameplayStatics::SpawnSoundAtLocation(this, CookingFinishSound, GetActorLocation());
 	}
 }
