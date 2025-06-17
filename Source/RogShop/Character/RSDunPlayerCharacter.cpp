@@ -280,7 +280,7 @@ void ARSDunPlayerCharacter::DecreaseHP(float Amount)
 void ARSDunPlayerCharacter::Move(const FInputActionValue& value)
 {
     // 카메라 시점을 기준하여 입력받은 방향으로 캐릭터 이동
-    if (Controller)
+    if (Controller && TrySkipMontage())
     {
         const FVector2D MoveInput = value.Get<FVector2D>();
         const FRotator MovementRotation(0.0f, Controller->GetControlRotation().Yaw, 0.0f);
@@ -336,15 +336,15 @@ void ARSDunPlayerCharacter::Dodge(const FInputActionValue& value)
 
     if (TrySkipMontage())
     {
+        FVector LastInput = GetLastMovementInputVector();
+
+        if (!LastInput.IsNearlyZero())
+        {
+            FRotator DesiredRotation = LastInput.Rotation();
+            SetActorRotation(DesiredRotation);
+        }
+
         PlayAnimMontage(DodgeMontage);
-    }
-
-    FVector LastInput = GetLastMovementInputVector();
-
-    if (!LastInput.IsNearlyZero())
-    {
-        FRotator DesiredRotation = LastInput.Rotation();
-        SetActorRotation(DesiredRotation);
     }
 }
 
@@ -384,10 +384,6 @@ void ARSDunPlayerCharacter::StrongAttack(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::FirstWeaponSlot(const FInputActionValue& value)
 {
-    // 애니메이션이 아직 준비되지 않았으므로 디버깅용 출력
-    // 추후에 해당 무기로 전환되는 기능 구현해야한다.
-    RS_LOG_DEBUG("FirstWeaponSlot Activated");
-
     UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
     if (!AnimInstance)
     {
@@ -411,10 +407,6 @@ void ARSDunPlayerCharacter::FirstWeaponSlot(const FInputActionValue& value)
 
 void ARSDunPlayerCharacter::SecondWeaponSlot(const FInputActionValue& value)
 {
-    // 애니메이션이 아직 준비되지 않았으므로 디버깅용 출력
-    // 추후에 해당 무기로 전환되는 기능 구현해야한다.
-    RS_LOG_DEBUG("SecondWeaponSlot Activated");
-
     UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
     if (!AnimInstance)
     {
@@ -477,8 +469,10 @@ bool ARSDunPlayerCharacter::TrySkipMontage()
     // 애니메이션 인스턴스가 유효하고 스킵 가능한 상태인 경우
     if (AnimInstance && bIsMontageSkippable)
     {
-        // 몽타주를 재생 중인 경우
-        if (AnimInstance->IsAnyMontagePlaying())
+        // 상체만 재생하는 몽타주를 제외한 다른 몽타주를 재생 중인 경우
+        float UpperBodyLocalWeight = AnimInstance->GetSlotMontageLocalWeight(FName(TEXT("UpperBody")));
+        bool IsUpperBodySlotActive = UpperBodyLocalWeight > 0;
+        if (!IsUpperBodySlotActive && AnimInstance->IsAnyMontagePlaying())
         {
             UAnimMontage* CurrentMontage = AnimInstance->GetCurrentActiveMontage();
 

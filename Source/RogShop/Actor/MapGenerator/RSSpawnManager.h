@@ -103,14 +103,17 @@ private:
 #pragma region GroundItem
 public:
 	UFUNCTION()
-	void SpawnGroundWeapon(FName TargetName, FTransform TargetTransform);
+	void SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform, bool AddImpulse);
+
+	UFUNCTION()
+	void SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform);
 
 private:
 	UFUNCTION()
-	void SpawnGroundIngredient(ARSDunBaseCharacter* DiedCharacter);
+	void SpawnGroundIngredientFromCharacter(ARSDunBaseCharacter* DiedCharacter);
 
 	UFUNCTION()
-	void SpawnGroundLifeEssence(ARSDunBaseCharacter* DiedCharacter);
+	void SpawnGroundLifeEssenceFromCharacter(ARSDunBaseCharacter* DiedCharacter);
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))

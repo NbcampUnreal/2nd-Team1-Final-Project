@@ -29,4 +29,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> MeshComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USceneComponent> WeaponSpawnSceneComp;
 };
