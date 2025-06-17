@@ -25,10 +25,10 @@
 #include "RSDungeonGroundLifeEssence.h"
 
 // 외부에서 전달받은 월드 및 테이블 초기화
-void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance,int32 TileIndex)
+void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, int32 TargetLevelIndex)
 {
 	World = InWorld;
-	LevelIndex = TileIndex;
+	LevelIndex = TargetLevelIndex;
 
 	if (!GameInstance) return;
 

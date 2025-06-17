@@ -9,6 +9,7 @@
 class UButton;
 class UUniformGridPanel;
 class URSInventorySlotWidget;
+class UCanvasPanel;
 
 struct FItemSlot;
 
@@ -22,7 +23,7 @@ public:
 
 private:
 	UFUNCTION()
-	void NextStageTravel();
+	void SendIngredientAndNextStageTravel();
 
 	UFUNCTION()
 	void ExitWidget();
@@ -42,6 +43,9 @@ public:
 
 private:
 	UFUNCTION()
+	void SendIngredientSlotCheck();
+
+	UFUNCTION()
 	void SetClickIngredientName(FName NewClickIngredientName);
 
 	UFUNCTION()
@@ -51,12 +55,14 @@ private:
 	void PlayerIngredientSlotPress();
 
 private:
+	// 바인드 위젯
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (BindWidget, AllowPrivateAccess = "true"))
 	TObjectPtr<UUniformGridPanel> SendIngredientPanel;	// 보낼 재료 슬롯을 배치할 패널
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (BindWidget, AllowPrivateAccess = "true"))
 	TObjectPtr<UUniformGridPanel> PlayerIngredientPanel;	// 플레이어가 획득한 재료 슬롯을 배치할 패널
 
+	// 위젯에 적용할 슬롯
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<URSInventorySlotWidget> InvecntorySlotWidgetClass;	// 슬롯 클래스
 
@@ -67,4 +73,21 @@ private:
 	TArray<TObjectPtr<URSInventorySlotWidget>> PlayerIngredientSlots;	// 플레이어 재료를 보여줄 슬롯
 
 	FName ClickIngredientName;  // 클릭한 슬롯의 재료의 데이터 테이블 RowName
+
+// 경고창
+private:
+	void WarningShow();
+
+	UFUNCTION()
+	void WarningHide();
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (BindWidget, AllowPrivateAccess = "true"))
+	TObjectPtr<UCanvasPanel> WarningCanvasPanel;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (BindWidget, AllowPrivateAccess = "true"))
+	TObjectPtr<UButton> WarningOkButton;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (BindWidget, AllowPrivateAccess = "true"))
+	TObjectPtr<UButton> WarningCancelButton;
 };

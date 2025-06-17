@@ -2,11 +2,14 @@
 
 
 #include "RSDunNextStagePortal.h"
+#include "Components/BoxComponent.h"
+#include "NiagaraComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "RSDunPlayerCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "RSSendIngredientWidget.h"
 #include "RSDungeonIngredientInventoryComponent.h"
+#include "RSDungeonGameModeBase.h"
 
 ARSDunNextStagePortal::ARSDunNextStagePortal()
 {
@@ -15,9 +18,12 @@ ARSDunNextStagePortal::ARSDunNextStagePortal()
 	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	SetRootComponent(SceneComp);
 
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	MeshComp->SetupAttachment(SceneComp);
-	MeshComp->SetCollisionProfileName("Interactable");
+	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara"));
+	NiagaraComp->SetupAttachment(SceneComp);
+
+	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
+	BoxComp->SetupAttachment(SceneComp);
+	BoxComp->SetCollisionProfileName("Interactable");
 
 	InteractName = FText::FromString(TEXT("다음 스테이지로"));
 	bIsAutoInteract = false;
@@ -27,6 +33,17 @@ void ARSDunNextStagePortal::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	ARSDungeonGameModeBase* DungeonGameMode = GetWorld()->GetAuthGameMode<ARSDungeonGameModeBase>();
+	if (DungeonGameMode)
+	{
+		// 마지막 스테이지인 경우
+		int32 MaxStageCount = DungeonGameMode->GetMaxStageCount();
+		int32 LevelIndex = DungeonGameMode->GetLevelIndex();
+		if ((MaxStageCount - 1) == LevelIndex)
+		{
+			InteractName = FText::FromString(TEXT("거점으로"));
+		}
+	}
 }
 
 void ARSDunNextStagePortal::Interact(ARSDunPlayerCharacter* Interactor)
@@ -53,7 +70,15 @@ void ARSDunNextStagePortal::Interact(ARSDunPlayerCharacter* Interactor)
 
 		const TArray<FItemSlot>& IngredientItems = IngredientInventoryComp->GetItems();
 
-		SendIngredientWidgetInstance->CreateSendIngredientSlots(2);
+		ARSDungeonGameModeBase* DungeonGameMode = GetWorld()->GetAuthGameMode<ARSDungeonGameModeBase>();
+		if (DungeonGameMode)
+		{
+			// 보스 잡은 횟수 + 1개의 슬롯을 적용한다.
+			int32 LevelIndex = DungeonGameMode->GetLevelIndex();
+
+			SendIngredientWidgetInstance->CreateSendIngredientSlots(LevelIndex + 1);
+		}
+
 		SendIngredientWidgetInstance->CreatePlayerIngredientSlots(IngredientItems);
 		SendIngredientWidgetInstance->AddToViewport();
 

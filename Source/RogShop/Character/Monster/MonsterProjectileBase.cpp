@@ -46,7 +46,6 @@ void AMonsterProjectileBase::BulletOverlapBegin(UPrimitiveComponent* OverlappedC
 
         if (bPlayerOverlap)
         {
-            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("원거리 피격"));
             UGameplayStatics::ApplyDamage(OtherActor, damage, GetInstigator()->GetController(), this, nullptr);
         }
     }

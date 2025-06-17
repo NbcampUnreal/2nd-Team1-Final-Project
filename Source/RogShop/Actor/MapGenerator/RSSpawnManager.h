@@ -37,7 +37,7 @@ class ROGSHOP_API URSSpawnManager : public UObject
 public:
 
 	// 월드와 데이터테이블 초기화
-	void Initialize(UWorld* InWorld, UGameInstance* GameInstance,int32 TileIndex);
+	void Initialize(UWorld* InWorld, UGameInstance* GameInstance,int32 TargetLevelIndex);
 
 	// 플레이어를 시작 위치에 스폰 또는 이동
 	void SpawnPlayerAtStartPoint();
