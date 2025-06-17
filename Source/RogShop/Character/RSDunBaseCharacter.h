@@ -47,7 +47,7 @@ private:
 // 상태 관련
 public:
 	virtual void OnDeath();
-
+	UFUNCTION(BlueprintCallable)
 	bool GetIsDead();
 
 private:
