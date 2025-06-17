@@ -167,9 +167,6 @@ void ARSTycoonChefCharacter::TryCook()
 
 		PlacedCookingTile->Interact(this);
 
-		check(CookingMontage)
-		PlayAnimMontage(CookingMontage);
-		
 		check(CookingSound)
 		if (CookingAudioComponent)
 		{

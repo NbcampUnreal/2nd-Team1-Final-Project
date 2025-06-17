@@ -23,8 +23,10 @@ public:
 
 	virtual void Pickup(AActor* Actor) override;
 	virtual AActor* Drop(FTransform DropTransform) override;
-	virtual AActor* GetPickupActor() override { return PickupActor; }
 
+	virtual AActor* GetPickupActor() override { return PickupActor; }
+	UFUNCTION(BlueprintPure)
+	bool IsPickup() const { return PickupActor != nullptr; }
 protected:
 	virtual void BeginPlay() override;
 

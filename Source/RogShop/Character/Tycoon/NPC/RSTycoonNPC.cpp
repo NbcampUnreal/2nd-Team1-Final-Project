@@ -72,13 +72,24 @@ void ARSTycoonNPC::MoveToTarget(FVector Location, AActor* Target)
 					GetWorldTimerManager().ClearTimer(MoveTargetTimer);
 					return;
 				}
-			
+
 				if (MoveTarget != nullptr && GetCharacterMovement()->Velocity.SquaredLength() < 0.1f * 0.1f)
 				{
 					RS_LOG_C("NPC가 네비게이션 문제로 움직이지 않음", FColor::Red);
-					MoveToTarget(Location, Target);
+
+					GetController<AAIController>()->MoveToLocation
+					(
+						GetActorLocation() + FVector(FMath::RandRange(0, 50), FMath::RandRange(0, 50), 0),
+						-1, true, false, false
+					);
+
+					FTimerHandle RetryTimer;
+					GetWorldTimerManager().SetTimer(RetryTimer, [&]()
+					{					
+						MoveToTarget(Location, Target);
+					}, 0.2f, false);
 				}
-			}, 0.1f, true);
+			}, 0.3f, true);
 		}
 	}
 }
