@@ -55,7 +55,6 @@ void ARSBushTriggerSoundActor::OnOverlapBegin(
 
             OverlappingCharacter = Player;
             LastKnownPlayerLocation = Player->GetActorLocation();
-            UE_LOG(LogTemp, Warning, TEXT("부쉬 재생"));
 
             GetWorldTimerManager().SetTimer(
                 MovementCheckTimerHandle, this,
