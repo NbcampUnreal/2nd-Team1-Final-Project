@@ -2,6 +2,8 @@
 
 
 #include "RSDunNextStagePortal.h"
+#include "Components/BoxComponent.h"
+#include "NiagaraComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "RSDunPlayerCharacter.h"
 #include "GameFramework/PlayerController.h"
@@ -16,9 +18,12 @@ ARSDunNextStagePortal::ARSDunNextStagePortal()
 	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	SetRootComponent(SceneComp);
 
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	MeshComp->SetupAttachment(SceneComp);
-	MeshComp->SetCollisionProfileName("Interactable");
+	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara"));
+	NiagaraComp->SetupAttachment(SceneComp);
+
+	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
+	BoxComp->SetupAttachment(SceneComp);
+	BoxComp->SetCollisionProfileName("Interactable");
 
 	InteractName = FText::FromString(TEXT("다음 스테이지로"));
 	bIsAutoInteract = false;
