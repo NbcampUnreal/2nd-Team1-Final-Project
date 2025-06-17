@@ -54,6 +54,7 @@ void ARSTileBlocker::Tick(float DeltaTime)
 		if (bRaising)
 		{
 			SetActorLocation(FMath::Lerp(HiddenLocation, ShownLocation, Alpha)); // 올라오는 위치로 보간
+			Collision->SetRelativeRotation(FMath::Lerp(HiddenRotation, ShownRotation, Alpha));
 			if (Alpha >= 1.f)
 			{
 				bRaising = false;
@@ -62,6 +63,7 @@ void ARSTileBlocker::Tick(float DeltaTime)
 		else if (bLowering)
 		{
 			SetActorLocation(FMath::Lerp(ShownLocation, HiddenLocation, Alpha));
+			Collision->SetRelativeRotation(FMath::Lerp(ShownRotation, HiddenRotation, Alpha));
 			if (Alpha >= 1.f)
 			{
 				bLowering = false;
@@ -75,9 +77,13 @@ void ARSTileBlocker::Tick(float DeltaTime)
 void ARSTileBlocker::RaiseBlocker() //위로 올라오게
 {
 	HiddenLocation = GetActorLocation();                   // 현재 지하 위치
-	ShownLocation = HiddenLocation + FVector(0, 0, 200.f); // 올라올 목표
+	ShownLocation = HiddenLocation + FVector(0, 0, 880.f); // 올라올 목표
+
+	HiddenRotation = Collision->GetRelativeRotation();
+	ShownRotation = HiddenRotation + FRotator(-90.f, 0, 0);
 
 	SetActorLocation(HiddenLocation);  // 위치 재설정
+	Collision->SetRelativeRotation(HiddenRotation);
 	SetActorHiddenInGame(false);       // 보이게
 	Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 

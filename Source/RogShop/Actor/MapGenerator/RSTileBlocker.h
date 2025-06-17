@@ -44,6 +44,9 @@ private:
 	FVector HiddenLocation;   // 시작 지하 위치
 	FVector ShownLocation;    // 올라온 위치
 
+	FRotator HiddenRotation;	//시작 각도
+	FRotator ShownRotation;		//올라온 각도
+
 	float AnimationTime = 0.f;
 	float TotalTime = 0.5f;
 
