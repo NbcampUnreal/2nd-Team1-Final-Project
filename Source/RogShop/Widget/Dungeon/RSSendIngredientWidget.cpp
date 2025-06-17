@@ -5,6 +5,7 @@
 #include "RogShop/UtilDefine.h"
 #include "Components/Button.h"
 #include "Components/UniformGridPanel.h"
+#include "Components/CanvasPanel.h"
 #include "GameFramework/PlayerController.h"
 #include "RSDungeonGameModeBase.h"
 #include "RSGameInstance.h"
@@ -30,14 +31,26 @@ void URSSendIngredientWidget::NativeConstruct()
 	// 확인 버튼 바인딩
 	if (OKButton)
 	{
-		OKButton->OnClicked.AddDynamic(this, &URSSendIngredientWidget::NextStageTravel);
+		OKButton->OnClicked.AddDynamic(this, &URSSendIngredientWidget::SendIngredientSlotCheck);
 	}
+
+	// 경고의 확인 버튼 바인딩
+	if (WarningOkButton)
+	{
+		WarningOkButton->OnClicked.AddDynamic(this, &URSSendIngredientWidget::SendIngredientAndNextStageTravel);
+	}
+
+	// 경고의 취소 버튼 바인딩
+	if (WarningCancelButton)
+	{
+		WarningCancelButton->OnClicked.AddDynamic(this, &URSSendIngredientWidget::WarningHide);
+	}
+
+	WarningHide();
 }
 
-void URSSendIngredientWidget::NextStageTravel()
+void URSSendIngredientWidget::SendIngredientAndNextStageTravel()
 {
-	// TODO : 재료를 보낼 수 있는 만큼 골랐는지 확인 후 적게 골랐다면 경고창을 띄운다.
-
 	URSGameInstance* RSGameInstance = GetGameInstance<URSGameInstance>();
 	if (!RSGameInstance)
 	{
@@ -247,6 +260,26 @@ void URSSendIngredientWidget::CreatePlayerIngredientSlots(const TArray<FItemSlot
 	}
 }
 
+void URSSendIngredientWidget::SendIngredientSlotCheck()
+{
+	// 재료를 보낼 수 있는 만큼 골랐는지 확인한다.
+	for (const auto& e : SendIngredientSlots)
+	{
+		FName ItemDataTableKey = e->GetItemDataTableKey();
+
+		// 보낼 재료를 선택하지 않은 경우 경고창을 띄운다.
+		if (ItemDataTableKey == NAME_None)
+		{
+			WarningShow();
+
+			return;
+		}
+	}
+
+	// 재료를 보낼 수 있는 만큼 모두 골랐으므로, 재료를 보내고 레벨을 이동하는 함수 호출
+	SendIngredientAndNextStageTravel();
+}
+
 void URSSendIngredientWidget::SetClickIngredientName(FName NewClickIngredientName)
 {
 	ClickIngredientName = NewClickIngredientName;
@@ -319,4 +352,14 @@ void URSSendIngredientWidget::PlayerIngredientSlotPress()
 	}
 
 	ClickIngredientName = NAME_None;
+}
+
+void URSSendIngredientWidget::WarningShow()
+{
+	WarningCanvasPanel->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+}
+
+void URSSendIngredientWidget::WarningHide()
+{
+	WarningCanvasPanel->SetVisibility(ESlateVisibility::Hidden);
 }
