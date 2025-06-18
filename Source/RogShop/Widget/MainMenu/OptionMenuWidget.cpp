@@ -48,8 +48,12 @@ void UOptionMenuWidget::NativeConstruct()
 
 void UOptionMenuWidget::LoadSettings()
 {
-    URSSaveGameSubsystem* OptionSaveSubsysyem = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
-    UOptionSaveGame* LoadedData = OptionSaveSubsysyem->LoadSettings();
+    UOptionSaveGame* LoadedData = nullptr;
+    URSSaveGameSubsystem* SaveGameSubsystem = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
+    if (UGameplayStatics::DoesSaveGameExist(SaveGameSubsystem->OptionSaveSlotName, 0))
+    {
+        LoadedData = Cast<UOptionSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->OptionSaveSlotName, 0));
+    }
 
     if (LoadedData)
     {
@@ -76,14 +80,24 @@ void UOptionMenuWidget::LoadSettings()
 
 void UOptionMenuWidget::SaveSettings()
 {
-    URSSaveGameSubsystem* OptionSaveSubsysyem = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
-    if (OptionSaveSubsysyem && MasterVolumeSlider && BGMVolumeSlider && SFXVolumeSlider)
+    UOptionSaveGame* SaveGameInstance = Cast<UOptionSaveGame>(
+        UGameplayStatics::CreateSaveGameObject(UOptionSaveGame::StaticClass()));
+
+    if (MasterVolumeSlider)
+        SaveGameInstance->MasterVolume = MasterVolumeSlider->GetValue();
+    if (BGMVolumeSlider)
+        SaveGameInstance->BGMVolume = BGMVolumeSlider->GetValue();
+    if (SFXVolumeSlider)
+        SaveGameInstance->SFXVolume = SFXVolumeSlider->GetValue();
+    if (ResolutionComboBox)
+        SaveGameInstance->ResolutionIndex = ResolutionComboBox->GetSelectedIndex();
+    if (WindowModeComboBox)
+        SaveGameInstance->WindowModeIndex = WindowModeComboBox->GetSelectedIndex();
+
+    URSSaveGameSubsystem* SaveGameSubsystem = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
+    if (SaveGameSubsystem)
     {
-        OptionSaveSubsysyem->SaveOptionSettings(
-            MasterVolumeSlider->GetValue(),
-            BGMVolumeSlider->GetValue(),
-            SFXVolumeSlider->GetValue()
-        );
+        UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameSubsystem->OptionSaveSlotName, 0);
     }
 }
 

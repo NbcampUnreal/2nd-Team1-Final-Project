@@ -32,12 +32,6 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnSaveRequested OnSaveRequested;	// 저장 요청을 의미하는 이벤트 디스패처
 
-	UFUNCTION(BlueprintCallable)
-	void SaveOptionSettings(float MasterVolume, float BGMVolume, float SFXVolume);
-
-	UFUNCTION(BlueprintCallable)
-	UOptionSaveGame* LoadSettings();
-
 // 세이브 슬롯 네임
 public:
 	// 던전
@@ -53,6 +47,6 @@ public:
 
 
 	//옵션
-	const FString SavedOptionSlot = TEXT("SavedOption");
+	const FString OptionSaveSlotName = TEXT("OptionSaveSlot");
 	
 };
