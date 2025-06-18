@@ -3,8 +3,6 @@
 #include "RSDunBossCharacter.h"
 #include "RSDungeonGameModeBase.h"
 #include "Components/WidgetComponent.h"
-#include "RSDunPlayerController.h" // TODO : 델리게이트 연결하면 아마 제거헤야될 듯
-#include "RSBossHPBarWidget.h"
 #include "RSDunPlayerController.h"
 
 void ARSDunBossCharacter::BeginPlay()
@@ -12,7 +10,21 @@ void ARSDunBossCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	OverheadWidget->DestroyComponent();	// 보스는 HP 바 삭제
-	UpdateBossName();
+}
+
+float ARSDunBossCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	ARSDunPlayerController* RSDunPlayerController = Cast<ARSDunPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+
+	if (RSDunPlayerController)
+	{
+		const float HPPercent = (GetMaxHP() > 0.f) ? (float)GetHP() / (float)GetMaxHP() : 0.f;
+		RSDunPlayerController->OnBossHPChange.Broadcast(GetMonsterRowName(), HPPercent);
+	}
+
+	return Damage;
 }
 
 void ARSDunBossCharacter::OnDeath()
@@ -24,14 +36,6 @@ void ARSDunBossCharacter::OnDeath()
 	{
 		DungeonGameMode->OnBossDead.Broadcast();
 	}
-
-	// TODO : 아마 선국님 델리게이트 추가하면 제거할 부분
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	if (PlayerController)
-	{
-		ARSDunPlayerController* MyPlayerController = Cast<ARSDunPlayerController>(PlayerController);
-		MyPlayerController->SetBossInfoWidgetHidden();
-	}
 }
 
 void ARSDunBossCharacter::PlaySpawnAnim()
@@ -39,41 +43,11 @@ void ARSDunBossCharacter::PlaySpawnAnim()
 	Super::PlaySpawnAnim();
 
 	// TODO : 아마 선국님 델리게이트 추가하면 제거할 부분
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	ARSDunPlayerController* PlayerController = Cast<ARSDunPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (PlayerController)
 	{
-		ARSDunPlayerController* MyPlayerController = Cast<ARSDunPlayerController>(PlayerController);
-		MyPlayerController->SetBossInfoWidgetVisible();
-	}
-}
-
-void ARSDunBossCharacter::UpdateHPUI()
-{
-	UpdateBossHP();
-}
-
-void ARSDunBossCharacter::UpdateBossHP()
-{
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	if (PlayerController)
-	{
-		ARSDunPlayerController* MyPlayerController = Cast<ARSDunPlayerController>(PlayerController);
-
-		// HPPercent = 0.0 ~ 1.0 범위의 값이 나오도록 설정
 		const float HPPercent = (GetMaxHP() > 0.f) ? (float)GetHP() / (float)GetMaxHP() : 0.f;
-		MyPlayerController->UpdateBossTargetPercent(HPPercent);
-	}
-}
-
-void ARSDunBossCharacter::UpdateBossName()
-{
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	if (PlayerController)
-	{
-		ARSDunPlayerController* MyPlayerController = Cast<ARSDunPlayerController>(PlayerController);
-		URSBossHPBarWidget* BossInfoWidget = MyPlayerController->GetBossInfoWidget();
-
-		BossInfoWidget->SetBossName(GetMonsterRowName());
+		PlayerController->OnBossHPChange.Broadcast(GetMonsterRowName(), HPPercent);
 	}
 }
 

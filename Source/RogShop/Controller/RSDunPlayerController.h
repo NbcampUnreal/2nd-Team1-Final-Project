@@ -15,6 +15,7 @@ class URSDunMainHUDWidget;
 class URSPlayerInventoryWidget;
 class ARSDunBaseCharacter;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBossHPChange, FName, BossName, float, HPPercent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotChange, int8, WeaponSlotIndex, FName, WeaponKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnIngredientChange, int32, IngredientSlotIndex, FItemSlot, IngredientItemSlot);
 
@@ -82,10 +83,6 @@ public:
 	void ShowInteractWidget();
 	void HideInteractWidget();
 
-	void SetBossInfoWidgetVisible();
-	void SetBossInfoWidgetHidden();
-	void UpdateBossTargetPercent(const float NewPercent);
-	URSBossHPBarWidget* GetBossInfoWidget() const;
 	URSDunMainHUDWidget* GetDunMainHudWidget();
 
 
@@ -111,18 +108,15 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UUserWidget> RSDeathWidget;
 
-	// 보스 몬스터의 체력 및 이름 정보를 가진 위젯
-	UPROPERTY()
-	URSBossHPBarWidget* WBPBossInfoWidget;
-	UProgressBar* BossHPBar;
-
 // 캐릭터의 델리게이트에 바인딩하는 함수를 모은 함수
 private:
 	void BindCharacterDelegates();
-	void BindBossMonsterDelegates();
 
 // 이벤트 디스패처
 public:
+	UPROPERTY(BlueprintAssignable)
+	FOnBossHPChange OnBossHPChange;
+
 	UPROPERTY(BlueprintAssignable)
 	FOnWeaponSlotChange OnWeaponSlotChange;	// WeaponSlot을 변경하는 시점
 

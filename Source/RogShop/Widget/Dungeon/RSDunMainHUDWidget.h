@@ -29,9 +29,8 @@ public:
 
     void ShowInteractWidget();
     void HideInteractWidget();
-    void UpdateMiniMapPlayerPosition(const FIntPoint& TileCoord);
 
-    URSBossHPBarWidget* GetBossHPBarWidget() const;
+    void UpdateMiniMapPlayerPosition(const FIntPoint& TileCoord);
 
 private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
@@ -47,7 +46,7 @@ private:
     TObjectPtr<URSInteractWidget> InteractWidget;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
-    TObjectPtr<URSBossHPBarWidget> WBP_BossInfoWidget;
+    TObjectPtr<URSBossHPBarWidget> BossInfoWidget;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<URSMiniMap> MiniMapWidget;
