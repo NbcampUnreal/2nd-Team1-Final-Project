@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameUserSettings.h"
 #include "Option/OptionSaveGame.h"
+#include "RSSaveGameSubsystem.h"
 
 void UOptionMenuWidget::NativeConstruct()
 {
@@ -47,34 +48,35 @@ void UOptionMenuWidget::NativeConstruct()
 
 void UOptionMenuWidget::LoadSettings()
 {
-    if (UGameplayStatics::DoesSaveGameExist(TEXT("OptionSaveSlot"), 0))
+    UOptionSaveGame* LoadedData = nullptr;
+    URSSaveGameSubsystem* SaveGameSubsystem = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
+    if (UGameplayStatics::DoesSaveGameExist(SaveGameSubsystem->OptionSaveSlotName, 0))
     {
-        UOptionSaveGame* LoadedGame = Cast<UOptionSaveGame>(
-            UGameplayStatics::LoadGameFromSlot(TEXT("OptionSaveSlot"), 0));
+        LoadedData = Cast<UOptionSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->OptionSaveSlotName, 0));
+    }
 
-        if (LoadedGame)
-        {
-            if (MasterVolumeSlider)
-                MasterVolumeSlider->SetValue(LoadedGame->MasterVolume);
-            if (BGMVolumeSlider)
-                BGMVolumeSlider->SetValue(LoadedGame->BGMVolume);
-            if (SFXVolumeSlider)
-                SFXVolumeSlider->SetValue(LoadedGame->SFXVolume);
-            if (ResolutionComboBox)
-                ResolutionComboBox->SetSelectedIndex(LoadedGame->ResolutionIndex);
-            if (WindowModeComboBox)
-                WindowModeComboBox->SetSelectedIndex(LoadedGame->WindowModeIndex);
-        }
+    if (LoadedData)
+    {
+        if (MasterVolumeSlider)
+            MasterVolumeSlider->SetValue(LoadedData->MasterVolume);
+        if (BGMVolumeSlider)
+            BGMVolumeSlider->SetValue(LoadedData->BGMVolume);
+        if (SFXVolumeSlider)
+            SFXVolumeSlider->SetValue(LoadedData->SFXVolume);
+        if (ResolutionComboBox)
+            ResolutionComboBox->SetSelectedIndex(LoadedData->ResolutionIndex);
+        if (WindowModeComboBox)
+            WindowModeComboBox->SetSelectedIndex(LoadedData->WindowModeIndex);
     }
     else
     {
-        // 기본값 선택
         if (ResolutionComboBox)
             ResolutionComboBox->SetSelectedIndex(0);
         if (WindowModeComboBox)
             WindowModeComboBox->SetSelectedIndex(0);
     }
 }
+
 
 void UOptionMenuWidget::SaveSettings()
 {
@@ -92,7 +94,11 @@ void UOptionMenuWidget::SaveSettings()
     if (WindowModeComboBox)
         SaveGameInstance->WindowModeIndex = WindowModeComboBox->GetSelectedIndex();
 
-    UGameplayStatics::SaveGameToSlot(SaveGameInstance, TEXT("OptionSaveSlot"), 0);
+    URSSaveGameSubsystem* SaveGameSubsystem = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
+    if (SaveGameSubsystem)
+    {
+        UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameSubsystem->OptionSaveSlotName, 0);
+    }
 }
 
 void UOptionMenuWidget::OnApplyButtonClicked()

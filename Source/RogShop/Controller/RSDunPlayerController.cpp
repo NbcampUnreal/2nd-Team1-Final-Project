@@ -187,3 +187,8 @@ URSBossHPBarWidget* ARSDunPlayerController::GetBossInfoWidget() const
 {
     return WBPBossInfoWidget;
 }
+
+URSDunMainHUDWidget* ARSDunPlayerController::GetDunMainHudWidget()
+{
+    return RSDunMainHUDWidget;
+}

@@ -11,6 +11,11 @@ ARSMonsterAIController::ARSMonsterAIController()
 	currentPatrolIdx = 0;
 
 	rotateSpeed = 0.01f;
+	chaseLength = 20000.f;
+	moveDistance = 0;
+	bIsChase = false;
+	priviousPos = FVector(0.f,0.f,0.f);
+	curPos = FVector(0.f, 0.f, 0.f);
 }
 
 void ARSMonsterAIController::SetRVOAvoidanceEnabled(bool bEnable)//path find bottleneck resolving function
@@ -160,6 +165,7 @@ void ARSMonsterAIController::RotateToFocus(FVector lookFor, float deltaSecond)
 	FVector chrPos;
 	FVector look;
 	FRotator chrRot;
+	FRotator lookRot;
 	FRotator newRot;
 	float targetYaw;
 	float currentYaw;
@@ -170,6 +176,12 @@ void ARSMonsterAIController::RotateToFocus(FVector lookFor, float deltaSecond)
 		chrPos = ctrlPawn->GetActorLocation();
 		chrRot = ctrlPawn->GetActorRotation();
 		look = (lookFor - chrPos).GetSafeNormal();
+		lookRot = look.Rotation();
+
+		chrRot.Pitch = 0.f;
+		chrRot.Roll = 0.f;
+		lookRot.Pitch = 0.f;
+		lookRot.Roll = 0.f;
 
 		targetYaw = look.Rotation().Yaw;
 		currentYaw = chrRot.Yaw;
@@ -178,7 +190,8 @@ void ARSMonsterAIController::RotateToFocus(FVector lookFor, float deltaSecond)
 //		DrawDebugLine(GetWorld(), ctrlPawn->GetActorLocation(), look, FColor::Blue, false, 5.0f, 0, 2.0f);
 //		DrawDebugLine(GetWorld(), ctrlPawn->GetActorLocation(), ctrlPawn->GetActorForwardVector(), FColor::Red, false, 5.0f, 0, 2.0f);
 
-		newRot = FMath::RInterpTo(chrRot, look.Rotation(), deltaSecond * 10.f, 0.3f);
+//		newRot = FMath::RInterpTo(chrRot, look.Rotation(), deltaSecond * 10.f, 0.3f);
+		newRot = FMath::RInterpTo(chrRot, lookRot, deltaSecond * 10.f, 0.3f);
 
 		ctrlPawn->SetActorRotation(newRot);
 	}
@@ -186,4 +199,36 @@ void ARSMonsterAIController::RotateToFocus(FVector lookFor, float deltaSecond)
 	{
 		return;
 	}
+}
+
+void ARSMonsterAIController::CalculateMoveLength()
+{
+	if (bIsChase)
+	{
+		APawn* ctrlPawn = GetPawn();
+		if (ctrlPawn)
+		{
+			curPos = ctrlPawn->GetActorLocation();
+			moveDistance += FVector::Dist(curPos, priviousPos);
+		}
+	}
+}
+
+void ARSMonsterAIController::SetIsChase(bool bIsValid)
+{
+	bIsChase = bIsValid;
+}
+
+void ARSMonsterAIController::SetPriviousPos()
+{
+	APawn* ctrlPawn = GetPawn();
+	if (ctrlPawn)
+	{
+		priviousPos = ctrlPawn->GetActorLocation();
+	}
+}
+
+bool ARSMonsterAIController::IsStillChase()
+{
+	return chaseLength < moveDistance ? false : true;
 }

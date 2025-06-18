@@ -86,6 +86,8 @@ public:
 	void SetBossInfoWidgetHidden();
 	void UpdateBossTargetPercent(const float NewPercent);
 	URSBossHPBarWidget* GetBossInfoWidget() const;
+	URSDunMainHUDWidget* GetDunMainHudWidget();
+
 
 private:
 	// 로딩 위젯

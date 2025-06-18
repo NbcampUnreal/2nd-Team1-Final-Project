@@ -6,6 +6,10 @@
 #include "RSBossHPBarWidget.h"
 #include "RSInteractWidget.h"
 #include "RSPlayerInventoryWidget.h"
+#include "RSDungeonGameModeBase.h"
+#include "EngineUtils.h"
+#include "RSMapGenerator.h"
+#include "RSMiniMap.h"
 #include "GameFramework/PlayerController.h"
 
 void URSDunMainHUDWidget::NativeConstruct()
@@ -30,6 +34,24 @@ void URSDunMainHUDWidget::NativeConstruct()
     if (InteractWidget)
     {
 		InteractWidget->SetVisibility(ESlateVisibility::Hidden);
+    }
+
+    if (MiniMapWidget)
+    {
+
+        if (UWorld* World = GetWorld())
+        {
+            if (ARSDungeonGameModeBase* DungeonGM = Cast<ARSDungeonGameModeBase>(UGameplayStatics::GetGameMode(World)))
+            {
+                if (ARSMapGenerator* MapGen = DungeonGM->GetMapGenerator())
+                {
+                    MiniMapWidget->InitializeMap(
+                        MapGen->GetAllTileCoords(),
+                        MapGen->GetBossTileCoord()
+                    );
+                }
+            }
+        }
     }
 
     if (WBP_BossInfoWidget)
@@ -149,6 +171,14 @@ void URSDunMainHUDWidget::HideInteractWidget()
     if (InteractWidget)
     {
         InteractWidget->SetVisibility(ESlateVisibility::Hidden);
+    }
+}
+
+void URSDunMainHUDWidget::UpdateMiniMapPlayerPosition(const FIntPoint& TileCoord) //플레이어가 다른 타일에 들어갔음을때 미니맵을 업데이트 시킬 함수
+{
+    if (MiniMapWidget)
+    {
+        MiniMapWidget->UpdatePlayerPosition(TileCoord);
     }
 }
 

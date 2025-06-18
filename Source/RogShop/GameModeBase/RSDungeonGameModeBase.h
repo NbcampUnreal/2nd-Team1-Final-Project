@@ -50,6 +50,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<ARSMapGenerator> MapGeneratorInstance; // 인스턴스
+public:
+	ARSMapGenerator* GetMapGenerator();
 #pragma endregion
 
 #pragma region SpawnManager

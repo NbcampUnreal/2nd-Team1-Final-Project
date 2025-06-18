@@ -8,6 +8,7 @@
 #include "WeaponAttackData.h"
 #include "ItemInfoData.generated.h"
 
+class UNiagaraSystem;
 class URSBaseRelic;
 
 UENUM(BlueprintType)
@@ -67,6 +68,12 @@ struct ROGSHOP_API FDungeonWeaponData : public FTableRowBase
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<ARSDungeonItemBase> WeaponClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UNiagaraSystem> WeaponTrail;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UNiagaraSystem> HitImpactEffect;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FWeaponAttackData> NormalAttackData;
