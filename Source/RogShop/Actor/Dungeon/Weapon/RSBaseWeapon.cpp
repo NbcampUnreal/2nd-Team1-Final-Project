@@ -5,6 +5,8 @@
 #include "GameFramework/Character.h"
 #include "Components/BoxComponent.h"
 #include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "RSDataSubsystem.h"
 #include "ItemInfoData.h"
 #include "WeaponAttackData.h"
@@ -25,9 +27,9 @@ ARSBaseWeapon::ARSBaseWeapon()
 	BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BoxComp->SetGenerateOverlapEvents(false);
 
-	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara"));
-	NiagaraComp->SetupAttachment(SceneComp);
-	NiagaraComp->SetAutoActivate(false);
+	TrailNiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara"));
+	TrailNiagaraComp->SetupAttachment(SceneComp);
+	TrailNiagaraComp->SetAutoActivate(false);
 
 	SetActorEnableCollision(false);
 }
@@ -134,18 +136,23 @@ float ARSBaseWeapon::GetStrongAttackMontageDamage(int32 MontageIndex) const
 
 void ARSBaseWeapon::StartTrail()
 {
-	if (NiagaraComp)
+	if (TrailNiagaraComp)
 	{
-		NiagaraComp->Activate();
+		TrailNiagaraComp->Activate();
 	}
 }
 
 void ARSBaseWeapon::EndTrail()
 {
-	if (NiagaraComp)
+	if (TrailNiagaraComp)
 	{
-		NiagaraComp->Deactivate();
+		TrailNiagaraComp->Deactivate();
 	}
+}
+
+void ARSBaseWeapon::SpawnHitImpactEffect(FVector TargetLocation)
+{
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitImpactEffect, TargetLocation);
 }
 
 FName ARSBaseWeapon::GetDataTableKey() const
@@ -188,11 +195,13 @@ void ARSBaseWeapon::Initialization()
 		NormalAttackDatas = WeaponData->NormalAttackData;
 		StrongAttackDatas = WeaponData->StrongAttackData;
 
-		NiagaraComp->SetAsset(WeaponData->WeaponTrail);
+		TrailNiagaraComp->SetAsset(WeaponData->WeaponTrail);
+
+		HitImpactEffect = WeaponData->HitImpactEffect;
 
 		//TODO : 서승우님이 나이아가라 크기 조절에 대해 알아봐주시고 아래 코드 사용하기
 		//FVector BoxExtent = BoxComp->GetScaledBoxExtent();
 		//FVector BoxLength = BoxExtent * 2;
-		//NiagaraComp->SetVectorParameter(TEXT("MeshBounds"), BoxLength);
+		//TrailNiagaraComp->SetVectorParameter(TEXT("MeshBounds"), BoxLength);
 	}
 }

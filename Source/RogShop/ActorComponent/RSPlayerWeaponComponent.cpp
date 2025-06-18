@@ -573,6 +573,8 @@ void URSPlayerWeaponComponent::PerformBoxSweepAttack()
 
 							UGameplayStatics::ApplyPointDamage(HitActor, TotalDamage, HitDirection, Hit, OwnerController, WeaponActors[Index], UDamageType::StaticClass());
 
+							WeaponActors[Index]->SpawnHitImpactEffect(Hit.ImpactPoint);
+
 							// 무기 데미지를 중복으로 주는 경우를 방지하기 위한 배열에 값 추가
 							DamagedActors.Add(HitActor);
 
