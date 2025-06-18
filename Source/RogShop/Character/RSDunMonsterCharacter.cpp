@@ -10,6 +10,7 @@
 #include "Components/ProgressBar.h"
 #include "RSDataSubsystem.h"
 #include "RSDungeonGameModeBase.h"
+#include "Perception/AISense_Damage.h"
 
 TArray<ARSDunMonsterCharacter*> ARSDunMonsterCharacter::AllMonsters;
 
@@ -174,6 +175,7 @@ void ARSDunMonsterCharacter::OnEveryMontageEnded(UAnimMontage* montage, bool bIn
 
 float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	UAISense_Damage* damagePerception;
 	RS_LOG("TakeDamage 들어옴");
 
 	if (GetIsDead()) return 0.f;	// 죽으면 데미지 안들어오게 방지
@@ -193,6 +195,8 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 		GetHP(),
 		GetMaxHP()
 	);
+
+	damagePerception->ReportDamageEvent(GetWorld(), this, DamageCauser, Damage, this->GetActorLocation(), DamageCauser->GetActorLocation(), TEXT("Default"));
 
 	return Damage;
 }
