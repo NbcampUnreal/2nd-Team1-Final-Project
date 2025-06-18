@@ -153,3 +153,8 @@ void ARSDunPlayerController::BindCharacterDelegates()
     }
 
 }
+
+URSDunMainHUDWidget* ARSDunPlayerController::GetDunMainHudWidget()
+{
+    return RSDunMainHUDWidget;
+}

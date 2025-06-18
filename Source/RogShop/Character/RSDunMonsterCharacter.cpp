@@ -11,6 +11,7 @@
 #include "RSDataSubsystem.h"
 #include "RSDungeonGameModeBase.h"
 #include "Perception/AISense_Damage.h"
+#include "RSMonsterHPBarWidget.h"
 
 TArray<ARSDunMonsterCharacter*> ARSDunMonsterCharacter::AllMonsters;
 
@@ -364,17 +365,14 @@ void ARSDunMonsterCharacter::OnDeath()
 		ctrl->Destroy();
 	}
 
-	if (GetFMonsterData())
+	ARSDungeonGameModeBase* DungeonGameMode = Cast<ARSDungeonGameModeBase>(GetWorld()->GetAuthGameMode());
+	if (GetFMonsterData() && DungeonGameMode)
 	{
 		// 몬스터의 타입이 보스인 경우 게임모드에 보스가 죽었다고 알린다.
 		EMonsterType CurMonsterType = GetFMonsterData()->MonsterType;
 		if (CurMonsterType == EMonsterType::Boss)
-		{
-			ARSDungeonGameModeBase* DungeonGameMode = Cast<ARSDungeonGameModeBase>(GetWorld()->GetAuthGameMode());
-			if (DungeonGameMode)
-			{
-				DungeonGameMode->OnBossDead.Broadcast();
-			}
+		{			
+			DungeonGameMode->OnBossDead.Broadcast();
 		}
 	}
 }
@@ -495,15 +493,17 @@ void ARSDunMonsterCharacter::UpdateOverheadEnemyHP(float const damage)
 		return;
 	}
 
-	// 2. 그 위젯의 실체에서 HPBar 프로그레스 바 부분 가져와서 퍼센트 업데이트 해주기
-	if (UProgressBar* HPBar = Cast<UProgressBar>(OverheadWidgetInstance->GetWidgetFromName(TEXT("Monster_HP_Bar"))))
+	// 2. 타입 캐스팅: UUserWidget → URSMonsterHPBarWidget
+	URSMonsterHPBarWidget* HPWidget = Cast<URSMonsterHPBarWidget>(OverheadWidgetInstance);
+	if (!HPWidget)
 	{
-		// HPPercent = 0.0 ~ 1.0 범위의 값이 나오도록 설정
-		const float HPPercent = (GetMaxHP() > 0.f) ? (float)GetHP() / (float)GetMaxHP() : 0.f;
-		HPBar->SetPercent(HPPercent);
-		HPBar->SetFillColorAndOpacity(FLinearColor(1.f, 0.f, 0.f, 0.8f));	// 살짝 투명한 빨강
-
+		return;
 	}
+	
+	// HPPercent = 0.0 ~ 1.0 범위의 값이 나오도록 설정
+	const float HPPercent = (GetMaxHP() > 0.f) ? (float)GetHP() / (float)GetMaxHP() : 0.f;
+	HPWidget->UpdateTargetPercent(HPPercent);
+
 }
 
 FName ARSDunMonsterCharacter::GetMonsterRowName() const

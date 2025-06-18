@@ -538,12 +538,12 @@ void URSPlayerWeaponComponent::PerformBoxSweepAttack()
 							// 일반 공격
 							if (AttackType == EAttackType::NormalAttack)
 							{
-								WeaponDamage = WeaponActors[Index]->GetNormalAttackMontageDamage(Index);
+								WeaponDamage = WeaponActors[Index]->GetNormalAttackMontageDamage(ComboIndex - 1);
 							}
 							// 강 공격
 							else if (AttackType == EAttackType::StrongAttack)
 							{
-								WeaponDamage = WeaponActors[Index]->GetStrongAttackMontageDamage(Index);
+								WeaponDamage = WeaponActors[Index]->GetStrongAttackMontageDamage(ComboIndex - 1);
 							}
 
 							float AttackPower = OwnerCharacter->GetAttackPower();
