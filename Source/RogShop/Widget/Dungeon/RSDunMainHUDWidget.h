@@ -10,6 +10,7 @@ class URSPlayerStatusWidget;
 class URSInGameMenuWidget;
 class URSPlayerInventoryWidget;
 class URSInteractWidget;
+class URSMiniMap;
 
 UCLASS()
 class ROGSHOP_API URSDunMainHUDWidget : public UUserWidget
@@ -27,6 +28,7 @@ public:
 
     void ShowInteractWidget();
     void HideInteractWidget();
+    void UpdateMiniMapPlayerPosition(const FIntPoint& TileCoord);
 
 private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
@@ -40,4 +42,7 @@ private:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<URSInteractWidget> InteractWidget;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
+    TObjectPtr<URSMiniMap> MiniMapWidget;
 };

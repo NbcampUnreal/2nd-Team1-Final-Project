@@ -10,6 +10,7 @@
 #include "Components/ProgressBar.h"
 #include "RSDataSubsystem.h"
 #include "RSDungeonGameModeBase.h"
+#include "Perception/AISense_Damage.h"
 #include "RSMonsterHPBarWidget.h"
 
 TArray<ARSDunMonsterCharacter*> ARSDunMonsterCharacter::AllMonsters;
@@ -175,6 +176,7 @@ void ARSDunMonsterCharacter::OnEveryMontageEnded(UAnimMontage* montage, bool bIn
 
 float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	UAISense_Damage* damagePerception;
 	RS_LOG("TakeDamage 들어옴");
 
 	if (GetIsDead()) return 0.f;	// 죽으면 데미지 안들어오게 방지
@@ -194,6 +196,8 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 		GetHP(),
 		GetMaxHP()
 	);
+
+	damagePerception->ReportDamageEvent(GetWorld(), this, DamageCauser, Damage, this->GetActorLocation(), DamageCauser->GetActorLocation(), TEXT("Default"));
 
 	return Damage;
 }
@@ -361,17 +365,14 @@ void ARSDunMonsterCharacter::OnDeath()
 		ctrl->Destroy();
 	}
 
-	if (GetFMonsterData())
+	ARSDungeonGameModeBase* DungeonGameMode = Cast<ARSDungeonGameModeBase>(GetWorld()->GetAuthGameMode());
+	if (GetFMonsterData() && DungeonGameMode)
 	{
 		// 몬스터의 타입이 보스인 경우 게임모드에 보스가 죽었다고 알린다.
 		EMonsterType CurMonsterType = GetFMonsterData()->MonsterType;
 		if (CurMonsterType == EMonsterType::Boss)
-		{
-			ARSDungeonGameModeBase* DungeonGameMode = Cast<ARSDungeonGameModeBase>(GetWorld()->GetAuthGameMode());
-			if (DungeonGameMode)
-			{
-				DungeonGameMode->OnBossDead.Broadcast();
-			}
+		{			
+			DungeonGameMode->OnBossDead.Broadcast();
 		}
 	}
 }
