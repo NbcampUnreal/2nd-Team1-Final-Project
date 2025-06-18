@@ -8,6 +8,7 @@
 #include "RSBaseWeapon.generated.h"
 
 class UBoxComponent;
+class UNiagaraComponent;
 
 struct FWeaponAttackData;
 
@@ -17,11 +18,9 @@ class ROGSHOP_API ARSBaseWeapon : public ARSDungeonItemBase
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ARSBaseWeapon();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 // 컴포넌트
@@ -31,10 +30,15 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USceneComponent> SceneComp;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMeshComponent> MeshComp;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UBoxComponent> BoxComp;	// 데미지 로직을 위한 콜리전 용도의 컴포넌트
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UNiagaraComponent> NiagaraComp;
 
 // 애니메이션
 public:
@@ -44,13 +48,9 @@ public:
 
 	const TArray<UAnimMontage*> GetNormalAttackMontages() const;
 
-	void SetNormalAttackDatas(TArray<FWeaponAttackData> NewNormalAttackDatas);
-
 	UAnimMontage* GetStrongAttackMontage(int32 Index) const;
 
 	const TArray<UAnimMontage*> GetStrongAttackMontages() const;
-
-	void SetStrongAttackDatas(TArray<FWeaponAttackData> NewStrongAttackDatas);
 		
 private:
 	// 애니메이션들을 캐싱한다.
@@ -74,10 +74,19 @@ public:
 
 	float GetStrongAttackMontageDamage(int32 MontageIndex) const;
 
+// 나이아가라
+public:
+	void StartTrail();
+
+	void EndTrail();
+
 // 데이터 테이블의 RowName을 ID값으로 사용한다.
 public:
 	FName GetDataTableKey() const;
 	void SetDataTableKey(FName NewDataTableKey);
+
+private:
+	void Initialization();
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info", meta = (AllowPrivateAccess = "true"))

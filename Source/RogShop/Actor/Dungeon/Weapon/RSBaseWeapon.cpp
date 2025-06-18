@@ -4,12 +4,13 @@
 #include "RSBaseWeapon.h"
 #include "GameFramework/Character.h"
 #include "Components/BoxComponent.h"
+#include "NiagaraComponent.h"
+#include "RSDataSubsystem.h"
+#include "ItemInfoData.h"
 #include "WeaponAttackData.h"
 
-// Sets default values
 ARSBaseWeapon::ARSBaseWeapon()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
@@ -24,12 +25,13 @@ ARSBaseWeapon::ARSBaseWeapon()
 	BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BoxComp->SetGenerateOverlapEvents(false);
 
-	SetActorEnableCollision(false);
+	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara"));
+	NiagaraComp->SetupAttachment(SceneComp);
+	NiagaraComp->SetAutoActivate(false);
 
-	//WeaponDamage = 0.f; TODO : 여기 WeaponDamage 안 쓰이고 있는데 임시 주석 처리했습니다.
+	SetActorEnableCollision(false);
 }
 
-// Called when the game starts or when spawned
 void ARSBaseWeapon::BeginPlay()
 {
 	Super::BeginPlay();
@@ -68,11 +70,6 @@ const TArray<UAnimMontage*> ARSBaseWeapon::GetNormalAttackMontages() const
 	return NormalAttackMontages;
 }
 
-void ARSBaseWeapon::SetNormalAttackDatas(TArray<FWeaponAttackData> NewNormalAttackDatas)
-{
-	NormalAttackDatas = NewNormalAttackDatas;
-}
-
 UAnimMontage* ARSBaseWeapon::GetStrongAttackMontage(int32 Index) const
 {
 	if (StrongAttackDatas.Num() > Index)
@@ -93,11 +90,6 @@ const TArray<UAnimMontage*> ARSBaseWeapon::GetStrongAttackMontages() const
 	}
 
 	return StrongAttackMontages;
-}
-
-void ARSBaseWeapon::SetStrongAttackDatas(TArray<FWeaponAttackData> NewStrongAttackDatas)
-{
-	StrongAttackDatas = NewStrongAttackDatas;
 }
 
 void ARSBaseWeapon::StartOverlap()
@@ -140,6 +132,22 @@ float ARSBaseWeapon::GetStrongAttackMontageDamage(int32 MontageIndex) const
 	return 0.0f;
 }
 
+void ARSBaseWeapon::StartTrail()
+{
+	if (NiagaraComp)
+	{
+		NiagaraComp->Activate();
+	}
+}
+
+void ARSBaseWeapon::EndTrail()
+{
+	if (NiagaraComp)
+	{
+		NiagaraComp->Deactivate();
+	}
+}
+
 FName ARSBaseWeapon::GetDataTableKey() const
 {
 	return DataTableKey;
@@ -148,4 +156,43 @@ FName ARSBaseWeapon::GetDataTableKey() const
 void ARSBaseWeapon::SetDataTableKey(FName NewDataTableKey)
 {
 	DataTableKey = NewDataTableKey;
+
+	// 데이터 테이블 키 값으로 현재 액터 초기화
+	Initialization();
+}
+
+void ARSBaseWeapon::Initialization()
+{
+	UGameInstance* CurGameInstance = GetWorld()->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	UDataTable* WeaponDetailDataTable = DataSubsystem->WeaponDetail;
+	if (!WeaponDetailDataTable)
+	{
+		return;
+	}
+
+	FDungeonWeaponData* WeaponData = WeaponDetailDataTable->FindRow<FDungeonWeaponData>(DataTableKey, TEXT("Get WeaponData"));
+
+	if (WeaponData)
+	{
+		NormalAttackDatas = WeaponData->NormalAttackData;
+		StrongAttackDatas = WeaponData->StrongAttackData;
+
+		NiagaraComp->SetAsset(WeaponData->WeaponTrail);
+
+		//TODO : 서승우님이 나이아가라 크기 조절에 대해 알아봐주시고 아래 코드 사용하기
+		//FVector BoxExtent = BoxComp->GetScaledBoxExtent();
+		//FVector BoxLength = BoxExtent * 2;
+		//NiagaraComp->SetVectorParameter(TEXT("MeshBounds"), BoxLength);
+	}
 }

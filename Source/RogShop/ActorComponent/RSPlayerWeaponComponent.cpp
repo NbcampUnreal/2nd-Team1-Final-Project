@@ -218,6 +218,24 @@ void URSPlayerWeaponComponent::ResetCombo()
 	ComboIndex = 0;
 }
 
+void URSPlayerWeaponComponent::StartTrail()
+{
+	int8 Index = static_cast<int8>(WeaponSlot) - 1;
+	if (WeaponActors.IsValidIndex(Index))
+	{
+		WeaponActors[Index]->StartTrail();
+	}
+}
+
+void URSPlayerWeaponComponent::EndTrail()
+{
+	int8 Index = static_cast<int8>(WeaponSlot) - 1;
+	if (WeaponActors.IsValidIndex(Index))
+	{
+		WeaponActors[Index]->EndTrail();
+	}
+}
+
 void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 {
 	// 슬롯의 크기가 잘못 설정된 경우
@@ -674,9 +692,6 @@ void URSPlayerWeaponComponent::LoadRequested()
 
 			if (SpawnWeapon)
 			{
-				SpawnWeapon->SetNormalAttackDatas(WeaponData->NormalAttackData);
-				SpawnWeapon->SetStrongAttackDatas(WeaponData->StrongAttackData);
-
 				SpawnWeapon->SetDataTableKey(CurWeaponName);
 				EquipWeaponToSlot(SpawnWeapon);
 			}
