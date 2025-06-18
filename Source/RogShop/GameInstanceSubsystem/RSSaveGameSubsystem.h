@@ -43,5 +43,7 @@ public:
 	const FString TycoonSaveSlot = TEXT("TycoonGame");
 	const FString TycoonTileMapSaveSlot = TEXT("TileMapSaveSlot");
 
+	//옵션
+	const FString OptionSaveSlotName = TEXT("OptionSaveSlot");
 	
 };
