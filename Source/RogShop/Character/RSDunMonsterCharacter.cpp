@@ -361,17 +361,14 @@ void ARSDunMonsterCharacter::OnDeath()
 		ctrl->Destroy();
 	}
 
-	if (GetFMonsterData())
+	ARSDungeonGameModeBase* DungeonGameMode = Cast<ARSDungeonGameModeBase>(GetWorld()->GetAuthGameMode());
+	if (GetFMonsterData() && DungeonGameMode)
 	{
 		// 몬스터의 타입이 보스인 경우 게임모드에 보스가 죽었다고 알린다.
 		EMonsterType CurMonsterType = GetFMonsterData()->MonsterType;
 		if (CurMonsterType == EMonsterType::Boss)
-		{
-			ARSDungeonGameModeBase* DungeonGameMode = Cast<ARSDungeonGameModeBase>(GetWorld()->GetAuthGameMode());
-			if (DungeonGameMode)
-			{
-				DungeonGameMode->OnBossDead.Broadcast();
-			}
+		{			
+			DungeonGameMode->OnBossDead.Broadcast();
 		}
 	}
 }
