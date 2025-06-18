@@ -8,6 +8,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSaveRequested);
 
+class UOptionSaveGame;
+
 UCLASS()
 class ROGSHOP_API URSSaveGameSubsystem : public UGameInstanceSubsystem
 {
@@ -30,6 +32,12 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnSaveRequested OnSaveRequested;	// 저장 요청을 의미하는 이벤트 디스패처
 
+	UFUNCTION(BlueprintCallable)
+	void SaveOptionSettings(float MasterVolume, float BGMVolume, float SFXVolume);
+
+	UFUNCTION(BlueprintCallable)
+	UOptionSaveGame* LoadSettings();
+
 // 세이브 슬롯 네임
 public:
 	// 던전
@@ -43,5 +51,8 @@ public:
 	const FString TycoonSaveSlot = TEXT("TycoonGame");
 	const FString TycoonTileMapSaveSlot = TEXT("TileMapSaveSlot");
 
+
+	//옵션
+	const FString SavedOptionSlot = TEXT("SavedOption");
 	
 };

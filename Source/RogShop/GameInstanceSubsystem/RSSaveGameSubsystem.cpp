@@ -8,6 +8,7 @@
 #include "RogShop/Actor/Tycoon/Tile/RSIceBoxTile.h"
 #include "Tycoon/RSTycoonSaveGame.h"
 #include "Tycoon/RSTycoonTileMapSaveGame.h"
+#include "Option/OptionSaveGame.h"
 
 void URSSaveGameSubsystem::AddIngredientDungeonToTycoon(FName IngredientKey, int32 Amount)
 {
@@ -137,4 +138,25 @@ bool URSSaveGameSubsystem::DoesTycoonSaveFileExist()
 	}
 
 	return false;
+}
+void URSSaveGameSubsystem::SaveOptionSettings(float MasterVolume, float BGMVolume, float SFXVolume)
+{
+	UOptionSaveGame* SaveGameInstance = Cast<UOptionSaveGame>(
+		UGameplayStatics::CreateSaveGameObject(UOptionSaveGame::StaticClass()));
+
+	SaveGameInstance->MasterVolume = MasterVolume;
+	SaveGameInstance->BGMVolume = BGMVolume;
+	SaveGameInstance->SFXVolume = SFXVolume;
+
+	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SavedOptionSlot, 0);
+
+}
+
+UOptionSaveGame* URSSaveGameSubsystem::LoadSettings()
+{
+	if (UGameplayStatics::DoesSaveGameExist(SavedOptionSlot, 0))
+	{
+		return Cast<UOptionSaveGame>(UGameplayStatics::LoadGameFromSlot(SavedOptionSlot, 0));
+	}
+	return nullptr;
 }

@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameUserSettings.h"
 #include "Option/OptionSaveGame.h"
+#include "RSSaveGameSubsystem.h"
 
 void UOptionMenuWidget::NativeConstruct()
 {
@@ -47,28 +48,24 @@ void UOptionMenuWidget::NativeConstruct()
 
 void UOptionMenuWidget::LoadSettings()
 {
-    if (UGameplayStatics::DoesSaveGameExist(TEXT("OptionSaveSlot"), 0))
-    {
-        UOptionSaveGame* LoadedGame = Cast<UOptionSaveGame>(
-            UGameplayStatics::LoadGameFromSlot(TEXT("OptionSaveSlot"), 0));
+    URSSaveGameSubsystem* OptionSaveSubsysyem = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
+    UOptionSaveGame* LoadedData = OptionSaveSubsysyem->LoadSettings();
 
-        if (LoadedGame)
-        {
-            if (MasterVolumeSlider)
-                MasterVolumeSlider->SetValue(LoadedGame->MasterVolume);
-            if (BGMVolumeSlider)
-                BGMVolumeSlider->SetValue(LoadedGame->BGMVolume);
-            if (SFXVolumeSlider)
-                SFXVolumeSlider->SetValue(LoadedGame->SFXVolume);
-            if (ResolutionComboBox)
-                ResolutionComboBox->SetSelectedIndex(LoadedGame->ResolutionIndex);
-            if (WindowModeComboBox)
-                WindowModeComboBox->SetSelectedIndex(LoadedGame->WindowModeIndex);
-        }
+    if (LoadedData)
+    {
+        if (MasterVolumeSlider)
+            MasterVolumeSlider->SetValue(LoadedData->MasterVolume);
+        if (BGMVolumeSlider)
+            BGMVolumeSlider->SetValue(LoadedData->BGMVolume);
+        if (SFXVolumeSlider)
+            SFXVolumeSlider->SetValue(LoadedData->SFXVolume);
+        if (ResolutionComboBox)
+            ResolutionComboBox->SetSelectedIndex(LoadedData->ResolutionIndex);
+        if (WindowModeComboBox)
+            WindowModeComboBox->SetSelectedIndex(LoadedData->WindowModeIndex);
     }
     else
     {
-        // 기본값 선택
         if (ResolutionComboBox)
             ResolutionComboBox->SetSelectedIndex(0);
         if (WindowModeComboBox)
@@ -76,23 +73,18 @@ void UOptionMenuWidget::LoadSettings()
     }
 }
 
+
 void UOptionMenuWidget::SaveSettings()
 {
-    UOptionSaveGame* SaveGameInstance = Cast<UOptionSaveGame>(
-        UGameplayStatics::CreateSaveGameObject(UOptionSaveGame::StaticClass()));
-
-    if (MasterVolumeSlider)
-        SaveGameInstance->MasterVolume = MasterVolumeSlider->GetValue();
-    if (BGMVolumeSlider)
-        SaveGameInstance->BGMVolume = BGMVolumeSlider->GetValue();
-    if (SFXVolumeSlider)
-        SaveGameInstance->SFXVolume = SFXVolumeSlider->GetValue();
-    if (ResolutionComboBox)
-        SaveGameInstance->ResolutionIndex = ResolutionComboBox->GetSelectedIndex();
-    if (WindowModeComboBox)
-        SaveGameInstance->WindowModeIndex = WindowModeComboBox->GetSelectedIndex();
-
-    UGameplayStatics::SaveGameToSlot(SaveGameInstance, TEXT("OptionSaveSlot"), 0);
+    URSSaveGameSubsystem* OptionSaveSubsysyem = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
+    if (OptionSaveSubsysyem && MasterVolumeSlider && BGMVolumeSlider && SFXVolumeSlider)
+    {
+        OptionSaveSubsysyem->SaveOptionSettings(
+            MasterVolumeSlider->GetValue(),
+            BGMVolumeSlider->GetValue(),
+            SFXVolumeSlider->GetValue()
+        );
+    }
 }
 
 void UOptionMenuWidget::OnApplyButtonClicked()
