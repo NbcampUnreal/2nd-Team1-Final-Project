@@ -13,6 +13,18 @@ void URSAttackAnimNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAn
 
 	RS_LOG_C("RSAttackAnimNotifyState Begin", FColor::Blue);
 
+	// 현재 무기 Trail 켜기
+	ARSDunPlayerCharacter* PlayerCharacter = MeshComp->GetOwner<ARSDunPlayerCharacter>();
+	if (!PlayerCharacter)
+	{
+		return;
+	}
+
+	URSPlayerWeaponComponent* WeaponComp = PlayerCharacter->GetRSPlayerWeaponComponent();
+	if (WeaponComp)
+	{
+		WeaponComp->StartTrail();
+	}
 }
 
 void URSAttackAnimNotifyState::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)
@@ -38,7 +50,6 @@ void URSAttackAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnim
 
 	RS_LOG_C("RSAttackAnimNotifyState End", FColor::Orange);
 
-	// 데미지를 가했던 액터들을 저장한 배열 초기화
 	ARSDunPlayerCharacter* PlayerCharacter = MeshComp->GetOwner<ARSDunPlayerCharacter>();
 	if (!PlayerCharacter)
 	{
@@ -48,6 +59,10 @@ void URSAttackAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnim
 	URSPlayerWeaponComponent* WeaponComp = PlayerCharacter->GetRSPlayerWeaponComponent();
 	if (WeaponComp)
 	{
+		// 현재 무기 Trail 끄기
+		WeaponComp->EndTrail();
+
+		// 데미지를 가했던 액터들을 저장한 배열 초기화
 		WeaponComp->ResetDamagedActors();
 	}
 }

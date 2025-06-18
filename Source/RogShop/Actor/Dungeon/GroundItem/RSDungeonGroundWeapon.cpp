@@ -7,8 +7,6 @@
 #include "RSBaseWeapon.h"
 #include "RSDunPlayerCharacter.h"
 #include "RSPlayerWeaponComponent.h"
-#include "RSDataSubsystem.h"
-#include "ItemInfoData.h"
 
 ARSDungeonGroundWeapon::ARSDungeonGroundWeapon()
 {
@@ -22,24 +20,6 @@ void ARSDungeonGroundWeapon::Interact(ARSDunPlayerCharacter* Interactor)
 		return;
 	}
 
-	UGameInstance* CurGameInstance = Interactor->GetGameInstance();
-	if (!CurGameInstance)
-	{
-		return;
-	}
-
-	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
-	if (!DataSubsystem)
-	{
-		return;
-	}
-
-	UDataTable* WeaponDetailDataTable = DataSubsystem->WeaponDetail;
-	if (!WeaponDetailDataTable)
-	{
-		return;
-	}
-
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.Owner = Interactor;
 	SpawnParameters.Instigator = Interactor;
@@ -49,11 +29,6 @@ void ARSDungeonGroundWeapon::Interact(ARSDunPlayerCharacter* Interactor)
 	URSPlayerWeaponComponent* RSPlayerWeaponComponent = Interactor->GetRSPlayerWeaponComponent();
 	if (SpawnWeapon && RSPlayerWeaponComponent)
 	{
-		FDungeonWeaponData* WeaponData = WeaponDetailDataTable->FindRow<FDungeonWeaponData>(DataTableKey, TEXT("Get WeaponData"));
-
-		SpawnWeapon->SetNormalAttackDatas(WeaponData->NormalAttackData);
-		SpawnWeapon->SetStrongAttackDatas(WeaponData->StrongAttackData);
-
 		SpawnWeapon->SetDataTableKey(DataTableKey);
 		RSPlayerWeaponComponent->EquipWeaponToSlot(SpawnWeapon);
 

@@ -141,9 +141,6 @@ bool URSDunItemWidget::BuyItem()
 
             if (SpawnedWeapon && WeaponComp)
             {
-                SpawnedWeapon->SetNormalAttackDatas(WeaponClassData->NormalAttackData);
-                SpawnedWeapon->SetStrongAttackDatas(WeaponClassData->StrongAttackData);
-
                 SpawnedWeapon->SetDataTableKey(CurrentRowName);
                 WeaponComp->EquipWeaponToSlot(SpawnedWeapon);
             }
