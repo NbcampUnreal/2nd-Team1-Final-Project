@@ -54,9 +54,11 @@ protected:
 public:
 	void OpenBuyTileLayout();
 	void CloseBuyTileLayout();
-	UFUNCTION()
 	void OpenBuyNPCLayout();
 	void CloseBuyNPCLayout();
+
+	UFUNCTION()
+	void OpenAndCloseNPCLayout();
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))

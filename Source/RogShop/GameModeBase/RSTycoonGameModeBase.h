@@ -7,6 +7,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "RSTycoonGameModeBase.generated.h"
 
+class URSTycoonEventViewWidget;
+class URSTycoonEvent;
 class ARSTycoonNPC;
 class ARSTycoonCustomerCharacter;
 class URSTycoonInventoryComponent;
@@ -47,6 +49,7 @@ public:
 	void StartWaitMode();
 	
 	void StartManagementMode();
+
 	
 	float GetGameTime() const; //게임 경과 시간을 반환해줌
 	const TArray<FFoodOrder>& GetOrders() const { return FoodOrders; }
@@ -96,13 +99,12 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	float SalePlayMinute = 5; //게임 플레이 시간, 기본 5분
-
-	ETycoonGameMode State; //현재 레벨이 어떤 모드인가
-	FTimerHandle CustomerTimerHandle; //손님 등장 타이머
-	FTimerHandle GameTimerHandle; //게임 경과 타이머
-
+	
 	// 사운드
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	TObjectPtr<USoundBase> CustomerAddSound;
-
+	
+	ETycoonGameMode State; //현재 레벨이 어떤 모드인가
+	FTimerHandle CustomerTimerHandle; //손님 등장 타이머
+	FTimerHandle GameTimerHandle; //게임 경과 타이머
 };

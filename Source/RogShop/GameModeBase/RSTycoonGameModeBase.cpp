@@ -18,6 +18,8 @@
 #include "RSTycoonSaveGame.h"
 #include "RogShop/Actor/Tycoon/RSTileMap.h"
 #include "RogShop/Actor/Tycoon/Tile/RSIceBoxTile.h"
+#include "RogShop/Object/RSTycoonEvent.h"
+#include "RogShop/Widget/Tycoon/RSTycoonEventViewWidget.h"
 
 
 ARSTycoonGameModeBase::ARSTycoonGameModeBase()
@@ -131,8 +133,10 @@ void ARSTycoonGameModeBase::EndSaleMode()
 void ARSTycoonGameModeBase::StartWaitMode()
 {
 	State = ETycoonGameMode::Wait;
-
-	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->StartWaitMode();
+	
+	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	PlayerController->CanSaleMode();	
+	PlayerController->StartWaitMode();
 }
 
 void ARSTycoonGameModeBase::StartManagementMode()
@@ -156,7 +160,7 @@ FFoodOrder ARSTycoonGameModeBase::GetOrderToCook()
 void ARSTycoonGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 #if WITH_EDITOR
 	GetGameInstance<URSGameInstance>()->SetDebugLogEnabled(true);
 #endif
@@ -213,12 +217,7 @@ void ARSTycoonGameModeBase::CreateCustomer()
 
 	if (CustomerAddSound)
 	{
-		UGameplayStatics::SpawnSoundAtLocation(
-			this,
-			CustomerAddSound,
-			SpawnDoorTile->GetActorLocation(),
-			FRotator::ZeroRotator
-		);
+		UGameplayStatics::SpawnSoundAtLocation(this, CustomerAddSound, SpawnDoorTile->GetActorLocation());
 	}
 }
 
@@ -295,11 +294,11 @@ void ARSTycoonGameModeBase::LoadGameData()
 		//최초 파일 생성
 		SaveGame = Cast<URSTycoonSaveGame>(UGameplayStatics::CreateSaveGameObject(URSTycoonSaveGame::StaticClass()));
 		SaveGame->SetDefault();
-		
+
 		//최초 파일 저장
 		UGameplayStatics::SaveGameToSlot(SaveGame, TycoonSaveSlot, 0);
 	}
-	
+
 	Controller->GetInventoryComponent()->LoadItemData();
 	Controller->GetInventoryComponent()->UpdateInventoryWidget();
 	Controller->SetGold(SaveGame->Money);

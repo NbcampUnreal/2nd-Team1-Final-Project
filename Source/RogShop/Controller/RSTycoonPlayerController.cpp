@@ -18,6 +18,8 @@
 #include "RogShop/Actor/Tycoon/RSTileMap.h"
 #include "RogShop/Actor/Tycoon/RSTycoonCamera.h"
 #include "RogShop/Actor/Tycoon/Tile/RSBaseTile.h"
+#include "RogShop/Object/RSTycoonEvent.h"
+#include "RogShop/Widget/Tycoon/RSTycoonEventViewWidget.h"
 #include "RogShop/Widget/Tycoon/RSTycoonManagementWidget.h"
 #include "RogShop/Widget/Tycoon/RSTycoonNPCInfoWidget.h"
 #include "RogShop/Widget/Tycoon/RSTycoonSaleResultWidget.h"
@@ -74,6 +76,37 @@ void ARSTycoonPlayerController::StartManagementMode()
 	SetCameraLocationToCenter();
 }
 
+void ARSTycoonPlayerController::SetSaleEnable(bool Value)
+{
+	WaitWidget->SetEnableSaleButton(Value);
+}
+
+bool ARSTycoonPlayerController::CanSaleMode()
+{
+	UWorld* World = GetWorld();
+	
+	//이벤트 검사
+	for (auto& Event : NeedEventsForSale)
+	{
+		URSTycoonEvent* EventObject = Event->GetDefaultObject<URSTycoonEvent>();
+		if (EventObject->Condition(World))
+		{
+			EventObject->Success(World);
+			EventViewWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else
+		{
+			EventObject->Fail(World);
+			
+			EventViewWidget->SetVisibility(ESlateVisibility::Visible);
+			EventViewWidget->Set(EventObject);
+			return false;
+		}
+	}
+
+	return true;
+}
+
 #pragma endregion
 
 #pragma region Widget
@@ -118,6 +151,10 @@ void ARSTycoonPlayerController::SettingWidget()
 	//SubWidget
 	InventoryWidget = CreateWidget<URSIngredientInventoryWidget>(this, InventoryWidgetClass.Get());
 	NPCInfoWidget = CreateWidget<URSTycoonNPCInfoWidget>(this, NPCInfoWidgetClass.Get());
+	
+	EventViewWidget = CreateWidget<URSTycoonEventViewWidget>(this, EventViewWidgetClass.Get());
+	EventViewWidget->AddToViewport();
+	EventViewWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 #pragma endregion
 

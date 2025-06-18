@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "RSTycoonPlayerController.generated.h"
 
+class URSTycoonEvent;
+class URSTycoonEventViewWidget;
 class URSTycoonNPCInfoWidget;
 struct FInputActionValue;
 struct FFoodOrder;
@@ -38,6 +40,12 @@ public:
 	void EndSaleMode();
 	void StartManagementMode();
 
+	void SetSaleEnable(bool Value);
+	bool CanSaleMode();
+	
+private:
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TSubclassOf<URSTycoonEvent>> NeedEventsForSale;
 #pragma endregion
 
 #pragma region Widget
@@ -72,6 +80,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<URSTycoonNPCInfoWidget> NPCInfoWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<URSTycoonEventViewWidget> EventViewWidgetClass;
 	
 	UPROPERTY()
 	TObjectPtr<URSTycoonWaitWidget> WaitWidget;
@@ -90,6 +101,9 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<URSTycoonNPCInfoWidget> NPCInfoWidget;
+
+	UPROPERTY()
+	TObjectPtr<URSTycoonEventViewWidget> EventViewWidget;
 #pragma endregion
 
 #pragma region Input
