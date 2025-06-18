@@ -9,6 +9,7 @@
 
 class UBoxComponent;
 class UNiagaraComponent;
+class UNiagaraSystem;
 
 struct FWeaponAttackData;
 
@@ -38,7 +39,7 @@ private:
 	TObjectPtr<UBoxComponent> BoxComp;	// 데미지 로직을 위한 콜리전 용도의 컴포넌트
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UNiagaraComponent> NiagaraComp;
+	TObjectPtr<UNiagaraComponent> TrailNiagaraComp;
 
 // 애니메이션
 public:
@@ -79,6 +80,12 @@ public:
 	void StartTrail();
 
 	void EndTrail();
+
+	void SpawnHitImpactEffect(FVector TargetLocation);
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Niagara", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UNiagaraSystem> HitImpactEffect;
 
 // 데이터 테이블의 RowName을 ID값으로 사용한다.
 public:
