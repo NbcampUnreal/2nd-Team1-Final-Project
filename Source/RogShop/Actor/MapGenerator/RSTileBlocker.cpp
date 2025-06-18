@@ -19,8 +19,6 @@ ARSTileBlocker::ARSTileBlocker()
 	Collision->SetupAttachment(Mesh);
 	Collision->SetCollisionProfileName("BlockAll");
 	Collision->SetGenerateOverlapEvents(false);
-
-	SetActorHiddenInGame(true); // 처음엔 숨겨진 상태
 }
 
 // Called when the game starts or when spawned
@@ -28,12 +26,6 @@ void ARSTileBlocker::BeginPlay()
 {
 	Super::BeginPlay();
 	
-}
-
-void ARSTileBlocker::OnConstruction(const FTransform& Transform)
-{
-	Super::OnConstruction(Transform);
-
 	FVector Loc = GetActorLocation();
 	LinkedTileCoord = FIntPoint(
 		FMath::RoundToInt(Loc.X / 4000.f),
@@ -84,7 +76,6 @@ void ARSTileBlocker::RaiseBlocker() //위로 올라오게
 
 	SetActorLocation(HiddenLocation);  // 위치 재설정
 	Collision->SetRelativeRotation(HiddenRotation);
-	SetActorHiddenInGame(false);       // 보이게
 	Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	AnimationTime = 0.f;

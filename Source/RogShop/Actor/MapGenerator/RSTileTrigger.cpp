@@ -5,6 +5,9 @@
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "RSDungeonGameModeBase.h"
+#include "GameFramework/HUD.h"
+#include "RSDunPlayerController.h"
+#include "RSDunMainHUDWidget.h"
 #include "RSSpawnManager.h"
 
 
@@ -35,6 +38,18 @@ void ARSTileTrigger::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 		return;
 	}
 
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
+	{
+
+		if (ARSDunPlayerController* MyPC = Cast<ARSDunPlayerController>(PC))
+		{
+			if (URSDunMainHUDWidget* HUD = MyPC->GetDunMainHudWidget())
+			{
+				HUD->UpdateMiniMapPlayerPosition(TileCoord);
+			}
+		}
+	}
+
 	if (TileCoord == FIntPoint(0, 0))
 	{
 		return;
@@ -54,4 +69,6 @@ void ARSTileTrigger::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 
 	SpawnManager->SpawnMonstersAtTile(TileCoord);
 	bMonsterSpawned = true;
+
+
 }
