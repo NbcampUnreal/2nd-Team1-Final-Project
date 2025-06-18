@@ -10,6 +10,7 @@
 #include "Components/ProgressBar.h"
 #include "RSDataSubsystem.h"
 #include "RSDungeonGameModeBase.h"
+#include "RSMonsterHPBarWidget.h"
 
 TArray<ARSDunMonsterCharacter*> ARSDunMonsterCharacter::AllMonsters;
 
@@ -491,15 +492,17 @@ void ARSDunMonsterCharacter::UpdateOverheadEnemyHP(float const damage)
 		return;
 	}
 
-	// 2. 그 위젯의 실체에서 HPBar 프로그레스 바 부분 가져와서 퍼센트 업데이트 해주기
-	if (UProgressBar* HPBar = Cast<UProgressBar>(OverheadWidgetInstance->GetWidgetFromName(TEXT("Monster_HP_Bar"))))
+	// 2. 타입 캐스팅: UUserWidget → URSMonsterHPBarWidget
+	URSMonsterHPBarWidget* HPWidget = Cast<URSMonsterHPBarWidget>(OverheadWidgetInstance);
+	if (!HPWidget)
 	{
-		// HPPercent = 0.0 ~ 1.0 범위의 값이 나오도록 설정
-		const float HPPercent = (GetMaxHP() > 0.f) ? (float)GetHP() / (float)GetMaxHP() : 0.f;
-		HPBar->SetPercent(HPPercent);
-		HPBar->SetFillColorAndOpacity(FLinearColor(1.f, 0.f, 0.f, 0.8f));	// 살짝 투명한 빨강
-
+		return;
 	}
+	
+	// HPPercent = 0.0 ~ 1.0 범위의 값이 나오도록 설정
+	const float HPPercent = (GetMaxHP() > 0.f) ? (float)GetHP() / (float)GetMaxHP() : 0.f;
+	HPWidget->UpdateTargetPercent(HPPercent);
+
 }
 
 FName ARSDunMonsterCharacter::GetMonsterRowName() const
