@@ -343,6 +343,15 @@ void ARSTycoonPlayerController::DeactiveSelectTileWidget()
 void ARSTycoonPlayerController::AddGold(int32 Value)
 {
 	SetGold(Gold + Value);
+	
+	if (Value > 0)
+	{
+		//[추가], 돈 추가 사운드
+	}
+	else
+	{
+		//[추가], 돈 줄어드는 사운드
+	}
 }
 
 void ARSTycoonPlayerController::AddCustomerCount(int32 Value)

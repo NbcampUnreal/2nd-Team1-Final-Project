@@ -93,26 +93,6 @@ void ARSTycoonCustomerCharacter::InteractTarget(AActor* TargetActor)
 	if (ARSTableTile* TableTile = Cast<ARSTableTile>(TargetActor))
 	{
 		TableTile->Sit(this);
-
-		if (SitMontage && GetMesh())
-		{
-			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-			if (AnimInstance)
-			{
-				PlayAnimMontage(SitMontage);
-
-				if (SitSound)
-				{
-					UGameplayStatics::SpawnSoundAtLocation(
-						this,
-						SitSound,
-						GetActorLocation(),
-						FRotator::ZeroRotator
-					);
-				}
-			}
-		}
 	}
 
 	//문에 닿으면 삭제
@@ -136,13 +116,10 @@ void ARSTycoonCustomerCharacter::Leave()
 	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	PlayerController->AddGold(Data->Price);
 	PlayerController->AddCustomerCount(1);
-
+	
+	//[추가], 돈 추가/감소 이펙트 (이펙트 안에 있는 숫자가 Value로 변경)
+	
 	OnFinishEat.Broadcast(this);
-
-	if (ExitSound)
-	{
-		UGameplayStatics::SpawnSoundAtLocation(this, ExitSound, GetActorLocation(), FRotator::ZeroRotator);
-	}
 
 	float PlayTime = PlayAnimMontage(StandMontage);
 	FTimerHandle StandTimer;
@@ -151,5 +128,4 @@ void ARSTycoonCustomerCharacter::Leave()
 		ARSDoorTile* DoorTile = Cast<ARSDoorTile>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSDoorTile::StaticClass()));
 		MoveToTarget(DoorTile->GetSpawnPoint(), DoorTile);
 	}, PlayTime, false);
-
 }
