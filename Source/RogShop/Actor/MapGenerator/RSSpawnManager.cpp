@@ -556,6 +556,9 @@ void URSSpawnManager::SpawnBossMonster()
 	BossMonster->IncreaseHP(BossData->MaxHP);
 	BossMonster->ChangeMoveSpeed(BossData->MoveSpeed);
 
+	// 사망 시 오브젝트 스폰 함수 바인딩
+	BossMonster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundIngredientFromCharacter);
+	BossMonster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundLifeEssenceFromCharacter);
 
 }
 
@@ -623,6 +626,10 @@ void URSSpawnManager::SpawnMonstersAtTile(FIntPoint TileCoord) // 특정 타일 
 			Monster->IncreaseHP(StateRow->MaxHP); 
 			Monster->ChangeMoveSpeed(StateRow->MoveSpeed); 
 			Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::OnMonsterDiedFromTile); // 몬스터 사망 시 호출될 델리게이트 바인딩
+
+			// 사망 시 오브젝트 스폰 함수 바인딩
+			Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundIngredientFromCharacter);
+			Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundLifeEssenceFromCharacter);
 
 			AliveMonstersPerTile.FindOrAdd(TileCoord) += 1;
 			TotalSpawned++;
