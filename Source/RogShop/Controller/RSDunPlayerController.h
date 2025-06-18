@@ -80,6 +80,9 @@ public:
 	void ShowInteractWidget();
 	void HideInteractWidget();
 
+	URSDunMainHUDWidget* GetDunMainHudWidget();
+
+
 private:
 	// 로딩 위젯
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))

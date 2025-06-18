@@ -43,6 +43,12 @@ public:
 	void SetTileType(int32 IGridSize, float ITileSize, TSoftObjectPtr<UWorld> ILineTileLevel, TSoftObjectPtr<UWorld> ICornerTileLevel, TSoftObjectPtr<UWorld> ICrossTileLevel, TSoftObjectPtr<UWorld> ITTileLevel, TSoftObjectPtr<UWorld> IDeadEndTileLevel, TSoftObjectPtr<UWorld> IBossArenaLevel, TSoftObjectPtr<UWorld> IEnvLevel);
 	void StartMapGenerator();
 
+	// 전체 타일 좌표 반환
+	TSet<FIntPoint> GetAllTileCoords() const;
+
+	// 보스 타일 위치 반환
+	FIntPoint GetBossTileCoord() const;
+
 
 #pragma region 타일로딩상태 검증함수
 	UFUNCTION()
@@ -111,6 +117,11 @@ public:
 	TArray<ULevelStreamingDynamic*> SpawnedLevels; // 스트리밍된 레벨 목록
 	UPROPERTY()
 	FVector BossWorldLocation;
+
+	UPROPERTY()
+	TSet<FIntPoint> SpawnedTiles; // 전체 타일 위치
+	UPROPERTY()
+	FIntPoint BossTileCoord; // 보스타일 위치
 
 #pragma endregion
 
