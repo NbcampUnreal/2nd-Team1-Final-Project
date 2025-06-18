@@ -8,6 +8,8 @@
 #include "TimerManager.h"
 #include "RSDunPlayerCharacter.h"
 #include "RSDungeonGameModeBase.h"
+#include "Components/ProgressBar.h"
+#include "RSBossHPBarWidget.h"
 
 ARSDunPlayerController::ARSDunPlayerController()
 {
@@ -32,6 +34,7 @@ void ARSDunPlayerController::BeginPlay()
     InitializeRSDunMainWidget();
 
     BindCharacterDelegates();
+    BindBossMonsterDelegates();
 }
 
 void ARSDunPlayerController::AddMapping()
@@ -71,6 +74,7 @@ void ARSDunPlayerController::InitializeRSDunMainWidget()
         if (RSDunMainHUDWidget)
         {
             RSDunMainHUDWidget->AddToViewport();
+            WBPBossInfoWidget = RSDunMainHUDWidget->GetBossHPBarWidget();
         }
     }
 }
@@ -151,5 +155,35 @@ void ARSDunPlayerController::BindCharacterDelegates()
     {
         CurPawn->OnCharacterDied.AddDynamic(this, &ARSDunPlayerController::ShowPlayerDeathWidget);
     }
+}
 
+void ARSDunPlayerController::BindBossMonsterDelegates()
+{
+    ARSDungeonGameModeBase* DungeonGameMode = Cast<ARSDungeonGameModeBase>(GetWorld()->GetAuthGameMode());
+    if (DungeonGameMode)
+    {
+        DungeonGameMode->OnBossDead.AddDynamic(this, &ARSDunPlayerController::SetBossInfoWidgetHidden);
+    }
+}
+
+void ARSDunPlayerController::SetBossInfoWidgetHidden()
+{
+    WBPBossInfoWidget->SetVisibility(ESlateVisibility::Hidden);
+
+}
+
+void ARSDunPlayerController::SetBossInfoWidgetVisible()
+{
+    WBPBossInfoWidget->SetVisibility(ESlateVisibility::Visible);
+
+}
+
+void ARSDunPlayerController::UpdateBossTargetPercent(const float NewPercent)
+{
+    WBPBossInfoWidget->UpdateTargetPercent(NewPercent);
+}
+
+URSBossHPBarWidget* ARSDunPlayerController::GetBossInfoWidget() const
+{
+    return WBPBossInfoWidget;
 }

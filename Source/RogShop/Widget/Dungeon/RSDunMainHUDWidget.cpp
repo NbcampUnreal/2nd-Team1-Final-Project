@@ -3,6 +3,7 @@
 #include "RSDunMainHUDWidget.h"
 #include "RSInGameMenuWidget.h"
 #include "RSPlayerStatusWidget.h"
+#include "RSBossHPBarWidget.h"
 #include "RSInteractWidget.h"
 #include "RSPlayerInventoryWidget.h"
 #include "GameFramework/PlayerController.h"
@@ -29,6 +30,11 @@ void URSDunMainHUDWidget::NativeConstruct()
     if (InteractWidget)
     {
 		InteractWidget->SetVisibility(ESlateVisibility::Hidden);
+    }
+
+    if (WBP_BossInfoWidget)
+    {
+        WBP_BossInfoWidget->SetVisibility(ESlateVisibility::Hidden);
     }
 }
 
@@ -144,4 +150,9 @@ void URSDunMainHUDWidget::HideInteractWidget()
     {
         InteractWidget->SetVisibility(ESlateVisibility::Hidden);
     }
+}
+
+URSBossHPBarWidget* URSDunMainHUDWidget::GetBossHPBarWidget() const
+{
+    return WBP_BossInfoWidget;
 }

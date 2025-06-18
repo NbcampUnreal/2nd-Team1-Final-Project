@@ -9,6 +9,8 @@
 
 class UInputMappingContext;
 class UInputAction;
+class URSBossHPBarWidget;
+class UProgressBar;
 class URSDunMainHUDWidget;
 class URSPlayerInventoryWidget;
 class ARSDunBaseCharacter;
@@ -80,6 +82,11 @@ public:
 	void ShowInteractWidget();
 	void HideInteractWidget();
 
+	void SetBossInfoWidgetVisible();
+	void SetBossInfoWidgetHidden();
+	void UpdateBossTargetPercent(const float NewPercent);
+	URSBossHPBarWidget* GetBossInfoWidget() const;
+
 private:
 	// 로딩 위젯
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
@@ -102,9 +109,15 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UUserWidget> RSDeathWidget;
 
+	// 보스 몬스터의 체력 및 이름 정보를 가진 위젯
+	UPROPERTY()
+	URSBossHPBarWidget* WBPBossInfoWidget;
+	UProgressBar* BossHPBar;
+
 // 캐릭터의 델리게이트에 바인딩하는 함수를 모은 함수
 private:
 	void BindCharacterDelegates();
+	void BindBossMonsterDelegates();
 
 // 이벤트 디스패처
 public:

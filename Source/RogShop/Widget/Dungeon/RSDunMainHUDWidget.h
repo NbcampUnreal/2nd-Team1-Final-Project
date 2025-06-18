@@ -10,6 +10,7 @@ class URSPlayerStatusWidget;
 class URSInGameMenuWidget;
 class URSPlayerInventoryWidget;
 class URSInteractWidget;
+class URSBossHPBarWidget;
 
 UCLASS()
 class ROGSHOP_API URSDunMainHUDWidget : public UUserWidget
@@ -28,6 +29,8 @@ public:
     void ShowInteractWidget();
     void HideInteractWidget();
 
+    URSBossHPBarWidget* GetBossHPBarWidget() const;
+
 private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<URSPlayerStatusWidget> PlayerStatusWidget;
@@ -40,4 +43,7 @@ private:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<URSInteractWidget> InteractWidget;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
+    TObjectPtr<URSBossHPBarWidget> WBP_BossInfoWidget;
 };
