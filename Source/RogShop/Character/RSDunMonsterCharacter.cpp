@@ -9,7 +9,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/ProgressBar.h"
 #include "RSDataSubsystem.h"
-#include "RSDungeonGameModeBase.h"
+#include "Perception/AISense_Damage.h"
 #include "RSMonsterHPBarWidget.h"
 
 TArray<ARSDunMonsterCharacter*> ARSDunMonsterCharacter::AllMonsters;
@@ -70,13 +70,6 @@ void ARSDunMonsterCharacter::BeginPlay()
 	if (UAnimInstance* animInstance = GetMesh()->GetAnimInstance())
 	{
 		animInstance->OnMontageEnded.AddDynamic(this, &ARSDunMonsterCharacter::OnEveryMontageEnded);
-	}
-
-	// 보스 몬스터만 머리 위 HP바 삭제
-	const FMonsterData* Data = GetFMonsterData();
-	if (Data && Data->MonsterType == EMonsterType::Boss)
-	{
-		OverheadWidget->DestroyComponent();	// 보스는 HP 바 삭제
 	}
 
 	AllMonsters.Add(this);	// 새로운 몬스터는 몬스터 배열에 추가 < 이유는 모든 몬스터의 HP바 회전을 위함.
@@ -175,6 +168,7 @@ void ARSDunMonsterCharacter::OnEveryMontageEnded(UAnimMontage* montage, bool bIn
 
 float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	UAISense_Damage* damagePerception;
 	RS_LOG("TakeDamage 들어옴");
 
 	if (GetIsDead()) return 0.f;	// 죽으면 데미지 안들어오게 방지
@@ -184,7 +178,7 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	DecreaseHP(Damage);
-	UpdateOverheadEnemyHP(Damage);
+	UpdateHPUI();
 
 	// 데미지 받으면 로그에 추가!
 	RS_LOG_F("[%s] 몬스터가 [%s] 에게 %f 데미지를 받았습니다. 체력 : %f / %f",
@@ -194,6 +188,8 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 		GetHP(),
 		GetMaxHP()
 	);
+
+	damagePerception->ReportDamageEvent(GetWorld(), this, DamageCauser, Damage, this->GetActorLocation(), DamageCauser->GetActorLocation(), TEXT("Default"));
 
 	return Damage;
 }
@@ -360,20 +356,6 @@ void ARSDunMonsterCharacter::OnDeath()
 		ctrl->UnPossess();
 		ctrl->Destroy();
 	}
-
-	if (GetFMonsterData())
-	{
-		// 몬스터의 타입이 보스인 경우 게임모드에 보스가 죽었다고 알린다.
-		EMonsterType CurMonsterType = GetFMonsterData()->MonsterType;
-		if (CurMonsterType == EMonsterType::Boss)
-		{
-			ARSDungeonGameModeBase* DungeonGameMode = Cast<ARSDungeonGameModeBase>(GetWorld()->GetAuthGameMode());
-			if (DungeonGameMode)
-			{
-				DungeonGameMode->OnBossDead.Broadcast();
-			}
-		}
-	}
 }
 
 void ARSDunMonsterCharacter::InitMonsterData()
@@ -456,6 +438,11 @@ const FMonsterData* ARSDunMonsterCharacter::GetFMonsterData()
 	return MonsterDataRow;
 }
 
+void ARSDunMonsterCharacter::UpdateHPUI()
+{
+	UpdateOverheadEnemyHP();
+}
+
 // 적이 가진 위젯 컴포넌트가 항상 카메라를 바라보게 회전시키는 함수
 void ARSDunMonsterCharacter::UpdateEnemyWidgetComponentRotation()
 {
@@ -478,7 +465,7 @@ void ARSDunMonsterCharacter::UpdateEnemyWidgetComponentRotation()
 	}
 }
 
-void ARSDunMonsterCharacter::UpdateOverheadEnemyHP(float const damage)
+void ARSDunMonsterCharacter::UpdateOverheadEnemyHP()
 {
 	if (!OverheadWidget)
 	{

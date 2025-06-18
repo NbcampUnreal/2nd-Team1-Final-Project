@@ -8,6 +8,7 @@
 #include "RogShop/Actor/Tycoon/Tile/RSIceBoxTile.h"
 #include "Tycoon/RSTycoonSaveGame.h"
 #include "Tycoon/RSTycoonTileMapSaveGame.h"
+#include "Option/OptionSaveGame.h"
 
 void URSSaveGameSubsystem::AddIngredientDungeonToTycoon(FName IngredientKey, int32 Amount)
 {
@@ -138,3 +139,4 @@ bool URSSaveGameSubsystem::DoesTycoonSaveFileExist()
 
 	return false;
 }
+

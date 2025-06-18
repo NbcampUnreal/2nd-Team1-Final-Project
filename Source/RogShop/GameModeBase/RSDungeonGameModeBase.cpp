@@ -211,3 +211,8 @@ void ARSDungeonGameModeBase::NotifyMapReady()
     OnMapFullyLoaded.Broadcast();
     OnMapReady();
 }
+
+ARSMapGenerator* ARSDungeonGameModeBase::GetMapGenerator()
+{
+    return MapGeneratorInstance;
+}
