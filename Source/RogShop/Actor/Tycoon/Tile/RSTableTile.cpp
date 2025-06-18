@@ -188,7 +188,7 @@ void ARSTableTile::Serving(ACharacter* InteractCharacter)
 
 		FoodActors[ServingCustomerIndex] = PickupActor;
 
-		CanPickupCharacter->Drop(FoodLocations[ServingCustomerIndex]->GetComponentLocation());
+		CanPickupCharacter->Drop(FoodLocations[ServingCustomerIndex]->GetComponentTransform());
 		OrderedCustomer->Eat();
 	}
 	else

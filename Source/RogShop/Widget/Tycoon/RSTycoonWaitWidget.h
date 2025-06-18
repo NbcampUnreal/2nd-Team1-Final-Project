@@ -59,4 +59,7 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UTextBlock* InCookingTileText;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UTextBlock* InIceBoxTileText;
 };

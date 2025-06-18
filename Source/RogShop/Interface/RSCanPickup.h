@@ -22,7 +22,7 @@ class ROGSHOP_API IRSCanPickup
 
 public:
 	virtual void Pickup(AActor* Actor) = 0;
-	virtual AActor* Drop(FVector DropLocation) = 0;
+	virtual AActor* Drop(FTransform DropTransform) = 0;
 	
 	virtual AActor* GetPickupActor() = 0;
 };
