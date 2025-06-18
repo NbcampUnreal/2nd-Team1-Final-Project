@@ -8,8 +8,6 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSaveRequested);
 
-class UOptionSaveGame;
-
 UCLASS()
 class ROGSHOP_API URSSaveGameSubsystem : public UGameInstanceSubsystem
 {
@@ -44,7 +42,6 @@ public:
 	// 타이쿤
 	const FString TycoonSaveSlot = TEXT("TycoonGame");
 	const FString TycoonTileMapSaveSlot = TEXT("TileMapSaveSlot");
-
 
 	//옵션
 	const FString OptionSaveSlotName = TEXT("OptionSaveSlot");
