@@ -10,6 +10,11 @@ ARSMonsterAIController::ARSMonsterAIController()
 	currentPatrolIdx = 0;
 
 	rotateSpeed = 0.01f;
+	chaseLength = 20000.f;
+	moveDistance = 0;
+	bIsChase = false;
+	priviousPos = FVector(0.f,0.f,0.f);
+	curPos = FVector(0.f, 0.f, 0.f);
 }
 
 void ARSMonsterAIController::SetRVOAvoidanceEnabled(bool bEnable)//path find bottleneck resolving function
@@ -185,4 +190,36 @@ void ARSMonsterAIController::RotateToFocus(FVector lookFor, float deltaSecond)
 	{
 		return;
 	}
+}
+
+void ARSMonsterAIController::CalculateMoveLength()
+{
+	if (bIsChase)
+	{
+		APawn* ctrlPawn = GetPawn();
+		if (ctrlPawn)
+		{
+			curPos = ctrlPawn->GetActorLocation();
+			moveDistance += FVector::Dist(curPos, priviousPos);
+		}
+	}
+}
+
+void ARSMonsterAIController::SetIsChase(bool bIsValid)
+{
+	bIsChase = bIsValid;
+}
+
+void ARSMonsterAIController::SetPriviousPos()
+{
+	APawn* ctrlPawn = GetPawn();
+	if (ctrlPawn)
+	{
+		priviousPos = ctrlPawn->GetActorLocation();
+	}
+}
+
+bool ARSMonsterAIController::IsStillChase()
+{
+	return chaseLength < moveDistance ? false : true;
 }
