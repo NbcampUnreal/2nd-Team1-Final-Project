@@ -5,70 +5,106 @@
 #include "RSMiniMapTileWidget.h"
 #include "Components/CanvasPanel.h"
 #include "Components/Image.h"
+#include "RSDungeonGameModeBase.h"
+#include "RSMapGenerator.h"
 #include "Components/CanvasPanelSlot.h"
 
-// 던전 생성 시 타일 전체를 미니맵에 배치
-void URSMiniMap::InitializeMap(const TSet<FIntPoint>& TileCoords, FIntPoint BossTile)
+
+void URSMiniMap::InitializeMap(const TSet<FIntPoint>& AllTiles, const FIntPoint& BossTile)
 {
-	if (!TileWidgetClass || !MapCanvas || !MiniMapBackgroundImage)
-	{
-		return; // 필수 값 누락 체크
-	}
-
-	UCanvasPanelSlot* BgSlot = Cast<UCanvasPanelSlot>(MiniMapBackgroundImage->Slot);
-	if (!BgSlot) return;
-
-	FVector2D BackgroundSize = BgSlot->GetSize();
-	const int32 GridSize = 3;
-
-	float TileSize = 400/3;
-
-
-	FIntPoint CenterOffset(0, 2);
-
-	BossRoom = BossTile;
-
-	for (FIntPoint Coord : TileCoords)
-	{
-		// 각 타일 위젯 생성
-		URSMiniMapTileWidget* Tile = CreateWidget<URSMiniMapTileWidget>(this, TileWidgetClass);
-		Tile->SetTileCoord(Coord);
-
-		// CanvasPanel 위에 위치 설정
-		UCanvasPanelSlot* TileSlot = MapCanvas->AddChildToCanvas(Tile);
-
-		FIntPoint LocalCoord = Coord - CenterOffset;
-
-		FVector2D TilePos = MiniMapBackgroundImage->RenderTransform.Translation
-			+ FVector2D(LocalCoord.X * TileSize, -LocalCoord.Y * TileSize);
-
-		TileSlot->SetSize(FVector2D(TileSize, TileSize));
-		TileSlot->SetPosition(TilePos);
-		TileSlot->SetZOrder(10);
-
-		// 초기 상태: 미방문, 현재 위치 아님, 보스방/상점 여부
-		Tile->SetState(false, false, Coord == BossTile);
-
-		// 맵에 등록
-		TileWidgets.Add(Coord, Tile);
-	}
-
+    for (const FIntPoint& Coord : AllTiles)
+    {
+        UpdateTileVisual(Coord);
+    }
 }
 
-// 플레이어가 이동할 때마다 호출해서 상태 갱신
-void URSMiniMap::UpdatePlayerPosition(FIntPoint PlayerCoord)
+void URSMiniMap::UpdatePlayerPosition(const FIntPoint& TileCoord)
 {
-	for (auto& Elem : TileWidgets)
-	{
-		FIntPoint Coord = Elem.Key;
+    UpdateTileVisual(TileCoord); // 진입한 곳은 항상 시각적으로 확정
+}
 
-		bool bVisited = VisitedTiles.Contains(Coord) || Coord == PlayerCoord;
-		bool bCurrent = Coord == PlayerCoord;
-		bool bBoss = (Coord == BossRoom);
+void URSMiniMap::UpdateTileVisual(const FIntPoint& TileCoord)
+{
+    ARSDungeonGameModeBase* GameMode = Cast<ARSDungeonGameModeBase>(UGameplayStatics::GetGameMode(this));
+    if (!GameMode || !MapCanvas) return;
 
-		Elem.Value->SetState(bVisited, bCurrent, bBoss);
-	}
+    ARSMapGenerator* MapGen = GameMode->GetMapGenerator();
+    if (!MapGen) return;
 
-	// 방문 기록에 추가
-	VisitedTiles.Add(PlayerCoord);
+    const FTileData* TileData = MapGen->GetTileData(TileCoord);
+
+    UTexture2D* TextureToUse = QuestionTileTexture;
+    FRotator Rotation = FRotator::ZeroRotator;
+
+    if (TileData && TileData->bVisited)
+    {
+        Rotation = TileData->Rotation;
+        int DirCount = FMath::CountBits((uint8)TileData->Connections);
+
+        switch (DirCount)
+        {
+        case 1: TextureToUse = DeadEndTexture; break;
+        case 2:
+            if ((uint8)TileData->Connections == ((uint8)(EDir::Up | EDir::Down)) ||
+                (uint8)TileData->Connections == ((uint8)(EDir::Left | EDir::Right)))
+                TextureToUse = StraightTexture;
+            else
+                TextureToUse = CornerTexture;
+            break;
+        case 3: TextureToUse = TTexture; break;
+        case 4: TextureToUse = CrossTexture; break;
+        default: break;
+        }
+
+        if (TileCoord == MapGen->GetBossTileCoord())
+        {
+            TextureToUse = BossRoomTexture;
+            Rotation = FRotator::ZeroRotator;
+        }
+    }
+
+    SetTileImage(TileCoord, TextureToUse, Rotation);
+}
+
+void URSMiniMap::SetTileImage(const FIntPoint& Coord, UTexture2D* Texture, const FRotator& Rotation)
+{
+    if (!MapCanvas)
+    {
+        UE_LOG(LogTemp, Error, TEXT("[MiniMap] 미니맵 캔버스 없음"));
+        return;
+    }
+
+    if (!MapCanvas || !Texture) return;
+
+    UImage* TileImage = nullptr;
+
+    // 이미지가 이미 생성되어 있는지 확인
+    if (TileImageMap.Contains(Coord))
+    {
+        TileImage = TileImageMap[Coord];
+    }
+    else
+    {
+        // 새로 생성
+        TileImage = NewObject<UImage>(this, UImage::StaticClass());
+        TileImage->SetBrushFromTexture(Texture);
+        MapCanvas->AddChild(TileImage);
+
+        // 위치 및 크기 설정
+        if (UCanvasPanelSlot* MapSlot = Cast<UCanvasPanelSlot>(TileImage->Slot))
+        {
+            MapSlot->SetPosition(FVector2D(Coord.X * (400/3), Coord.Y * (400/3)));
+            MapSlot->SetSize(FVector2D(400/3, 400/3));
+        }
+
+        TileImageMap.Add(Coord, TileImage); // 맵에 저장
+    }
+
+    // 텍스처 갱신
+    TileImage->SetBrushFromTexture(Texture);
+
+    // 회전 설정
+    FWidgetTransform Transform;
+    Transform.Angle = Rotation.Yaw;
+    TileImage->SetRenderTransform(Transform);
 }

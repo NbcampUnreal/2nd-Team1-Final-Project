@@ -7,19 +7,24 @@
 #include "RSBossHPBarWidget.generated.h"
 
 class UTextBlock;
+class UProgressBar;
 
 UCLASS()
 class ROGSHOP_API URSBossHPBarWidget : public URSMonsterHPBarWidget
 {
 	GENERATED_BODY()
 
-public:
+protected:
+	virtual void NativeOnInitialized() override;
+
 	virtual void NativeConstruct() override;
 
-	void SetBossName(const FName& BossNameInput);
+private:
+	UFUNCTION()
+	void UpdateBossHPBar(FName BossName, float HPPercent);
 
-protected:
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* BossNameTextBlock;
-	
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
+	TObjectPtr<UTextBlock> BossNameTextBlock;
+
 };

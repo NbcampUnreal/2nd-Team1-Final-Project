@@ -2,16 +2,43 @@
 
 #include "RSBossHPBarWidget.h"
 #include "Components/TextBlock.h"
-#include "RSDunMonsterCharacter.h"
+#include "RSDunPlayerController.h"
+
+void URSBossHPBarWidget::NativeOnInitialized()
+{
+    Super::NativeOnInitialized();
+
+    ARSDunPlayerController* RSDunPlayerController = GetOwningPlayer<ARSDunPlayerController>();
+
+    if (RSDunPlayerController)
+    {
+        RSDunPlayerController->OnBossHPChange.AddDynamic(this, &URSBossHPBarWidget::UpdateBossHPBar);
+    }
+}
 
 void URSBossHPBarWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+    SetVisibility(ESlateVisibility::Hidden);
 }
 
-void URSBossHPBarWidget::SetBossName(const FName& BossNameInput)
+void URSBossHPBarWidget::UpdateBossHPBar(FName BossName, float HPPercent)
 {
-	BossNameTextBlock->SetText(FText::FromName(BossNameInput));
+    if (BossNameTextBlock)
+    {
+	    BossNameTextBlock->SetText(FText::FromName(BossName));
+    }
 
+    UpdateTargetPercent(HPPercent);
+
+    if (HPPercent > 0)
+    {
+        SetVisibility(ESlateVisibility::HitTestInvisible);
+    }
+    else
+    {
+        SetVisibility(ESlateVisibility::Hidden);
+    }
+    
 }

@@ -13,11 +13,11 @@ class ROGSHOP_API ARSDunBossCharacter : public ARSDunMonsterCharacter
 	
 public:
 	virtual void BeginPlay() override;
-	virtual void OnDeath() override;
-	void PlaySpawnAnim() override;
-	void UpdateHPUI() override;
 
-	void UpdateBossHP();
-	void UpdateBossName();
+	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	virtual void OnDeath() override;
+
+	void PlaySpawnAnim() override;
 
 };

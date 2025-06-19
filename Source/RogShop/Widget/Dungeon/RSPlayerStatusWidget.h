@@ -14,6 +14,11 @@ class ROGSHOP_API URSPlayerStatusWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+protected:
+    virtual void NativeOnInitialized() override;
+
+    virtual void NativeConstruct() override;
+
 public:
     UFUNCTION()
     void UpdateWeaponSlot(int8 SlotIndex, FName WeaponKey);
@@ -23,10 +28,6 @@ public:
 
     UFUNCTION()
     void UpdateMaxHP();
-
-protected:
-    virtual void NativeOnInitialized() override;
-    virtual void NativeConstruct() override;
 
 private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))

@@ -26,7 +26,7 @@
 #include "RogShop/Widget/Tycoon/RSTycoonSaleWidget.h"
 #include "RogShop/Widget/Tycoon/RSTycoonWaitWidget.h"
 #include "Tycoon/NPC/RSTycoonNPC.h"
-
+#include "RSPlayerFloatingDamageWidget.h"
 
 #pragma region Mode
 ARSTycoonPlayerController::ARSTycoonPlayerController()
@@ -154,6 +154,7 @@ void ARSTycoonPlayerController::SettingWidget()
 	//SubWidget
 	InventoryWidget = CreateWidget<URSIngredientInventoryWidget>(this, InventoryWidgetClass.Get());
 	NPCInfoWidget = CreateWidget<URSTycoonNPCInfoWidget>(this, NPCInfoWidgetClass.Get());
+	FloatingTextWidget = CreateWidget<URSPlayerFloatingDamageWidget>(this, FloatingTextWidgetClass);
 	
 	EventViewWidget = CreateWidget<URSTycoonEventViewWidget>(this, EventViewWidgetClass.Get());
 	EventViewWidget->AddToViewport();
@@ -386,11 +387,13 @@ void ARSTycoonPlayerController::AddGold(int32 Value)
 	
 	if (Value > 0)
 	{
-		//[추가], 돈 추가 사운드
+		check(AddGoldSound);
+		UGameplayStatics::SpawnSoundAtLocation(this, AddGoldSound, FVector::ZeroVector);
 	}
 	else
 	{
-		//[추가], 돈 줄어드는 사운드
+		check(SpendGoldSound);
+		UGameplayStatics::SpawnSoundAtLocation(this, SpendGoldSound, FVector::ZeroVector);
 	}
 
 	SaleGold += Value;
@@ -488,4 +491,17 @@ void ARSTycoonPlayerController::OnClickTileOrNPC()
 	{
 		DeactiveSelectTileWidget();
 	}
+}
+
+void ARSTycoonPlayerController::FloatingGold(int32 Amount, FVector WorldLocation)
+{
+	check(FloatingTextWidget);
+
+	FloatingTextWidget->AddToViewport();
+
+	FVector2D ScreenPos;
+	ProjectWorldLocationToScreen(WorldLocation, ScreenPos);
+	FloatingTextWidget->SetPositionInViewport(ScreenPos);
+
+	FloatingTextWidget->FloatingValue(Amount);
 }

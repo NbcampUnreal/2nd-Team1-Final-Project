@@ -8,7 +8,7 @@ void URSPlayerFloatingDamageWidget::NativeOnInitialized()
 
     if (RSDunPlayerController)
     {
-        RSDunPlayerController->OnFloatDamage.AddDynamic(this, &URSPlayerFloatingDamageWidget::ShowDamage);
+        RSDunPlayerController->OnFloatDamage.AddDynamic(this, &URSPlayerFloatingDamageWidget::FloatingValue);
     }
 }
 
@@ -23,14 +23,14 @@ void URSPlayerFloatingDamageWidget::NativeConstruct()
     }
 }
 
-void URSPlayerFloatingDamageWidget::ShowDamage(float Damage)
+void URSPlayerFloatingDamageWidget::FloatingValue(float Value)
 {
     if (!TextDamage)
     {
         return;
     }
 
-    TextDamage->SetText(FText::AsNumber(FMath::RoundToInt(Damage * -1)));
+    TextDamage->SetText(FText::AsNumber(FMath::RoundToInt(Value)));
     TextDamage->SetVisibility(ESlateVisibility::Visible);
 
     // 페이드 아웃 애니메이션 재생 (기존 애니 재생 중이면 재시작)

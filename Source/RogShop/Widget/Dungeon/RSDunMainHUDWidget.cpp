@@ -49,14 +49,14 @@ void URSDunMainHUDWidget::NativeConstruct()
                         MapGen->GetAllTileCoords(),
                         MapGen->GetBossTileCoord()
                     );
+                    UE_LOG(LogTemp, Warning, TEXT("[HUD] 미니맵 초기화 완료"));
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("[HUD] 미니맵 초기화 실패"));
                 }
             }
         }
-    }
-
-    if (WBP_BossInfoWidget)
-    {
-        WBP_BossInfoWidget->SetVisibility(ESlateVisibility::Hidden);
     }
 }
 
@@ -182,7 +182,5 @@ void URSDunMainHUDWidget::UpdateMiniMapPlayerPosition(const FIntPoint& TileCoord
     }
 }
 
-URSBossHPBarWidget* URSDunMainHUDWidget::GetBossHPBarWidget() const
-{
-    return WBP_BossInfoWidget;
-}
+
+
