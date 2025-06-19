@@ -74,6 +74,7 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, i
 		if (ARSDungeonGameModeBase* DungeonGM = Cast<ARSDungeonGameModeBase>(GM))
 		{
 			DungeonGM->OnBossDead.AddDynamic(this, &URSSpawnManager::SpawnDunNextStagePortal);
+			DungeonGM->OnBossRoomPortalEntered.AddDynamic(this, &URSSpawnManager::SpawnBossMonster);
 		}
 	}
 
@@ -489,8 +490,10 @@ void URSSpawnManager::SpawnDunNextStagePortal() // 다음 스테이지 포탈 �
 
 void URSSpawnManager::SpawnBossMonster()
 {
+	UE_LOG(LogTemp, Warning, TEXT("보스 스폰함수 불러옴"));
 	if (!World || !MonsterDataTable)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("월드나 데이터 테이블이 없음"));
 		return;
 	}
 
@@ -507,6 +510,7 @@ void URSSpawnManager::SpawnBossMonster()
 
 	if (!BossTarget)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("보스몬스터 타겟이 없음"));
 		return;
 	}
 	FName BossMonsterRowName;
@@ -529,6 +533,7 @@ void URSSpawnManager::SpawnBossMonster()
 	FMonsterData* BossData = MonsterDataTable->FindRow<FMonsterData>(BossMonsterRowName, TEXT("SpawnBossMonster"));
 	if (!BossData || !BossData->MonsterClass)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("보스 데이터가 없음"));
 		return;
 	}
 
@@ -545,6 +550,7 @@ void URSSpawnManager::SpawnBossMonster()
 
 	if (!BossMonster)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("보스몬스터 스폰 안됨"));
 		return;
 	}
 
