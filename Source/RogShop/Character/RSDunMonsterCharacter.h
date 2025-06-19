@@ -26,7 +26,7 @@ class ROGSHOP_API ARSDunMonsterCharacter : public ARSDunBaseCharacter
 public:
 	ARSDunMonsterCharacter();
 
-	virtual void BeginPlay()override;
+	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	UFUNCTION(BlueprintCallable)
@@ -82,12 +82,16 @@ public:
 public:
 	// 애니메이션 실행 함수
 	void PlayAttackAnim();
-	void PlaySpawnAnim();
+	virtual void PlaySpawnAnim();
 
 	void UpdateEnemyWidgetComponentRotation();			// 몬스터 위젯 컴포넌트(체력바, 데미지 표시) 회전 함수
-	void UpdateOverheadEnemyHP(float const damage);		// 몬스터 HP 업데이트 함수
+	void UpdateOverheadEnemyHP();						// 몬스터 HP 업데이트 함수	
 
 	FName GetMonsterRowName() const;
+
+protected:
+	const FMonsterData* GetFMonsterData();				// 코드 중복 부분 정리용 함수
+	virtual void UpdateHPUI();
 
 protected:
 	// 애니메이션 몽타주
@@ -159,8 +163,6 @@ public:
 
 private:
 	TObjectPtr<ARSMonsterAIController> AIController;  // TODO : 혹시나 캐싱해서 쓸 일 생길까봐 미리 만들어둠.
-
-	const FMonsterData* GetFMonsterData();	// 코드 중복 부분 정리용 함수
 
 	FTimerHandle MonsterWidgetComponentRotationTimer;
 

@@ -218,6 +218,24 @@ void URSPlayerWeaponComponent::ResetCombo()
 	ComboIndex = 0;
 }
 
+void URSPlayerWeaponComponent::StartTrail()
+{
+	int8 Index = static_cast<int8>(WeaponSlot) - 1;
+	if (WeaponActors.IsValidIndex(Index))
+	{
+		WeaponActors[Index]->StartTrail();
+	}
+}
+
+void URSPlayerWeaponComponent::EndTrail()
+{
+	int8 Index = static_cast<int8>(WeaponSlot) - 1;
+	if (WeaponActors.IsValidIndex(Index))
+	{
+		WeaponActors[Index]->EndTrail();
+	}
+}
+
 void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 {
 	// 슬롯의 크기가 잘못 설정된 경우
@@ -555,6 +573,8 @@ void URSPlayerWeaponComponent::PerformBoxSweepAttack()
 
 							UGameplayStatics::ApplyPointDamage(HitActor, TotalDamage, HitDirection, Hit, OwnerController, WeaponActors[Index], UDamageType::StaticClass());
 
+							WeaponActors[Index]->SpawnHitImpactEffect(Hit.ImpactPoint);
+
 							// 무기 데미지를 중복으로 주는 경우를 방지하기 위한 배열에 값 추가
 							DamagedActors.Add(HitActor);
 
@@ -674,9 +694,6 @@ void URSPlayerWeaponComponent::LoadRequested()
 
 			if (SpawnWeapon)
 			{
-				SpawnWeapon->SetNormalAttackDatas(WeaponData->NormalAttackData);
-				SpawnWeapon->SetStrongAttackDatas(WeaponData->StrongAttackData);
-
 				SpawnWeapon->SetDataTableKey(CurWeaponName);
 				EquipWeaponToSlot(SpawnWeapon);
 			}
