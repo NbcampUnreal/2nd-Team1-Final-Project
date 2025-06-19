@@ -346,11 +346,13 @@ void ARSTycoonPlayerController::AddGold(int32 Value)
 	
 	if (Value > 0)
 	{
-		//[추가], 돈 추가 사운드
+		check(AddGoldSound);
+		UGameplayStatics::SpawnSoundAtLocation(this, AddGoldSound, FVector::ZeroVector);
 	}
 	else
 	{
-		//[추가], 돈 줄어드는 사운드
+		check(SpendGoldSound);
+		UGameplayStatics::SpawnSoundAtLocation(this, SpendGoldSound, FVector::ZeroVector);
 	}
 }
 
