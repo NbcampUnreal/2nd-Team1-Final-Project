@@ -5,6 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "NiagaraComponent.h"
 #include "RSDunPlayerCharacter.h"
+#include "RSDungeonGameModeBase.h"
 
 ARSDunBossRoomPortal::ARSDunBossRoomPortal()
 {
@@ -35,6 +36,12 @@ void ARSDunBossRoomPortal::Interact(ARSDunPlayerCharacter* Interactor)
 	if (Interactor)
 	{
 		Interactor->SetActorTransform(TargetTransform);
+	}
+
+	ARSDungeonGameModeBase* DungeonGameMode = GetWorld()->GetAuthGameMode<ARSDungeonGameModeBase>();
+	if (DungeonGameMode)
+	{
+		DungeonGameMode->OnBossRoomPortalEntered.Broadcast();
 	}
 }
 

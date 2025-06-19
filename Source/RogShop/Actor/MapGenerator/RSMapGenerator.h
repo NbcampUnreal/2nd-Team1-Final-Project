@@ -30,6 +30,8 @@ struct FTileData
 	FVector2D GridPos;
 	EDir Connections = EDir::None;
 	bool bIsMainPath = false;
+	bool bVisited = false;
+	FRotator Rotation = FRotator::ZeroRotator;
 };
 
 UCLASS()
@@ -43,9 +45,12 @@ public:
 	void SetTileType(int32 IGridSize, float ITileSize, TSoftObjectPtr<UWorld> ILineTileLevel, TSoftObjectPtr<UWorld> ICornerTileLevel, TSoftObjectPtr<UWorld> ICrossTileLevel, TSoftObjectPtr<UWorld> ITTileLevel, TSoftObjectPtr<UWorld> IDeadEndTileLevel, TSoftObjectPtr<UWorld> IBossArenaLevel, TSoftObjectPtr<UWorld> IEnvLevel);
 	void StartMapGenerator();
 
+	// 타일 방문처리
+	void MarkTileVisited(const FIntPoint& Coord);
+	// 타일 정보 조회
+	const FTileData* GetTileData(const FIntPoint& Coord) const;
 	// 전체 타일 좌표 반환
 	TSet<FIntPoint> GetAllTileCoords() const;
-
 	// 보스 타일 위치 반환
 	FIntPoint GetBossTileCoord() const;
 

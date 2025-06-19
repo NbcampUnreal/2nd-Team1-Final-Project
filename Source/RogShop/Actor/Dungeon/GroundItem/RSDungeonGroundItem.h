@@ -7,6 +7,8 @@
 #include "RSInteractable.h"
 #include "RSDungeonGroundItem.generated.h"
 
+class UNiagaraComponent;
+
 UCLASS()
 class ROGSHOP_API ARSDungeonGroundItem : public AActor, public IRSInteractable
 {
@@ -51,7 +53,10 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
 	TObjectPtr<USceneComponent> SceneComp;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UStaticMeshComponent> MeshComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UNiagaraComponent> DropEffectComp;
 };
