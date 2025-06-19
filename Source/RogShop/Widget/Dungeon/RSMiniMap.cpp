@@ -59,6 +59,7 @@ void URSMiniMap::UpdateTileVisual(const FIntPoint& TileCoord)
         if (TileCoord == MapGen->GetBossTileCoord())
         {
             TextureToUse = BossRoomTexture;
+            Rotation = FRotator::ZeroRotator;
         }
     }
 
