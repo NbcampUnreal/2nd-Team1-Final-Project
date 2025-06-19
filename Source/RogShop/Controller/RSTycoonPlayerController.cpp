@@ -24,7 +24,7 @@
 #include "RogShop/Widget/Tycoon/RSTycoonSaleWidget.h"
 #include "RogShop/Widget/Tycoon/RSTycoonWaitWidget.h"
 #include "Tycoon/NPC/RSTycoonNPC.h"
-
+#include "RSPlayerFloatingDamageWidget.h"
 
 #pragma region Mode
 ARSTycoonPlayerController::ARSTycoonPlayerController()
@@ -118,6 +118,8 @@ void ARSTycoonPlayerController::SettingWidget()
 	//SubWidget
 	InventoryWidget = CreateWidget<URSIngredientInventoryWidget>(this, InventoryWidgetClass.Get());
 	NPCInfoWidget = CreateWidget<URSTycoonNPCInfoWidget>(this, NPCInfoWidgetClass.Get());
+
+	FloatingTextWidget = CreateWidget<URSPlayerFloatingDamageWidget>(this, FloatingTextWidgetClass);
 }
 #pragma endregion
 
@@ -448,4 +450,17 @@ void ARSTycoonPlayerController::OnClickTileOrNPC()
 	{
 		DeactiveSelectTileWidget();
 	}
+}
+
+void ARSTycoonPlayerController::FloatingGold(int32 Amount, FVector WorldLocation)
+{
+	check(FloatingTextWidget);
+
+	FloatingTextWidget->AddToViewport();
+
+	FVector2D ScreenPos;
+	ProjectWorldLocationToScreen(WorldLocation, ScreenPos);
+	FloatingTextWidget->SetPositionInViewport(ScreenPos);
+
+	FloatingTextWidget->FloatingValue(Amount);
 }

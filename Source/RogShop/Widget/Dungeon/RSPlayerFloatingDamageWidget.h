@@ -15,7 +15,7 @@ class ROGSHOP_API URSPlayerFloatingDamageWidget : public UUserWidget
 
 public:
     UFUNCTION()
-    void ShowDamage(float Damage);
+    void FloatingValue(float Value);
 
 protected:
     virtual void NativeOnInitialized() override;

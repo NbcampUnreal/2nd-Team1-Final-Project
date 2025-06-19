@@ -296,7 +296,7 @@ void ARSDunPlayerCharacter::DecreaseHP(float Amount)
     if (PC)
     {
         PC->OnHPChange.Broadcast();
-        PC->OnFloatDamage.Broadcast(Amount);
+        PC->OnFloatDamage.Broadcast(-Amount);
     }
 }
 

@@ -19,6 +19,7 @@ class URSTycoonSaleResultWidget;
 class URSTycoonWaitWidget;
 class UInputAction;
 class UInputMappingContext;
+class URSPlayerFloatingDamageWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeGold, int32, Value);
 
@@ -73,6 +74,10 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<URSTycoonNPCInfoWidget> NPCInfoWidgetClass;
 	
+	// 획득 골드 표시 위젯 클래스
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<URSPlayerFloatingDamageWidget> FloatingTextWidgetClass;
+
 	UPROPERTY()
 	TObjectPtr<URSTycoonWaitWidget> WaitWidget;
 
@@ -90,6 +95,9 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<URSTycoonNPCInfoWidget> NPCInfoWidget;
+
+	UPROPERTY()
+	TObjectPtr<URSPlayerFloatingDamageWidget> FloatingTextWidget;
 #pragma endregion
 
 #pragma region Input
@@ -197,6 +205,8 @@ private:
 public:
 	FOnChangeGold OnChangeGold;
 	
+	void FloatingGold(int32 Amount, FVector WorldLocation);
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<URSTycoonInventoryComponent> InventoryComponent; //인벤토리
@@ -205,10 +215,12 @@ private:
 	int32 Gold;
 	int32 CustomerCount;
 
+	// 사운드
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	TObjectPtr<USoundBase> AddGoldSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	TObjectPtr<USoundBase> SpendGoldSound;
 
+	
 };
