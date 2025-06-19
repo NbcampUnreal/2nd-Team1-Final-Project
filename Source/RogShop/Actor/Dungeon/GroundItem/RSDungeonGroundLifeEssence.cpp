@@ -15,7 +15,7 @@ ARSDungeonGroundLifeEssence::ARSDungeonGroundLifeEssence()
 
 	CharacterFollowSpeed = 600.f;
 
-	InteractDelayTime = 1.f;
+	InteractDelayTime = 1.5f;
 
 	Quantity = 1;
 }
