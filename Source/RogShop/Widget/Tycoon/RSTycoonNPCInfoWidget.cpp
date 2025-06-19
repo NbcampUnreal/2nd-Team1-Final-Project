@@ -30,7 +30,8 @@ void URSTycoonNPCInfoWidget::OnClickSellButton()
 		PlayerController->AddGold(InfoNPC->GetPrice());
 		
 		//[추가], 돈 추가/감소 이펙트 (이펙트 안에 있는 숫자가 Value로 변경)
-		
+		PlayerController->FloatingGold(InfoNPC->GetPrice(), InfoNPC->GetActorLocation());
+
 		InfoNPC->Destroy();
 		InfoNPC = nullptr;
 

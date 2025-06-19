@@ -118,7 +118,8 @@ void ARSTycoonCustomerCharacter::Leave()
 	PlayerController->AddCustomerCount(1);
 	
 	//[추가], 돈 추가/감소 이펙트 (이펙트 안에 있는 숫자가 Value로 변경)
-	
+	PlayerController->FloatingGold(Data->Price, GetActorLocation());
+
 	OnFinishEat.Broadcast(this);
 
 	float PlayTime = PlayAnimMontage(StandMontage);
