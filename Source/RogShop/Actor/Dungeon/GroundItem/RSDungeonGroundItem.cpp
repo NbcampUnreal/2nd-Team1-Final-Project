@@ -3,6 +3,7 @@
 
 #include "RSDungeonGroundItem.h"
 #include "Components/BoxComponent.h"
+#include "NiagaraComponent.h"
 
 // Sets default values
 ARSDungeonGroundItem::ARSDungeonGroundItem()
@@ -16,6 +17,10 @@ ARSDungeonGroundItem::ARSDungeonGroundItem()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	MeshComp->SetupAttachment(SceneComp);
 	MeshComp->SetCollisionProfileName(TEXT("Interactable"));
+	
+	DropEffectComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("DropEffect"));
+	DropEffectComp->SetupAttachment(MeshComp);
+	DropEffectComp->SetAbsolute(false, true, false);
 
 	InteractName = FText::GetEmpty();
 	bIsAutoInteract = false;

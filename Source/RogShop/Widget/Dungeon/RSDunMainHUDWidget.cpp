@@ -3,6 +3,7 @@
 #include "RSDunMainHUDWidget.h"
 #include "RSInGameMenuWidget.h"
 #include "RSPlayerStatusWidget.h"
+#include "RSBossHPBarWidget.h"
 #include "RSInteractWidget.h"
 #include "RSPlayerInventoryWidget.h"
 #include "RSDungeonGameModeBase.h"
@@ -180,4 +181,6 @@ void URSDunMainHUDWidget::UpdateMiniMapPlayerPosition(const FIntPoint& TileCoord
         MiniMapWidget->UpdatePlayerPosition(TileCoord);
     }
 }
+
+
 

@@ -28,7 +28,9 @@ void URSTycoonNPCInfoWidget::OnClickSellButton()
 	{
 		ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 		PlayerController->AddGold(InfoNPC->GetPrice());
-
+		
+		//[추가], 돈 추가/감소 이펙트 (이펙트 안에 있는 숫자가 Value로 변경)
+		
 		InfoNPC->Destroy();
 		InfoNPC = nullptr;
 

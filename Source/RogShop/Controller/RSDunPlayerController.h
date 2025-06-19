@@ -9,10 +9,13 @@
 
 class UInputMappingContext;
 class UInputAction;
+class URSBossHPBarWidget;
+class UProgressBar;
 class URSDunMainHUDWidget;
 class URSPlayerInventoryWidget;
 class ARSDunBaseCharacter;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBossHPChange, FName, BossName, float, HPPercent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotChange, int8, WeaponSlotIndex, FName, WeaponKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnIngredientChange, int32, IngredientSlotIndex, FItemSlot, IngredientItemSlot);
 
@@ -111,6 +114,9 @@ private:
 
 // 이벤트 디스패처
 public:
+	UPROPERTY(BlueprintAssignable)
+	FOnBossHPChange OnBossHPChange;
+
 	UPROPERTY(BlueprintAssignable)
 	FOnWeaponSlotChange OnWeaponSlotChange;	// WeaponSlot을 변경하는 시점
 

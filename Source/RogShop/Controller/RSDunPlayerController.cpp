@@ -151,7 +151,6 @@ void ARSDunPlayerController::BindCharacterDelegates()
     {
         CurPawn->OnCharacterDied.AddDynamic(this, &ARSDunPlayerController::ShowPlayerDeathWidget);
     }
-
 }
 
 URSDunMainHUDWidget* ARSDunPlayerController::GetDunMainHudWidget()

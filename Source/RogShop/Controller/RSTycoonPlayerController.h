@@ -204,4 +204,11 @@ protected:
 private:
 	int32 Gold;
 	int32 CustomerCount;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	TObjectPtr<USoundBase> AddGoldSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	TObjectPtr<USoundBase> SpendGoldSound;
+
 };

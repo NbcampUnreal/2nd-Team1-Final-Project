@@ -343,6 +343,17 @@ void ARSTycoonPlayerController::DeactiveSelectTileWidget()
 void ARSTycoonPlayerController::AddGold(int32 Value)
 {
 	SetGold(Gold + Value);
+	
+	if (Value > 0)
+	{
+		check(AddGoldSound);
+		UGameplayStatics::SpawnSoundAtLocation(this, AddGoldSound, FVector::ZeroVector);
+	}
+	else
+	{
+		check(SpendGoldSound);
+		UGameplayStatics::SpawnSoundAtLocation(this, SpendGoldSound, FVector::ZeroVector);
+	}
 }
 
 void ARSTycoonPlayerController::AddCustomerCount(int32 Value)

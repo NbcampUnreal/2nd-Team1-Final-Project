@@ -4,12 +4,15 @@
 #include "RSBaseWeapon.h"
 #include "GameFramework/Character.h"
 #include "Components/BoxComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
+#include "RSDataSubsystem.h"
+#include "ItemInfoData.h"
 #include "WeaponAttackData.h"
 
-// Sets default values
 ARSBaseWeapon::ARSBaseWeapon()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
@@ -24,12 +27,13 @@ ARSBaseWeapon::ARSBaseWeapon()
 	BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BoxComp->SetGenerateOverlapEvents(false);
 
-	SetActorEnableCollision(false);
+	TrailNiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara"));
+	TrailNiagaraComp->SetupAttachment(SceneComp);
+	TrailNiagaraComp->SetAutoActivate(false);
 
-	//WeaponDamage = 0.f; TODO : 여기 WeaponDamage 안 쓰이고 있는데 임시 주석 처리했습니다.
+	SetActorEnableCollision(false);
 }
 
-// Called when the game starts or when spawned
 void ARSBaseWeapon::BeginPlay()
 {
 	Super::BeginPlay();
@@ -68,11 +72,6 @@ const TArray<UAnimMontage*> ARSBaseWeapon::GetNormalAttackMontages() const
 	return NormalAttackMontages;
 }
 
-void ARSBaseWeapon::SetNormalAttackDatas(TArray<FWeaponAttackData> NewNormalAttackDatas)
-{
-	NormalAttackDatas = NewNormalAttackDatas;
-}
-
 UAnimMontage* ARSBaseWeapon::GetStrongAttackMontage(int32 Index) const
 {
 	if (StrongAttackDatas.Num() > Index)
@@ -93,11 +92,6 @@ const TArray<UAnimMontage*> ARSBaseWeapon::GetStrongAttackMontages() const
 	}
 
 	return StrongAttackMontages;
-}
-
-void ARSBaseWeapon::SetStrongAttackDatas(TArray<FWeaponAttackData> NewStrongAttackDatas)
-{
-	StrongAttackDatas = NewStrongAttackDatas;
 }
 
 void ARSBaseWeapon::StartOverlap()
@@ -140,6 +134,27 @@ float ARSBaseWeapon::GetStrongAttackMontageDamage(int32 MontageIndex) const
 	return 0.0f;
 }
 
+void ARSBaseWeapon::StartTrail()
+{
+	if (TrailNiagaraComp)
+	{
+		TrailNiagaraComp->Activate();
+	}
+}
+
+void ARSBaseWeapon::EndTrail()
+{
+	if (TrailNiagaraComp)
+	{
+		TrailNiagaraComp->Deactivate();
+	}
+}
+
+void ARSBaseWeapon::SpawnHitImpactEffect(FVector TargetLocation)
+{
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitImpactEffect, TargetLocation);
+}
+
 FName ARSBaseWeapon::GetDataTableKey() const
 {
 	return DataTableKey;
@@ -148,4 +163,61 @@ FName ARSBaseWeapon::GetDataTableKey() const
 void ARSBaseWeapon::SetDataTableKey(FName NewDataTableKey)
 {
 	DataTableKey = NewDataTableKey;
+
+	// 데이터 테이블 키 값으로 현재 액터 초기화
+	Initialization();
+}
+
+void ARSBaseWeapon::Initialization()
+{
+	UGameInstance* CurGameInstance = GetWorld()->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	UDataTable* WeaponDetailDataTable = DataSubsystem->WeaponDetail;
+	if (!WeaponDetailDataTable)
+	{
+		return;
+	}
+
+	FDungeonWeaponData* WeaponData = WeaponDetailDataTable->FindRow<FDungeonWeaponData>(DataTableKey, TEXT("Get WeaponData"));
+
+	if (WeaponData)
+	{
+		NormalAttackDatas = WeaponData->NormalAttackData;
+		StrongAttackDatas = WeaponData->StrongAttackData;
+
+		TrailNiagaraComp->SetAsset(WeaponData->WeaponTrail);
+
+		HitImpactEffect = WeaponData->HitImpactEffect;
+
+		// Trail 나이아가라 크기 및 위치 조절
+		// 박스 컴포넌트의 월드 기준 크기의 절반
+		FVector BoxExtent = BoxComp->GetScaledBoxExtent();
+
+		// 4배 크기로 설정
+		// 2배할 경우 박스의 월드 기준 크기
+		// 한번 더 2배하여 Trail에 맞는 크기 설정
+		FVector BoxLength = BoxExtent * 4;
+		TrailNiagaraComp->SetFloatParameter(TEXT("User.EffectWidth"), BoxLength.Z);
+
+		// 박스 컴포넌트의 월드 기준 위치
+		FVector BoxWorldLocation = BoxComp->GetComponentLocation();
+
+		// 박스 컴포넌트의 최하단 위치
+		FVector Position = { BoxWorldLocation.X, BoxWorldLocation.Y, BoxWorldLocation.Z - BoxExtent.Z };
+		
+		// TrailNiagaraComp의 상대 위치로 변환
+		FVector RelativePosition = TrailNiagaraComp->GetComponentTransform().InverseTransformPosition(Position);
+
+		TrailNiagaraComp->SetVectorParameter(TEXT("User.EffectPosition"), RelativePosition);
+	}
 }
