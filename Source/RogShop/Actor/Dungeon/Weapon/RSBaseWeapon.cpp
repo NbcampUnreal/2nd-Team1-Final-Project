@@ -27,10 +27,6 @@ ARSBaseWeapon::ARSBaseWeapon()
 	BoxComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BoxComp->SetGenerateOverlapEvents(false);
 
-	TrailNiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara"));
-	TrailNiagaraComp->SetupAttachment(SceneComp);
-	TrailNiagaraComp->SetAutoActivate(false);
-
 	SetActorEnableCollision(false);
 }
 
@@ -136,23 +132,66 @@ float ARSBaseWeapon::GetStrongAttackMontageDamage(int32 MontageIndex) const
 
 void ARSBaseWeapon::StartTrail()
 {
-	if (TrailNiagaraComp)
+	if (TrailEffect && BoxComp)
 	{
+		TrailNiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(TrailEffect, SceneComp, NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, true, true);
+		
 		TrailNiagaraComp->Activate();
+
+		// Trail 나이아가라 크기 및 위치 조절
+		// 박스 컴포넌트의 월드 기준 크기의 절반
+		FVector BoxExtent = BoxComp->GetScaledBoxExtent();
+
+		// 4배 크기로 설정
+		// 2배할 경우 박스의 월드 기준 크기
+		// 한번 더 2배하여 Trail에 맞는 크기 설정
+		FVector BoxLength = BoxExtent * 4;
+		TrailNiagaraComp->SetFloatParameter(TEXT("User.EffectWidth"), BoxLength.Z);
+
+		// 박스 컴포넌트의 월드 기준 위치
+		FVector BoxWorldLocation = BoxComp->GetComponentLocation();
+
+		// 박스 컴포넌트의 최하단 위치
+		FVector Position = { BoxWorldLocation.X, BoxWorldLocation.Y, BoxWorldLocation.Z - BoxExtent.Z };
+
+		// TrailNiagaraComp의 상대 위치로 변환
+		FVector RelativePosition = TrailNiagaraComp->GetComponentTransform().InverseTransformPosition(Position);
+
+		TrailNiagaraComp->SetVectorParameter(TEXT("User.EffectPosition"), RelativePosition);
 	}
 }
 
 void ARSBaseWeapon::EndTrail()
 {
-	if (TrailNiagaraComp)
+	if (TrailNiagaraComp && TrailNiagaraComp->IsValidLowLevel())
 	{
+		// 기존 Trail 이펙트는 비활성화한다.
 		TrailNiagaraComp->Deactivate();
+
+		// 나이아가라가 Loop되는 경우 자동적으로 제거되지 않는다.
+		// 그렇기 때문에 명시적으로 3초 후 제거한다.
+		TWeakObjectPtr<UNiagaraComponent> DeactivateNiagara = TrailNiagaraComp;
+
+		FTimerHandle TrailTimer;
+
+		GetWorld()->GetTimerManager().SetTimer(TrailTimer, [DeactivateNiagara]()
+			{
+				if (DeactivateNiagara.IsValid())
+				{
+					DeactivateNiagara->DestroyComponent();
+				}
+			}, 2.f, false);
+
+		TrailNiagaraComp = nullptr;
 	}
 }
 
 void ARSBaseWeapon::SpawnHitImpactEffect(FVector TargetLocation)
 {
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitImpactEffect, TargetLocation);
+	if (HitImpactEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitImpactEffect, TargetLocation);
+	}
 }
 
 FName ARSBaseWeapon::GetDataTableKey() const
@@ -195,29 +234,8 @@ void ARSBaseWeapon::Initialization()
 		NormalAttackDatas = WeaponData->NormalAttackData;
 		StrongAttackDatas = WeaponData->StrongAttackData;
 
-		TrailNiagaraComp->SetAsset(WeaponData->WeaponTrail);
+		TrailEffect = WeaponData->WeaponTrail;
 
 		HitImpactEffect = WeaponData->HitImpactEffect;
-
-		// Trail 나이아가라 크기 및 위치 조절
-		// 박스 컴포넌트의 월드 기준 크기의 절반
-		FVector BoxExtent = BoxComp->GetScaledBoxExtent();
-
-		// 4배 크기로 설정
-		// 2배할 경우 박스의 월드 기준 크기
-		// 한번 더 2배하여 Trail에 맞는 크기 설정
-		FVector BoxLength = BoxExtent * 4;
-		TrailNiagaraComp->SetFloatParameter(TEXT("User.EffectWidth"), BoxLength.Z);
-
-		// 박스 컴포넌트의 월드 기준 위치
-		FVector BoxWorldLocation = BoxComp->GetComponentLocation();
-
-		// 박스 컴포넌트의 최하단 위치
-		FVector Position = { BoxWorldLocation.X, BoxWorldLocation.Y, BoxWorldLocation.Z - BoxExtent.Z };
-		
-		// TrailNiagaraComp의 상대 위치로 변환
-		FVector RelativePosition = TrailNiagaraComp->GetComponentTransform().InverseTransformPosition(Position);
-
-		TrailNiagaraComp->SetVectorParameter(TEXT("User.EffectPosition"), RelativePosition);
 	}
 }
