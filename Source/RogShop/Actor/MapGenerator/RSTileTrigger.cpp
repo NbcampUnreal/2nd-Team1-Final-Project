@@ -38,6 +38,17 @@ void ARSTileTrigger::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 		return;
 	}
 
+	ARSDungeonGameModeBase* GameMode = Cast<ARSDungeonGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (!GameMode)
+	{
+		return;
+	}
+	if (GameMode->GetMapGenerator())
+	{
+		FIntPoint Coord(TileCoord.X, TileCoord.Y);
+		GameMode->GetMapGenerator()->MarkTileVisited(Coord); // 방문 처리
+	}
+
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
 	{
 
@@ -55,11 +66,6 @@ void ARSTileTrigger::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 		return;
 	}
 
-	ARSDungeonGameModeBase* GameMode = Cast<ARSDungeonGameModeBase>(UGameplayStatics::GetGameMode(this));
-	if (!GameMode)
-	{
-		return;
-	}
 
 	URSSpawnManager* SpawnManager = GameMode->GetSpawnManager();
 	if (!SpawnManager)

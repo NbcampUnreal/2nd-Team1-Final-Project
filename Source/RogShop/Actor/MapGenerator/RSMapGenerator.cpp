@@ -463,6 +463,8 @@ void ARSMapGenerator::SpawnTiles()
                     break;
                 }
             }
+			Data.Rotation = Rot; //회전값 저장
+            TileMap[Pos] = Data;
 
             // 스폰 실행
             if (SelectedLevel.IsValid()) //선택된 레벨이 유효한 레벨인지 확인
@@ -665,6 +667,7 @@ void ARSMapGenerator::SpawnEnvLevel()
     if (!bSuccess || !StreamingLevel)
     {
         UE_LOG(LogTemp, Error, TEXT("Env 레벨 로딩 실패"));
+        return;
     }
 
     SpawnedLevels.Add(StreamingLevel);
@@ -679,6 +682,19 @@ TSet<FIntPoint> ARSMapGenerator::GetAllTileCoords() const // 전체 타일 위�
 FIntPoint ARSMapGenerator::GetBossTileCoord() const // 보스 타일 위치 반환
 {
     return BossTileCoord;
+}
+
+void ARSMapGenerator::MarkTileVisited(const FIntPoint& Coord)
+{
+    if (TileMap.Contains(Coord))
+    {
+        TileMap[Coord].bVisited = true;
+    }
+}
+
+const FTileData* ARSMapGenerator::GetTileData(const FIntPoint& Coord) const
+{
+    return TileMap.Find(Coord);
 }
 
 
