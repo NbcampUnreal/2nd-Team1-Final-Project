@@ -23,6 +23,9 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UProgressBar* MonsterHPBar;
 
+	UPROPERTY(meta = (BindWidget))
+	UProgressBar* MonsterHPBackBar;
+
 private:
 	float TargetPercent;
 	float CurrentPercent;
