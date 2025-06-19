@@ -154,7 +154,9 @@ void ARSTycoonPlayerController::SettingWidget()
 	//SubWidget
 	InventoryWidget = CreateWidget<URSIngredientInventoryWidget>(this, InventoryWidgetClass.Get());
 	NPCInfoWidget = CreateWidget<URSTycoonNPCInfoWidget>(this, NPCInfoWidgetClass.Get());
+
 	FloatingTextWidget = CreateWidget<URSPlayerFloatingDamageWidget>(this, FloatingTextWidgetClass);
+	FloatingTextWidget->SetTextColor(FColor::Yellow);
 	
 	EventViewWidget = CreateWidget<URSTycoonEventViewWidget>(this, EventViewWidgetClass.Get());
 	EventViewWidget->AddToViewport();
@@ -384,6 +386,7 @@ void ARSTycoonPlayerController::DeactiveSelectTileWidget()
 void ARSTycoonPlayerController::AddGold(int32 Value)
 {
 	SetGold(Gold + Value);
+	SaleGold += Value;
 	
 	if (Value > 0)
 	{
@@ -396,7 +399,6 @@ void ARSTycoonPlayerController::AddGold(int32 Value)
 		UGameplayStatics::SpawnSoundAtLocation(this, SpendGoldSound, FVector::ZeroVector);
 	}
 
-	SaleGold += Value;
 }
 
 void ARSTycoonPlayerController::AddCustomerCount(int32 Value)

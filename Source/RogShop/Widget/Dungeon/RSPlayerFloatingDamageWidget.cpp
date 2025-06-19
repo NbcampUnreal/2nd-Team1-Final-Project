@@ -50,6 +50,11 @@ void URSPlayerFloatingDamageWidget::FloatingValue(float Value)
     );
 }
 
+void URSPlayerFloatingDamageWidget::SetTextColor(FColor NewColor)
+{   
+    TextDamage->SetColorAndOpacity(NewColor);
+}
+
 void URSPlayerFloatingDamageWidget::OnFadeOutFinished()
 {
     if (TextDamage)

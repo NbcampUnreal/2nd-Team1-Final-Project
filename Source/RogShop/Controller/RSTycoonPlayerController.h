@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RSTycoonPlayerController.generated.h"
 
+class URSPlayerFloatingDamageWidget;
 class URSTycoonEvent;
 class URSTycoonEventViewWidget;
 class URSTycoonNPCInfoWidget;
@@ -87,8 +88,7 @@ private:
 	// 획득 골드 표시 위젯 클래스
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<URSPlayerFloatingDamageWidget> FloatingTextWidgetClass;
-
-
+	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<URSTycoonEventViewWidget> EventViewWidgetClass;
 
