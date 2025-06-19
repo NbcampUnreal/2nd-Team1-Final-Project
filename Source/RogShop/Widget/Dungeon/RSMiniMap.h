@@ -21,10 +21,13 @@ class ROGSHOP_API URSMiniMap : public UUserWidget
 public:
 
 	// 맵 전체 초기화 (던전의 타일 구성 정보 제공)
-	void InitializeMap(const TSet<FIntPoint>& TileCoords, FIntPoint BossTile);
+	void InitializeMap(const TSet<FIntPoint>& TileCoords,const FIntPoint& BossTile);
 
 	// 플레이어 현재 위치 업데이트
-	void UpdatePlayerPosition(FIntPoint PlayerCoord);
+	void UpdatePlayerPosition(const FIntPoint& TileCoord);
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateTileVisual(const FIntPoint& TileCoord);
 
 protected:
 	// 위젯 디자인에서 설정한 CanvasPanel (전체 타일이 이 위에 추가됨)
@@ -33,17 +36,29 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UImage* MiniMapBackgroundImage;
 
-	// 타일 위젯 클래스
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<URSMiniMapTileWidget> TileWidgetClass;
+	// 타일 이미지들
+	UPROPERTY(EditAnywhere, Category = "Minimap")
+	UTexture2D* StraightTexture;
 
-private:
-	// 좌표별 타일 위젯들을 저장
-	TMap<FIntPoint, URSMiniMapTileWidget*> TileWidgets;
+	UPROPERTY(EditAnywhere, Category = "Minimap")
+	UTexture2D* CornerTexture;
 
-	// 방문한 타일 좌표들
-	TSet<FIntPoint> VisitedTiles;
+	UPROPERTY(EditAnywhere, Category = "Minimap")
+	UTexture2D* TTexture;
 
-	// 보스, 상점 방의 좌표
-	FIntPoint BossRoom;
+	UPROPERTY(EditAnywhere, Category = "Minimap")
+	UTexture2D* CrossTexture;
+
+	UPROPERTY(EditAnywhere, Category = "Minimap")
+	UTexture2D* DeadEndTexture;
+
+	UPROPERTY(EditAnywhere, Category = "Minimap")
+	UTexture2D* BossRoomTexture;
+
+	UPROPERTY(EditAnywhere, Category = "Minimap")
+	UTexture2D* QuestionTileTexture;
+
+	TMap<FIntPoint, UImage*> TileImageMap; // 좌표 -> 타일 이미지 매핑
+
+	void SetTileImage(const FIntPoint& Coord, UTexture2D* Texture, const FRotator& Rotation);
 };
