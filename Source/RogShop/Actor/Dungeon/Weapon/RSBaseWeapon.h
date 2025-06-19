@@ -85,6 +85,9 @@ public:
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Niagara", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UNiagaraSystem> TrailEffect;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Niagara", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UNiagaraSystem> HitImpactEffect;
 
 // 데이터 테이블의 RowName을 ID값으로 사용한다.
