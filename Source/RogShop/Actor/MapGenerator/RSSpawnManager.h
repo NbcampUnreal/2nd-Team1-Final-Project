@@ -43,6 +43,7 @@ public:
 	void SpawnPlayerAtStartPoint();
 
 	// 보스몬스터 스폰 함수
+	UFUNCTION()
 	void SpawnBossMonster();
 
 	// 특정 타일에 몬스터 스폰을 위한 함수
