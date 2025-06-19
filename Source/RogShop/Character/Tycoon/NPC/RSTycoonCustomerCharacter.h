@@ -81,7 +81,4 @@ private:
 	// 사운드
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	TObjectPtr<USoundBase> SitSound;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Sound")
-	TObjectPtr<USoundBase> ExitSound;
 };

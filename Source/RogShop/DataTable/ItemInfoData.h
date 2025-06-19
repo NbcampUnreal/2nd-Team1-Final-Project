@@ -73,6 +73,9 @@ public:
 	TObjectPtr<UNiagaraSystem> WeaponTrail;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UNiagaraSystem> HitImpactEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FWeaponAttackData> NormalAttackData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

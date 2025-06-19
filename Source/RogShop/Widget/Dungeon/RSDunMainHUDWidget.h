@@ -10,6 +10,7 @@ class URSPlayerStatusWidget;
 class URSInGameMenuWidget;
 class URSPlayerInventoryWidget;
 class URSInteractWidget;
+class URSBossHPBarWidget;
 class URSMiniMap;
 
 UCLASS()
@@ -30,6 +31,8 @@ public:
     void HideInteractWidget();
     void UpdateMiniMapPlayerPosition(const FIntPoint& TileCoord);
 
+    URSBossHPBarWidget* GetBossHPBarWidget() const;
+
 private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<URSPlayerStatusWidget> PlayerStatusWidget;
@@ -42,6 +45,9 @@ private:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<URSInteractWidget> InteractWidget;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
+    TObjectPtr<URSBossHPBarWidget> WBP_BossInfoWidget;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<URSMiniMap> MiniMapWidget;

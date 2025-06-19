@@ -79,6 +79,11 @@ public:
 
 	void ResetCombo();
 
+	// 공격시 재생되는 Trail
+	void StartTrail();
+
+	void EndTrail();
+
 private:
 	// 애니메이션을 위한 상태
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
