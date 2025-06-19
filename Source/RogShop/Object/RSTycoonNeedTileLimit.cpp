@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "RSTycoonNeedTileEvent.h"
+#include "RSTycoonNeedTileLimit.h"
 
 #include "RSTycoonGameModeBase.h"
 #include "RSTycoonPlayerController.h"
@@ -14,12 +14,12 @@
 #include "RogShop/Actor/Tycoon/Tile/RSIceBoxTile.h"
 #include "RogShop/Actor/Tycoon/Tile/RSTableTile.h"
 
-URSTycoonNeedTileEvent::URSTycoonNeedTileEvent()
+URSTycoonNeedTileLimit::URSTycoonNeedTileLimit()
 {
 	EventName = TEXT("타일 제한!");
 }
 
-bool URSTycoonNeedTileEvent::Condition_Implementation(UWorld* World)
+bool URSTycoonNeedTileLimit::Condition_Implementation(UWorld* World)
 {
 	//운영시 문, 화구, 테이블 타일이 한개 이상씩은 있어야함
 	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(World, ARSTileMap::StaticClass()));
@@ -52,7 +52,7 @@ bool URSTycoonNeedTileEvent::Condition_Implementation(UWorld* World)
 	return DoorCount > 0 && CookingCount > 0 && TableCount > 0 && IceBoxCount > 0;
 }
 
-void URSTycoonNeedTileEvent::Fail_Implementation(UWorld* World)
+void URSTycoonNeedTileLimit::Fail_Implementation(UWorld* World)
 {
 	Description = TEXT("아래의 타일이 모두 배치되어야 합니다!");
 	Description.Append(FString::Printf(TEXT("\n문 : %d / 1"), DoorCount));
@@ -63,7 +63,7 @@ void URSTycoonNeedTileEvent::Fail_Implementation(UWorld* World)
 	World->GetFirstPlayerController<ARSTycoonPlayerController>()->SetSaleEnable(false);
 }
 
-void URSTycoonNeedTileEvent::Success_Implementation(UWorld* World)
+void URSTycoonNeedTileLimit::Success_Implementation(UWorld* World)
 {
 	World->GetFirstPlayerController<ARSTycoonPlayerController>()->SetSaleEnable(true);
 }

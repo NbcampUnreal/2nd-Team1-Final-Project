@@ -22,15 +22,25 @@ public:
 	void Fail(UWorld* World);
 	UFUNCTION(BlueprintNativeEvent)
 	void Success(UWorld* World);
+
+protected:
+	UFUNCTION(BlueprintCallable)
+	AActor* GetActorOfClass(UWorld* World, TSubclassOf<AActor> ActorClass);
+	UFUNCTION(BlueprintCallable)
+	TArray<AActor*> GetAllActorsOfClass(UWorld* World, TSubclassOf<AActor> ActorClass);
+	UFUNCTION(BlueprintPure)
+	APlayerController* GetPlayerController(UWorld* World);
+	UFUNCTION(BlueprintPure)
+	AGameModeBase* GetGameModeBase(UWorld* World);
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Order;
+	int32 Priority;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString EventName;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(MultiLine=true))
 	FString Description;
 
 	

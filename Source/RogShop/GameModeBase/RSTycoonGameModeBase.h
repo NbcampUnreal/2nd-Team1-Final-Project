@@ -50,6 +50,11 @@ public:
 	
 	void StartManagementMode();
 
+	//남은 재료중에 요리가 가능한지 반환
+	//OutOrderFood : true로 통과된다면 해야할 요리
+	UFUNCTION(BlueprintCallable)
+	bool CanOrder(FName& OutOrderFood);
+
 	
 	float GetGameTime() const; //게임 경과 시간을 반환해줌
 	const TArray<FFoodOrder>& GetOrders() const { return FoodOrders; }
@@ -66,7 +71,6 @@ protected:
 
 private:
 	void CreateCustomer();
-	bool CanOrder(FName& OutOrderFood);
 	void LoadGameData();
 
 	UFUNCTION()

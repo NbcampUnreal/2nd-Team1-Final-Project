@@ -12,18 +12,18 @@
 
 void URSSaveGameSubsystem::AddIngredientDungeonToTycoon(FName IngredientKey, int32 Amount)
 {
-	URSTycoonSaveGame* TycoonSaveGame = Cast<URSTycoonSaveGame>(
-		UGameplayStatics::LoadGameFromSlot(TycoonSaveSlot, 0));
+	URSTycoonSaveGame* TycoonSaveGame =
+		Cast<URSTycoonSaveGame>(UGameplayStatics::LoadGameFromSlot(TycoonSaveSlot, 0));
 	if (TycoonSaveGame == nullptr)
 	{
 		RS_LOG_C("TycoonSaveGame 불러오기 실패, 새로운 파일을 생성합니다.", FColor::Red)
 		TycoonSaveGame = Cast<URSTycoonSaveGame>(UGameplayStatics::CreateSaveGameObject(URSTycoonSaveGame::StaticClass()));
-		TycoonSaveGame->SetDefault(true);
+		TycoonSaveGame->SetDefault(true, TycoonTileMapSaveSlot);
 	}
-	
+
 	TArray<FItemSlot>& Ingredients = TycoonSaveGame->Ingredients;
 	int32 NoneIndex = INDEX_NONE;
-	
+
 	for (int32 i = 0; i < Ingredients.Num(); i++)
 	{
 		if (Ingredients[i].ItemKey == IngredientKey)
@@ -43,7 +43,7 @@ void URSSaveGameSubsystem::AddIngredientDungeonToTycoon(FName IngredientKey, int
 	{
 		Ingredients[NoneIndex].ItemKey = IngredientKey;
 		Ingredients[NoneIndex].Quantity = Amount;
-		
+
 		UGameplayStatics::SaveGameToSlot(TycoonSaveGame, TycoonSaveSlot, 0);
 	}
 	else
@@ -139,4 +139,3 @@ bool URSSaveGameSubsystem::DoesTycoonSaveFileExist()
 
 	return false;
 }
-

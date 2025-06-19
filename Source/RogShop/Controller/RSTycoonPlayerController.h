@@ -40,12 +40,15 @@ public:
 	void EndSaleMode();
 	void StartManagementMode();
 
+	UFUNCTION(BlueprintCallable)
 	void SetSaleEnable(bool Value);
-	bool CanSaleMode();
-	
+
+private:
+	bool CheckLimitsOfSale();
+
 private:
 	UPROPERTY(EditDefaultsOnly)
-	TArray<TSubclassOf<URSTycoonEvent>> NeedEventsForSale;
+	TArray<TSubclassOf<URSTycoonEvent>> LimitsForSale;
 #pragma endregion
 
 #pragma region Widget
@@ -55,7 +58,7 @@ public:
 	void RemoveOrderSlot(FFoodOrder Order);
 	void ActiveOrderSlot(FFoodOrder Order, FTimerHandle CookTimer);
 	void FinishOrderSlot(FFoodOrder Order);
-	
+
 	URSIngredientInventoryWidget* GetInventoryWidget() const { return InventoryWidget; }
 
 private:
@@ -83,7 +86,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<URSTycoonEventViewWidget> EventViewWidgetClass;
-	
+
 	UPROPERTY()
 	TObjectPtr<URSTycoonWaitWidget> WaitWidget;
 
@@ -98,7 +101,7 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<URSIngredientInventoryWidget> InventoryWidget;
-	
+
 	UPROPERTY()
 	TObjectPtr<URSTycoonNPCInfoWidget> NPCInfoWidget;
 
@@ -124,38 +127,39 @@ public:
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputAction> TileClickAction;
-	
+
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputAction> ZoomAction;
-	
+
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputMappingContext> IMC;
 
 #pragma endregion
 
 #pragma region Camera
+
 public:
 	void SetCameraLocationToCenter();
-	
+
 private:
 	void SettingCamera();
 
 	UFUNCTION(BlueprintCallable)
 	void SetMaxLengthOfMainCamera();
-	
+
 	UFUNCTION()
 	void OnZoom(const FInputActionValue& Value);
 
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	float CameraMoveSensitivity = 4.f;
-	
+
 	UPROPERTY(EditDefaultsOnly)
 	float OrthoWidthSensitivity = 20.f;
 
 	UPROPERTY(EditDefaultsOnly)
 	float MinLengthOfMainCamera = 50.f;
-	
+
 	UPROPERTY(EditDefaultsOnly)
 	float MinOrthoWidth;
 
@@ -165,10 +169,11 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<ARSTycoonCamera> TopCamera;
-	
-#pragma endregion 
+
+#pragma endregion
 
 #pragma region TileChange
+
 public:
 	int32 GetSelectTileIndex() const { return SelectTileIndex; }
 
@@ -177,22 +182,22 @@ private:
 	void OnRotateTile(const FInputActionValue& Value);
 
 	void SettingChangeTile();
-	
+
 	void DeactiveSelectTileWidget();
-	
+
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActor> SelectTileActorClass;
 	UPROPERTY()
 	TObjectPtr<AActor> SelectTileActor;
-	
+
 	int32 SelectTileIndex = INDEX_NONE;
-#pragma endregion 
-	
+#pragma endregion
+
 public:
 	UFUNCTION(BlueprintCallable)
 	void AddGold(int32 Value);
-	
+
 	void AddCustomerCount(int32 Value);
 	void SetGold(int32 Value);
 	void SetCustomerCount(int32 Value);
@@ -200,6 +205,7 @@ public:
 	int32 GetGold() const { return Gold; }
 	int32 GetCustomerCount() const { return CustomerCount; }
 	URSTycoonInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
+	int32 GetSaleGold() const { return SaleGold; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -207,15 +213,16 @@ protected:
 private:
 	UFUNCTION()
 	void OnClickTileOrNPC();
-	
+
 public:
 	FOnChangeGold OnChangeGold;
-	
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<URSTycoonInventoryComponent> InventoryComponent; //인벤토리
-	
+
 private:
 	int32 Gold;
 	int32 CustomerCount;
+	int32 SaleGold; //이번 게임에서 얻은 골드
 };

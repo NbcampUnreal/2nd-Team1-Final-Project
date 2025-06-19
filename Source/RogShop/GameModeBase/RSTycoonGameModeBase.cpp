@@ -135,7 +135,6 @@ void ARSTycoonGameModeBase::StartWaitMode()
 	State = ETycoonGameMode::Wait;
 	
 	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
-	PlayerController->CanSaleMode();	
 	PlayerController->StartWaitMode();
 }
 
@@ -144,6 +143,65 @@ void ARSTycoonGameModeBase::StartManagementMode()
 	State = ETycoonGameMode::Management;
 
 	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->StartManagementMode();
+}
+
+//남은 재료중에 요리가 가능한지 반환
+//OutOrderFood : true로 통과된다면 해야할 요리
+bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
+{
+	URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
+	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	check(Controller)
+
+	//1. 이미 들어와있는 손님들이 시키는 음식들이 사용하는 재료를 남은 재료 목록에서 제외 시켜야함
+	TArray<FItemSlot> Ingredients = Controller->GetInventoryComponent()->GetItems(); //재료 있는 것들 복사
+	for (auto& Customer : Customers)
+	{
+		FCookFoodData const* Data = DataSubsystem->Food->FindRow<FCookFoodData>(Customer->WantFoodKey, TEXT("Get FoodData"));
+		for (auto& Need : Data->NeedIngredients)
+		{
+			//손님이 바라는 음식인데 이미 요리가 나와서 재료가 없는 상황엔 재료를 차감하지 않음
+			//어차피 아래쪽에서 만들 수 있는지 검사하기 때문에 여기서 차감만
+			for (FItemSlot& e : Ingredients)
+			{
+				if (e.ItemKey == Need.Key)
+				{
+					e.Quantity -= Need.Value;
+				}
+			}
+		}
+	}
+
+	//2. 남은 재료중에 만들 수 있는거 있는지 확인
+	TArray<FCookFoodData*> FoodDatas;
+	int OrderFoodIndex = INDEX_NONE;
+	DataSubsystem->Food->GetAllRows<FCookFoodData>(TEXT("Get All Food Data"), FoodDatas);
+
+	for (int i = 0; i < FoodDatas.Num(); i++)
+	{
+		FCookFoodData* Data = FoodDatas[i];
+
+		//만들 수 있는 음식이 1개라도 있으면 true
+		if (Data->CanMake(Ingredients))
+		{
+			if (OrderFoodIndex == INDEX_NONE ||
+				FoodDatas[OrderFoodIndex]->Price < Data->Price)
+			{
+				OrderFoodIndex = i;
+			}
+		}
+	}
+
+	//3. 요리를 만들 수 있다면 어떤 요리를 만들지 설정
+	bool bResult = OrderFoodIndex >= 0;
+	if (bResult)
+	{
+		//데이터와 Row의 대응의 순서가 보장된다면 정상작동함
+		auto RowNames = DataSubsystem->Food->GetRowNames();
+		OutOrderFood = RowNames[OrderFoodIndex];
+	}
+
+	return bResult;
 }
 
 float ARSTycoonGameModeBase::GetGameTime() const
@@ -219,65 +277,6 @@ void ARSTycoonGameModeBase::CreateCustomer()
 	{
 		UGameplayStatics::SpawnSoundAtLocation(this, CustomerAddSound, SpawnDoorTile->GetActorLocation());
 	}
-}
-
-//남은 재료중에 요리가 가능한지 반환
-//OutOrderFood : true로 통과된다면 해야할 요리
-bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
-{
-	URSDataSubsystem* DataSubsystem = GetGameInstance()->GetSubsystem<URSDataSubsystem>();
-	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
-	check(Controller)
-
-	//1. 이미 들어와있는 손님들이 시키는 음식들이 사용하는 재료를 남은 재료 목록에서 제외 시켜야함
-	TArray<FItemSlot> Ingredients = Controller->GetInventoryComponent()->GetItems(); //재료 있는 것들 복사
-	for (auto& Customer : Customers)
-	{
-		FCookFoodData const* Data = DataSubsystem->Food->FindRow<FCookFoodData>(Customer->WantFoodKey, TEXT("Get FoodData"));
-		for (auto& Need : Data->NeedIngredients)
-		{
-			//손님이 바라는 음식인데 이미 요리가 나와서 재료가 없는 상황엔 재료를 차감하지 않음
-			//어차피 아래쪽에서 만들 수 있는지 검사하기 때문에 여기서 차감만
-			for (FItemSlot& e : Ingredients)
-			{
-				if (e.ItemKey == Need.Key)
-				{
-					e.Quantity -= Need.Value;
-				}
-			}
-		}
-	}
-
-	//2. 남은 재료중에 만들 수 있는거 있는지 확인
-	TArray<FCookFoodData*> FoodDatas;
-	int OrderFoodIndex = INDEX_NONE;
-	DataSubsystem->Food->GetAllRows<FCookFoodData>(TEXT("Get All Food Data"), FoodDatas);
-
-	for (int i = 0; i < FoodDatas.Num(); i++)
-	{
-		FCookFoodData* Data = FoodDatas[i];
-
-		//만들 수 있는 음식이 1개라도 있으면 true
-		if (Data->CanMake(Ingredients))
-		{
-			if (OrderFoodIndex == INDEX_NONE ||
-				FoodDatas[OrderFoodIndex]->Price < Data->Price)
-			{
-				OrderFoodIndex = i;
-			}
-		}
-	}
-
-	//3. 요리를 만들 수 있다면 어떤 요리를 만들지 설정
-	bool bResult = OrderFoodIndex >= 0;
-	if (bResult)
-	{
-		//데이터와 Row의 대응의 순서가 보장된다면 정상작동함
-		auto RowNames = DataSubsystem->Food->GetRowNames();
-		OutOrderFood = RowNames[OrderFoodIndex];
-	}
-
-	return bResult;
 }
 
 void ARSTycoonGameModeBase::LoadGameData()

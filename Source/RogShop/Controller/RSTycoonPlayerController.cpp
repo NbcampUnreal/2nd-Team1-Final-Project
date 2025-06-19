@@ -45,6 +45,8 @@ void ARSTycoonPlayerController::StartWaitMode()
 
 	SelectTileIndex = INDEX_NONE;
 	SelectTileActor->SetActorHiddenInGame(true);
+
+	CheckLimitsOfSale();
 }
 
 void ARSTycoonPlayerController::StartSaleMode()
@@ -53,6 +55,7 @@ void ARSTycoonPlayerController::StartSaleMode()
 	SetInputMode(InputMode);
 	ChangeMainWidget(SaleWidget);
 
+	SaleGold = 0;
 	CustomerCount = 0;
 	SaleWidget->SetCustomerCount(CustomerCount);
 }
@@ -81,12 +84,12 @@ void ARSTycoonPlayerController::SetSaleEnable(bool Value)
 	WaitWidget->SetEnableSaleButton(Value);
 }
 
-bool ARSTycoonPlayerController::CanSaleMode()
+bool ARSTycoonPlayerController::CheckLimitsOfSale()
 {
 	UWorld* World = GetWorld();
-	
+
 	//이벤트 검사
-	for (auto& Event : NeedEventsForSale)
+	for (auto& Event : LimitsForSale)
 	{
 		URSTycoonEvent* EventObject = Event->GetDefaultObject<URSTycoonEvent>();
 		if (EventObject->Condition(World))
@@ -389,6 +392,8 @@ void ARSTycoonPlayerController::AddGold(int32 Value)
 	{
 		//[추가], 돈 줄어드는 사운드
 	}
+
+	SaleGold += Value;
 }
 
 void ARSTycoonPlayerController::AddCustomerCount(int32 Value)
