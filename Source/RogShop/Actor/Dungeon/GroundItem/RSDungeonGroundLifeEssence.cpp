@@ -13,7 +13,7 @@ ARSDungeonGroundLifeEssence::ARSDungeonGroundLifeEssence()
 	InteractName = FText::FromString(TEXT("생명의 정수"));
 	bIsAutoInteract = true;
 
-	CharacterFollowSpeed = 300.f;
+	CharacterFollowSpeed = 600.f;
 
 	InteractDelayTime = 1.f;
 
