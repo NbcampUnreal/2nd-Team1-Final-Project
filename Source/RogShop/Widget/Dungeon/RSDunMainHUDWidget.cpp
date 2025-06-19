@@ -53,11 +53,6 @@ void URSDunMainHUDWidget::NativeConstruct()
             }
         }
     }
-
-    if (WBP_BossInfoWidget)
-    {
-        WBP_BossInfoWidget->SetVisibility(ESlateVisibility::Hidden);
-    }
 }
 
 void URSDunMainHUDWidget::HideAllWidgets()
@@ -180,9 +175,4 @@ void URSDunMainHUDWidget::UpdateMiniMapPlayerPosition(const FIntPoint& TileCoord
     {
         MiniMapWidget->UpdatePlayerPosition(TileCoord);
     }
-}
-
-URSBossHPBarWidget* URSDunMainHUDWidget::GetBossHPBarWidget() const
-{
-    return WBP_BossInfoWidget;
 }
