@@ -42,7 +42,6 @@ void ARSDunBossCharacter::PlaySpawnAnim()
 {
 	Super::PlaySpawnAnim();
 
-	// TODO : 아마 선국님 델리게이트 추가하면 제거할 부분
 	ARSDunPlayerController* PlayerController = Cast<ARSDunPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (PlayerController)
 	{
