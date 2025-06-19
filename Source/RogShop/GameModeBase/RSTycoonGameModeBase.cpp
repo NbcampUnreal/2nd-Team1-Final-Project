@@ -18,6 +18,8 @@
 #include "RSTycoonSaveGame.h"
 #include "RogShop/Actor/Tycoon/RSTileMap.h"
 #include "RogShop/Actor/Tycoon/Tile/RSIceBoxTile.h"
+#include "RogShop/Object/RSTycoonEvent.h"
+#include "RogShop/Widget/Tycoon/RSTycoonEventViewWidget.h"
 
 
 ARSTycoonGameModeBase::ARSTycoonGameModeBase()
@@ -131,8 +133,9 @@ void ARSTycoonGameModeBase::EndSaleMode()
 void ARSTycoonGameModeBase::StartWaitMode()
 {
 	State = ETycoonGameMode::Wait;
-
-	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->StartWaitMode();
+	
+	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	PlayerController->StartWaitMode();
 }
 
 void ARSTycoonGameModeBase::StartManagementMode()
@@ -140,86 +143,6 @@ void ARSTycoonGameModeBase::StartManagementMode()
 	State = ETycoonGameMode::Management;
 
 	GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>()->StartManagementMode();
-}
-
-float ARSTycoonGameModeBase::GetGameTime() const
-{
-	return GetWorldTimerManager().GetTimerElapsed(GameTimerHandle);
-}
-
-FFoodOrder ARSTycoonGameModeBase::GetOrderToCook()
-{
-	//제일 처음 주문을 반환
-	return FoodOrders[0];
-}
-
-void ARSTycoonGameModeBase::BeginPlay()
-{
-	Super::BeginPlay();
-
-#if WITH_EDITOR
-	GetGameInstance<URSGameInstance>()->SetDebugLogEnabled(true);
-#endif
-
-	URSSaveGameSubsystem* SaveSubsystem = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
-	SaveSubsystem->OnSaveRequested.AddDynamic(this, &ARSTycoonGameModeBase::SaveGameData);
-
-	GetWorldTimerManager().SetTimerForNextTick([&]()
-	{
-		LoadGameData();
-		StartWaitMode();
-	});
-}
-
-void ARSTycoonGameModeBase::CreateCustomer()
-{
-	//손님의 인원이 최대 손님의 갯수를 넘을 수 없음
-	if (GetCurrentCustomerCount() >= MaxCustomerCount)
-	{
-		return;
-	}
-
-	//손님이 들어와서 먹을 수 있는 음식이 있는지 검사
-	FName OrderFoodKey;
-	if (!CanOrder(OrderFoodKey))
-	{
-		return;
-	}
-
-	//임시, 동적 생성이 생긴 후에는 RSTileMap에서 할 예정
-
-	//손님이 앉을 테이블 결정
-	TArray<AActor*> TableTiles;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSTableTile::StaticClass(), TableTiles);
-	check(TableTiles.Num())
-
-	ARSTableTile* TargetTableTile;
-	do
-	{
-		int32 RandomTableIndex = FMath::RandRange(0, TableTiles.Num() - 1);
-		TargetTableTile = Cast<ARSTableTile>(TableTiles[RandomTableIndex]);
-	} while (!TargetTableTile->CanSit());
-
-	//손님을 스폰할 문 결정
-	TArray<AActor*> DoorTiles;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSDoorTile::StaticClass(), DoorTiles);
-	check(DoorTiles.Num())
-
-	int32 RandomDoorIndex = FMath::RandRange(0, DoorTiles.Num() - 1);
-	ARSDoorTile* SpawnDoorTile = Cast<ARSDoorTile>(DoorTiles[RandomDoorIndex]);
-
-	ARSTycoonCustomerCharacter* Customer = SpawnDoorTile->SpawnCustomer(OrderFoodKey, TargetTableTile);
-	Customers.Add(Customer);
-
-	if (CustomerAddSound)
-	{
-		UGameplayStatics::SpawnSoundAtLocation(
-			this,
-			CustomerAddSound,
-			SpawnDoorTile->GetActorLocation(),
-			FRotator::ZeroRotator
-		);
-	}
 }
 
 //남은 재료중에 요리가 가능한지 반환
@@ -281,6 +204,81 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 	return bResult;
 }
 
+float ARSTycoonGameModeBase::GetGameTime() const
+{
+	return GetWorldTimerManager().GetTimerElapsed(GameTimerHandle);
+}
+
+FFoodOrder ARSTycoonGameModeBase::GetOrderToCook()
+{
+	//제일 처음 주문을 반환
+	return FoodOrders[0];
+}
+
+void ARSTycoonGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+	
+#if WITH_EDITOR
+	GetGameInstance<URSGameInstance>()->SetDebugLogEnabled(true);
+#endif
+
+	URSSaveGameSubsystem* SaveSubsystem = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
+	SaveSubsystem->OnSaveRequested.AddDynamic(this, &ARSTycoonGameModeBase::SaveGameData);
+
+	GetWorldTimerManager().SetTimerForNextTick([&]()
+	{
+		LoadGameData();
+		StartWaitMode();
+	});
+}
+
+void ARSTycoonGameModeBase::CreateCustomer()
+{
+	//손님의 인원이 최대 손님의 갯수를 넘을 수 없음
+	if (GetCurrentCustomerCount() >= MaxCustomerCount)
+	{
+		return;
+	}
+
+	//손님이 들어와서 먹을 수 있는 음식이 있는지 검사
+	FName OrderFoodKey;
+	if (!CanOrder(OrderFoodKey))
+	{
+		return;
+	}
+
+	//임시, 동적 생성이 생긴 후에는 RSTileMap에서 할 예정
+
+	//손님이 앉을 테이블 결정
+	TArray<AActor*> TableTiles;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSTableTile::StaticClass(), TableTiles);
+	check(TableTiles.Num())
+
+	ARSTableTile* TargetTableTile;
+	do
+	{
+		int32 RandomTableIndex = FMath::RandRange(0, TableTiles.Num() - 1);
+		TargetTableTile = Cast<ARSTableTile>(TableTiles[RandomTableIndex]);
+	} while (!TargetTableTile->CanSit());
+
+	//손님을 스폰할 문 결정
+	TArray<AActor*> DoorTiles;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSDoorTile::StaticClass(), DoorTiles);
+	check(DoorTiles.Num())
+
+	int32 RandomDoorIndex = FMath::RandRange(0, DoorTiles.Num() - 1);
+	ARSDoorTile* SpawnDoorTile = Cast<ARSDoorTile>(DoorTiles[RandomDoorIndex]);
+
+	ARSTycoonCustomerCharacter* Customer = SpawnDoorTile->SpawnCustomer(OrderFoodKey, TargetTableTile);
+	Customers.Add(Customer);
+
+	if (CustomerAddSound)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(this, CustomerAddSound, SpawnDoorTile->GetActorLocation());
+	}
+}
+
 void ARSTycoonGameModeBase::LoadGameData()
 {
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
@@ -295,11 +293,11 @@ void ARSTycoonGameModeBase::LoadGameData()
 		//최초 파일 생성
 		SaveGame = Cast<URSTycoonSaveGame>(UGameplayStatics::CreateSaveGameObject(URSTycoonSaveGame::StaticClass()));
 		SaveGame->SetDefault();
-		
+
 		//최초 파일 저장
 		UGameplayStatics::SaveGameToSlot(SaveGame, TycoonSaveSlot, 0);
 	}
-	
+
 	Controller->GetInventoryComponent()->LoadItemData();
 	Controller->GetInventoryComponent()->UpdateInventoryWidget();
 	Controller->SetGold(SaveGame->Money);

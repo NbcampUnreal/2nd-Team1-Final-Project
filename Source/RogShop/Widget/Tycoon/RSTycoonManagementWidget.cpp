@@ -44,7 +44,7 @@ void URSTycoonManagementWidget::NativeOnInitialized()
 
 	ExpandTileButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OnClickExpandTile);
 	ReturnBaseAreaButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OnClickWaitMode);
-	CreateNPCButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OpenBuyNPCLayout);
+	CreateNPCButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OpenAndCloseNPCLayout);
 
 	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(PlayerController)
@@ -77,7 +77,6 @@ void URSTycoonManagementWidget::OnClickExpandTile()
 void URSTycoonManagementWidget::OnClickWaitMode()
 {
 	GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->OnSaveRequested.Broadcast();
-	
 	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->StartWaitMode();
 }
 
@@ -90,7 +89,7 @@ void URSTycoonManagementWidget::OnChangeGold(int32 Value)
 void URSTycoonManagementWidget::OpenBuyTileLayout()
 {
 	CloseBuyNPCLayout();
-	
+
 	if (!bOpenBuyTileLayout)
 	{
 		bOpenBuyTileLayout = true;
@@ -110,7 +109,7 @@ void URSTycoonManagementWidget::CloseBuyTileLayout()
 void URSTycoonManagementWidget::OpenBuyNPCLayout()
 {
 	CloseBuyTileLayout();
-	
+
 	if (!bOpenBuyNPCLayout)
 	{
 		bOpenBuyNPCLayout = true;
@@ -122,7 +121,19 @@ void URSTycoonManagementWidget::CloseBuyNPCLayout()
 {
 	if (bOpenBuyNPCLayout)
 	{
-		PlayAnimation(BuyNPCBorderCloseAni);
 		bOpenBuyNPCLayout = false;
+		PlayAnimation(BuyNPCBorderCloseAni);
+	}
+}
+
+void URSTycoonManagementWidget::OpenAndCloseNPCLayout()
+{
+	if (bOpenBuyNPCLayout)
+	{
+		CloseBuyNPCLayout();
+	}
+	else
+	{
+		OpenBuyNPCLayout();
 	}
 }

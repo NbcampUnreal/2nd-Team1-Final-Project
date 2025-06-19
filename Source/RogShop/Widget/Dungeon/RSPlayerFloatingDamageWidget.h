@@ -16,6 +16,7 @@ class ROGSHOP_API URSPlayerFloatingDamageWidget : public UUserWidget
 public:
     UFUNCTION()
     void FloatingValue(float Value);
+    void SetTextColor(FColor NewColor);
 
 protected:
     virtual void NativeOnInitialized() override;

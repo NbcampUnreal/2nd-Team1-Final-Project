@@ -18,6 +18,11 @@
 #include "RogShop/Actor/Tycoon/Tile/RSIceBoxTile.h"
 #include "RogShop/Actor/Tycoon/Tile/RSTableTile.h"
 
+void URSTycoonWaitWidget::SetEnableSaleButton(bool Value)
+{
+	SaleStartButton->SetIsEnabled(Value);
+}
+
 void URSTycoonWaitWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
@@ -25,60 +30,10 @@ void URSTycoonWaitWidget::NativeOnInitialized()
 	SaleStartButton->OnClicked.AddDynamic(this, &URSTycoonWaitWidget::OnClickSalesStartButton);
 	ManagementButton->OnClicked.AddDynamic(this, &URSTycoonWaitWidget::OnClickManagementButton);
 	OutButton->OnClicked.AddDynamic(this, &URSTycoonWaitWidget::OnClickOutButton);
-
 	
 	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(PlayerController)
 	PlayerController->OnChangeGold.AddDynamic(this, &URSTycoonWaitWidget::OnChangeGold);
-}
-
-void URSTycoonWaitWidget::NativeConstruct()
-{
-	Super::NativeConstruct();
-
-	//운영시 문, 화구, 테이블 타일이 한개 이상씩은 있어야함
-	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
-	check(TileMap)
-
-	int32 DoorCount = 0, CookingCount = 0, TableCount = 0, IceBoxCount = 0;
-	for (auto& Tile : TileMap->GetTiles())
-	{
-		 if (Tile->IsA<ARSDoorTile>())
-		 {
-			 DoorCount++;
-		 }
-
-		if (Tile->IsA<ARSCookingTile>())
-		{
-			CookingCount++;
-		}
-		
-		if (Tile->IsA<ARSTableTile>())
-		{
-			TableCount++;
-		}
-
-		if (Tile->IsA<ARSIceBoxTile>())
-		{
-			IceBoxCount++;
-		}
-	}
-
-	InDoorTileText->SetText(FText::FromString(FString::FromInt(DoorCount)));
-	InCookingTileText->SetText(FText::FromString(FString::FromInt(CookingCount)));
-	InTableTileText->SetText(FText::FromString(FString::FromInt(TableCount)));
-	InIceBoxTileText->SetText(FText::FromString(FString::FromInt(IceBoxCount)));
-
-	if (DoorCount < 1 || CookingCount < 1 || TableCount < 1 || IceBoxCount < 1)
-	{
-		TutorialBorder->SetVisibility(ESlateVisibility::Visible);
-		SaleStartButton->SetIsEnabled(false);
-	}
-	else
-	{
-		TutorialBorder->SetVisibility(ESlateVisibility::Hidden);
-		SaleStartButton->SetIsEnabled(true);
-	}
 }
 
 void URSTycoonWaitWidget::OnClickSalesStartButton()

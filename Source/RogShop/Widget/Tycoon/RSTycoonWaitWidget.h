@@ -17,9 +17,11 @@ class ROGSHOP_API URSTycoonWaitWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	void SetEnableSaleButton(bool Value);
+	
 protected:
 	virtual void NativeOnInitialized() override;
-	virtual void NativeConstruct() override;
 
 private:
 	UFUNCTION()
@@ -47,19 +49,4 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UTextBlock* GoldText;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UBorder* TutorialBorder;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UTextBlock* InDoorTileText;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UTextBlock* InTableTileText;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UTextBlock* InCookingTileText;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UTextBlock* InIceBoxTileText;
 };

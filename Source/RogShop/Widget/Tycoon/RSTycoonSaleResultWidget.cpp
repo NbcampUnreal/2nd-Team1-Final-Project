@@ -23,7 +23,7 @@ void URSTycoonSaleResultWidget::NativeConstruct()
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(Controller)
 	
-	CoinText->SetText(FText::FromString(FString::FromInt(Controller->GetGold())));
+	CoinText->SetText(FText::FromString(FString::FromInt(Controller->GetSaleGold())));
 	CustomerCountText->SetText(FText::FromString(FString::FromInt(Controller->GetCustomerCount())));
 }
 

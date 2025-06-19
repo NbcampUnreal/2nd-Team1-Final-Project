@@ -17,7 +17,7 @@ class ROGSHOP_API URSTycoonSaveGame : public USaveGame
 	GENERATED_BODY()
 
 public:
-	void SetDefault(bool bSetToFile = false);
+	void SetDefault(bool bSetToFile = false, FString FileName = TEXT(""));
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

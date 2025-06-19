@@ -85,7 +85,7 @@ void ARSTycoonNPC::MoveToTarget(FVector Location, AActor* Target)
 
 					FTimerHandle RetryTimer;
 					GetWorldTimerManager().SetTimer(RetryTimer, [&]()
-					{					
+					{
 						MoveToTarget(Location, Target);
 					}, 0.2f, false);
 				}
@@ -96,6 +96,8 @@ void ARSTycoonNPC::MoveToTarget(FVector Location, AActor* Target)
 
 void ARSTycoonNPC::StopAllAction()
 {
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+	
 	MoveTarget = nullptr;
 }
 
@@ -114,7 +116,9 @@ void ARSTycoonNPC::BeginPlay()
 void ARSTycoonNPC::Destroyed()
 {
 	if (GetWorld()->IsGameWorld())
+	{
 		GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->RemoveNPC(this);
+	}
 
 	Super::Destroyed();
 }
