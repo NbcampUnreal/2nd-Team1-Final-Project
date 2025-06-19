@@ -6,6 +6,9 @@
 #include "GameFramework/PlayerController.h"
 #include "RSTycoonPlayerController.generated.h"
 
+class URSPlayerFloatingDamageWidget;
+class URSTycoonEvent;
+class URSTycoonEventViewWidget;
 class URSTycoonNPCInfoWidget;
 struct FInputActionValue;
 struct FFoodOrder;
@@ -19,7 +22,6 @@ class URSTycoonSaleResultWidget;
 class URSTycoonWaitWidget;
 class UInputAction;
 class UInputMappingContext;
-class URSPlayerFloatingDamageWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeGold, int32, Value);
 
@@ -39,6 +41,15 @@ public:
 	void EndSaleMode();
 	void StartManagementMode();
 
+	UFUNCTION(BlueprintCallable)
+	void SetSaleEnable(bool Value);
+
+private:
+	bool CheckLimitsOfSale();
+
+private:
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TSubclassOf<URSTycoonEvent>> LimitsForSale;
 #pragma endregion
 
 #pragma region Widget
@@ -77,6 +88,9 @@ private:
 	// 획득 골드 표시 위젯 클래스
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<URSPlayerFloatingDamageWidget> FloatingTextWidgetClass;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<URSTycoonEventViewWidget> EventViewWidgetClass;
 
 	UPROPERTY()
 	TObjectPtr<URSTycoonWaitWidget> WaitWidget;
@@ -95,6 +109,9 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<URSTycoonNPCInfoWidget> NPCInfoWidget;
+
+	UPROPERTY()
+	TObjectPtr<URSTycoonEventViewWidget> EventViewWidget;
 
 	UPROPERTY()
 	TObjectPtr<URSPlayerFloatingDamageWidget> FloatingTextWidget;
@@ -128,6 +145,7 @@ private:
 #pragma endregion
 
 #pragma region Camera
+
 public:
 	void SetCameraLocationToCenter();
 	
@@ -136,7 +154,7 @@ private:
 
 	UFUNCTION(BlueprintCallable)
 	void SetMaxLengthOfMainCamera();
-	
+
 	UFUNCTION()
 	void OnZoom(const FInputActionValue& Value);
 
@@ -194,6 +212,7 @@ public:
 	int32 GetGold() const { return Gold; }
 	int32 GetCustomerCount() const { return CustomerCount; }
 	URSTycoonInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
+	int32 GetSaleGold() const { return SaleGold; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -214,6 +233,7 @@ protected:
 private:
 	int32 Gold;
 	int32 CustomerCount;
+	int32 SaleGold; //이번 게임에서 얻은 골드
 
 	// 사운드
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")

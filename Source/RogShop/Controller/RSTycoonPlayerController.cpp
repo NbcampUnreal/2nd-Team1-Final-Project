@@ -18,6 +18,8 @@
 #include "RogShop/Actor/Tycoon/RSTileMap.h"
 #include "RogShop/Actor/Tycoon/RSTycoonCamera.h"
 #include "RogShop/Actor/Tycoon/Tile/RSBaseTile.h"
+#include "RogShop/Object/RSTycoonEvent.h"
+#include "RogShop/Widget/Tycoon/RSTycoonEventViewWidget.h"
 #include "RogShop/Widget/Tycoon/RSTycoonManagementWidget.h"
 #include "RogShop/Widget/Tycoon/RSTycoonNPCInfoWidget.h"
 #include "RogShop/Widget/Tycoon/RSTycoonSaleResultWidget.h"
@@ -43,6 +45,8 @@ void ARSTycoonPlayerController::StartWaitMode()
 
 	SelectTileIndex = INDEX_NONE;
 	SelectTileActor->SetActorHiddenInGame(true);
+
+	CheckLimitsOfSale();
 }
 
 void ARSTycoonPlayerController::StartSaleMode()
@@ -51,6 +55,7 @@ void ARSTycoonPlayerController::StartSaleMode()
 	SetInputMode(InputMode);
 	ChangeMainWidget(SaleWidget);
 
+	SaleGold = 0;
 	CustomerCount = 0;
 	SaleWidget->SetCustomerCount(CustomerCount);
 }
@@ -72,6 +77,37 @@ void ARSTycoonPlayerController::StartManagementMode()
 
 	SetViewTargetWithBlend(TopCamera, 1.f);
 	SetCameraLocationToCenter();
+}
+
+void ARSTycoonPlayerController::SetSaleEnable(bool Value)
+{
+	WaitWidget->SetEnableSaleButton(Value);
+}
+
+bool ARSTycoonPlayerController::CheckLimitsOfSale()
+{
+	UWorld* World = GetWorld();
+
+	//이벤트 검사
+	for (auto& Event : LimitsForSale)
+	{
+		URSTycoonEvent* EventObject = Event->GetDefaultObject<URSTycoonEvent>();
+		if (EventObject->Condition(World))
+		{
+			EventObject->Success(World);
+			EventViewWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else
+		{
+			EventObject->Fail(World);
+			
+			EventViewWidget->SetVisibility(ESlateVisibility::Visible);
+			EventViewWidget->Set(EventObject);
+			return false;
+		}
+	}
+
+	return true;
 }
 
 #pragma endregion
@@ -120,6 +156,11 @@ void ARSTycoonPlayerController::SettingWidget()
 	NPCInfoWidget = CreateWidget<URSTycoonNPCInfoWidget>(this, NPCInfoWidgetClass.Get());
 
 	FloatingTextWidget = CreateWidget<URSPlayerFloatingDamageWidget>(this, FloatingTextWidgetClass);
+	FloatingTextWidget->SetTextColor(FColor::Yellow);
+	
+	EventViewWidget = CreateWidget<URSTycoonEventViewWidget>(this, EventViewWidgetClass.Get());
+	EventViewWidget->AddToViewport();
+	EventViewWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 #pragma endregion
 
@@ -345,6 +386,7 @@ void ARSTycoonPlayerController::DeactiveSelectTileWidget()
 void ARSTycoonPlayerController::AddGold(int32 Value)
 {
 	SetGold(Gold + Value);
+	SaleGold += Value;
 	
 	if (Value > 0)
 	{
@@ -356,6 +398,7 @@ void ARSTycoonPlayerController::AddGold(int32 Value)
 		check(SpendGoldSound);
 		UGameplayStatics::SpawnSoundAtLocation(this, SpendGoldSound, FVector::ZeroVector);
 	}
+
 }
 
 void ARSTycoonPlayerController::AddCustomerCount(int32 Value)
