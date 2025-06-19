@@ -144,7 +144,7 @@ bool ARSMonsterAIController::IsFocusing(FVector lookFor)
 		deltaQuat = lookQuat * dirQuat.Inverse();
 //		dot = deltaQuat.GetAngle();
 
-		if (dot >= 0.99f)
+		if (dot >= 0.95f)
 //		if(dot<10.f)
 		{
 			bIsLook = true;
