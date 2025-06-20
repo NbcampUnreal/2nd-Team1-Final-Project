@@ -18,7 +18,6 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 {
 	// 몬스터 스폰 테스트할 때 AIController가 스폰안되는 문제가 있어서 설정
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-	AIControllerClass = ARSDunMonsterCharacter::StaticClass();
 
 	//Navigation, NavLink
 	navGenerationRadius = 1000.0f;
