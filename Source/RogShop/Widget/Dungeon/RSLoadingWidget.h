@@ -6,9 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "RSLoadingWidget.generated.h"
 
-/**
- * 
- */
+class UImage;
+
 UCLASS()
 class ROGSHOP_API URSLoadingWidget : public UUserWidget
 {
@@ -20,4 +19,11 @@ protected:
 private:
 	UFUNCTION()
 	void HideLoading();
+
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TArray<TObjectPtr<UTexture2D>> BackGroundImages;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
+	TObjectPtr<UImage> LoadingImage;
 };
