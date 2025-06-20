@@ -40,6 +40,7 @@ public:
 	void StartSaleMode();
 	void EndSaleMode();
 	void StartManagementMode();
+	void EndManagementMode();
 
 	UFUNCTION(BlueprintCallable)
 	void SetSaleEnable(bool Value);
@@ -189,14 +190,21 @@ private:
 	void OnRotateTile(const FInputActionValue& Value);
 
 	void SettingChangeTile();
-	
-	void DeactiveSelectTileWidget();
+
+	void EnableSelectTileOutline(FVector CenterLocation);
+	void DisableSelectTileOutline();
+
 	
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActor> SelectTileActorClass;
 	UPROPERTY()
 	TObjectPtr<AActor> SelectTileActor;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> CanRotateWidgetClass;
+	UPROPERTY()
+	TObjectPtr<UUserWidget> CanRotateWidget;
 	
 	int32 SelectTileIndex = INDEX_NONE;
 #pragma endregion 

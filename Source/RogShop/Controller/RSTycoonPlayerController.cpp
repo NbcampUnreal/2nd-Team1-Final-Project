@@ -27,6 +27,7 @@
 #include "RogShop/Widget/Tycoon/RSTycoonWaitWidget.h"
 #include "Tycoon/NPC/RSTycoonNPC.h"
 #include "RSPlayerFloatingDamageWidget.h"
+#include "RogShop/Actor/Tycoon/Tile/RSIceBoxTile.h"
 
 #pragma region Mode
 ARSTycoonPlayerController::ARSTycoonPlayerController()
@@ -43,9 +44,16 @@ void ARSTycoonPlayerController::StartWaitMode()
 	SetViewTargetWithBlend(MainCamera, 1.f);
 	SetCameraLocationToCenter();
 
-	SelectTileIndex = INDEX_NONE;
-	SelectTileActor->SetActorHiddenInGame(true);
+	DisableSelectTileOutline();
 
+	//인벤토리 크기 설정
+	TArray<AActor*> IceBoxActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARSIceBoxTile::StaticClass(), IceBoxActors);
+
+	InventoryComponent->SetMaxSlot(ARSIceBoxTile::AddInventorySlot * (IceBoxActors.Num() + 1));
+	InventoryComponent->UpdateInventoryWidget();
+
+	//리미트 검사
 	CheckLimitsOfSale();
 }
 
@@ -100,7 +108,7 @@ bool ARSTycoonPlayerController::CheckLimitsOfSale()
 		else
 		{
 			EventObject->Fail(World);
-			
+
 			EventViewWidget->SetVisibility(ESlateVisibility::Visible);
 			EventViewWidget->Set(EventObject);
 			return false;
@@ -157,7 +165,7 @@ void ARSTycoonPlayerController::SettingWidget()
 
 	FloatingTextWidget = CreateWidget<URSPlayerFloatingDamageWidget>(this, FloatingTextWidgetClass);
 	FloatingTextWidget->SetTextColor(FColor::Yellow);
-	
+
 	EventViewWidget = CreateWidget<URSTycoonEventViewWidget>(this, EventViewWidgetClass.Get());
 	EventViewWidget->AddToViewport();
 	EventViewWidget->SetVisibility(ESlateVisibility::Hidden);
@@ -368,9 +376,23 @@ void ARSTycoonPlayerController::SettingChangeTile()
 {
 	SelectTileActor = GetWorld()->SpawnActor(SelectTileActorClass);
 	SelectTileActor->SetActorHiddenInGame(true);
+
+	CanRotateWidget = CreateWidget(this, CanRotateWidgetClass);
 }
 
-void ARSTycoonPlayerController::DeactiveSelectTileWidget()
+void ARSTycoonPlayerController::EnableSelectTileOutline(FVector CenterLocation)
+{
+	SelectTileActor->SetActorHiddenInGame(false);
+	SelectTileActor->SetActorLocation(CenterLocation);
+
+	CanRotateWidget->AddToViewport();
+
+	FVector2D ScreenPos;
+	ProjectWorldLocationToScreen(CenterLocation, ScreenPos);
+	CanRotateWidget->SetPositionInViewport(ScreenPos);
+}
+
+void ARSTycoonPlayerController::DisableSelectTileOutline()
 {
 	if (SelectTileIndex != INDEX_NONE)
 	{
@@ -379,6 +401,7 @@ void ARSTycoonPlayerController::DeactiveSelectTileWidget()
 		ManagementWidget->CloseBuyNPCLayout();
 
 		SelectTileActor->SetActorHiddenInGame(true);
+		CanRotateWidget->RemoveFromParent();
 	}
 }
 #pragma endregion
@@ -387,7 +410,7 @@ void ARSTycoonPlayerController::AddGold(int32 Value)
 {
 	SetGold(Gold + Value);
 	SaleGold += Value;
-	
+
 	if (Value > 0)
 	{
 		check(AddGoldSound);
@@ -398,7 +421,6 @@ void ARSTycoonPlayerController::AddGold(int32 Value)
 		check(SpendGoldSound);
 		UGameplayStatics::SpawnSoundAtLocation(this, SpendGoldSound, FVector::ZeroVector);
 	}
-
 }
 
 void ARSTycoonPlayerController::AddCustomerCount(int32 Value)
@@ -470,14 +492,13 @@ void ARSTycoonPlayerController::OnClickTileOrNPC()
 			RS_LOG_F("%s 타일이 선택됬습니다", *HitActor->GetName());
 			ManagementWidget->OpenBuyTileLayout();
 
-			SelectTileActor->SetActorHiddenInGame(false);
-			SelectTileActor->SetActorLocation(Tile->GetActorLocation());
+			EnableSelectTileOutline(Tile->GetActorLocation());
 		}
 		else if (ARSTycoonNPC* NPC = Cast<ARSTycoonNPC>(HitActor))
 		{
 			RS_LOG_F("%s NPC가 선택됬습니다", *HitActor->GetName());
 
-			DeactiveSelectTileWidget();
+			DisableSelectTileOutline();
 
 			NPCInfoWidget->SetNPC(NPC);
 			NPCInfoWidget->AddToViewport();
@@ -491,7 +512,7 @@ void ARSTycoonPlayerController::OnClickTileOrNPC()
 	//타일을 한번 선택한 후 어딜 누르든 타일 선택이 취소됨
 	else
 	{
-		DeactiveSelectTileWidget();
+		DisableSelectTileOutline();
 	}
 }
 

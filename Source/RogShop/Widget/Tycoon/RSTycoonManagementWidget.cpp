@@ -45,6 +45,8 @@ void URSTycoonManagementWidget::NativeOnInitialized()
 	ExpandTileButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OnClickExpandTile);
 	ReturnBaseAreaButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OnClickWaitMode);
 	CreateNPCButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OpenAndCloseNPCLayout);
+	WidthBox->OnValueChanged.AddDynamic(this, &URSTycoonManagementWidget::OnChangeTileSizeBox);
+	HeightBox->OnValueChanged.AddDynamic(this, &URSTycoonManagementWidget::OnChangeTileSizeBox);
 
 	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(PlayerController)
@@ -59,6 +61,13 @@ void URSTycoonManagementWidget::NativeConstruct()
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(Controller)
 	OnChangeGold(Controller->GetGold());
+
+	//현재 타일의 크기로 초기화
+	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
+	check(TileMap)
+	
+	WidthBox->SetValue(TileMap->GetWidth());
+	HeightBox->SetValue(TileMap->GetHeight());
 }
 
 void URSTycoonManagementWidget::OnClickExpandTile()
@@ -69,9 +78,10 @@ void URSTycoonManagementWidget::OnClickExpandTile()
 	int32 Width = FMath::RoundToInt(WidthBox->GetValue());
 	int32 Height = FMath::RoundToInt(HeightBox->GetValue());
 
-	TileMap->ChangeTileSize(Width, Height);
-
+	TileMap->ChangeTileSize(Width, Height, true);
 	GetOwningPlayer<ARSTycoonPlayerController>()->SetCameraLocationToCenter();
+
+	WidthBox->SetValue(Width);
 }
 
 void URSTycoonManagementWidget::OnClickWaitMode()
@@ -85,6 +95,37 @@ void URSTycoonManagementWidget::OnChangeGold(int32 Value)
 	GoldText->SetText(FText::FromString(FString::FromInt(Value)));
 }
 
+void URSTycoonManagementWidget::OnChangeTileSizeBox(float Value)
+{
+	int32 Width = FMath::RoundToInt(WidthBox->GetValue());
+	int32 Height = FMath::RoundToInt(HeightBox->GetValue());
+
+	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
+	check(TileMap)
+	int32 NeedPrice = TileMap->GetNeedPrice(Width, Height);
+
+	TilePriceText->SetText(FText::FromString(FString::Printf(TEXT("%d 원"), NeedPrice)));
+
+	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	check(PlayerController)
+	
+	if (PlayerController->GetGold() < NeedPrice)
+	{
+		CanTileChangeText->SetColorAndOpacity(FColor::Red);
+		CanTileChangeText->SetText(FText::FromString(TEXT("돈이 부족합니다!")));
+		
+		TilePriceText->SetColorAndOpacity(FColor::Red);
+		ExpandTileButton->SetIsEnabled(false);
+	}
+	else
+	{
+		CanTileChangeText->SetColorAndOpacity(FColor::Cyan);
+		CanTileChangeText->SetText(FText::FromString(TEXT("변경 가능합니다!")));
+		
+		TilePriceText->SetColorAndOpacity(FColor::Cyan);
+		ExpandTileButton->SetIsEnabled(true);
+	}
+}
 
 void URSTycoonManagementWidget::OpenBuyTileLayout()
 {

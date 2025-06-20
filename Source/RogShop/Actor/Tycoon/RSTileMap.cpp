@@ -6,6 +6,7 @@
 #include "NavigationSystem.h"
 #include "RSSaveGameSubsystem.h"
 #include "RSTycoonGameModeBase.h"
+#include "RSTycoonPlayerController.h"
 #include "Components/BrushComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
@@ -45,8 +46,24 @@ void ARSTileMap::ChangeTile(int32 Index, FName TileKey)
 	TileName2DMap[Row].Tiles[Column] = TileKey;
 }
 
-void ARSTileMap::ChangeTileSize(int32 NewWidth, int32 NewHeight)
+void ARSTileMap::ChangeTileSize(int32 NewWidth, int32 NewHeight, bool bUseGold)
 {
+	if (bUseGold)
+	{
+		ARSTycoonPlayerController* PlayerController =
+			Cast<ARSTycoonPlayerController>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTycoonPlayerController::StaticClass()));
+		check(PlayerController)
+		
+		int32 Price = GetNeedPrice(NewWidth, NewHeight);
+		if (PlayerController->GetGold() < Price)
+		{
+			RS_LOG_C("돈이 부족합니다.", FColor::Red)
+			return;
+		}
+
+		PlayerController->AddGold(-Price);
+	}
+	
 	Width = NewWidth;
 	Height = NewHeight;
 
@@ -89,6 +106,15 @@ void ARSTileMap::ResetAllTile()
 	{
 		Tile->ResetAll();
 	}
+}
+
+int32 ARSTileMap::GetNeedPrice(int32 NewWidth, int32 NewHeight)
+{
+	int32 WidthDistance = NewWidth - Width;
+	int32 HeightDistance = NewHeight - Height;
+	int32 Price = TilePrice * (WidthDistance + HeightDistance);;
+
+	return Price;
 }
 
 void ARSTileMap::SpawnActorInMap(UClass* ActorClass)
