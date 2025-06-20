@@ -21,9 +21,10 @@ public:
 	ARSTileMap();
 
 	void ChangeTile(int32 Index, FName TileKey);
-	void ChangeTileSize(int32 NewWidth, int32 NewHeight);
+	void ChangeTileSize(int32 NewWidth, int32 NewHeight, bool bUseGold = false);
 	void RotateTile(int32 Index, float YawValue);
 	void ResetAllTile();
+	int32 GetNeedPrice(int32 NewWidth, int32 NewHeight);
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnActorInMap(UClass* ActorClass);
@@ -65,7 +66,10 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="TileMap")
 	int32 DefaultHeight = 3;
-
+	
+	UPROPERTY(EditDefaultsOnly, Category="TileMap")
+	int32 TilePrice = 100; //타일 증축시 타일 당 들어가는 돈
+	
 	UPROPERTY(EditDefaultsOnly, Category="TileMap")
 	TArray<TSubclassOf<ARSBaseTile>> TileClasses;
 
