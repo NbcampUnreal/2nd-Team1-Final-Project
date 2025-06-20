@@ -5,6 +5,7 @@
 #include "RSDunMonsterCharacter.h"
 #include "RSDunPlayerController.h"
 #include "RSGameInstance.h"
+#include "RSDunPlayerCharacter.h"
 
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
@@ -178,6 +179,19 @@ void URSCheatManager::ToggleDebugLog() const
     RSGameInstance->SetDebugLogEnabled(!RSGameInstance->GetDebugLogEnabled());
 
     RS_LOG_DEBUG("DebugLog is now: Enabled");
+}
+
+void URSCheatManager::GodMode()
+{
+    UWorld* World = GetWorld();
+    if (!World)
+    {
+        return;
+    }
+
+    ARSDunPlayerCharacter* Player = Cast<ARSDunPlayerCharacter>(UGameplayStatics::GetActorOfClass(World, ARSDunPlayerCharacter::StaticClass()));
+
+    Player->ToggleGodMode();
 }
 
 void URSCheatManager::OpenTycoonLevel()

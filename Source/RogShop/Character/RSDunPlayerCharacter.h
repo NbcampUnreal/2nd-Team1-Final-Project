@@ -189,4 +189,11 @@ public:
 
 	void LoadStatus();
 
+// 개발자를 위한 디버그 전용 무적 플래그 변수/함수!
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
+	bool bGodMode;
+	
+	void ToggleGodMode();
+
 };

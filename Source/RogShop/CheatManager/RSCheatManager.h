@@ -41,6 +41,9 @@ public:
 	UFUNCTION(exec)
 	void ToggleDebugLog() const;
 
+	UFUNCTION(Exec)
+	void GodMode();
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SpawnMonster")
 	TMap<FString, TSubclassOf<AActor>> MonsterMap;
 
