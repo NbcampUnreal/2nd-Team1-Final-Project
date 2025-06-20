@@ -158,7 +158,7 @@ void URSSpawnManager::SpawnGroundWeaponAtTransform(FName TargetName, FTransform 
 	}
 }
 
-void URSSpawnManager::SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform)
+void URSSpawnManager::SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Amount)
 {
 	URSGameInstance* RSGameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
 	if (!RSGameInstance)
@@ -196,7 +196,7 @@ void URSSpawnManager::SpawnGroundIngredientAtTransform(FName TargetName, FTransf
 			UStaticMesh* ItemStaticMesh = IngredientInfoDataRow->ItemStaticMesh;
 
 			DungeonIngredient->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
-			DungeonIngredient->SetQuantity(1);
+			DungeonIngredient->SetQuantity(Amount);
 			DungeonIngredient->RandImpulse();
 		}
 	}

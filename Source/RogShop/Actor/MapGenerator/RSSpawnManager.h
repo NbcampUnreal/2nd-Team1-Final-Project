@@ -128,7 +128,7 @@ public:
 	void SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform, bool AddImpulse);
 
 	UFUNCTION()
-	void SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform);
+	void SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Amount);
 
 private:
 	UFUNCTION()
