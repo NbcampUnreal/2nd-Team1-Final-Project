@@ -93,8 +93,8 @@ void URSMiniMap::SetTileImage(const FIntPoint& Coord, UTexture2D* Texture, const
         // 위치 및 크기 설정
         if (UCanvasPanelSlot* MapSlot = Cast<UCanvasPanelSlot>(TileImage->Slot))
         {
-            MapSlot->SetPosition(FVector2D(Coord.X * (400/3), Coord.Y * (400/3)));
-            MapSlot->SetSize(FVector2D(400/3, 400/3));
+            MapSlot->SetPosition(FVector2D(Coord.X * (300/3), Coord.Y * (300/3)));
+            MapSlot->SetSize(FVector2D(300/3, 300/3));
         }
 
         TileImageMap.Add(Coord, TileImage); // 맵에 저장

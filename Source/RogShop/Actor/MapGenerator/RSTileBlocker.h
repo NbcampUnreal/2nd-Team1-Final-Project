@@ -47,7 +47,7 @@ private:
 	FRotator ShownRotation;		//올라온 각도
 
 	float AnimationTime = 0.f;
-	float TotalTime = 0.5f;
+	float TotalTime = 1.5f;
 
 	bool bRaising = false;
 	bool bLowering = false;
