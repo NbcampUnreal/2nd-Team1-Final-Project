@@ -57,9 +57,7 @@ void ARSDungeonGroundLifeEssence::Interact(ARSDunPlayerCharacter* Interactor)
 	// 더이상 상호작용 함수가 호출되지 않도록 한다.
 	bIsAutoInteract = false;
 
-	MeshComp->SetSimulatePhysics(false);
 	MeshComp->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	MeshComp->SetSimulatePhysics(true);
 
 	GetWorld()->GetTimerManager().SetTimer(InteractDelayTimer, FTimerDelegate::CreateLambda([=, this]()
 	{

@@ -126,7 +126,7 @@ void URSDungeonIngredientInventoryComponent::DropItem(FName ItemKey)
 		return;
 	}
 
-	SpawnManager->SpawnGroundIngredientAtTransform(ItemKey, CurCharacter->GetActorTransform());
+	SpawnManager->SpawnGroundIngredientAtTransform(ItemKey, CurCharacter->GetActorTransform(), CurItemQuantity);
 
 	int32 ItemIndex = RemoveItem(ItemKey, INT32_MAX);
 
