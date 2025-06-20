@@ -240,7 +240,7 @@ void ARSDunPlayerCharacter::ChangeMaxHP(float Amount)
     ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
     if (PC)
     {
-        PC->OnMaxHPChange.Broadcast();
+        PC->OnHPChange.Broadcast(GetHP(), GetMaxHP());
     }
 }
 
@@ -251,7 +251,7 @@ void ARSDunPlayerCharacter::IncreaseMaxHP(float Amount)
     ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
     if (PC)
     {
-        PC->OnMaxHPChange.Broadcast();
+        PC->OnHPChange.Broadcast(GetHP(), GetMaxHP());
     }
 }
 
@@ -262,7 +262,7 @@ void ARSDunPlayerCharacter::DecreaseMaxHP(float Amount)
     ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
     if (PC)
     {
-        PC->OnMaxHPChange.Broadcast();
+        PC->OnHPChange.Broadcast(GetHP(), GetMaxHP());
     }
 }
 
@@ -273,7 +273,7 @@ void ARSDunPlayerCharacter::ChangeHP(float Amount)
     ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
     if (PC)
     {
-        PC->OnHPChange.Broadcast();
+        PC->OnHPChange.Broadcast(GetHP(), GetMaxHP());
     }
 }
 
@@ -284,7 +284,7 @@ void ARSDunPlayerCharacter::IncreaseHP(float Amount)
     ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
     if (PC)
     {
-        PC->OnHPChange.Broadcast();
+        PC->OnHPChange.Broadcast(GetHP(), GetMaxHP());
     }
 }
 
@@ -295,7 +295,7 @@ void ARSDunPlayerCharacter::DecreaseHP(float Amount)
     ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
     if (PC)
     {
-        PC->OnHPChange.Broadcast();
+        PC->OnHPChange.Broadcast(GetHP(), GetMaxHP());
         PC->OnFloatDamage.Broadcast(-Amount);
     }
 }

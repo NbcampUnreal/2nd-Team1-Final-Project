@@ -23,19 +23,7 @@ public:
     UFUNCTION()
     void UpdateWeaponSlot(int8 SlotIndex, FName WeaponKey);
 
-    UFUNCTION()
-    void UpdateHP();
-
-    UFUNCTION()
-    void UpdateMaxHP();
-
 private:
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
-    TObjectPtr<UTextBlock> MaxHPText;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
-    TObjectPtr<UTextBlock> HPText;
-
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<URSInventorySlotWidget> WeaponSlot1;
 
