@@ -15,16 +15,16 @@ class URSDunMainHUDWidget;
 class URSPlayerInventoryWidget;
 class ARSDunBaseCharacter;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBossHPChange, FName, BossName, float, HPPercent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHPChange, float, HP, float, MaxHP);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponSlotChange, int8, WeaponSlotIndex, FName, WeaponKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnIngredientChange, int32, IngredientSlotIndex, FItemSlot, IngredientItemSlot);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBossHPChange, FName, BossName, float, HPPercent);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteractableFound, FText, InteractName);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRelicAdded, FName, RelicKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLifeEssenceChange, int32, NewLifeEssence);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFloatDamage, float, DamageAmount);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHPChange);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMaxHPChange);
 
 UCLASS()
@@ -134,9 +134,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnHPChange OnHPChange;
-
-	UPROPERTY(BlueprintAssignable)
-	FOnMaxHPChange OnMaxHPChange;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnFloatDamage OnFloatDamage;

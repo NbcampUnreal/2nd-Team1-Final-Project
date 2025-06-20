@@ -23,8 +23,6 @@ void URSPlayerStatusWidget::NativeOnInitialized()
     if (RSDunPlayerController)
     {
         RSDunPlayerController->OnWeaponSlotChange.AddDynamic(this, &URSPlayerStatusWidget::UpdateWeaponSlot);
-        RSDunPlayerController->OnHPChange.AddDynamic(this, &URSPlayerStatusWidget::UpdateHP);
-        RSDunPlayerController->OnMaxHPChange.AddDynamic(this, &URSPlayerStatusWidget::UpdateMaxHP);
     }
 }
 
@@ -79,27 +77,5 @@ void URSPlayerStatusWidget::UpdateWeaponSlot(int8 WeaponSlotIndex, FName WeaponK
                 }
             }
         }
-    }
-}
-
-void URSPlayerStatusWidget::UpdateHP()
-{
-    ARSDunPlayerCharacter* PlayerChar = Cast<ARSDunPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-
-    if (PlayerChar && HPText)
-    {
-        FString HPString = FString::Printf(TEXT("%.0f"), PlayerChar->GetHP()); // 소수점 없는 정수 형태로 변환
-        HPText->SetText(FText::FromString(HPString));
-    }
-}
-
-void URSPlayerStatusWidget::UpdateMaxHP()
-{
-    ARSDunPlayerCharacter* PlayerChar = Cast<ARSDunPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-
-    if (PlayerChar && MaxHPText)
-    {
-        FString MaxHPString = FString::Printf(TEXT("%.0f"), PlayerChar->GetMaxHP()); // 소수점 없는 정수 형태로 변환
-        MaxHPText->SetText(FText::FromString(MaxHPString));
     }
 }
