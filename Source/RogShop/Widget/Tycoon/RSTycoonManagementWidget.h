@@ -34,6 +34,9 @@ private:
 	UFUNCTION()
 	void OnChangeGold(int32 Value);
 
+	UFUNCTION()
+	void OnChangeTileSizeBox(float Value);
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UTextBlock> GoldText;
@@ -46,6 +49,12 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<USpinBox> HeightBox;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<UTextBlock> TilePriceText;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<UTextBlock> CanTileChangeText;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UButton> ReturnBaseAreaButton;
