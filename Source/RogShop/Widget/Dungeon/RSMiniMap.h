@@ -35,6 +35,8 @@ protected:
 	UCanvasPanel* MapCanvas;
 	UPROPERTY(meta = (BindWidget))
 	UImage* MiniMapBackgroundImage;
+	UPROPERTY()
+	UImage* PlayerHighlightImage = nullptr;
 
 	// 타일 이미지들
 	UPROPERTY(EditAnywhere, Category = "Minimap")
@@ -57,6 +59,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Minimap")
 	UTexture2D* QuestionTileTexture;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Minimap")
+	UTexture2D* HighlightBorderTexture; // 테두리용 텍스처
 
 	TMap<FIntPoint, UImage*> TileImageMap; // 좌표 -> 타일 이미지 매핑
 

@@ -16,11 +16,32 @@ void URSMiniMap::InitializeMap(const TSet<FIntPoint>& AllTiles, const FIntPoint&
     {
         UpdateTileVisual(Coord);
     }
+    if (!PlayerHighlightImage && HighlightBorderTexture && MapCanvas)
+    {
+        PlayerHighlightImage = NewObject<UImage>(this, UImage::StaticClass());
+        PlayerHighlightImage->SetBrushFromTexture(HighlightBorderTexture);
+        PlayerHighlightImage->SetVisibility(ESlateVisibility::HitTestInvisible);
+
+        MapCanvas->AddChild(PlayerHighlightImage);
+
+        if (UCanvasPanelSlot* MapSlot = Cast<UCanvasPanelSlot>(PlayerHighlightImage->Slot))
+        {
+            MapSlot->SetSize(FVector2D(300 / 3, 300 / 3));
+        }
+    }
 }
 
 void URSMiniMap::UpdatePlayerPosition(const FIntPoint& TileCoord)
 {
     UpdateTileVisual(TileCoord); // 진입한 곳은 항상 시각적으로 확정
+
+    if (!PlayerHighlightImage || !MapCanvas) return;
+
+    if (UCanvasPanelSlot* MapSlot = Cast<UCanvasPanelSlot>(PlayerHighlightImage->Slot))
+    {
+        FVector2D Pos(TileCoord.X * (300 / 3), TileCoord.Y * (300 / 3));
+        MapSlot->SetPosition(Pos);
+    }
 }
 
 void URSMiniMap::UpdateTileVisual(const FIntPoint& TileCoord)
@@ -70,7 +91,6 @@ void URSMiniMap::SetTileImage(const FIntPoint& Coord, UTexture2D* Texture, const
 {
     if (!MapCanvas)
     {
-        UE_LOG(LogTemp, Error, TEXT("[MiniMap] 미니맵 캔버스 없음"));
         return;
     }
 
