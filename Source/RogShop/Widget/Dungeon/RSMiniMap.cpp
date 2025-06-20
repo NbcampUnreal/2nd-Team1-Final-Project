@@ -70,7 +70,6 @@ void URSMiniMap::SetTileImage(const FIntPoint& Coord, UTexture2D* Texture, const
 {
     if (!MapCanvas)
     {
-        UE_LOG(LogTemp, Error, TEXT("[MiniMap] 미니맵 캔버스 없음"));
         return;
     }
 
