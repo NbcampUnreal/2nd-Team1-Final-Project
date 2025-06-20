@@ -139,6 +139,18 @@ void URSRelicInventoryComponent::LoadRelicData()
 
 	}
 
+	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	UDataTable* RelicClassDataTable = DataSubsystem->RelicDetail;
+	if (!RelicClassDataTable)
+	{
+		return;
+	}
+
 	URSDungeonRelicSaveGame* RelicLoadGame = Cast<URSDungeonRelicSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->RelicSaveSlotName, 0));
 	if (RelicLoadGame)
 	{
@@ -150,18 +162,6 @@ void URSRelicInventoryComponent::LoadRelicData()
 			// 동작 시켜야할 클래스를 찾아온다.
 			FString ObjectString = CurRelicName.ToString() + TEXT("Object");
 			FName ObjectName = FName(*ObjectString);
-
-			URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
-			if (!DataSubsystem)
-			{
-				return;
-			}
-
-			UDataTable* RelicClassDataTable = DataSubsystem->RelicDetail;
-			if (!RelicClassDataTable)
-			{
-				return;
-			}
 
 			FDungeonRelicData* RelicClassData = RelicClassDataTable->FindRow<FDungeonRelicData>(CurRelicName, TEXT("Get RelicClassData"));
 			if (!RelicClassData)

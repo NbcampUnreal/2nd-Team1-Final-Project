@@ -80,6 +80,9 @@ ARSDunPlayerCharacter::ARSDunPlayerCharacter()
     // 스탯
     AttackPower = 0.f;
     AttackSpeed = 1.f;
+
+    // 개발자를 위한 디버그 전용 무적 플래그 변수!
+    bGodMode = false;
 }
 
 // Called when the game starts or when spawned
@@ -180,6 +183,12 @@ void ARSDunPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 float ARSDunPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+    // 만약 무적 모드라면 데미지가 안들어오게끔
+    if (bGodMode)
+    {
+        return 0.f;
+    }
+
     const float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
     DecreaseHP(Damage);
@@ -240,7 +249,7 @@ void ARSDunPlayerCharacter::ChangeMaxHP(float Amount)
     ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
     if (PC)
     {
-        PC->OnMaxHPChange.Broadcast();
+        PC->OnHPChange.Broadcast(GetHP(), GetMaxHP());
     }
 }
 
@@ -251,7 +260,7 @@ void ARSDunPlayerCharacter::IncreaseMaxHP(float Amount)
     ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
     if (PC)
     {
-        PC->OnMaxHPChange.Broadcast();
+        PC->OnHPChange.Broadcast(GetHP(), GetMaxHP());
     }
 }
 
@@ -262,7 +271,7 @@ void ARSDunPlayerCharacter::DecreaseMaxHP(float Amount)
     ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
     if (PC)
     {
-        PC->OnMaxHPChange.Broadcast();
+        PC->OnHPChange.Broadcast(GetHP(), GetMaxHP());
     }
 }
 
@@ -273,7 +282,7 @@ void ARSDunPlayerCharacter::ChangeHP(float Amount)
     ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
     if (PC)
     {
-        PC->OnHPChange.Broadcast();
+        PC->OnHPChange.Broadcast(GetHP(), GetMaxHP());
     }
 }
 
@@ -284,7 +293,7 @@ void ARSDunPlayerCharacter::IncreaseHP(float Amount)
     ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
     if (PC)
     {
-        PC->OnHPChange.Broadcast();
+        PC->OnHPChange.Broadcast(GetHP(), GetMaxHP());
     }
 }
 
@@ -295,7 +304,7 @@ void ARSDunPlayerCharacter::DecreaseHP(float Amount)
     ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
     if (PC)
     {
-        PC->OnHPChange.Broadcast();
+        PC->OnHPChange.Broadcast(GetHP(), GetMaxHP());
         PC->OnFloatDamage.Broadcast(-Amount);
     }
 }
@@ -791,6 +800,21 @@ void ARSDunPlayerCharacter::LoadStatus()
     ChangeHP(StatusLoadGame->HP);
     LifeEssence = StatusLoadGame->LifeEssence;
 }
+
+void ARSDunPlayerCharacter::ToggleGodMode()
+{
+    bGodMode = !bGodMode;
+
+    if (bGodMode == true)
+    {
+        RS_LOG("무적 모드 적용!!");
+    }
+    else
+    {
+        RS_LOG("무적 해제...");
+    }
+}
+
 USoundBase* ARSDunPlayerCharacter::GetFootstepSound(EPhysicalSurface SurfaceType) const
 {
     const USoundBase* const* FoundSound = FootstepSounds.Find(SurfaceType);
