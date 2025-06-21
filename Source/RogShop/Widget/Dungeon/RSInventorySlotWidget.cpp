@@ -25,6 +25,15 @@ void URSInventorySlotWidget::SetSlotItemInfo(FName NewItemDataTableKey, UObject*
     if (ItemIcon)
     {
         ItemIcon->SetBrushResourceObject(NewItemIcon);
+        
+        FLinearColor TargetColor = FLinearColor(1.f, 1.f, 1.f, 1.f);
+        
+        if (!NewItemIcon)
+        {
+            TargetColor = FLinearColor(1.f, 1.f, 1.f, 0.f);
+        }
+
+        ItemIcon->SetBrushTintColor(TargetColor);
     }
 
     if (ItemCount)
