@@ -7,9 +7,9 @@
 
 ARSDunBaseCharacter::ARSDunBaseCharacter()
 {	
-	MoveSpeed = 600.f;
 	MaxHP = 100.f;
 	HP = MaxHP;
+	MoveSpeed = 600.f;
 
 	GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
 

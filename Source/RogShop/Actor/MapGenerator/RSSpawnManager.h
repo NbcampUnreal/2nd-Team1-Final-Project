@@ -18,9 +18,10 @@ class ARSDunBossRoomPortal;
 class ARSDunNextStagePortal;
 class ARSDunLifeEssenceShop;
 class ARSDunBaseCharacter;
-class ARSDungeonGroundWeapon;
 class ARSTileBlocker;
+class ARSDungeonGroundWeapon;
 class ARSDungeonGroundIngredient;
+class ARSDungeonGroundRelic;
 class ARSDungeonGroundLifeEssence;
 
 /**
@@ -130,6 +131,9 @@ public:
 	UFUNCTION()
 	void SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Amount);
 
+	UFUNCTION()
+	void SpawnGroundRelicAtTransform(FName TargetName, FTransform TargetTransform);
+
 private:
 	UFUNCTION()
 	void SpawnGroundIngredientFromCharacter(ARSDunBaseCharacter* DiedCharacter);
@@ -143,6 +147,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ARSDungeonGroundIngredient> DungeonGroundIngredientClass; // 아이템으로 드랍되는 요리 재료 클래스
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ARSDungeonGroundRelic> DungeonGroundRelicClass; // 아이템으로 드랍되는 유물 클래스
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ARSDungeonGroundLifeEssence> DungeonGroundLifeEssenceClass; // 아이템으로 드랍되는 생명의 정수 클래스

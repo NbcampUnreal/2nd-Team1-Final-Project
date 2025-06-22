@@ -25,6 +25,8 @@ class ROGSHOP_API URSStatusRelic : public URSBaseRelic
 public:
 	virtual void ApplyEffect(ARSDunPlayerCharacter* OwnerCharacter) override;
 
+	virtual void LoadEffect(ARSDunPlayerCharacter* OwnerCharacter) override;
+
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
 	EStatus TargetStatus;

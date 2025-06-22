@@ -21,8 +21,9 @@
 #include "ItemInfoData.h"
 #include "RSDungeonGroundWeapon.h"
 #include "RSDungeonGroundIngredient.h"
-#include "RSTileBlocker.h"
+#include "RSDungeonGroundRelic.h"
 #include "RSDungeonGroundLifeEssence.h"
+#include "RSTileBlocker.h"
 
 // 외부에서 전달받은 월드 및 테이블 초기화
 void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, int32 TargetLevelIndex)
@@ -198,6 +199,44 @@ void URSSpawnManager::SpawnGroundIngredientAtTransform(FName TargetName, FTransf
 			DungeonIngredient->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
 			DungeonIngredient->SetQuantity(Amount);
 			DungeonIngredient->RandImpulse();
+		}
+	}
+}
+
+void URSSpawnManager::SpawnGroundRelicAtTransform(FName TargetName, FTransform TargetTransform)
+{
+	UGameInstance* CurGameInstance = GetWorld()->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	UDataTable* RelicInfoDataTable = DataSubsystem->RelicInfo;
+	UDataTable* RelicClassDataTable = DataSubsystem->RelicDetail;
+	if (!RelicInfoDataTable || !RelicClassDataTable)
+	{
+		return;
+	}
+
+	FItemInfoData* RelicInfoDataRow = RelicInfoDataTable->FindRow<FItemInfoData>(TargetName, TEXT("Get ItemInfoData"));
+	FDungeonRelicData* RelicClassDataRow = RelicClassDataTable->FindRow<FDungeonRelicData>(TargetName, TEXT("Get RelicClassData"));
+	if (RelicInfoDataRow && RelicClassDataRow)
+	{
+		ARSDungeonGroundRelic* GroundRelic = GetWorld()->SpawnActor<ARSDungeonGroundRelic>(DungeonGroundRelicClass, TargetTransform);
+		
+		if (GroundRelic)
+		{
+			FText ItemName = RelicInfoDataRow->ItemName;
+			UStaticMesh* ItemStaticMesh = RelicInfoDataRow->ItemStaticMesh;
+
+			GroundRelic->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
+			GroundRelic->SetRelicClass(RelicClassDataRow->RelicClass);
 		}
 	}
 }

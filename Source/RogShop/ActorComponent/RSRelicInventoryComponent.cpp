@@ -174,7 +174,7 @@ void URSRelicInventoryComponent::LoadRelicData()
 				return;
 			}
 
-			URSBaseRelic* SpawnRelic = NewObject<URSBaseRelic>(OwnerCharacter, ObjectName, EObjectFlags::RF_Transient, RelicClassData->RelicClass);
+			URSBaseRelic* SpawnRelic = NewObject<URSBaseRelic>(OwnerCharacter, RelicClassData->RelicClass, ObjectName, EObjectFlags::RF_Transient);
 			if (!SpawnRelic)
 			{
 				return;
@@ -184,7 +184,7 @@ void URSRelicInventoryComponent::LoadRelicData()
 			AddRelic(CurRelicName);
 
 			// 유물의 로직을 적용
-			SpawnRelic->ApplyEffect(OwnerCharacter);
+			SpawnRelic->LoadEffect(OwnerCharacter);
 		}
 	}
 }

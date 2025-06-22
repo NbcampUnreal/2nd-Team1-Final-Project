@@ -8,3 +8,8 @@ void URSBaseRelic::ApplyEffect(ARSDunPlayerCharacter* OwnerCharacter)
 {
 
 }
+
+void URSBaseRelic::LoadEffect(ARSDunPlayerCharacter* OwnerCharacter)
+{
+
+}

@@ -6,8 +6,11 @@
 #include "RSDunPlayerController.h"
 #include "RSGameInstance.h"
 #include "RSDunPlayerCharacter.h"
-
+#include "RSDataSubsystem.h"
+#include "ItemInfoData.h"
+#include "RSSpawnManagerAccessor.h"
 #include "Blueprint/UserWidget.h"
+#include "GameFramework/GameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "RogShop/UtilDefine.h"
 
@@ -98,6 +101,35 @@ void URSCheatManager::SpawnMonster(FString MonsterName)
     else
     {
         RS_LOG_DEBUG("Monster not found for key: %s", *Key);
+    }
+}
+
+void URSCheatManager::SpawnRelic(FName RelicName)
+{
+    UWorld* World = GetWorld();
+    if (!World)
+    {
+        return;
+    }
+
+    IRSSpawnManagerAccessor* SpawnManagerAccessor = World->GetAuthGameMode<IRSSpawnManagerAccessor>();
+    URSSpawnManager* SpawnManager = nullptr;
+    if (SpawnManagerAccessor)
+    {
+        SpawnManager = SpawnManagerAccessor->GetSpawnManager();
+    }
+
+    if (SpawnManager)
+    {
+        FVector PlayerLocation = GetOuterAPlayerController()->GetPawn()->GetActorLocation();
+        FVector Forward = GetOuterAPlayerController()->GetPawn()->GetActorForwardVector();
+
+        FTransform TargetTransform;
+        TargetTransform.SetLocation(PlayerLocation + Forward * 100.0f);
+        TargetTransform.SetRotation(FQuat::Identity);
+        TargetTransform.SetScale3D(FVector::OneVector);
+
+        SpawnManager->SpawnGroundRelicAtTransform(RelicName, TargetTransform);
     }
 }
 

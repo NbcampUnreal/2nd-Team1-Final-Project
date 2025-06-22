@@ -39,3 +39,16 @@ void URSStatusRelic::ApplyEffect(ARSDunPlayerCharacter* OwnerCharacter)
 		OwnerCharacter->IncreaseAttackSpeed(Amount);
 	}
 }
+
+void URSStatusRelic::LoadEffect(ARSDunPlayerCharacter* OwnerCharacter)
+{
+	if (TargetStatus == EStatus::HP)
+	{
+		// HP를 회복시키는 개념이므로 로드시 해당 기능을 제외한 스탯 상승 부분만 적용한다.
+		return;
+	}
+	else
+	{
+		ApplyEffect(OwnerCharacter);
+	}
+}

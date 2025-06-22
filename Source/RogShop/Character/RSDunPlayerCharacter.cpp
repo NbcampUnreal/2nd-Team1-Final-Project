@@ -713,6 +713,11 @@ float ARSDunPlayerCharacter::GetAttackPower() const
     return AttackPower;
 }
 
+void ARSDunPlayerCharacter::ChangeAttackPower(float Amount)
+{
+    AttackPower = Amount;
+}
+
 void ARSDunPlayerCharacter::IncreaseAttackPower(float Amount)
 {
     float NewAttackPower = AttackPower + Amount;
@@ -728,6 +733,11 @@ void ARSDunPlayerCharacter::DecreaseAttackPower(float Amount)
 float ARSDunPlayerCharacter::GetAttackSpeed() const
 {
     return AttackSpeed;
+}
+
+void ARSDunPlayerCharacter::ChangeAttackSpeed(float Amount)
+{
+    AttackSpeed = Amount;
 }
 
 void ARSDunPlayerCharacter::IncreaseAttackSpeed(float Amount)
@@ -752,7 +762,11 @@ void ARSDunPlayerCharacter::SaveStatus()
         return;
     }
 
+    StatusSaveGame->MaxHP = GetMaxHP();
     StatusSaveGame->HP = GetHP();
+    StatusSaveGame->MoveSpeed = GetMoveSpeed();
+    StatusSaveGame->AttackPower = GetAttackPower();
+    StatusSaveGame->AttackSpeed = GetAttackSpeed();
     StatusSaveGame->LifeEssence = LifeEssence;
 
     // 저장
@@ -790,14 +804,19 @@ void ARSDunPlayerCharacter::LoadStatus()
     if (!StatusLoadGame)
     {
         // 저장된 값이 없는 경우 기본값으로 설정
-        ChangeMaxHP(GetMaxHP());
-        ChangeHP(GetHP());
+
+        // 최대 체력, 현재 체력, 이동 속도는 부모 클래스에서 기본값을 설정합니다.
+        
+        // 공격력과 공격 속도는 캐릭터에 기본값을 설정합니다.
         return;
     }
     
     // 로드
-    ChangeMaxHP(GetMaxHP());
+    ChangeMaxHP(StatusLoadGame->MaxHP);
     ChangeHP(StatusLoadGame->HP);
+    ChangeMoveSpeed(StatusLoadGame->MoveSpeed);
+    ChangeAttackPower(StatusLoadGame->AttackPower);
+    ChangeAttackSpeed(StatusLoadGame->AttackSpeed);
     LifeEssence = StatusLoadGame->LifeEssence;
 }
 

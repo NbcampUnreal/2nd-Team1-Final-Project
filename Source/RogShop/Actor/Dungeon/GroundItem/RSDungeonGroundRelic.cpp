@@ -22,7 +22,7 @@ void ARSDungeonGroundRelic::Interact(ARSDunPlayerCharacter* Interactor)
 	FString ObjectString = DataTableKey.ToString() + TEXT("Object");
 	FName ObjectName = FName(*ObjectString);
 
-	URSBaseRelic* SpawnRelic = NewObject<URSBaseRelic>(Interactor, ObjectName, EObjectFlags::RF_Transient, RelicClass->StaticClass());
+	URSBaseRelic* SpawnRelic = NewObject<URSBaseRelic>(Interactor, RelicClass, ObjectName, EObjectFlags::RF_Transient);
 
 	URSRelicInventoryComponent* RSPlayerWeaponComponent = Interactor->GetRSRelicInventoryComponent();
 	if (SpawnRelic && RSPlayerWeaponComponent)
