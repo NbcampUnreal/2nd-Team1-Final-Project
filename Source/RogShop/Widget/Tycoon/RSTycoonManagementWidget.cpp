@@ -114,7 +114,7 @@ void URSTycoonManagementWidget::OnChangeTileSizeBox(float Value)
 		CanTileChangeText->SetColorAndOpacity(FColor::Red);
 		CanTileChangeText->SetText(FText::FromString(TEXT("돈이 부족합니다!")));
 		
-		TilePriceText->SetColorAndOpacity(FColor::Red);
+		//TilePriceText->SetColorAndOpacity(FColor::Red);
 		ExpandTileButton->SetIsEnabled(false);
 	}
 	else
@@ -122,7 +122,7 @@ void URSTycoonManagementWidget::OnChangeTileSizeBox(float Value)
 		CanTileChangeText->SetColorAndOpacity(FColor::Cyan);
 		CanTileChangeText->SetText(FText::FromString(TEXT("변경 가능합니다!")));
 		
-		TilePriceText->SetColorAndOpacity(FColor::Cyan);
+		//TilePriceText->SetColorAndOpacity(FColor::Cyan);
 		ExpandTileButton->SetIsEnabled(true);
 	}
 }
