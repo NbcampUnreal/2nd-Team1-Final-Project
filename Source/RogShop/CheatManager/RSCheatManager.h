@@ -33,6 +33,9 @@ public:
 	void SpawnMonster(FString MonsterName);
 
 	UFUNCTION(Exec)
+	void SpawnRelic(FName RelicName);
+
+	UFUNCTION(Exec)
 	void SpawnDunShopNPC();
   
 	UFUNCTION(exec)

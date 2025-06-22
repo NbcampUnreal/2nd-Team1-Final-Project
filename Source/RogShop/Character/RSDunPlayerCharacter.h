@@ -40,14 +40,6 @@ public:
 
 	void OnDeath();
 
-	virtual void ChangeMaxHP(float Amount) override;
-	virtual void IncreaseMaxHP(float Amount) override;
-	virtual void DecreaseMaxHP(float Amount) override;
-
-	virtual void ChangeHP(float Amount) override;
-	virtual void IncreaseHP(float Amount) override;
-	virtual void DecreaseHP(float Amount) override;
-
 protected:
 	UFUNCTION()
 	void Move(const FInputActionValue& value);
@@ -157,11 +149,21 @@ private:
 
 // 스탯 관련
 public:
+	virtual void ChangeMaxHP(float Amount) override;
+	virtual void IncreaseMaxHP(float Amount) override;
+	virtual void DecreaseMaxHP(float Amount) override;
+
+	virtual void ChangeHP(float Amount) override;
+	virtual void IncreaseHP(float Amount) override;
+	virtual void DecreaseHP(float Amount) override;
+
 	float GetAttackPower() const;
+	void ChangeAttackPower(float Amount);
 	void IncreaseAttackPower(float Amount);
 	void DecreaseAttackPower(float Amount);
 
 	float GetAttackSpeed() const;
+	void ChangeAttackSpeed(float Amount);
 	void IncreaseAttackSpeed(float Amount);
 	void DecreaseAttackSpeed(float Amount);
 
