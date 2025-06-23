@@ -23,6 +23,7 @@ class ARSDungeonGroundWeapon;
 class ARSDungeonGroundIngredient;
 class ARSDungeonGroundRelic;
 class ARSDungeonGroundLifeEssence;
+class ARSBaseAltar;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemySpawn, ARSDunBaseCharacter*, SpawnCharacter);
 
@@ -123,8 +124,9 @@ private:
 public:
 	// 상점 NPC를 스폰
 	void SpawnShopNPCInLevel();
-	// 성소 생성
-	void SpawnSanctuary();
+
+	// 제단 생성
+	void SpawnAltar();
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
@@ -134,10 +136,10 @@ private:
 	TObjectPtr<ARSDunLifeEssenceShop> DunLifeEssenceShopInstance; // 인스턴스
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
-	TArray<TSubclassOf<ARSDunLifeEssenceShop>> AltarClasses; //제단 클래스
+	TArray<TSubclassOf<ARSBaseAltar>> AltarClasses; //제단 클래스
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
-	TArray<TObjectPtr<ARSDunLifeEssenceShop>> AltarInstance; //제단 인스턴스
+	TArray<TObjectPtr<ARSBaseAltar>> AltarInstance; //제단 인스턴스
 #pragma endregion
 
 #pragma region GroundItem
@@ -146,10 +148,13 @@ public:
 	void SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform, bool AddImpulse);
 
 	UFUNCTION()
-	void SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Amount);
+	void SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Quantity);
 
 	UFUNCTION()
 	void SpawnGroundRelicAtTransform(FName TargetName, FTransform TargetTransform);
+
+	UFUNCTION()
+	void SpawnGroundLifeEssenceAtTransform(FTransform TargetTransform, int32 Quantity);
 
 private:
 	UFUNCTION()
@@ -170,7 +175,32 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ARSDungeonGroundLifeEssence> DungeonGroundLifeEssenceClass; // 아이템으로 드랍되는 생명의 정수 클래스
+#pragma endregion
 
+#pragma region Unspawned
+public:
+	TSet<FName> GetUnspawnedWeapons() const;
+
+	void SetUnspawnedWeapons(TArray<FName> NewUnspawnedWeapons);
+
+	void RemoveUnspawnedWeapon(FName RemoveTargetName);
+
+	void ResetUnspawnedWeapons();
+
+	TSet<FName> GetUnspawnedRelics() const;
+
+	void SetUnspawnedRelics(TArray<FName> NewUnspawnedRelics);
+
+	void RemoveUnspawnedRelic(FName RemoveTargetName);
+
+	void ResetUnspawnedRelics();
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
+	TSet<FName> UnspawnedWeapons;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
+	TSet<FName> UnspawnedRelics;
 #pragma endregion
 
 #pragma region DataTableCaching
