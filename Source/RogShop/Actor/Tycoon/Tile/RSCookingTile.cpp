@@ -132,7 +132,9 @@ void ARSCookingTile::FinishCook()
 
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(Controller)
+
 	Controller->FinishOrderSlot(CookingFoodOrder);
+	Cast<ARSTycoonPlayerCharacter>(Controller->GetCharacter())->SetCooking(false);
 	
 	if (CookingAudioComponent && CookingAudioComponent->IsPlaying())
 	{
