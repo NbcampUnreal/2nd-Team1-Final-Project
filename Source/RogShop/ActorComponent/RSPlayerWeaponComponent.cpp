@@ -238,6 +238,11 @@ void URSPlayerWeaponComponent::EndTrail()
 
 void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 {
+	if (!NewWeaponActor)
+	{
+		return;
+	}
+
 	// 슬롯의 크기가 잘못 설정된 경우
 	if (WeaponActors.Num() != WeaponSlotSize)
 	{
@@ -255,7 +260,7 @@ void URSPlayerWeaponComponent::EquipWeaponToSlot(ARSBaseWeapon* NewWeaponActor)
 		if (SkeletalMeshComp)
 		{
 			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-			NewWeaponActor->AttachToComponent(SkeletalMeshComp, AttachmentRules, FName("Weapon_Hand_r"));
+			NewWeaponActor->AttachToComponent(SkeletalMeshComp, AttachmentRules, NewWeaponActor->GetAttachSocketName());
 		}
 	}
 
