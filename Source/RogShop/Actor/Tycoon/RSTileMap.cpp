@@ -51,9 +51,10 @@ void ARSTileMap::ChangeTileSize(int32 NewWidth, int32 NewHeight, bool bUseGold)
 	if (bUseGold)
 	{
 		ARSTycoonPlayerController* PlayerController =
-			Cast<ARSTycoonPlayerController>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTycoonPlayerController::StaticClass()));
+			Cast<ARSTycoonPlayerController>(
+				UGameplayStatics::GetActorOfClass(GetWorld(), ARSTycoonPlayerController::StaticClass()));
 		check(PlayerController)
-		
+
 		int32 Price = GetNeedPrice(NewWidth, NewHeight);
 		if (PlayerController->GetGold() < Price)
 		{
@@ -63,7 +64,7 @@ void ARSTileMap::ChangeTileSize(int32 NewWidth, int32 NewHeight, bool bUseGold)
 
 		PlayerController->AddGold(-Price);
 	}
-	
+
 	Width = NewWidth;
 	Height = NewHeight;
 
@@ -406,7 +407,8 @@ void ARSTileMap::DeleteTileData()
 {
 	RS_LOG_C("저장 데이터 삭제", FColor::Orange);
 
-	FString SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
+	// FString SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
+	FString SlotName = TEXT("TileMapSaveSlot");;
 	UGameplayStatics::DeleteGameInSlot(SlotName, 0);
 }
 

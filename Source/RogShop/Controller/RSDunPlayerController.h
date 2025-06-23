@@ -108,10 +108,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UUserWidget> RSDeathWidget;
 
-// 캐릭터의 델리게이트에 바인딩하는 함수를 모은 함수
-private:
-	void BindCharacterDelegates();
-
 // 이벤트 디스패처
 public:
 	UPROPERTY(BlueprintAssignable)

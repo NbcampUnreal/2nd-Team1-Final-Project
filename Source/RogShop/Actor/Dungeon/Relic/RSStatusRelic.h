@@ -4,18 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "RSBaseRelic.h"
+#include "CharacterStatus.h"
 #include "RSStatusRelic.generated.h"
-
-UENUM(BlueprintType)
-enum class EStatus : uint8
-{
-	NONE,
-	HP,
-	MaxHP,
-	MoveSpeed,
-	AttackPower,
-	AttackSpeed,
-};
 
 UCLASS(Blueprintable)
 class ROGSHOP_API URSStatusRelic : public URSBaseRelic
@@ -29,7 +19,7 @@ public:
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
-	EStatus TargetStatus;
+	ECharacterStatus TargetStatus;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "Status", meta = (AllowPrivateAccess = "true"))
 	float Amount;

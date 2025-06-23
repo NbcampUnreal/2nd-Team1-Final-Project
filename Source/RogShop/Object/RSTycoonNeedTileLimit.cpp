@@ -55,10 +55,11 @@ bool URSTycoonNeedTileLimit::Condition_Implementation(UWorld* World)
 void URSTycoonNeedTileLimit::Fail_Implementation(UWorld* World)
 {
 	Description = TEXT("아래의 타일이 모두 배치되어야 합니다!");
+	Description.Append(TEXT("\n관리 모드에서 타일을 클릭해 바꿔보세요!"));
 	Description.Append(FString::Printf(TEXT("\n문 : %d / 1"), DoorCount));
 	Description.Append(FString::Printf(TEXT("\n화구 : %d / 1"), CookingCount));
 	Description.Append(FString::Printf(TEXT("\n테이블 : %d / 1"), TableCount));
-	Description.Append(FString::Printf(TEXT("\n상자 : %d / 1"), IceBoxCount));
+	Description.Append(FString::Printf(TEXT("\n박스 : %d / 1"), IceBoxCount));
 	
 	World->GetFirstPlayerController<ARSTycoonPlayerController>()->SetSaleEnable(false);
 }

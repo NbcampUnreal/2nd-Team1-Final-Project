@@ -43,13 +43,4 @@ private:
 	UPROPERTY()
 	TObjectPtr<ARSCookingTile> PlacedCookingTile; //배치된 쿠킹 타일
 
-	// 사운드
-	UPROPERTY(EditDefaultsOnly, Category = "Sound")
-	TObjectPtr<USoundBase> CookingSound;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Sound")
-	TObjectPtr<USoundBase> CookingFinishSound;
-
-	UPROPERTY()
-	TObjectPtr<UAudioComponent> CookingAudioComponent;
 };

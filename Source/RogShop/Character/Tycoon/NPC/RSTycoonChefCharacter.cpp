@@ -166,16 +166,6 @@ void ARSTycoonChefCharacter::TryCook()
 		FoodBubble->SetImage(GameMode->GetOrderToCook().FoodKey);
 
 		PlacedCookingTile->Interact(this);
-
-		check(CookingSound)
-		if (CookingAudioComponent)
-		{
-			CookingAudioComponent->Play();
-		}
-		else
-		{
-			CookingAudioComponent = UGameplayStatics::SpawnSoundAttached(CookingSound, RootComponent);
-		}
 	}
 }
 
@@ -185,13 +175,5 @@ void ARSTycoonChefCharacter::CheckFinish()
 	{
 		bCooking = false;
 		FoodBubbleWidgetComponent->SetVisibility(false);
-
-		if (CookingAudioComponent && CookingAudioComponent->IsPlaying())
-		{
-			CookingAudioComponent->Stop();
-		}
-
-		check(CookingFinishSound)
-		UGameplayStatics::SpawnSoundAtLocation(this, CookingFinishSound, GetActorLocation());
 	}
 }

@@ -5,6 +5,7 @@
 
 #include "RSTycoonInventoryComponent.h"
 #include "RSTycoonPlayerController.h"
+#include "Components/AudioComponent.h"
 #include "RogShop/UtilDefine.h"
 #include "RogShop/Actor/Tycoon/Food/RSBaseFood.h"
 #include "RogShop/DataTable/CookFoodData.h"
@@ -99,7 +100,17 @@ void ARSCookingTile::Cook(FFoodOrder Order)
 	{
 		Controller->GetInventoryComponent()->RemoveItem(Need.Key, Need.Value);
 	}
-
+	
+	check(CookingSound)
+	if (CookingAudioComponent)
+	{
+		CookingAudioComponent->Play();
+	}
+	else
+	{
+		CookingAudioComponent = UGameplayStatics::SpawnSoundAttached(CookingSound, RootComponent);
+	}
+	
 	//5초 후 완성
 	FTimerHandle Timer;
 	GetWorldTimerManager().SetTimer(Timer, this, &ARSCookingTile::FinishCook, 5.f, false);
@@ -122,6 +133,14 @@ void ARSCookingTile::FinishCook()
 	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(Controller)
 	Controller->FinishOrderSlot(CookingFoodOrder);
+	
+	if (CookingAudioComponent && CookingAudioComponent->IsPlaying())
+	{
+		CookingAudioComponent->Stop();
+	}
+
+	check(CookingFinishSound)
+	UGameplayStatics::SpawnSoundAtLocation(this, CookingFinishSound, GetActorLocation());
 
 	CookedFood = Food;
 	CookingFoodOrder = FFoodOrder(); //초기화
