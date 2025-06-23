@@ -99,6 +99,7 @@ void ARSTycoonNPC::StopAllAction()
 	GetWorldTimerManager().ClearAllTimersForObject(this);
 	
 	MoveTarget = nullptr;
+	GetController<AAIController>()->StopMovement();
 }
 
 void ARSTycoonNPC::InteractTarget(AActor* TargetActor)

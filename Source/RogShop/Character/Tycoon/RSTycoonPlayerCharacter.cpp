@@ -4,12 +4,15 @@
 #include "RSTycoonPlayerCharacter.h"
 
 #include "EnhancedInputComponent.h"
+#include "RSTycoonGameModeBase.h"
 #include "RSTycoonPlayerController.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "RogShop/UtilDefine.h"
 #include "RogShop/Actor/Tycoon/Tile/RSBaseTile.h"
+#include "RogShop/Actor/Tycoon/Tile/RSCookingTile.h"
+#include "RogShop/Actor/Tycoon/Tile/RSTableTile.h"
 
 
 ARSTycoonPlayerCharacter::ARSTycoonPlayerCharacter()
@@ -67,6 +70,9 @@ void ARSTycoonPlayerCharacter::Pickup(AActor* Actor)
 	
 	Actor->AttachToComponent(PickupLocation, FAttachmentTransformRules::KeepWorldTransform);
 	Actor->SetActorRelativeTransform(FTransform::Identity);
+
+	check(PickupFoodMontage)
+	PlayAnimMontage(PickupFoodMontage);
 }
 
 AActor* ARSTycoonPlayerCharacter::Drop(FTransform DropTransform)
@@ -83,6 +89,9 @@ AActor* ARSTycoonPlayerCharacter::Drop(FTransform DropTransform)
 	PickupActor->SetActorTransform(DropTransform);
 	PickupActor = nullptr;
 
+	check(DropFoodMontage)
+	PlayAnimMontage(DropFoodMontage);
+	
 	return Temp;
 }
 
@@ -95,15 +104,51 @@ void ARSTycoonPlayerCharacter::BeginPlay()
 	GetMesh()->SetSkeletalMeshAsset(MergeSkeletalMesh);
 }
 
+void ARSTycoonPlayerCharacter::PlayInteractAnimation(ARSBaseTile* InteractTile)
+{
+	//바빠잇
+
+	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
+	check(GameMode)
+	
+	if (ARSTableTile* TableTile = Cast<ARSTableTile>(InteractTile))
+	{
+		if (TableTile->GetOrderWaitCustomerIndex() != INDEX_NONE)
+		{
+			check(TakeOrderMontage)
+			PlayAnimMontage(TakeOrderMontage);
+		}
+	}
+
+	if (ARSCookingTile* CookingTile = Cast<ARSCookingTile>(InteractTile))
+	{
+		if (CookingTile->GetState() == ECookingState::None &&
+			GameMode->GetOrders().Num() > 0)
+		{
+			bCooking = true;
+			SetActorTransform(CookingTile->GetChefTransform());
+		}
+	}
+}
+
 void ARSTycoonPlayerCharacter::OnMove(const FInputActionValue& Value)
 {
+	if (bCooking)
+	{
+		return;
+	}
+	
 	FVector Input = Value.Get<FVector>();
-
 	GetMovementComponent()->AddInputVector(Input);
 }
 
 void ARSTycoonPlayerCharacter::OnInteract(const FInputActionValue& Value)
 {
+	if (bCooking)
+	{
+		return;
+	}
+	
 	TArray<AActor*> OverlapTileActors;
 	InteractSphere->GetOverlappingActors(OverlapTileActors, ARSBaseTile::StaticClass());
 
@@ -130,5 +175,6 @@ void ARSTycoonPlayerCharacter::OnInteract(const FInputActionValue& Value)
 	ARSBaseTile* Tile = Cast<ARSBaseTile>(MinActor);
 	RS_LOG_F("상호작용 하는 Tile 이름 : %s", *Tile->GetTileDisplayName());
 
+	PlayInteractAnimation(Tile);
 	Tile->Interact(this);
 }
