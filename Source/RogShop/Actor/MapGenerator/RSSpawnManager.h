@@ -125,10 +125,10 @@ private:
 	TObjectPtr<ARSDunLifeEssenceShop> DunLifeEssenceShopInstance; // 인스턴스
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<ARSDunLifeEssenceShop> SanctuaryClass; // 생명의 정수 상점 클래스
+	TArray<TSubclassOf<ARSDunLifeEssenceShop>> AltarClasses; //제단 클래스
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<ARSDunLifeEssenceShop> SanctuaryInstance; // 인스턴스
+	TArray<TObjectPtr<ARSDunLifeEssenceShop>> AltarInstance; //제단 인스턴스
 #pragma endregion
 
 #pragma region GroundItem

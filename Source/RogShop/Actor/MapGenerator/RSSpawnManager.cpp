@@ -807,15 +807,31 @@ void URSSpawnManager::SpawnSanctuary()
 		return;
 	}
 
-	int32 Index = FMath::RandRange(0, SanctuaryPoints.Num() - 1);
-	ATargetPoint* ChosenPoint = SanctuaryPoints[Index];
+	TArray<int32> Indices;
+	if (SanctuaryPoints.Num() >= 3 && AltarClasses.Num() >= 3)
+	{
+		for (int32 i = 0; i < SanctuaryPoints.Num(); ++i)
+		{
+			Indices.Add(i);
+		}
+	}
 
-	FTransform SpawnTransform = ChosenPoint->GetActorTransform();
+	Algo::RandomShuffle(Indices); // 중복 없이 무작위 순서 결정
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	SanctuaryInstance = World->SpawnActor<ARSDunLifeEssenceShop>(SanctuaryClass, SpawnTransform, SpawnParams);
+	for (int32 i = 0; i < 3; ++i)
+	{
+		int32 Index = Indices[i];
+		ATargetPoint* ChosenPoint = SanctuaryPoints[Index];
+
+		FTransform SpawnTransform = ChosenPoint->GetActorTransform();
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		AltarInstance[i] = World->SpawnActor<ARSDunLifeEssenceShop>(
+			AltarClasses[i], SpawnTransform, SpawnParams);
+	}
 
 	RS_LOG_DEBUG("성소 생성 성공");
 }
