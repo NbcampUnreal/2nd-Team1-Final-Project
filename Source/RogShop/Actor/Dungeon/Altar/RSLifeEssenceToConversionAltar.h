@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "RSBaseAltar.h"
-#include "RSLifeEssenceToWeaponAltar.generated.h"
+#include "RSLifeEssenceToConversionAltar.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ROGSHOP_API ARSLifeEssenceToWeaponAltar : public ARSBaseAltar
+class ROGSHOP_API ARSLifeEssenceToConversionAltar : public ARSBaseAltar
 {
 	GENERATED_BODY()
 	
 public:
-	ARSLifeEssenceToWeaponAltar();
+	ARSLifeEssenceToConversionAltar();
 
 	virtual void BeginPlay() override;
 
