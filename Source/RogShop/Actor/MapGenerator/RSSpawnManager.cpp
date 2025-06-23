@@ -24,6 +24,7 @@
 #include "RSDungeonGroundRelic.h"
 #include "RSDungeonGroundLifeEssence.h"
 #include "RSTileBlocker.h"
+#include "RSBaseAltar.h"
 
 // 외부에서 전달받은 월드 및 테이블 초기화
 void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, int32 TargetLevelIndex)
@@ -150,6 +151,8 @@ void URSSpawnManager::SpawnGroundWeaponAtTransform(FName TargetName, FTransform 
 				GroundWeapon->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
 				GroundWeapon->SetWeaponClass(WeaponClassData->WeaponClass);
 
+				RemoveUnspawnedWeapon(TargetName);
+
 				if (AddImpulse)
 				{
 					GroundWeapon->RandImpulse();
@@ -237,6 +240,8 @@ void URSSpawnManager::SpawnGroundRelicAtTransform(FName TargetName, FTransform T
 
 			GroundRelic->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
 			GroundRelic->SetRelicClass(RelicClassDataRow->RelicClass);
+
+			RemoveUnspawnedRelic(TargetName);
 		}
 	}
 }
@@ -352,6 +357,70 @@ void URSSpawnManager::SpawnGroundLifeEssenceFromCharacter(ARSDunBaseCharacter* D
 			DungeonLifeEssence->SetQuantity(LifeEssenceQuantity);
 		}
 	}
+}
+
+TSet<FName> URSSpawnManager::GetUnspawnedWeapons() const
+{
+	return UnspawnedWeapons;
+}
+
+void URSSpawnManager::SetUnspawnedWeapons(TArray<FName> NewUnspawnedWeapons)
+{
+	UnspawnedWeapons = TSet<FName>(NewUnspawnedWeapons);
+}
+
+void URSSpawnManager::RemoveUnspawnedWeapon(FName RemoveTargetName)
+{
+	UnspawnedWeapons.Remove(RemoveTargetName);
+}
+
+void URSSpawnManager::ResetUnspawnedWeapons()
+{
+	URSGameInstance* RSGameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
+	if (!RSGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = RSGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	UnspawnedWeapons = TSet<FName>(DataSubsystem->WeaponInfo->GetRowNames());
+}
+
+TSet<FName> URSSpawnManager::GetUnspawnedRelics() const
+{
+	return UnspawnedRelics;
+}
+
+void URSSpawnManager::SetUnspawnedRelics(TArray<FName> NewUnspawnedRelics)
+{
+	UnspawnedRelics = TSet<FName>(NewUnspawnedRelics);
+}
+
+void URSSpawnManager::RemoveUnspawnedRelic(FName RemoveTargetName)
+{
+	UnspawnedRelics.Remove(RemoveTargetName);
+}
+
+void URSSpawnManager::ResetUnspawnedRelics()
+{
+	URSGameInstance* RSGameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
+	if (!RSGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = RSGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	UnspawnedRelics = TSet<FName>(DataSubsystem->RelicInfo->GetRowNames());
 }
 
 // Player 태그가 있는 TargetPoint에 플레이어 이동 또는 스폰
@@ -835,7 +904,7 @@ void URSSpawnManager::SpawnAltar()
 	}
 
 	Algo::RandomShuffle(Indices); // 중복 없이 무작위 순서 결정
-
+	AltarInstance.SetNum(3);
 
 	for (int32 i = 0; i < 3; ++i)
 	{
@@ -847,8 +916,7 @@ void URSSpawnManager::SpawnAltar()
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		AltarInstance[i] = World->SpawnActor<ARSDunLifeEssenceShop>(
-			AltarClasses[i], SpawnTransform, SpawnParams);
+		AltarInstance[i] = World->SpawnActor<ARSBaseAltar>(AltarClasses[i], SpawnTransform, SpawnParams);
 	}
 
 	RS_LOG_DEBUG("성소 생성 성공");

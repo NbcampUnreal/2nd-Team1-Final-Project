@@ -5,7 +5,7 @@
 #include "RSDunPlayerCharacter.h"
 #include "GameFramework/GameModeBase.h"
 #include "RSSpawnManagerAccessor.h"
-#include "RSAlterCostWidget.h"
+#include "RSAltarCostWidget.h"
 
 ARSHPToLifeEssenceAltar::ARSHPToLifeEssenceAltar()
 {
@@ -17,11 +17,13 @@ ARSHPToLifeEssenceAltar::ARSHPToLifeEssenceAltar()
 
 void ARSHPToLifeEssenceAltar::BeginPlay()
 {
-	URSAlterCostWidget* CostWidget = Cast<URSAlterCostWidget>(GetCostWidgetObject());
+	Super::BeginPlay();
+
+	URSAltarCostWidget* CostWidget = Cast<URSAltarCostWidget>(GetCostWidgetObject());
 	if (CostWidget)
 	{
 		CostWidget->ChangeColor(FLinearColor::Red);
-		CostWidget->UpdateCost(Cost);
+		CostWidget->UpdateCost(FString::FromInt(Cost) + "%");
 	}
 }
 
@@ -57,9 +59,9 @@ void ARSHPToLifeEssenceAltar::Interact(ARSDunPlayerCharacter* Interactor)
 	}
 
 	// 비용 업데이트
-	URSAlterCostWidget* CostWidget = Cast<URSAlterCostWidget>(GetCostWidgetObject());
+	URSAltarCostWidget* CostWidget = Cast<URSAltarCostWidget>(GetCostWidgetObject());
 	if (CostWidget)
 	{
-		CostWidget->UpdateCost(Cost);
+		CostWidget->UpdateCost(FString::FromInt(Cost) + "%");
 	}
 }

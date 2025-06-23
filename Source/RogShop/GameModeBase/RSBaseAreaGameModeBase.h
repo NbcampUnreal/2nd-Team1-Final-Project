@@ -39,4 +39,13 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<URSSpawnManager> SpawnManager;// 인스턴스
 #pragma endregion
+
+#pragma region SaveData
+public:
+	UFUNCTION()
+	void SaveDungeonInfo();
+
+private:
+	void LoadDungeonInfo();
+#pragma endregion
 };

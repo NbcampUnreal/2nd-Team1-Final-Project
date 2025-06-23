@@ -20,4 +20,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Seed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FName> UnspawnedWeapons;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FName> UnspawnedRelics;
 };

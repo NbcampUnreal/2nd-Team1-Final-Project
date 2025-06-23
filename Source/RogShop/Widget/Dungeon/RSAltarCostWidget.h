@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "RSAlterCostWidget.generated.h"
+#include "RSAltarCostWidget.generated.h"
 
 class UTextBlock;
 
 UCLASS()
-class ROGSHOP_API URSAlterCostWidget : public UUserWidget
+class ROGSHOP_API URSAltarCostWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -19,7 +19,7 @@ protected:
 public:
 	void ChangeColor(FLinearColor TargetColor);
 
-	void UpdateCost(int32 NewCost);
+	void UpdateCost(FString NewCost);
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (BindWidget, AllowPrivateAccess = "true"))
