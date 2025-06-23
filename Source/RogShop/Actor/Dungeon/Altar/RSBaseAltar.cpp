@@ -19,9 +19,9 @@ ARSBaseAltar::ARSBaseAltar()
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	BoxComp->SetupAttachment(SceneComp);
 
-	CostWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("CostWidget"));
-	CostWidget->SetupAttachment(SceneComp);
-	CostWidget->SetWidgetSpace(EWidgetSpace::World);
+	CostWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("CostWidget"));
+	CostWidgetComp->SetupAttachment(SceneComp);
+	CostWidgetComp->SetWidgetSpace(EWidgetSpace::World);
 
 	InteractName = FText::GetEmpty();
 	bIsAutoInteract = false;
@@ -55,9 +55,17 @@ UAnimMontage* ARSBaseAltar::GetInteractAnimMontage() const
 
 UUserWidget* ARSBaseAltar::GetCostWidgetObject()
 {
-	if (CostWidget)
+	if (CostWidgetComp)
 	{
-		return CostWidget->GetUserWidgetObject();
+		UUserWidget* UserWidgetObject = CostWidgetComp->GetUserWidgetObject();
+
+		if (UserWidgetObject == nullptr)
+		{
+			CostWidgetComp->InitWidget();
+			UserWidgetObject = CostWidgetComp->GetUserWidgetObject();
+		}
+
+		return UserWidgetObject;
 	}
 
 	return nullptr;

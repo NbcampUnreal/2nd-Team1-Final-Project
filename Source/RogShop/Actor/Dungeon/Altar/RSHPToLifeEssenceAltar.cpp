@@ -13,12 +13,16 @@ ARSHPToLifeEssenceAltar::ARSHPToLifeEssenceAltar()
 
 	Cost = 10;
 
+}
+
+void ARSHPToLifeEssenceAltar::BeginPlay()
+{
 	URSAlterCostWidget* CostWidget = Cast<URSAlterCostWidget>(GetCostWidgetObject());
 	if (CostWidget)
 	{
 		CostWidget->ChangeColor(FLinearColor::Red);
+		CostWidget->UpdateCost(Cost);
 	}
-
 }
 
 void ARSHPToLifeEssenceAltar::Interact(ARSDunPlayerCharacter* Interactor)

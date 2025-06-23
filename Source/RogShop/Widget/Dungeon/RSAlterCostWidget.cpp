@@ -12,7 +12,10 @@ void URSAlterCostWidget::NativeOnInitialized()
 
 void URSAlterCostWidget::ChangeColor(FLinearColor TargetColor)
 {
-	CostText->SetColorAndOpacity(FSlateColor(TargetColor));
+	if (CostText)
+	{
+		CostText->SetColorAndOpacity(FSlateColor(TargetColor));
+	}	
 }
 
 void URSAlterCostWidget::UpdateCost(int32 NewCost)

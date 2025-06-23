@@ -17,6 +17,8 @@ class ROGSHOP_API ARSHPToLifeEssenceAltar : public ARSBaseAltar
 public:
 	ARSHPToLifeEssenceAltar();
 
+	virtual void BeginPlay() override;
+
 // 상호작용
 public:
 	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;

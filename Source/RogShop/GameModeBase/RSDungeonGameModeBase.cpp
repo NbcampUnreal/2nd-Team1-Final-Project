@@ -77,7 +77,7 @@ void ARSDungeonGameModeBase::SpawnMap()// 선택된 맵 타입에 따라 맵 생
         return;
     }
 
-    FDungeonLevelData* Level = AllGroups[1];
+    FDungeonLevelData* Level = AllGroups[LevelIndex];
 
     FActorSpawnParameters SpawnParams;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; //무슨일이 있어도 스폰// 충돌 무시하고 항상 스폰하도록 설정
@@ -196,7 +196,7 @@ void ARSDungeonGameModeBase::OnMapReady()// 맵 로딩이 완료되었을 때 �
         
         if (GameMode->SpawnManager)
         {
-            GameMode->SpawnManager->Initialize(GameMode->GetWorld(), GameMode->GetGameInstance(),1);
+            GameMode->SpawnManager->Initialize(GameMode->GetWorld(), GameMode->GetGameInstance(),GameMode->LevelIndex);
         
             GameMode->SpawnManager->SpawnPlayerAtStartPoint();
             GameMode->SpawnManager->SpawnShopNPCInLevel();

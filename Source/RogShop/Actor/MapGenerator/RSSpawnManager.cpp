@@ -815,7 +815,9 @@ void URSSpawnManager::SpawnAltar()
 	for (TActorIterator<ATargetPoint> It(World); It; ++It)
 	{
 		if (It->Tags.Contains(FName("Altar")))
+		{
 			AltarPoints.Add(*It);
+		}
 	}
 
 	if (AltarPoints.Num() == 0)

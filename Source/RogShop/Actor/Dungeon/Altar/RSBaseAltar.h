@@ -56,5 +56,5 @@ private:
 	TObjectPtr<UBoxComponent> BoxComp;	// 캐릭터와의 충돌을 위한 콜리전 용도의 컴포넌트
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UWidgetComponent> CostWidget;
+	TObjectPtr<UWidgetComponent> CostWidgetComp;
 };
