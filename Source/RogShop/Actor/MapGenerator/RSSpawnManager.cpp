@@ -517,7 +517,6 @@ void URSSpawnManager::SpawnDunNextStagePortal() // 다음 스테이지 포탈 �
 {
 	if (!World || !DunNextStagePortalClass)
 	{
-		RS_LOG_DEBUG("다음 스테이지 포탈 생성 실패: World 또는 PortalClass 누락");
 		return;
 	}
 
@@ -787,3 +786,37 @@ void URSSpawnManager::RegisterAllTileBlockers()
 		}
 	}
 }
+
+void URSSpawnManager::SpawnSanctuary()
+{
+	if (!World)
+	{
+		RS_LOG_DEBUG("성소 생성 실패");
+		return;
+	}
+
+	TArray<ATargetPoint*> SanctuaryPoints;
+	for (TActorIterator<ATargetPoint> It(World); It; ++It)
+	{
+		if (It->Tags.Contains(FName("Sanctuary")))
+			SanctuaryPoints.Add(*It);
+	}
+
+	if (SanctuaryPoints.Num() == 0)
+	{
+		return;
+	}
+
+	int32 Index = FMath::RandRange(0, SanctuaryPoints.Num() - 1);
+	ATargetPoint* ChosenPoint = SanctuaryPoints[Index];
+
+	FTransform SpawnTransform = ChosenPoint->GetActorTransform();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	SanctuaryInstance = World->SpawnActor<ARSDunLifeEssenceShop>(SanctuaryClass, SpawnTransform, SpawnParams);
+
+	RS_LOG_DEBUG("성소 생성 성공");
+}
+ 

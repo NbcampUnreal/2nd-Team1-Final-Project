@@ -24,6 +24,7 @@ public:
 #pragma region 공개 함수
 	ARSDungeonGameModeBase(); // 생성자
 	virtual void BeginPlay() override; // 게임 시작 시 호출
+	virtual void StartPlay() override;
 	UFUNCTION()
 	void OnMapReady(); // 맵이 완전히 로드되었을 때 실행되는 콜백
 	UFUNCTION()

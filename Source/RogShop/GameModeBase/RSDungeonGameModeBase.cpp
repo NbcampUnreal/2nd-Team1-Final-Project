@@ -19,6 +19,12 @@ ARSDungeonGameModeBase::ARSDungeonGameModeBase()
 {
     MaxStageCount = 3;
 }
+void ARSDungeonGameModeBase::StartPlay()
+{
+	Super::StartPlay();
+	// 스폰 매니저 생성
+	SpawnManager = NewObject<URSSpawnManager>(this, SpawnManagerClass);
+}
 
 
 void ARSDungeonGameModeBase::BeginPlay()// 게임이 시작될 때 호출됨
@@ -71,7 +77,7 @@ void ARSDungeonGameModeBase::SpawnMap()// 선택된 맵 타입에 따라 맵 생
         return;
     }
 
-    FDungeonLevelData* Level = AllGroups[LevelIndex];
+    FDungeonLevelData* Level = AllGroups[1];
 
     FActorSpawnParameters SpawnParams;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; //무슨일이 있어도 스폰// 충돌 무시하고 항상 스폰하도록 설정
@@ -176,7 +182,6 @@ void ARSDungeonGameModeBase::LoadDungeonInfo()
 
 void ARSDungeonGameModeBase::OnMapReady()// 맵 로딩이 완료되었을 때 호출되는 함수
 {
-    RS_LOG_DEBUG("맵 로딩 완료, 캐릭터 생성 시작");
     
     TWeakObjectPtr<ARSDungeonGameModeBase> WeakThis(this);
 
@@ -189,14 +194,13 @@ void ARSDungeonGameModeBase::OnMapReady()// 맵 로딩이 완료되었을 때 �
         
         ARSDungeonGameModeBase* GameMode = WeakThis.Get();
         
-        if (!GameMode->SpawnManager)
+        if (GameMode->SpawnManager)
         {
-            RS_LOG_DEBUG("스폰 매니저 생성");
-            GameMode->SpawnManager = NewObject<URSSpawnManager>(GameMode, GameMode->SpawnManagerClass);
-            GameMode->SpawnManager->Initialize(GameMode->GetWorld(), GameMode->GetGameInstance(), GameMode->LevelIndex);
+            GameMode->SpawnManager->Initialize(GameMode->GetWorld(), GameMode->GetGameInstance(),1);
         
             GameMode->SpawnManager->SpawnPlayerAtStartPoint();
             GameMode->SpawnManager->SpawnShopNPCInLevel();
+            GameMode->SpawnManager->SpawnSanctuary();
             GameMode->SpawnManager->SetBossTileCoord(GameMode->MapGeneratorInstance->BossWorldLocation);
         
             GameMode->OnGameReady.Broadcast();

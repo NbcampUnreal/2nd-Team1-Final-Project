@@ -114,6 +114,8 @@ private:
 public:
 	// 상점 NPC를 스폰
 	void SpawnShopNPCInLevel();
+	// 성소 생성
+	void SpawnSanctuary();
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
@@ -121,6 +123,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<ARSDunLifeEssenceShop> DunLifeEssenceShopInstance; // 인스턴스
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ARSDunLifeEssenceShop> SanctuaryClass; // 생명의 정수 상점 클래스
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<ARSDunLifeEssenceShop> SanctuaryInstance; // 인스턴스
 #pragma endregion
 
 #pragma region GroundItem
