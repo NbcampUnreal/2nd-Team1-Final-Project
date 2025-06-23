@@ -48,4 +48,6 @@ void URSTycoonBuyTileWidget::OnClickButton()
 	
 	Controller->AddGold(PrePrice - Price);
 	TileMap->ChangeTile(SelectTileIndex, TileKey);
+
+	Controller->CheckLimitsOfSale();
 }

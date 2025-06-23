@@ -50,6 +50,16 @@ private:
 	UPROPERTY()
 	TObjectPtr<ARSBaseFood> CookedFood; //완성되어 배치되있는 음식 
 
+	// 사운드
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	TObjectPtr<USoundBase> CookingSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	TObjectPtr<USoundBase> CookingFinishSound;
+
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> CookingAudioComponent;
+	
 	ECookingState State;
 	FFoodOrder CookingFoodOrder;
 };
