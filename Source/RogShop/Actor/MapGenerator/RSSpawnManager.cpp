@@ -798,7 +798,7 @@ void URSSpawnManager::SpawnSanctuary()
 	TArray<ATargetPoint*> SanctuaryPoints;
 	for (TActorIterator<ATargetPoint> It(World); It; ++It)
 	{
-		if (It->Tags.Contains(FName("Sanctuary")))
+		if (It->Tags.Contains(FName("Altar")))
 			SanctuaryPoints.Add(*It);
 	}
 
