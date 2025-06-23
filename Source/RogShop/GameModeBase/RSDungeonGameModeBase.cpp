@@ -135,6 +135,14 @@ void ARSDungeonGameModeBase::SaveDungeonInfo()
     DungeonStageSaveGame->LevelIndex = LevelIndex;
     DungeonStageSaveGame->Seed = Seed;
 
+    if (SpawnManager)
+    {
+        TSet<FName> UnspawnedWeapons = SpawnManager->GetUnspawnedWeapons();
+        TSet<FName> UnspawnedRelics = SpawnManager->GetUnspawnedRelics();
+        DungeonStageSaveGame->UnspawnedWeapons = UnspawnedWeapons.Array();
+        DungeonStageSaveGame->UnspawnedRelics = UnspawnedWeapons.Array();
+    }
+
     // 저장
     UGameInstance* CurGameInstance = GetGameInstance();
     if (!CurGameInstance)
@@ -171,12 +179,24 @@ void ARSDungeonGameModeBase::LoadDungeonInfo()
     {
         LevelIndex = DungeonInfoLoadGame->LevelIndex;
         Seed = DungeonInfoLoadGame->Seed;
-    }
 
-    // 시드 값이 설정되어있지 않은 경우 랜덤한 시드를 설정한다.
-    if (Seed == 0)
+        if (SpawnManager)
+        {
+            SpawnManager->SetUnspawnedWeapons(DungeonInfoLoadGame->UnspawnedWeapons);
+            SpawnManager->SetUnspawnedRelics(DungeonInfoLoadGame->UnspawnedRelics);
+        }
+    }
+    // 세이브 파일이 없는 경우
+    else
     {
-        InitRandSeed();
+        // 랜덤한 시드를 설정한다.
+        if (Seed == 0)
+        {
+            InitRandSeed();
+        }
+
+        SpawnManager->ResetUnspawnedWeapons();
+        SpawnManager->ResetUnspawnedRelics();
     }
 }
 
@@ -200,7 +220,7 @@ void ARSDungeonGameModeBase::OnMapReady()// 맵 로딩이 완료되었을 때 �
         
             GameMode->SpawnManager->SpawnPlayerAtStartPoint();
             GameMode->SpawnManager->SpawnShopNPCInLevel();
-            GameMode->SpawnManager->SpawnSanctuary();
+            GameMode->SpawnManager->SpawnAltar();
             GameMode->SpawnManager->SetBossTileCoord(GameMode->MapGeneratorInstance->BossWorldLocation);
         
             GameMode->OnGameReady.Broadcast();
