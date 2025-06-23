@@ -370,6 +370,7 @@ void ARSTycoonPlayerController::OnRotateTile(const FInputActionValue& Value)
 	Yaw += 90 * Sign;
 
 	TileMap->RotateTile(SelectTileIndex, Yaw);
+	CheckLimitsOfSale();
 }
 
 void ARSTycoonPlayerController::SettingChangeTile()

@@ -40,12 +40,10 @@ public:
 	void StartSaleMode();
 	void EndSaleMode();
 	void StartManagementMode();
-	void EndManagementMode();
 
 	UFUNCTION(BlueprintCallable)
 	void SetSaleEnable(bool Value);
-
-private:
+	UFUNCTION(BlueprintCallable)
 	bool CheckLimitsOfSale();
 
 private:
