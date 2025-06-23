@@ -188,7 +188,9 @@ float ARSDunMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 		GetMaxHP()
 	);
 
+	//피해를 받은 경우 공격 대상을 찾는다
 	damagePerception->ReportDamageEvent(GetWorld(), this, DamageCauser, Damage, this->GetActorLocation(), DamageCauser->GetActorLocation(), TEXT("Default"));
+
 
 	return Damage;
 }
