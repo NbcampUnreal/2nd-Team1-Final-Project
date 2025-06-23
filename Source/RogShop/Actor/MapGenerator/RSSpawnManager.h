@@ -138,10 +138,13 @@ public:
 	void SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform, bool AddImpulse);
 
 	UFUNCTION()
-	void SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Amount);
+	void SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Quantity);
 
 	UFUNCTION()
 	void SpawnGroundRelicAtTransform(FName TargetName, FTransform TargetTransform);
+
+	UFUNCTION()
+	void SpawnGroundLifeEssenceAtTransform(FTransform TargetTransform, int32 Quantity);
 
 private:
 	UFUNCTION()

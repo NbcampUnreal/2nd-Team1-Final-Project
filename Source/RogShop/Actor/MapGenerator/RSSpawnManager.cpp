@@ -159,7 +159,7 @@ void URSSpawnManager::SpawnGroundWeaponAtTransform(FName TargetName, FTransform 
 	}
 }
 
-void URSSpawnManager::SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Amount)
+void URSSpawnManager::SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Quantity)
 {
 	URSGameInstance* RSGameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
 	if (!RSGameInstance)
@@ -197,7 +197,7 @@ void URSSpawnManager::SpawnGroundIngredientAtTransform(FName TargetName, FTransf
 			UStaticMesh* ItemStaticMesh = IngredientInfoDataRow->ItemStaticMesh;
 
 			DungeonIngredient->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
-			DungeonIngredient->SetQuantity(Amount);
+			DungeonIngredient->SetQuantity(Quantity);
 			DungeonIngredient->RandImpulse();
 		}
 	}
@@ -238,6 +238,17 @@ void URSSpawnManager::SpawnGroundRelicAtTransform(FName TargetName, FTransform T
 			GroundRelic->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
 			GroundRelic->SetRelicClass(RelicClassDataRow->RelicClass);
 		}
+	}
+}
+
+void URSSpawnManager::SpawnGroundLifeEssenceAtTransform(FTransform TargetTransform, int32 Quantity)
+{
+	ARSDungeonGroundLifeEssence* DungeonLifeEssence = GetWorld()->SpawnActor<ARSDungeonGroundLifeEssence>(DungeonGroundLifeEssenceClass, TargetTransform);
+
+	if (DungeonLifeEssence)
+	{
+		DungeonLifeEssence->RandImpulse();
+		DungeonLifeEssence->SetQuantity(Quantity);
 	}
 }
 
