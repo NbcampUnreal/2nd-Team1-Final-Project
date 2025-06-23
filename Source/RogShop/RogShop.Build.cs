@@ -39,6 +39,7 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "SaveGame", "Tycoon"),
             Path.Combine(ModuleDirectory, "SaveGame", "Option"),
             Path.Combine(ModuleDirectory, "Struct"),
+            Path.Combine(ModuleDirectory, "Enum"),
             Path.Combine(ModuleDirectory, "DeveloperSettings"),
         });
 

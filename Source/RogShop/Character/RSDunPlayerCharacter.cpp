@@ -106,9 +106,15 @@ void ARSDunPlayerCharacter::BeginPlay()
         return;
     }
 
+    LoadStatus();
+
     SaveGameSubsystem->OnSaveRequested.AddDynamic(this, &ARSDunPlayerCharacter::SaveStatus);
 
-    LoadStatus();
+    ARSDunPlayerController* DunPlayerController = GetController<ARSDunPlayerController>();
+    if (DunPlayerController)
+    {
+        OnCharacterDied.AddDynamic(DunPlayerController, &ARSDunPlayerController::ShowPlayerDeathWidget);
+    }
 }
 
 // Called every frame
@@ -804,6 +810,9 @@ void ARSDunPlayerCharacter::LoadStatus()
     if (!StatusLoadGame)
     {
         // 저장된 값이 없는 경우 기본값으로 설정
+        // 바인딩된 함수를 호출하기 위한 함수 호출
+        ChangeMaxHP(GetMaxHP());
+        ChangeHP(GetHP());
 
         // 최대 체력, 현재 체력, 이동 속도는 부모 클래스에서 기본값을 설정합니다.
         
