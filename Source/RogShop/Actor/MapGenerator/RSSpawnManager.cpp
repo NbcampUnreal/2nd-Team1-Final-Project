@@ -517,7 +517,6 @@ void URSSpawnManager::SpawnDunNextStagePortal() // 다음 스테이지 포탈 �
 {
 	if (!World || !DunNextStagePortalClass)
 	{
-		RS_LOG_DEBUG("다음 스테이지 포탈 생성 실패: World 또는 PortalClass 누락");
 		return;
 	}
 
@@ -792,3 +791,53 @@ void URSSpawnManager::RegisterAllTileBlockers()
 		}
 	}
 }
+
+void URSSpawnManager::SpawnSanctuary()
+{
+	if (!World)
+	{
+		RS_LOG_DEBUG("성소 생성 실패");
+		return;
+	}
+
+	TArray<ATargetPoint*> SanctuaryPoints;
+	for (TActorIterator<ATargetPoint> It(World); It; ++It)
+	{
+		if (It->Tags.Contains(FName("Sanctuary")))
+			SanctuaryPoints.Add(*It);
+	}
+
+	if (SanctuaryPoints.Num() == 0)
+	{
+		return;
+	}
+
+	TArray<int32> Indices;
+	if (SanctuaryPoints.Num() >= 3 && AltarClasses.Num() >= 3)
+	{
+		for (int32 i = 0; i < SanctuaryPoints.Num(); ++i)
+		{
+			Indices.Add(i);
+		}
+	}
+
+	Algo::RandomShuffle(Indices); // 중복 없이 무작위 순서 결정
+
+
+	for (int32 i = 0; i < 3; ++i)
+	{
+		int32 Index = Indices[i];
+		ATargetPoint* ChosenPoint = SanctuaryPoints[Index];
+
+		FTransform SpawnTransform = ChosenPoint->GetActorTransform();
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		AltarInstance[i] = World->SpawnActor<ARSDunLifeEssenceShop>(
+			AltarClasses[i], SpawnTransform, SpawnParams);
+	}
+
+	RS_LOG_DEBUG("성소 생성 성공");
+}
+ 
