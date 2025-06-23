@@ -75,6 +75,10 @@ void UOptionMenuWidget::LoadSettings()
         if (WindowModeComboBox)
             WindowModeComboBox->SetSelectedIndex(0);
     }
+
+    OnMasterVolumeChanged(LoadedData->MasterVolume);
+    OnBGMVolumeChanged(LoadedData->BGMVolume);
+    OnSFXVolumeChanged(LoadedData->SFXVolume);
 }
 
 
