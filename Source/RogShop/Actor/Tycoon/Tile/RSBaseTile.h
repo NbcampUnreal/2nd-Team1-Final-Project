@@ -41,7 +41,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UStaticMeshComponent> Plane;
-
+	
+	UPROPERTY(EditDefaultsOnly)
+	FString TileDisplayName = TEXT("기본");
+	
 	//데이터 테이블로 옮길수도?
 	UPROPERTY(EditDefaultsOnly)
 	int32 Price = 10;
@@ -49,7 +52,4 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UTexture2D> Thumbnail;
 	
-protected:
-	UPROPERTY(EditDefaultsOnly)
-	FString TileDisplayName = TEXT("기본");
 };

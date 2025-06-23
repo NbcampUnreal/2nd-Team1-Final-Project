@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RSTycoonPlayerController.generated.h"
 
+class URSTycoonFoodListWidget;
 class URSPlayerFloatingDamageWidget;
 class URSTycoonEvent;
 class URSTycoonEventViewWidget;
@@ -59,6 +60,11 @@ public:
 	void ActiveOrderSlot(FFoodOrder Order, FTimerHandle CookTimer);
 	void FinishOrderSlot(FFoodOrder Order);
 	
+	void OpenFoodListWidget();
+	
+	UFUNCTION(BlueprintCallable)
+	void CloseFoodListWidget();
+	
 	URSIngredientInventoryWidget* GetInventoryWidget() const { return InventoryWidget; }
 
 private:
@@ -91,6 +97,9 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<URSTycoonEventViewWidget> EventViewWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<URSTycoonFoodListWidget> FoodListWidgetClass;
+	
 	UPROPERTY()
 	TObjectPtr<URSTycoonWaitWidget> WaitWidget;
 
@@ -114,6 +123,10 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<URSPlayerFloatingDamageWidget> FloatingTextWidget;
+	
+	UPROPERTY()
+	TObjectPtr<URSTycoonFoodListWidget> FoodListWidget;
+	
 #pragma endregion
 
 #pragma region Input
