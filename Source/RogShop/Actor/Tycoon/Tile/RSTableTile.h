@@ -23,9 +23,12 @@ public:
 	virtual void ResetAll() override;
 	
 	void Sit(ARSTycoonCustomerCharacter* Customer);
-	
+
+	//주문 불가능하면 -1
 	int32 GetOrderWaitCustomerIndex();
+	//Order를 기다리고 있는 손님이 없으면 -1
 	int32 GetFoodWaitCustomerIndex(FFoodOrder Order);
+	//못 앉으면 -1
 	int32 GetCanSitingLocationIndex() const;
 	bool CanSit() const;
 	int32 GetMaxPlace() const { return SittingLocations.Num(); }

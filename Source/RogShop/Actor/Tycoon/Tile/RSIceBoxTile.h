@@ -20,4 +20,11 @@ public:
 
 public:
 	static const int32 AddInventorySlot;
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	TObjectPtr<USoundBase> OpenSound;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	TObjectPtr<USoundBase> CloseSound;
 };
