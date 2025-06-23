@@ -24,6 +24,8 @@ class ARSDungeonGroundIngredient;
 class ARSDungeonGroundRelic;
 class ARSDungeonGroundLifeEssence;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemySpawn, ARSDunBaseCharacter*, SpawnCharacter);
+
 /**
  * URSSpawnManager
  * 레벨 내 플레이어, 몬스터, 상점 NPC 스폰을 담당하는 매니저
@@ -66,6 +68,13 @@ private:
 	
 	TSet<FIntPoint> SpawnedTiles; // 타일별로 몬스터가 한 번이라도 스폰됐는지	
 	TMap<FIntPoint, bool> ClearedTiles; // 타일별로 클리어(= 몬스터 전멸) 여부
+#pragma endregion
+
+#pragma region Delegate
+public:
+	// 적(몬스터, 보스)가 스폰될 때 바인딩될 함수를 연결하는 델리게이트
+	UPROPERTY(BlueprintAssignable)
+	FOnEnemySpawn OnEnemySpawn;
 #pragma endregion
 
 #pragma region Wall

@@ -12,15 +12,15 @@ void URSStatusRelic::ApplyEffect(ARSDunPlayerCharacter* OwnerCharacter)
 		return;
 	}
 
-	if (TargetStatus == EStatus::HP)
+	if (TargetStatus == ECharacterStatus::HP)
 	{
 		OwnerCharacter->IncreaseHP(Amount);
 	}
-	else if (TargetStatus == EStatus::MaxHP)
+	else if (TargetStatus == ECharacterStatus::MaxHP)
 	{
 		OwnerCharacter->IncreaseMaxHP(Amount);
 	}
-	else if (TargetStatus == EStatus::MoveSpeed)
+	else if (TargetStatus == ECharacterStatus::MoveSpeed)
 	{
 		UCharacterMovementComponent* MovementComp = OwnerCharacter->GetCharacterMovement();
 		if (MovementComp)
@@ -30,11 +30,11 @@ void URSStatusRelic::ApplyEffect(ARSDunPlayerCharacter* OwnerCharacter)
 			OwnerCharacter->ChangeMoveSpeed(CurrentSpeed);
 		}
 	}
-	else if (TargetStatus == EStatus::AttackPower)
+	else if (TargetStatus == ECharacterStatus::AttackPower)
 	{
 		OwnerCharacter->IncreaseAttackPower(Amount);
 	}
-	else if (TargetStatus == EStatus::AttackSpeed)
+	else if (TargetStatus == ECharacterStatus::AttackSpeed)
 	{
 		OwnerCharacter->IncreaseAttackSpeed(Amount);
 	}
@@ -42,7 +42,7 @@ void URSStatusRelic::ApplyEffect(ARSDunPlayerCharacter* OwnerCharacter)
 
 void URSStatusRelic::LoadEffect(ARSDunPlayerCharacter* OwnerCharacter)
 {
-	if (TargetStatus == EStatus::HP)
+	if (TargetStatus == ECharacterStatus::HP)
 	{
 		// HP를 회복시키는 개념이므로 로드시 해당 기능을 제외한 스탯 상승 부분만 적용한다.
 		return;
