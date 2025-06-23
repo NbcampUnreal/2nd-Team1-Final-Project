@@ -8,6 +8,7 @@
 #include "RSBaseAltar.generated.h"
 
 class UBoxComponent;
+class UWidgetComponent;
 
 UCLASS()
 class ROGSHOP_API ARSBaseAltar : public AActor, public IRSInteractable
@@ -41,6 +42,9 @@ protected:
 	int32 Cost;
 
 // 컴포넌트
+public:
+	UUserWidget* GetCostWidgetObject();
+	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USceneComponent> SceneComp;
@@ -50,4 +54,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UBoxComponent> BoxComp;	// 캐릭터와의 충돌을 위한 콜리전 용도의 컴포넌트
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UWidgetComponent> CostWidget;
 };

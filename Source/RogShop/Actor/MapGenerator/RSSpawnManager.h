@@ -123,8 +123,8 @@ private:
 public:
 	// 상점 NPC를 스폰
 	void SpawnShopNPCInLevel();
-	// 성소 생성
-	void SpawnSanctuary();
+	// 제단 생성
+	void SpawnAltar();
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))

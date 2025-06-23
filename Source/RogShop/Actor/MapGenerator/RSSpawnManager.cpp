@@ -803,30 +803,30 @@ void URSSpawnManager::RegisterAllTileBlockers()
 	}
 }
 
-void URSSpawnManager::SpawnSanctuary()
+void URSSpawnManager::SpawnAltar()
 {
 	if (!World)
 	{
-		RS_LOG_DEBUG("성소 생성 실패");
+		RS_LOG_DEBUG("제단 생성 실패");
 		return;
 	}
 
-	TArray<ATargetPoint*> SanctuaryPoints;
+	TArray<ATargetPoint*> AltarPoints;
 	for (TActorIterator<ATargetPoint> It(World); It; ++It)
 	{
-		if (It->Tags.Contains(FName("Sanctuary")))
-			SanctuaryPoints.Add(*It);
+		if (It->Tags.Contains(FName("Altar")))
+			AltarPoints.Add(*It);
 	}
 
-	if (SanctuaryPoints.Num() == 0)
+	if (AltarPoints.Num() == 0)
 	{
 		return;
 	}
 
 	TArray<int32> Indices;
-	if (SanctuaryPoints.Num() >= 3 && AltarClasses.Num() >= 3)
+	if (AltarPoints.Num() >= 3 && AltarClasses.Num() >= 3)
 	{
-		for (int32 i = 0; i < SanctuaryPoints.Num(); ++i)
+		for (int32 i = 0; i < AltarPoints.Num(); ++i)
 		{
 			Indices.Add(i);
 		}
@@ -838,7 +838,7 @@ void URSSpawnManager::SpawnSanctuary()
 	for (int32 i = 0; i < 3; ++i)
 	{
 		int32 Index = Indices[i];
-		ATargetPoint* ChosenPoint = SanctuaryPoints[Index];
+		ATargetPoint* ChosenPoint = AltarPoints[Index];
 
 		FTransform SpawnTransform = ChosenPoint->GetActorTransform();
 

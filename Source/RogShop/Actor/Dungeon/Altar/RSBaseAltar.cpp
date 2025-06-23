@@ -3,6 +3,7 @@
 
 #include "RSBaseAltar.h"
 #include "Components/BoxComponent.h"
+#include "Components/WidgetComponent.h"
 
 ARSBaseAltar::ARSBaseAltar()
 {
@@ -17,6 +18,10 @@ ARSBaseAltar::ARSBaseAltar()
 
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	BoxComp->SetupAttachment(SceneComp);
+
+	CostWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("CostWidget"));
+	CostWidget->SetupAttachment(SceneComp);
+	CostWidget->SetWidgetSpace(EWidgetSpace::World);
 
 	InteractName = FText::GetEmpty();
 	bIsAutoInteract = false;
@@ -45,6 +50,16 @@ bool ARSBaseAltar::GetIsAutoInteract() const
 
 UAnimMontage* ARSBaseAltar::GetInteractAnimMontage() const
 {
+	return nullptr;
+}
+
+UUserWidget* ARSBaseAltar::GetCostWidgetObject()
+{
+	if (CostWidget)
+	{
+		return CostWidget->GetUserWidgetObject();
+	}
+
 	return nullptr;
 }
 

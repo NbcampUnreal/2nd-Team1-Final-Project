@@ -200,7 +200,7 @@ void ARSDungeonGameModeBase::OnMapReady()// 맵 로딩이 완료되었을 때 �
         
             GameMode->SpawnManager->SpawnPlayerAtStartPoint();
             GameMode->SpawnManager->SpawnShopNPCInLevel();
-            GameMode->SpawnManager->SpawnSanctuary();
+            GameMode->SpawnManager->SpawnAltar();
             GameMode->SpawnManager->SetBossTileCoord(GameMode->MapGeneratorInstance->BossWorldLocation);
         
             GameMode->OnGameReady.Broadcast();

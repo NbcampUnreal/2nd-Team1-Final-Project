@@ -5,12 +5,20 @@
 #include "RSDunPlayerCharacter.h"
 #include "GameFramework/GameModeBase.h"
 #include "RSSpawnManagerAccessor.h"
+#include "RSAlterCostWidget.h"
 
 ARSHPToLifeEssenceAltar::ARSHPToLifeEssenceAltar()
 {
 	InteractName = FText::FromString(TEXT("피의 제단"));
 
 	Cost = 10;
+
+	URSAlterCostWidget* CostWidget = Cast<URSAlterCostWidget>(GetCostWidgetObject());
+	if (CostWidget)
+	{
+		CostWidget->ChangeColor(FLinearColor::Red);
+	}
+
 }
 
 void ARSHPToLifeEssenceAltar::Interact(ARSDunPlayerCharacter* Interactor)
@@ -43,7 +51,11 @@ void ARSHPToLifeEssenceAltar::Interact(ARSDunPlayerCharacter* Interactor)
 		// 비용을 2배로 증가시킨다.
 		Cost *= 2;
 	}
-	
 
-
+	// 비용 업데이트
+	URSAlterCostWidget* CostWidget = Cast<URSAlterCostWidget>(GetCostWidgetObject());
+	if (CostWidget)
+	{
+		CostWidget->UpdateCost(Cost);
+	}
 }
