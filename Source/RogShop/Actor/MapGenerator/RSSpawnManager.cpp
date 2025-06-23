@@ -517,7 +517,6 @@ void URSSpawnManager::SpawnDunNextStagePortal() // 다음 스테이지 포탈 �
 {
 	if (!World || !DunNextStagePortalClass)
 	{
-		RS_LOG_DEBUG("다음 스테이지 포탈 생성 실패: World 또는 PortalClass 누락");
 		return;
 	}
 
@@ -600,6 +599,8 @@ void URSSpawnManager::SpawnBossMonster()
 	BossMonster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundIngredientFromCharacter);
 	BossMonster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundLifeEssenceFromCharacter);
 
+	// 적이 스폰됐음을 알려 필요한 함수 바인딩
+	OnEnemySpawn.Broadcast(BossMonster);
 }
 
 void URSSpawnManager::SpawnMonstersAtTile(FIntPoint TileCoord) // 특정 타일 좌표에 몬스터 스폰하는 함수
@@ -670,6 +671,9 @@ void URSSpawnManager::SpawnMonstersAtTile(FIntPoint TileCoord) // 특정 타일 
 			// 사망 시 오브젝트 스폰 함수 바인딩
 			Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundIngredientFromCharacter);
 			Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundLifeEssenceFromCharacter);
+
+			// 적이 스폰됐음을 알려 필요한 함수 바인딩
+			OnEnemySpawn.Broadcast(Monster);
 
 			AliveMonstersPerTile.FindOrAdd(TileCoord) += 1;
 			TotalSpawned++;
@@ -787,3 +791,53 @@ void URSSpawnManager::RegisterAllTileBlockers()
 		}
 	}
 }
+
+void URSSpawnManager::SpawnSanctuary()
+{
+	if (!World)
+	{
+		RS_LOG_DEBUG("성소 생성 실패");
+		return;
+	}
+
+	TArray<ATargetPoint*> SanctuaryPoints;
+	for (TActorIterator<ATargetPoint> It(World); It; ++It)
+	{
+		if (It->Tags.Contains(FName("Altar")))
+			SanctuaryPoints.Add(*It);
+	}
+
+	if (SanctuaryPoints.Num() == 0)
+	{
+		return;
+	}
+
+	TArray<int32> Indices;
+	if (SanctuaryPoints.Num() >= 3 && AltarClasses.Num() >= 3)
+	{
+		for (int32 i = 0; i < SanctuaryPoints.Num(); ++i)
+		{
+			Indices.Add(i);
+		}
+	}
+
+	Algo::RandomShuffle(Indices); // 중복 없이 무작위 순서 결정
+
+
+	for (int32 i = 0; i < 3; ++i)
+	{
+		int32 Index = Indices[i];
+		ATargetPoint* ChosenPoint = SanctuaryPoints[Index];
+
+		FTransform SpawnTransform = ChosenPoint->GetActorTransform();
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		AltarInstance[i] = World->SpawnActor<ARSDunLifeEssenceShop>(
+			AltarClasses[i], SpawnTransform, SpawnParams);
+	}
+
+	RS_LOG_DEBUG("성소 생성 성공");
+}
+ 
