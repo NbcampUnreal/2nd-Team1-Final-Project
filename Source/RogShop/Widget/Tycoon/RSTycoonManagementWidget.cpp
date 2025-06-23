@@ -86,6 +86,9 @@ void URSTycoonManagementWidget::OnClickExpandTile()
 
 void URSTycoonManagementWidget::OnClickWaitMode()
 {
+	CloseBuyNPCLayout();
+	CloseBuyTileLayout();
+	
 	GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->OnSaveRequested.Broadcast();
 	GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>()->StartWaitMode();
 }
