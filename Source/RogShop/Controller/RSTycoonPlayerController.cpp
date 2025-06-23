@@ -28,6 +28,7 @@
 #include "Tycoon/NPC/RSTycoonNPC.h"
 #include "RSPlayerFloatingDamageWidget.h"
 #include "RogShop/Actor/Tycoon/Tile/RSIceBoxTile.h"
+#include "RogShop/Widget/Tycoon/RSTycoonFoodListWidget.h"
 
 #pragma region Mode
 ARSTycoonPlayerController::ARSTycoonPlayerController()
@@ -141,6 +142,16 @@ void ARSTycoonPlayerController::FinishOrderSlot(FFoodOrder Order)
 	SaleWidget->StopOrderSlotAnimation(Order);
 }
 
+void ARSTycoonPlayerController::OpenFoodListWidget()
+{
+	FoodListWidget->AddToViewport();
+}
+
+void ARSTycoonPlayerController::CloseFoodListWidget()
+{
+	FoodListWidget->RemoveFromParent();
+}
+
 void ARSTycoonPlayerController::ChangeMainWidget(UUserWidget* ActiveWidget)
 {
 	WaitWidget->RemoveFromParent();
@@ -169,6 +180,8 @@ void ARSTycoonPlayerController::SettingWidget()
 	EventViewWidget = CreateWidget<URSTycoonEventViewWidget>(this, EventViewWidgetClass.Get());
 	EventViewWidget->AddToViewport();
 	EventViewWidget->SetVisibility(ESlateVisibility::Hidden);
+
+	FoodListWidget = CreateWidget<URSTycoonFoodListWidget>(this, FoodListWidgetClass.Get());
 }
 #pragma endregion
 

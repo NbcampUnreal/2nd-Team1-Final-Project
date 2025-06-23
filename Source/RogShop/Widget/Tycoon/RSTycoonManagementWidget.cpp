@@ -81,7 +81,8 @@ void URSTycoonManagementWidget::OnClickExpandTile()
 	TileMap->ChangeTileSize(Width, Height, true);
 	GetOwningPlayer<ARSTycoonPlayerController>()->SetCameraLocationToCenter();
 
-	WidthBox->SetValue(Width);
+	//드는 돈 다시 갱신하기 위해 추가
+	OnChangeTileSizeBox(0);
 }
 
 void URSTycoonManagementWidget::OnClickWaitMode()
@@ -117,7 +118,6 @@ void URSTycoonManagementWidget::OnChangeTileSizeBox(float Value)
 		CanTileChangeText->SetColorAndOpacity(FColor::Red);
 		CanTileChangeText->SetText(FText::FromString(TEXT("돈이 부족합니다!")));
 		
-		//TilePriceText->SetColorAndOpacity(FColor::Red);
 		ExpandTileButton->SetIsEnabled(false);
 	}
 	else
@@ -125,7 +125,6 @@ void URSTycoonManagementWidget::OnChangeTileSizeBox(float Value)
 		CanTileChangeText->SetColorAndOpacity(FColor::Cyan);
 		CanTileChangeText->SetText(FText::FromString(TEXT("변경 가능합니다!")));
 		
-		//TilePriceText->SetColorAndOpacity(FColor::Cyan);
 		ExpandTileButton->SetIsEnabled(true);
 	}
 }
