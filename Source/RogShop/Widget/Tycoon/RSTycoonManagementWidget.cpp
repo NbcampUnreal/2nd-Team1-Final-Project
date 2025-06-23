@@ -38,10 +38,6 @@ void URSTycoonManagementWidget::NativeOnInitialized()
 		BuyTileSlot->SetPadding(FMargin(0, 10));
 	}
 
-	// 보더 초기 위치 세팅
-	BuyTileParentBorder->SetRenderTranslation(FVector2D(0.f, 0.f));
-	BuyNPCBorder->SetRenderTranslation(FVector2D(0.f, 0.f));
-
 	ExpandTileButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OnClickExpandTile);
 	ReturnBaseAreaButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OnClickWaitMode);
 	CreateNPCButton->OnClicked.AddDynamic(this, &URSTycoonManagementWidget::OpenAndCloseNPCLayout);
@@ -68,6 +64,12 @@ void URSTycoonManagementWidget::NativeConstruct()
 	
 	WidthBox->SetValue(TileMap->GetWidth());
 	HeightBox->SetValue(TileMap->GetHeight());
+
+	// 보더 초기 세팅
+	bOpenBuyTileLayout = false;
+	bOpenBuyNPCLayout = false;
+	BuyTileParentBorder->SetRenderTranslation(FVector2D(0.f, 0.f));
+	BuyNPCBorder->SetRenderTranslation(FVector2D(0.f, 0.f));
 }
 
 void URSTycoonManagementWidget::OnClickExpandTile()
