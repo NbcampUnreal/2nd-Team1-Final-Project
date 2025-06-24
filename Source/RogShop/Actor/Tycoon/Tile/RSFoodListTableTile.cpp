@@ -19,14 +19,12 @@ void ARSFoodListTableTile::Interact(ACharacter* InteractCharacter)
 	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	check(PlayerController);
 	
-	if (bUIOpen)
+	if (PlayerController->IsOpenFoodListUI())
 	{
-		bUIOpen = false;
 		PlayerController->CloseFoodListWidget();
 	}
 	else
 	{
-		bUIOpen = true;
 		PlayerController->OpenFoodListWidget();
 	}
 }

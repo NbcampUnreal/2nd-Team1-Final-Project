@@ -21,6 +21,9 @@ class ROGSHOP_API URSTycoonFoodListButtonWidget : public UUserWidget
 public:
 	void Set(const FCookFoodData* NewData, FName NewKey);
 
+	const FCookFoodData* GetData() const { return Data; }
+	FName GetKey() const { return Key; }
+
 protected:
 	virtual void NativeOnInitialized() override;
 
@@ -30,11 +33,11 @@ private:
 
 public:
 	FOnClickFoodListButton OnClickFoodListButton;
-	
+
 private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	TObjectPtr<UButton> Button;
-	
+
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	TObjectPtr<UTextBlock> FoodNameText;
 

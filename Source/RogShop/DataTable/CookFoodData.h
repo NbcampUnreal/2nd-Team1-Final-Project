@@ -54,7 +54,6 @@ struct ROGSHOP_API FIngredientDetailData : public FTableRowBase
 	GENERATED_BODY()
 
 public:
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EIngredientType Category;
 };

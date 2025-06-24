@@ -144,11 +144,13 @@ void ARSTycoonPlayerController::FinishOrderSlot(FFoodOrder Order)
 
 void ARSTycoonPlayerController::OpenFoodListWidget()
 {
+	bIsOpenFoodListUI = true;
 	FoodListWidget->AddToViewport();
 }
 
 void ARSTycoonPlayerController::CloseFoodListWidget()
 {
+	bIsOpenFoodListUI = false;
 	FoodListWidget->RemoveFromParent();
 }
 
