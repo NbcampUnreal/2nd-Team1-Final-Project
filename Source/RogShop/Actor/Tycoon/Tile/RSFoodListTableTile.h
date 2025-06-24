@@ -17,7 +17,4 @@ public:
 	GENERATED_TILE()
 	
 	virtual void Interact(ACharacter* InteractCharacter) override;
-
-private:
-	bool bUIOpen;
 };

@@ -22,13 +22,17 @@ class ROGSHOP_API URSTycoonFoodListWidget : public UUserWidget
 
 public:
 	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
 
 private:
 	UFUNCTION()
 	void SetFoodInformation(const FCookFoodData& Data, FName Key);
-
+	void SortFoodList();
+	
 	UFUNCTION()
 	void OnClickMakeButton();
+	
+	FString GetSpecialStr(FName FoodKey);
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
@@ -55,6 +59,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<URSTycoonFoodListButtonWidget> FoodListButtonClass;
 
+	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	TObjectPtr<USoundBase> MakeSound;
+	
 private:
 	FName NowOpenKey;
 	const FCookFoodData* NowOpenData;
