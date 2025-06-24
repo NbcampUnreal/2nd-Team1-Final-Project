@@ -2,6 +2,7 @@
 #include "RSDunLifeEssenceShop.h"
 #include "RSDunPlayerCharacter.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/BoxComponent.h"
 
 ARSDunLifeEssenceShop::ARSDunLifeEssenceShop()
 {
@@ -17,6 +18,8 @@ ARSDunLifeEssenceShop::ARSDunLifeEssenceShop()
 	SkeletalMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	SkeletalMeshComp->SetupAttachment(SceneComp);
 
+	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
+	BoxComp->SetupAttachment(SceneComp);
 
 	InteractName = FText::FromString(TEXT("상점"));
 	bIsAutoInteract = false;
