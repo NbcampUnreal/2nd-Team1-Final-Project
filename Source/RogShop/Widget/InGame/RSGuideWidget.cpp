@@ -55,7 +55,7 @@ void URSGuideWidget::CreateButtons()
             continue;
         }
 
-        GuideButton->SetPadding(20);
+        GuideButton->SetPadding(FMargin(0.0, 5.0));
         GuideButton->SetGuideButtonData(RowName, RowData->ButtonTitle);
 
         // 커스텀 버튼 델리게이트 처리
@@ -90,6 +90,11 @@ void URSGuideWidget::OnGuideButtonClicked(FName CategoryID)
     {
         GuideImage->SetBrushFromTexture(GuideData->GuideImage);
     }
+}
+
+UButton* URSGuideWidget::GetCloseButton() const
+{
+    return CloseButton;
 }
 
 void URSGuideWidget::OnClickCloseButton()
