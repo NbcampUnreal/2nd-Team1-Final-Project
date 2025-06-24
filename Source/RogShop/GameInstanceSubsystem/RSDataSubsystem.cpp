@@ -25,6 +25,7 @@ void URSDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	Monster = DataSettings->MonsterDataTable.LoadSynchronous();
 	DungeonLevel = DataSettings->DungeonLevelDataTable.LoadSynchronous();
 	Guide = DataSettings->GuideDataTable.LoadSynchronous();
+	GameFlowInfo = DataSettings->GameFlowInfoDataTable.LoadSynchronous();
 
 	check(Food)
 	check(FoodDetail)
@@ -40,4 +41,5 @@ void URSDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	check(Monster)
 	check(DungeonLevel)
 	check(Guide)
+	check(GameFlowInfo)
 }

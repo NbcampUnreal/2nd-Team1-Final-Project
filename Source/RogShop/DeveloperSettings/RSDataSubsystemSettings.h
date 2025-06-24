@@ -56,4 +56,7 @@ public:
 
 	UPROPERTY(Config, EditAnywhere)
 	TSoftObjectPtr<UDataTable> GuideDataTable;
+
+	UPROPERTY(Config, EditAnywhere)
+	TSoftObjectPtr<UDataTable> GameFlowInfoDataTable;
 };
