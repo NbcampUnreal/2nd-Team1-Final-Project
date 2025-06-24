@@ -92,6 +92,11 @@ void URSGuideWidget::OnGuideButtonClicked(FName CategoryID)
     }
 }
 
+UButton* URSGuideWidget::GetCloseButton() const
+{
+    return CloseButton;
+}
+
 void URSGuideWidget::OnClickCloseButton()
 {
     RemoveFromParent();

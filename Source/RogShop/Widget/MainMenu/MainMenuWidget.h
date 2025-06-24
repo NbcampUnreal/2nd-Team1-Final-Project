@@ -11,15 +11,27 @@
  */
 
 class UButton;
-class UUserwidget;
+class URSGuideWidget;
 
 UCLASS()
 class ROGSHOP_API UMainMenuWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
-public:
+protected:
 	virtual void NativeConstruct() override;
+
+
+public:
+	UFUNCTION()
+	void VsibleMainMenu();
+
+	UFUNCTION()
+	void HideMainMenu();
+
+private:
+	UFUNCTION()
+	void OnGuideButtonClicked();
 
 	UFUNCTION()
 	void OnStartButtonClicked();
@@ -44,9 +56,20 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> OptionButton;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
+	TObjectPtr<UButton> GuideButton;
+
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> ExitButton;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+// 위젯
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UUserWidget> OptionMenuWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> GuideWidgetClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<URSGuideWidget> GuideWidgetInstance;
 };
