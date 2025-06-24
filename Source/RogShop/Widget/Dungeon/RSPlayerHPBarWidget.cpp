@@ -25,6 +25,10 @@ void URSPlayerHPBarWidget::NativeOnInitialized()
 
     LastUpdateHP = 0.f;
     LastUpdateMaxHP = 0.f;
+
+    TargetPercent = 1.0f;
+    CurrentPercent = 1.0f;
+    InterpSpeed = 5.0f;
 }
 
 void URSPlayerHPBarWidget::NativeConstruct()
@@ -32,6 +36,17 @@ void URSPlayerHPBarWidget::NativeConstruct()
     Super::NativeConstruct();
 
 
+}
+
+void URSPlayerHPBarWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+    Super::NativeTick(MyGeometry, InDeltaTime);
+
+    if (HPProgressBar && HPBackProgressBar)
+    {
+        CurrentPercent = FMath::FInterpTo(CurrentPercent, TargetPercent, InDeltaTime, InterpSpeed);
+        HPBackProgressBar->SetPercent(CurrentPercent);
+    }
 }
 
 void URSPlayerHPBarWidget::UpdateHP(float HP, float MaxHP)
@@ -53,7 +68,7 @@ void URSPlayerHPBarWidget::UpdateHP(float HP, float MaxHP)
     if (HPProgressBar)
     {
         const float HPPercent = (HP > 0.f) ? (float)HP / MaxHP : 0.f;
-        float TargetPercent = FMath::Clamp(HPPercent, 0.0f, 1.0f);  // 0 ~ 1 사이로 고정
+        TargetPercent = FMath::Clamp(HPPercent, 0.0f, 1.0f);  // 0 ~ 1 사이로 고정
         HPProgressBar->SetPercent(TargetPercent);
     }
 
@@ -69,8 +84,6 @@ void URSPlayerHPBarWidget::UpdateHP(float HP, float MaxHP)
         // 변경된 체력을 기준으로 마커의 크기를 변경합니다.
         if (HPBarHorizontalBox && MarkerHorizontalBox)
         {
-
-
             float HPBarBoxSize = HPBarHorizontalBox->GetDesiredSize().X;
 
             if (HPBarBoxSize == 0)
