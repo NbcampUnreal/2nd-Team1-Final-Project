@@ -911,7 +911,7 @@ void URSSpawnManager::SpawnAltar()
 	Algo::RandomShuffle(Indices); // 중복 없이 무작위 순서 결정
 	AltarInstance.SetNum(3); //소환될 제단의 숫자
 
-	for (int32 i = 0; i < AltarPoints.Num(); ++i)
+	for (int32 i = 0; i < AltarClasses.Num(); ++i)
 	{
 		int32 Index = Indices[i];
 		ATargetPoint* ChosenPoint = AltarPoints[Index];
@@ -964,7 +964,7 @@ void URSSpawnManager::SpawnTreasureChest()
 	Algo::RandomShuffle(Indices); // 중복 없이 무작위 순서 결정
 	TreasureInstance.SetNum(3); //소환될 보물상자의 숫자
 
-	for (int32 i = 0; i < 3; ++i)
+	for (int32 i = 0; i < TreasureClasses.Num(); ++i)
 	{
 		int32 Index = Indices[i];
 		ATargetPoint* ChosenPoint = TreasurePoints[Index];
