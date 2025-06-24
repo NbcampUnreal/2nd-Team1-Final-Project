@@ -26,8 +26,10 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USceneComponent> SceneComp;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UNiagaraComponent> NiagaraComp;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UBoxComponent> BoxComp;	// 상호작용의 충돌체크를 위한 콜리전 용도의 컴포넌트
 
