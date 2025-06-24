@@ -10,7 +10,7 @@ class UButton;
 class UTextBlock;
 struct FCookFoodData;
 
-DECLARE_DELEGATE_OneParam(FOnClickFoodListButton, const FCookFoodData&)
+DECLARE_DELEGATE_TwoParams(FOnClickFoodListButton, const FCookFoodData&, FName)
 
 
 UCLASS()
@@ -19,7 +19,7 @@ class ROGSHOP_API URSTycoonFoodListButtonWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void Set(const FCookFoodData* NewData);
+	void Set(const FCookFoodData* NewData, FName NewKey);
 
 protected:
 	virtual void NativeOnInitialized() override;
@@ -39,4 +39,5 @@ private:
 	TObjectPtr<UTextBlock> FoodNameText;
 
 	const FCookFoodData* Data;
+	FName Key;
 };

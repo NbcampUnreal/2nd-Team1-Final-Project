@@ -19,6 +19,9 @@ public:
 	TSoftObjectPtr<UDataTable> FoodDataTable;
 	
 	UPROPERTY(Config, EditAnywhere)
+	TSoftObjectPtr<UDataTable> FoodDetailDataTable;
+	
+	UPROPERTY(Config, EditAnywhere)
 	TSoftObjectPtr<UDataTable> IngredientDataTable;
 
 	UPROPERTY(Config, EditAnywhere)

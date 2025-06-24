@@ -25,7 +25,10 @@ public:
 
 private:
 	UFUNCTION()
-	void SetFoodInformation(const FCookFoodData& Data);
+	void SetFoodInformation(const FCookFoodData& Data, FName Key);
+
+	UFUNCTION()
+	void OnClickMakeButton();
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
@@ -46,7 +49,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	TObjectPtr<UTextBlock> DescriptionText;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	TObjectPtr<UButton> MakeButton;
+	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<URSTycoonFoodListButtonWidget> FoodListButtonClass;
-	
+
+private:
+	FName NowOpenKey;
+	const FCookFoodData* NowOpenData;
 };

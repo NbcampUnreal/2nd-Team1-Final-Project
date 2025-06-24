@@ -8,9 +8,10 @@
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 
-void URSTycoonFoodListButtonWidget::Set(const FCookFoodData* NewData)
+void URSTycoonFoodListButtonWidget::Set(const FCookFoodData* NewData, FName NewKey)
 {
 	Data = NewData;
+	Key = NewKey;
 
 	FoodNameText->SetText(FText::FromString(Data->Name));
 }
@@ -24,5 +25,5 @@ void URSTycoonFoodListButtonWidget::NativeOnInitialized()
 
 void URSTycoonFoodListButtonWidget::OnClick()
 {
-	OnClickFoodListButton.ExecuteIfBound(*Data);
+	OnClickFoodListButton.ExecuteIfBound(*Data, Key);
 }

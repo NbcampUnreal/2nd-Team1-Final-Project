@@ -38,6 +38,7 @@ public:
 	const FString RelicSaveSlotName = TEXT("RelicSaveSlot");
 	const FString StatusSaveSlotName = TEXT("StatusSaveSlot");
 	const FString DungeonInfoSaveSlotName = TEXT("DungeonInfoSaveSlot");
+	const FString FoodStatusSaveSlotName = TEXT("FoodStatusSaveSlot");
 
 	// 타이쿤
 	const FString TycoonSaveSlot = TEXT("TycoonGame");

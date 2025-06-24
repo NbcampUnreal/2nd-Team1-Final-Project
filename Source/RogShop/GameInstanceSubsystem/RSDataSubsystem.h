@@ -22,6 +22,9 @@ public:
 	TObjectPtr<UDataTable> Food;
 	
 	UPROPERTY()
+	TObjectPtr<UDataTable> FoodDetail;
+	
+	UPROPERTY()
 	TObjectPtr<UDataTable> IngredientInfo;
 
 	UPROPERTY()
