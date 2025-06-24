@@ -531,6 +531,8 @@ void URSPlayerWeaponComponent::PerformBoxSweepAttack()
 
 				FVector Start = BoxLocation;
 				FVector End = BoxLocation + BoxRotation.RotateVector(FVector(BoxExtent.X * 2.f, 0.f, 0.f));
+				Start.Z = 0.f;
+				End.Z *= 2.f;
 
 				FCollisionShape BoxShape = FCollisionShape::MakeBox(BoxExtent);
 				FCollisionQueryParams Params;
