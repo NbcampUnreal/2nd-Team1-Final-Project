@@ -7,12 +7,18 @@
 #include "Components/ScrollBox.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
+#include "Components/Button.h"
 
 void URSGuideWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	CreateButtons();
+    if (CloseButton)
+    {
+        CloseButton->OnClicked.AddDynamic(this, &URSGuideWidget::OnClickCloseButton);
+    }
+
+    CreateButtons();
 }
 
 void URSGuideWidget::CreateButtons()
@@ -49,9 +55,10 @@ void URSGuideWidget::CreateButtons()
             continue;
         }
 
+        GuideButton->SetPadding(20);
         GuideButton->SetGuideButtonData(RowName, RowData->ButtonTitle);
 
-        // 클릭 이벤트 바인딩
+        // 커스텀 버튼 델리게이트 처리
         GuideButton->OnGuideButtonClicked.AddDynamic(this, &URSGuideWidget::OnGuideButtonClicked);
 
         GuideScrollBox->AddChild(GuideButton);
@@ -83,4 +90,9 @@ void URSGuideWidget::OnGuideButtonClicked(FName CategoryID)
     {
         GuideImage->SetBrushFromTexture(GuideData->GuideImage);
     }
+}
+
+void URSGuideWidget::OnClickCloseButton()
+{
+    RemoveFromParent();
 }
