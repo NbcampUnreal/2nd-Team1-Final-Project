@@ -9,6 +9,7 @@
 #include "RSGameInstance.h"
 #include "RSSaveGameSubsystem.h"
 #include "RSLevelSubsystem.h"
+#include "RSGuideWidget.h"
 
 
 void UMainMenuWidget::NativeConstruct()
@@ -61,9 +62,62 @@ void UMainMenuWidget::NativeConstruct()
 		OptionButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnOptionButtonClicked);
 	}
 
+	if (GuideButton)
+	{
+		GuideButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnGuideButtonClicked);
+		GuideButton->OnClicked.AddDynamic(this, &UMainMenuWidget::HideMainMenu);
+	}
+
 	if (ExitButton)
 	{
 		ExitButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnExitButtonClicked);
+	}
+}
+
+void UMainMenuWidget::VsibleMainMenu()
+{
+	SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+}
+
+void UMainMenuWidget::HideMainMenu()
+{
+	SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UMainMenuWidget::OnGuideButtonClicked()
+{
+	APlayerController* PC = GetOwningPlayer();
+
+	// 위젯이 생성된 상태인 경우
+	if (PC && GuideWidgetInstance)
+	{
+		GuideWidgetInstance->AddToViewport();
+
+		FInputModeUIOnly InputMode;
+		PC->SetInputMode(InputMode);
+		PC->SetShowMouseCursor(true);
+		PC->FlushPressedKeys();
+
+		return;
+	}
+
+	// 생성된 위젯이 없는 경우
+	if (PC && GuideWidgetClass)
+	{
+		GuideWidgetInstance = CreateWidget<URSGuideWidget>(PC, GuideWidgetClass);
+
+		GuideWidgetInstance->AddToViewport();
+
+		FInputModeUIOnly InputMode;
+		PC->SetInputMode(InputMode);
+		PC->SetShowMouseCursor(true);
+		PC->FlushPressedKeys();
+
+		UButton* GuideWidgetCloswButton = GuideWidgetInstance->GetCloseButton();
+		if (GuideWidgetCloswButton)
+		{
+			GuideWidgetCloswButton->OnClicked.AddDynamic(this, &UMainMenuWidget::VsibleMainMenu);
+		}
 	}
 }
 
