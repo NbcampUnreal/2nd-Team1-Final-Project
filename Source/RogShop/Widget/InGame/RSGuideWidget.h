@@ -11,6 +11,7 @@ class URSGuideButtonWidget;
 class UScrollBox;
 class UTextBlock;
 class UImage;
+class UButton;
 
 UCLASS()
 class ROGSHOP_API URSGuideWidget : public UUserWidget
@@ -20,13 +21,15 @@ class ROGSHOP_API URSGuideWidget : public UUserWidget
 protected:
 	virtual void NativeOnInitialized() override;
 
-	// 버튼 클릭 시 호출되는 함수
 	UFUNCTION()
 	void OnGuideButtonClicked(FName CategoryID);
 
 private:
-	// 데이터테이블에서 버튼 리스트 동적 생성 함수
+	// 데이터테이블을 이용한 버튼 동적 생성 함수
 	void CreateButtons();
+
+	UFUNCTION()
+	void OnClickCloseButton();
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UScrollBox> GuideScrollBox;
@@ -36,6 +39,9 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> GuideImage;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UButton> CloseButton;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<URSGuideButtonWidget> GuideButtonClass;
