@@ -895,18 +895,23 @@ void URSSpawnManager::SpawnAltar()
 	}
 
 	TArray<int32> Indices;
-	if (AltarPoints.Num() >= 3 && AltarClasses.Num() >= 3)
+
+
+	if(AltarClasses.Num() <= 0)
 	{
-		for (int32 i = 0; i < AltarPoints.Num(); ++i)
-		{
-			Indices.Add(i);
-		}
+		return;
 	}
 
-	Algo::RandomShuffle(Indices); // 중복 없이 무작위 순서 결정
-	AltarInstance.SetNum(3);
+	for (int32 i = 0; i < AltarPoints.Num(); ++i)
+	{
+		Indices.Add(i);
+	}
 
-	for (int32 i = 0; i < 3; ++i)
+
+	Algo::RandomShuffle(Indices); // 중복 없이 무작위 순서 결정
+	AltarInstance.SetNum(3); //소환될 제단의 숫자
+
+	for (int32 i = 0; i < AltarPoints.Num(); ++i)
 	{
 		int32 Index = Indices[i];
 		ATargetPoint* ChosenPoint = AltarPoints[Index];
@@ -919,6 +924,59 @@ void URSSpawnManager::SpawnAltar()
 		AltarInstance[i] = World->SpawnActor<ARSBaseAltar>(AltarClasses[i], SpawnTransform, SpawnParams);
 	}
 
-	RS_LOG_DEBUG("성소 생성 성공");
+	RS_LOG_DEBUG("제단 생성 성공");
+}
+
+void URSSpawnManager::SpawnTreasureChest()
+{
+	if (!World)
+	{
+		RS_LOG_DEBUG("보물상자 생성 실패");
+		return;
+	}
+
+	TArray<ATargetPoint*> TreasurePoints;
+	for (TActorIterator<ATargetPoint> It(World); It; ++It)
+	{
+		if (It->Tags.Contains(FName("TreasureChest")))
+		{
+			TreasurePoints.Add(*It);
+		}
+	}
+
+	if (TreasurePoints.Num() == 0)
+	{
+		return;
+	}
+
+	TArray<int32> Indices;
+
+	for (int32 i = 0; i < TreasurePoints.Num(); ++i)
+	{
+		Indices.Add(i);
+	}
+
+	if (TreasureClasses.Num() <= 0)
+	{
+		return;
+	}
+
+	Algo::RandomShuffle(Indices); // 중복 없이 무작위 순서 결정
+	TreasureInstance.SetNum(3); //소환될 보물상자의 숫자
+
+	for (int32 i = 0; i < 3; ++i)
+	{
+		int32 Index = Indices[i];
+		ATargetPoint* ChosenPoint = TreasurePoints[Index];
+
+		FTransform SpawnTransform = ChosenPoint->GetActorTransform();
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		TreasureInstance[i] = World->SpawnActor<ARSBaseAltar>(TreasureClasses[i], SpawnTransform, SpawnParams);
+	}
+
+	RS_LOG_DEBUG("보물상자 생성 성공");
 }
  

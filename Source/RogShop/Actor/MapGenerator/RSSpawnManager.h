@@ -128,6 +128,9 @@ public:
 	// 제단 생성
 	void SpawnAltar();
 
+	// 보물상자 생성
+	void SpawnTreasureChest();
+
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ARSDunLifeEssenceShop> DunLifeEssenceShopClass; // 생명의 정수 상점 클래스
@@ -140,6 +143,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
 	TArray<TObjectPtr<ARSBaseAltar>> AltarInstance; //제단 인스턴스
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
+	TArray<TSubclassOf<ARSBaseAltar>> TreasureClasses; //제단 클래스
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
+	TArray<TObjectPtr<ARSBaseAltar>> TreasureInstance; //제단 인스턴스
 #pragma endregion
 
 #pragma region GroundItem
