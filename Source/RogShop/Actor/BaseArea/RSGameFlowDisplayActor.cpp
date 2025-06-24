@@ -67,6 +67,9 @@ void ARSGameFlowDisplayActor::Interact(ARSDunPlayerCharacter* Interactor)
 		PC->SetInputMode(InputMode);
 		PC->SetShowMouseCursor(true);
 		PC->FlushPressedKeys();
+
+		// TODO : 2번째 UI부터 여러 시도 후에도 위젯 생성된게 눈에 안보여서 이렇게 했습니다.
+		GameFlowDisplayWidgetInstance = nullptr;	
 	}
 }
 

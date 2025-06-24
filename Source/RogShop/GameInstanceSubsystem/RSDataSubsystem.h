@@ -56,4 +56,7 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UDataTable> Guide;
+
+	UPROPERTY()
+	TObjectPtr<UDataTable> GameFlowInfo;
 };
