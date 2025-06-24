@@ -56,7 +56,8 @@ ARSDunMonsterCharacter::ARSDunMonsterCharacter()
 	meleeAtkRange = 150.0f;
 	strafeRange = 500.0f;
 	bIsPlayingAnim = false;
-
+	bIsInterruptable = true;
+	interruptResistance = 0.f;
 }
 
 void ARSDunMonsterCharacter::BeginPlay()
@@ -118,6 +119,7 @@ void ARSDunMonsterCharacter::PlaySpawnAnim()
 	{
 		PlayAnimMontage(SpawnMontage);
 		bIsPlayingAnim = true;
+		bIsInterruptable = false;
 	}
 }
 
@@ -134,6 +136,7 @@ void ARSDunMonsterCharacter::PlayAction(int32 actionIdx, FVector interestedPos)
 			{
 				animInstance->Montage_Play(action);
 				bIsPlayingAnim = true;
+				bIsInterruptable = false;
 				skillActionIdx = actionIdx;
 			}
 		}
@@ -162,6 +165,7 @@ void ARSDunMonsterCharacter::OnEveryMontageEnded(UAnimMontage* montage, bool bIn
 			Destroy();
 		}
 		bIsPlayingAnim = false;
+		bIsInterruptable = true;
 	}
 }
 
@@ -356,6 +360,7 @@ void ARSDunMonsterCharacter::OnDeath()
 	{
 		ctrl->UnPossess();
 		ctrl->Destroy();
+		bIsInterruptable = false;
 	}
 }
 
