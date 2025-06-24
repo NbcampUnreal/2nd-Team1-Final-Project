@@ -24,6 +24,9 @@ protected:
 	UFUNCTION()
 	void OnGuideButtonClicked(FName CategoryID);
 
+public:
+	UButton* GetCloseButton() const;
+
 private:
 	// 데이터테이블을 이용한 버튼 동적 생성 함수
 	void CreateButtons();
