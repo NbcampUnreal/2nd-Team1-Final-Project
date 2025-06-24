@@ -24,6 +24,7 @@ class ARSDungeonGroundIngredient;
 class ARSDungeonGroundRelic;
 class ARSDungeonGroundLifeEssence;
 class ARSBaseAltar;
+class USoundBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemySpawn, ARSDunBaseCharacter*, SpawnCharacter);
 
@@ -149,6 +150,17 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
 	TArray<TObjectPtr<ARSBaseAltar>> TreasureInstance; //제단 인스턴스
+#pragma endregion
+
+#pragma region BGM
+public:
+	void PlayBGMSound();
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Audio", meta = (AllowPrivateAccess = "true"))
+	TArray<TObjectPtr<USoundBase>> BGMCues;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USoundBase> BGM;
 #pragma endregion
 
 #pragma region GroundItem
