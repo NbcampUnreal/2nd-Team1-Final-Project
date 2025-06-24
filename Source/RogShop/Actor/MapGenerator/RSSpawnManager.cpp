@@ -58,6 +58,7 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, i
 		return;
 		break;
 	}
+	BGM = BGMCues[LevelIndex];
 	MonsterDataTable = DataSubsystem->Monster;
 
 	if (!MonsterSpawnGroupDataTable)
@@ -978,5 +979,13 @@ void URSSpawnManager::SpawnTreasureChest()
 	}
 
 	RS_LOG_DEBUG("보물상자 생성 성공");
+}
+void URSSpawnManager::PlayBGMSound() 
+{
+	UGameplayStatics::PlaySoundAtLocation(
+		this,
+		BGM,
+		FVector::ZeroVector
+	);
 }
  
