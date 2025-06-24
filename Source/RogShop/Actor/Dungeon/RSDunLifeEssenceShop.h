@@ -7,6 +7,8 @@
 #include "RSInteractable.h" // 인터페이스 헤더
 #include "RSDunLifeEssenceShop.generated.h"
 
+class UBoxComponent;
+
 UCLASS()
 class ROGSHOP_API ARSDunLifeEssenceShop : public AActor, public IRSInteractable
 {
@@ -63,4 +65,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UBoxComponent> BoxComp;	// 캐릭터와의 충돌을 위한 콜리전 용도의 컴포넌트
 };

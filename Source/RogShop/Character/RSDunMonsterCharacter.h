@@ -151,6 +151,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ActionData")
 	float strafeRange;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ActionData")
+	bool bIsInterruptable;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ActionData")
+	float interruptResistance;
 	// 데이터 테이블 관련
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ActionData")
 	TArray<FMonsterAttackSkillData> MonsterAttackSkills;	// 몬스터 공격 스킬을 모아놓은 구조체를 배열로 저장
