@@ -52,7 +52,10 @@ void ARSHPToLifeEssenceAltar::Interact(ARSDunPlayerCharacter* Interactor)
 
 	if (SpawnManager)
 	{
-		SpawnManager->SpawnGroundLifeEssenceAtTransform(GetActorTransform(), HPCost);
+		for (int32 i = 0; i < HPCost; ++i)
+		{
+			SpawnManager->SpawnGroundLifeEssenceAtTransform(GetActorTransform(), 1);
+		}
 
 		// 비용을 2배로 증가시킨다.
 		Cost *= 2;

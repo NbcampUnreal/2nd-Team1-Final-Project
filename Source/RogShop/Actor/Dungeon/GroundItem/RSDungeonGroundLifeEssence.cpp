@@ -75,6 +75,11 @@ void ARSDungeonGroundLifeEssence::Interact(ARSDunPlayerCharacter* Interactor)
 			MeshComp->SetRelativeLocation(FVector::ZeroVector);
 			MeshComp->SetRelativeRotation(FRotator::ZeroRotator);
 		}
+		else
+		{
+			GetWorld()->GetTimerManager().ClearTimer(InteractDelayTimer);
+			return;
+		}
 
 		// 틱 활성화
 		SetActorTickEnabled(true);
