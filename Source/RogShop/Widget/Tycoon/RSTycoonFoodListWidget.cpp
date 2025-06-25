@@ -109,25 +109,25 @@ void URSTycoonFoodListWidget::SetFoodInformation(const FCookFoodData& Data, FNam
 
 void URSTycoonFoodListWidget::SortFoodList()
 {
-	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
-	check(Controller)
-
-	TArray<UWidget*> Childs = FoodListScroll->GetAllChildren();
-	int32 ChangeNum = 0;
-	for (int32 i = 0; i < Childs.Num(); i++)
-	{
-		if (URSTycoonFoodListButtonWidget* FoodListButton = Cast<URSTycoonFoodListButtonWidget>(Childs[i]))
-		{
-			if (FoodListButton->GetData()->CanMake(Controller->GetInventoryComponent()->GetItems()))
-			{
-				UWidget* Temp = Childs[ChangeNum];
-				FoodListScroll->ReplaceChildAt(ChangeNum, Childs[i]);
-				FoodListScroll->ReplaceChildAt(i, Temp);
-
-				ChangeNum++;
-			}
-		}
-	}
+	// ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	// check(Controller)
+	//
+	// TArray<UWidget*> Childs = FoodListScroll->GetAllChildren();
+	// int32 ChangeNum = 0;
+	// for (int32 i = 0; i < Childs.Num(); i++)
+	// {
+	// 	if (URSTycoonFoodListButtonWidget* FoodListButton = Cast<URSTycoonFoodListButtonWidget>(Childs[i]))
+	// 	{
+	// 		if (FoodListButton->GetData()->CanMake(Controller->GetInventoryComponent()->GetItems()))
+	// 		{
+	// 			UWidget* Temp = Childs[ChangeNum];
+	// 			FoodListScroll->ReplaceChildAt(ChangeNum, Childs[i]);
+	// 			FoodListScroll->ReplaceChildAt(i, Temp);
+	//
+	// 			ChangeNum++;
+	// 		}
+	// 	}
+	// }
 }
 
 void URSTycoonFoodListWidget::OnClickMakeButton()

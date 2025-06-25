@@ -27,7 +27,7 @@ public:
 	FOnGuideButtonClicked OnGuideButtonClicked;
 
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
 
 	UFUNCTION()
 	void HandleButtonClicked();

@@ -60,13 +60,6 @@ void ARSBaseAreaGameModeBase::SaveDungeonInfo()
     }
 
     // 세이브
-    if (SpawnManager)
-    {
-        TSet<FName> UnspawnedWeapons = SpawnManager->GetUnspawnedWeapons();
-        TSet<FName> UnspawnedRelics = SpawnManager->GetUnspawnedRelics();
-        DungeonStageSaveGame->UnspawnedWeapons = UnspawnedWeapons.Array();
-        DungeonStageSaveGame->UnspawnedRelics = UnspawnedWeapons.Array();
-    }
 
     // 저장
     UGameInstance* CurGameInstance = GetGameInstance();
@@ -81,7 +74,8 @@ void ARSBaseAreaGameModeBase::SaveDungeonInfo()
         return;
     }
 
-    UGameplayStatics::SaveGameToSlot(DungeonStageSaveGame, SaveGameSubsystem->DungeonInfoSaveSlotName, 0);
+    // 현재 세이브 할 데이터가 없습니다.
+    //UGameplayStatics::SaveGameToSlot(DungeonStageSaveGame, SaveGameSubsystem->DungeonInfoSaveSlotName, 0);
 }
 
 void ARSBaseAreaGameModeBase::LoadDungeonInfo()
@@ -102,16 +96,6 @@ void ARSBaseAreaGameModeBase::LoadDungeonInfo()
     URSDungeonStageSaveGame* DungeonInfoLoadGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->DungeonInfoSaveSlotName, 0));
     if (DungeonInfoLoadGame)
     {
-        if (SpawnManager)
-        {
-            SpawnManager->SetUnspawnedWeapons(DungeonInfoLoadGame->UnspawnedWeapons);
-            SpawnManager->SetUnspawnedRelics(DungeonInfoLoadGame->UnspawnedRelics);
-        }
-    }
-    // 세이브 파일이 없는 경우
-    else
-    {
-        SpawnManager->ResetUnspawnedWeapons();
-        SpawnManager->ResetUnspawnedRelics();
+        // 현재 로드 할 데이터가 없습니다.
     }
 }

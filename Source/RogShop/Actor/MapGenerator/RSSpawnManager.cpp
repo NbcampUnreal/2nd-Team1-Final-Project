@@ -26,6 +26,8 @@
 #include "RSTileBlocker.h"
 #include "RSBaseAltar.h"
 #include "RSBaseTreasureChest.h"
+#include "RSDungeonStageSaveGame.h"
+#include "RSSaveGameSubsystem.h"
 
 // 외부에서 전달받은 월드 및 테이블 초기화
 void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, int32 TargetLevelIndex)
@@ -84,6 +86,20 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, i
 
 	TileToTargets = BuildTileToTargets();
 	RegisterAllTileBlockers();
+
+	// 세이브 된 데이터 로드
+	LoadSpawnInfo();
+
+	// 세이브 하도록 바인딩
+	UGameInstance* CurGameInstance = GetWorld()->GetGameInstance();
+	if (CurGameInstance)
+	{
+		URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+		if (SaveGameSubsystem)
+		{
+			SaveGameSubsystem->OnSaveRequested.AddDynamic(this, &URSSpawnManager::SaveSpawnInfo);
+		}
+	}
 }
 
 // NPC 태그가 있는 TargetPoint 중 하나에 상점 NPC 스폰
@@ -392,6 +408,11 @@ void URSSpawnManager::RemoveUnspawnedWeapon(FName RemoveTargetName)
 
 void URSSpawnManager::ResetUnspawnedWeapons()
 {
+	if (!GetWorld())
+	{
+		return;
+	}
+
 	URSGameInstance* RSGameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
 	if (!RSGameInstance)
 	{
@@ -437,6 +458,64 @@ void URSSpawnManager::ResetUnspawnedRelics()
 	}
 
 	UnspawnedRelics = TSet<FName>(DataSubsystem->RelicInfo->GetRowNames());
+}
+
+void URSSpawnManager::SaveSpawnInfo()
+{
+	// SaveGame 오브젝트 생성
+	URSDungeonStageSaveGame* DungeonStageSaveGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::CreateSaveGameObject(URSDungeonStageSaveGame::StaticClass()));
+	if (!DungeonStageSaveGame)
+	{
+		return;
+	}
+
+	// 세이브 데이터 설정
+	DungeonStageSaveGame->UnspawnedWeapons = UnspawnedWeapons.Array();
+	DungeonStageSaveGame->UnspawnedRelics = UnspawnedWeapons.Array();
+
+	// 저장
+	UGameInstance* CurGameInstance = GetWorld()->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+	if (!SaveGameSubsystem)
+	{
+		return;
+	}
+
+	UGameplayStatics::SaveGameToSlot(DungeonStageSaveGame, SaveGameSubsystem->DungeonInfoSaveSlotName, 0);
+}
+
+void URSSpawnManager::LoadSpawnInfo()
+{
+	// 저장된 세이브 로드
+	UGameInstance* CurGameInstance = GetWorld()->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+	if (!SaveGameSubsystem)
+	{
+		return;
+	}
+
+	URSDungeonStageSaveGame* DungeonInfoLoadGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->DungeonInfoSaveSlotName, 0));
+	if (DungeonInfoLoadGame)
+	{
+		SetUnspawnedWeapons(DungeonInfoLoadGame->UnspawnedWeapons);
+		SetUnspawnedRelics(DungeonInfoLoadGame->UnspawnedRelics);
+	}
+	// 세이브 파일이 없는 경우
+	else
+	{
+		ResetUnspawnedWeapons();
+		ResetUnspawnedRelics();
+	}
 }
 
 // Player 태그가 있는 TargetPoint에 플레이어 이동 또는 스폰

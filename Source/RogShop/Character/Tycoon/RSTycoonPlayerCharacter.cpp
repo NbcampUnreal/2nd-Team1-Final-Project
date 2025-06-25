@@ -44,7 +44,7 @@ void ARSTycoonPlayerCharacter::SetupPlayerInputComponent(UInputComponent* Player
 
 	ARSTycoonPlayerController* PlayerController = Cast<ARSTycoonPlayerController>(GetController());
 	check(PlayerController)
-	
+
 	if (PlayerController->MoveAction)
 	{
 		EnhancedInput->BindAction(PlayerController->MoveAction, ETriggerEvent::Triggered, this,
@@ -65,9 +65,9 @@ void ARSTycoonPlayerCharacter::Pickup(AActor* Actor)
 		RS_LOG_C("이미 들고있는 음식이 있습니다.", FColor::Red)
 		return;
 	}
-	
+
 	PickupActor = Actor;
-	
+
 	Actor->AttachToComponent(PickupLocation, FAttachmentTransformRules::KeepWorldTransform);
 	Actor->SetActorRelativeTransform(FTransform::Identity);
 
@@ -84,15 +84,25 @@ AActor* ARSTycoonPlayerCharacter::Drop(FTransform DropTransform)
 	}
 
 	AActor* Temp = PickupActor.Get();
-	
+
 	PickupActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	PickupActor->SetActorTransform(DropTransform);
 	PickupActor = nullptr;
 
 	check(DropFoodMontage)
 	PlayAnimMontage(DropFoodMontage);
-	
+
 	return Temp;
+}
+
+void ARSTycoonPlayerCharacter::ResetPickup()
+{
+	if (PickupActor)
+	{
+		PickupActor->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+		PickupActor->Destroy();
+		PickupActor = nullptr;
+	}
 }
 
 void ARSTycoonPlayerCharacter::BeginPlay()
@@ -110,7 +120,7 @@ void ARSTycoonPlayerCharacter::PlayInteractAnimation(ARSBaseTile* InteractTile)
 
 	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
 	check(GameMode)
-	
+
 	if (ARSTableTile* TableTile = Cast<ARSTableTile>(InteractTile))
 	{
 		if (TableTile->GetOrderWaitCustomerIndex() != INDEX_NONE)
@@ -137,7 +147,7 @@ void ARSTycoonPlayerCharacter::OnMove(const FInputActionValue& Value)
 	{
 		return;
 	}
-	
+
 	FVector Input = Value.Get<FVector>();
 	GetMovementComponent()->AddInputVector(Input);
 }
@@ -148,7 +158,7 @@ void ARSTycoonPlayerCharacter::OnInteract(const FInputActionValue& Value)
 	{
 		return;
 	}
-	
+
 	TArray<AActor*> OverlapTileActors;
 	InteractSphere->GetOverlappingActors(OverlapTileActors, ARSBaseTile::StaticClass());
 
@@ -156,7 +166,7 @@ void ARSTycoonPlayerCharacter::OnInteract(const FInputActionValue& Value)
 	{
 		return;
 	}
-	
+
 	AActor* MinActor = nullptr;
 	int32 Min = INT32_MAX;
 	const FVector PlayerLocation = GetActorLocation();

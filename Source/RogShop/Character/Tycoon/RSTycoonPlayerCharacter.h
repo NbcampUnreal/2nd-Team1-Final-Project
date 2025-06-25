@@ -23,15 +23,18 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Pickup(AActor* Actor) override;
 	virtual AActor* Drop(FTransform DropTransform) override;
-	void SetCooking(bool Value) { bCooking = Value; }
-
-	virtual AActor* GetPickupActor() override { return PickupActor; }
+	virtual void ResetPickup() override;
 	
 	UFUNCTION(BlueprintPure)
 	bool IsPickup() const { return PickupActor != nullptr; }
 
 	UFUNCTION(BlueprintPure)
 	bool NowCooking() const { return bCooking; }
+	
+	void SetCooking(bool Value) { bCooking = Value; }
+
+	virtual AActor* GetPickupActor() override { return PickupActor; }
+	
 
 protected:
 	virtual void BeginPlay() override;

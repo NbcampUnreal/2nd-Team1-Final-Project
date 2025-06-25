@@ -133,7 +133,7 @@ void ARSTycoonGameModeBase::EndSaleMode()
 void ARSTycoonGameModeBase::StartWaitMode()
 {
 	State = ETycoonGameMode::Wait;
-	
+
 	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
 	PlayerController->StartWaitMode();
 }
@@ -176,13 +176,17 @@ bool ARSTycoonGameModeBase::CanOrder(FName& OutOrderFood)
 	TArray<FCookFoodData*> FoodDatas;
 	int OrderFoodIndex = INDEX_NONE;
 	DataSubsystem->Food->GetAllRows<FCookFoodData>(TEXT("Get All Food Data"), FoodDatas);
+	TArray<FName> FoodNames = DataSubsystem->Food->GetRowNames();
 
 	for (int i = 0; i < FoodDatas.Num(); i++)
 	{
 		FCookFoodData* Data = FoodDatas[i];
+		FCookFoodDetailData* Detail =
+			DataSubsystem->FoodDetail->FindRow<FCookFoodDetailData>(FoodNames[i], TEXT("Get Detail in CanOrder"));
 
 		//만들 수 있는 음식이 1개라도 있으면 true
-		if (Data->CanMake(Ingredients))
+		//플레이어가 제작해 먹을 수 있는 음식은 요리 불가능
+		if (Data->CanMake(Ingredients) && Detail == nullptr)
 		{
 			if (OrderFoodIndex == INDEX_NONE ||
 				FoodDatas[OrderFoodIndex]->Price < Data->Price)
@@ -218,7 +222,7 @@ FFoodOrder ARSTycoonGameModeBase::GetOrderToCook()
 void ARSTycoonGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 #if WITH_EDITOR
 	GetGameInstance<URSGameInstance>()->SetDebugLogEnabled(true);
 #endif

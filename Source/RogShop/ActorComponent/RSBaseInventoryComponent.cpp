@@ -33,6 +33,7 @@ int32 URSBaseInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 	if (CheckValidItem(ItemKey))
 	{
 		// 인벤토리 순회
+		size_t EmptySlot = INDEX_NONE;
 		for (size_t i = 0; i < ItemList.Num(); ++i)
 		{
 			FItemSlot& ItemSlot = ItemList[i];
@@ -47,13 +48,18 @@ int32 URSBaseInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 			// 인벤토리에 해당 슬롯이 비어있는 경우 아이템 추가			
 			if (ItemSlot.ItemKey == NAME_None)
 			{
-				ItemSlot.ItemKey = ItemKey;
-				ItemSlot.Quantity = Amount;
-				return i;
+				EmptySlot = i;
 			}
 		}
+
+		if (EmptySlot != INDEX_NONE)
+		{
+			ItemList[EmptySlot].ItemKey = ItemKey;
+			ItemList[EmptySlot].Quantity = Amount;
+			return EmptySlot;
+		}
 	}
-	
+
 	RS_LOG_C("아이템을 추가하지 못했습니다.", FColor::Red);
 	return -1;
 }
@@ -85,7 +91,7 @@ int32 URSBaseInventoryComponent::RemoveItem(FName ItemKey, int32 Amount)
 			}
 		}
 	}
-	
+
 	RS_LOG_C("아이템을 삭제하지 못했습니다.", FColor::Red);
 	return -1;
 }

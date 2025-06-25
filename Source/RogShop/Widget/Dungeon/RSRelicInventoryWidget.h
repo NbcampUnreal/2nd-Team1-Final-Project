@@ -18,7 +18,7 @@ protected:
     virtual void NativeConstruct() override;
 
 public:
-    void CreateSlots(int32 NumSlots, int32 NumColumns);
+    void AddSlot();
 
     UFUNCTION()
     void UpdateSlots(FName RelicDataTableKey);
@@ -27,9 +27,12 @@ private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (BindWidget, AllowPrivateAccess = "true"))
     TObjectPtr<UUniformGridPanel> RelicSlots;
 
+private:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
     TSubclassOf<URSInventorySlotWidget> InvecntorySlotWidgetClass;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
     TArray<TObjectPtr<URSInventorySlotWidget>> InvecntorySlots;
+
+    int32 MaxColumn;
 };
