@@ -4,9 +4,9 @@
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 
-void URSGuideButtonWidget::NativeConstruct()
+void URSGuideButtonWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 
 	if (GuideButton)
 	{
