@@ -135,14 +135,6 @@ void ARSDungeonGameModeBase::SaveDungeonInfo()
     DungeonStageSaveGame->LevelIndex = LevelIndex;
     DungeonStageSaveGame->Seed = Seed;
 
-    if (SpawnManager)
-    {
-        TSet<FName> UnspawnedWeapons = SpawnManager->GetUnspawnedWeapons();
-        TSet<FName> UnspawnedRelics = SpawnManager->GetUnspawnedRelics();
-        DungeonStageSaveGame->UnspawnedWeapons = UnspawnedWeapons.Array();
-        DungeonStageSaveGame->UnspawnedRelics = UnspawnedWeapons.Array();
-    }
-
     // 저장
     UGameInstance* CurGameInstance = GetGameInstance();
     if (!CurGameInstance)
@@ -179,12 +171,6 @@ void ARSDungeonGameModeBase::LoadDungeonInfo()
     {
         LevelIndex = DungeonInfoLoadGame->LevelIndex;
         Seed = DungeonInfoLoadGame->Seed;
-
-        if (SpawnManager)
-        {
-            SpawnManager->SetUnspawnedWeapons(DungeonInfoLoadGame->UnspawnedWeapons);
-            SpawnManager->SetUnspawnedRelics(DungeonInfoLoadGame->UnspawnedRelics);
-        }
     }
     // 세이브 파일이 없는 경우
     else
@@ -194,9 +180,6 @@ void ARSDungeonGameModeBase::LoadDungeonInfo()
         {
             InitRandSeed();
         }
-
-        SpawnManager->ResetUnspawnedWeapons();
-        SpawnManager->ResetUnspawnedRelics();
     }
 }
 
