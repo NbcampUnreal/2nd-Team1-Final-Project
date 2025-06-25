@@ -29,6 +29,7 @@
 #include "RSPlayerFloatingDamageWidget.h"
 #include "RogShop/Actor/Tycoon/Tile/RSIceBoxTile.h"
 #include "RogShop/Widget/Tycoon/RSTycoonFoodListWidget.h"
+#include "Tycoon/RSTycoonPlayerCharacter.h"
 
 #pragma region Mode
 ARSTycoonPlayerController::ARSTycoonPlayerController()
@@ -76,6 +77,10 @@ void ARSTycoonPlayerController::EndSaleMode()
 	ChangeMainWidget(SaleResultWidget);
 
 	SaleWidget->RemoveAllOrderSlots();
+	
+	ARSTycoonPlayerCharacter* PlayerCharacter = Cast<ARSTycoonPlayerCharacter>(GetCharacter());
+	PlayerCharacter->ResetPickup();
+	PlayerCharacter->SetCooking(false);
 }
 
 void ARSTycoonPlayerController::StartManagementMode()
