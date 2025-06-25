@@ -24,6 +24,7 @@ class ARSDungeonGroundIngredient;
 class ARSDungeonGroundRelic;
 class ARSDungeonGroundLifeEssence;
 class ARSBaseAltar;
+class ARSBaseTreasureChest;
 class USoundBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemySpawn, ARSDunBaseCharacter*, SpawnCharacter);
@@ -146,10 +147,10 @@ private:
 	TArray<TObjectPtr<ARSBaseAltar>> AltarInstance; //제단 인스턴스
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
-	TArray<TSubclassOf<ARSBaseAltar>> TreasureClasses; //제단 클래스
+	TArray<TSubclassOf<ARSBaseTreasureChest>> TreasureChestClasses; // 보물상자 클래스
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
-	TArray<TObjectPtr<ARSBaseAltar>> TreasureInstance; //제단 인스턴스
+	TArray<TObjectPtr<ARSBaseTreasureChest>> TreasureChestInstance; // 보물상자 인스턴스
 #pragma endregion
 
 #pragma region BGM
@@ -166,16 +167,16 @@ private:
 #pragma region GroundItem
 public:
 	UFUNCTION()
-	void SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform, bool AddImpulse);
+	AActor* SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform, bool AddImpulse);
 
 	UFUNCTION()
-	void SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Quantity);
+	AActor* SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Quantity);
 
 	UFUNCTION()
-	void SpawnGroundRelicAtTransform(FName TargetName, FTransform TargetTransform);
+	AActor* SpawnGroundRelicAtTransform(FName TargetName, FTransform TargetTransform);
 
 	UFUNCTION()
-	void SpawnGroundLifeEssenceAtTransform(FTransform TargetTransform, int32 Quantity);
+	AActor* SpawnGroundLifeEssenceAtTransform(FTransform TargetTransform, int32 Quantity);
 
 private:
 	UFUNCTION()

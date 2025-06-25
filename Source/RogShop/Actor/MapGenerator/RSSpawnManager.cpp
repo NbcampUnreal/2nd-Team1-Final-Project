@@ -25,6 +25,7 @@
 #include "RSDungeonGroundLifeEssence.h"
 #include "RSTileBlocker.h"
 #include "RSBaseAltar.h"
+#include "RSBaseTreasureChest.h"
 
 // 외부에서 전달받은 월드 및 테이블 초기화
 void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, int32 TargetLevelIndex)
@@ -119,18 +120,18 @@ void URSSpawnManager::SpawnShopNPCInLevel()
 	RS_LOG_DEBUG("상점 생성 성공");
 }
 
-void URSSpawnManager::SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform, bool AddImpulse)
+AActor* URSSpawnManager::SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform, bool AddImpulse)
 {
 	URSGameInstance* RSGameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
 	if (!RSGameInstance)
 	{
-		return;
+		return nullptr;
 	}
 
 	URSDataSubsystem* DataSubsystem = RSGameInstance->GetSubsystem<URSDataSubsystem>();
 	if (!DataSubsystem)
 	{
-		return;
+		return nullptr;
 	}
 
 	FItemInfoData* WeaponData = DataSubsystem->WeaponInfo->FindRow<FItemInfoData>(TargetName, TEXT("Get ItemInfoData"));
@@ -158,36 +159,40 @@ void URSSpawnManager::SpawnGroundWeaponAtTransform(FName TargetName, FTransform 
 				{
 					GroundWeapon->RandImpulse();
 				}
+
+				return GroundWeapon;
 			}
 		}
 	}
+
+	return nullptr;
 }
 
-void URSSpawnManager::SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Quantity)
+AActor* URSSpawnManager::SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Quantity)
 {
 	URSGameInstance* RSGameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
 	if (!RSGameInstance)
 	{
-		return;
+		return nullptr;
 	}
 
 	URSDataSubsystem* DataSubsystem = RSGameInstance->GetSubsystem<URSDataSubsystem>();
 	if (!DataSubsystem)
 	{
-		return;
+		return nullptr;
 	}
 
 	UDataTable* IngredientInfoDataTable = DataSubsystem->IngredientInfo;
 	if (!IngredientInfoDataTable)
 	{
 		RS_LOG("재료 데이터테이블 nullptr");
-		return;
+		return nullptr;
 	}
 
 	if (!MonsterDataTable)
 	{
 		RS_LOG("캐싱 된 데이터 테이블이 nullptr");
-		return;
+		return nullptr;
 	}
 
 	FItemInfoData* IngredientInfoDataRow = IngredientInfoDataTable->FindRow<FItemInfoData>(TargetName, TEXT("Get IngredientDetailData"));
@@ -203,29 +208,33 @@ void URSSpawnManager::SpawnGroundIngredientAtTransform(FName TargetName, FTransf
 			DungeonIngredient->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
 			DungeonIngredient->SetQuantity(Quantity);
 			DungeonIngredient->RandImpulse();
+
+			return DungeonIngredient;
 		}
 	}
+
+	return nullptr;
 }
 
-void URSSpawnManager::SpawnGroundRelicAtTransform(FName TargetName, FTransform TargetTransform)
+AActor* URSSpawnManager::SpawnGroundRelicAtTransform(FName TargetName, FTransform TargetTransform)
 {
 	UGameInstance* CurGameInstance = GetWorld()->GetGameInstance();
 	if (!CurGameInstance)
 	{
-		return;
+		return nullptr;
 	}
 
 	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
 	if (!DataSubsystem)
 	{
-		return;
+		return nullptr;
 	}
 
 	UDataTable* RelicInfoDataTable = DataSubsystem->RelicInfo;
 	UDataTable* RelicClassDataTable = DataSubsystem->RelicDetail;
 	if (!RelicInfoDataTable || !RelicClassDataTable)
 	{
-		return;
+		return nullptr;
 	}
 
 	FItemInfoData* RelicInfoDataRow = RelicInfoDataTable->FindRow<FItemInfoData>(TargetName, TEXT("Get ItemInfoData"));
@@ -243,11 +252,15 @@ void URSSpawnManager::SpawnGroundRelicAtTransform(FName TargetName, FTransform T
 			GroundRelic->SetRelicClass(RelicClassDataRow->RelicClass);
 
 			RemoveUnspawnedRelic(TargetName);
+
+			return GroundRelic;
 		}
 	}
+
+	return nullptr;
 }
 
-void URSSpawnManager::SpawnGroundLifeEssenceAtTransform(FTransform TargetTransform, int32 Quantity)
+AActor* URSSpawnManager::SpawnGroundLifeEssenceAtTransform(FTransform TargetTransform, int32 Quantity)
 {
 	ARSDungeonGroundLifeEssence* DungeonLifeEssence = GetWorld()->SpawnActor<ARSDungeonGroundLifeEssence>(DungeonGroundLifeEssenceClass, TargetTransform);
 
@@ -256,6 +269,8 @@ void URSSpawnManager::SpawnGroundLifeEssenceAtTransform(FTransform TargetTransfo
 		DungeonLifeEssence->RandImpulse();
 		DungeonLifeEssence->SetQuantity(Quantity);
 	}
+
+	return DungeonLifeEssence;
 }
 
 void URSSpawnManager::SpawnGroundIngredientFromCharacter(ARSDunBaseCharacter* DiedCharacter)
@@ -957,15 +972,15 @@ void URSSpawnManager::SpawnTreasureChest()
 		Indices.Add(i);
 	}
 
-	if (TreasureClasses.Num() <= 0)
+	if (TreasureChestClasses.Num() <= 0)
 	{
 		return;
 	}
 
 	Algo::RandomShuffle(Indices); // 중복 없이 무작위 순서 결정
-	TreasureInstance.SetNum(3); //소환될 보물상자의 숫자
+	TreasureChestInstance.SetNum(3); //소환될 보물상자의 숫자
 
-	for (int32 i = 0; i < TreasureClasses.Num(); ++i)
+	for (int32 i = 0; i < TreasureChestClasses.Num(); ++i)
 	{
 		int32 Index = Indices[i];
 		ATargetPoint* ChosenPoint = TreasurePoints[Index];
@@ -975,7 +990,7 @@ void URSSpawnManager::SpawnTreasureChest()
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		TreasureInstance[i] = World->SpawnActor<ARSBaseAltar>(TreasureClasses[i], SpawnTransform, SpawnParams);
+		TreasureChestInstance[i] = World->SpawnActor<ARSBaseTreasureChest>(TreasureChestClasses[i], SpawnTransform, SpawnParams);
 	}
 
 	RS_LOG_DEBUG("보물상자 생성 성공");
