@@ -13,17 +13,22 @@ void URSRelicInventoryWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
+    MaxColumn = 5;
+
     ARSDunPlayerController* RSDunPlayerController = GetOwningPlayer<ARSDunPlayerController>();
     if (RSDunPlayerController)
     {
         RSDunPlayerController->OnRelicAdded.AddDynamic(this, &URSRelicInventoryWidget::UpdateSlots);
+    }
 
-        // 24개 슬롯, 4열 기준 생성
-        CreateSlots(24, 5);
+    if (RelicSlots && InvecntorySlotWidgetClass)
+    {
+        RelicSlots->ClearChildren();
+        InvecntorySlots.Empty();
     }
 }
 
-void URSRelicInventoryWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
+void URSRelicInventoryWidget::AddSlot()
 {
     if (!RelicSlots || !InvecntorySlotWidgetClass)
     {
@@ -31,21 +36,17 @@ void URSRelicInventoryWidget::CreateSlots(int32 NumSlots, int32 NumColumns)
         return;
     }
 
-    RelicSlots->ClearChildren();
-    InvecntorySlots.Empty();
+    URSInventorySlotWidget* NewSlotImage = CreateWidget<URSInventorySlotWidget>(GetWorld(), InvecntorySlotWidgetClass);
 
-    for (int32 i = 0; i < NumSlots; ++i)
+    if (NewSlotImage)
     {
-        URSInventorySlotWidget* NewSlotImage = CreateWidget<URSInventorySlotWidget>(GetWorld(), InvecntorySlotWidgetClass);
+        int32 ChildrenCount = RelicSlots->GetChildrenCount();
 
-        if (NewSlotImage)
-        {
-            int32 Row = i / NumColumns;
-            int32 Col = i % NumColumns;
+        int32 Row = ChildrenCount / MaxColumn;
+        int32 Col = ChildrenCount % MaxColumn;
 
-            RelicSlots->AddChildToUniformGrid(NewSlotImage, Row, Col);
-            InvecntorySlots.Add(NewSlotImage);
-        }
+        RelicSlots->AddChildToUniformGrid(NewSlotImage, Row, Col);
+        InvecntorySlots.Add(NewSlotImage);
     }
 }
 
@@ -78,17 +79,12 @@ void URSRelicInventoryWidget::UpdateSlots(FName RelicDataTableKey)
     FItemInfoData* Data = RelicDataTable->FindRow<FItemInfoData>(RelicDataTableKey, TEXT("Get RelicInfo"));
     if (Data)
     {
-        for (size_t i = 0; i < InvecntorySlots.Num(); ++i)
+        AddSlot();
+
+        int32 TargetIndex = InvecntorySlots.Num() - 1;
+        if (InvecntorySlots.IsValidIndex(TargetIndex) && InvecntorySlots[TargetIndex]->GetItemDataTableKey() == NAME_None)
         {
-            FName ItemDataTableKey = InvecntorySlots[i]->GetItemDataTableKey();
-            if (ItemDataTableKey == NAME_None)
-            {
-                InvecntorySlots[i]->SetSlotItemInfo(RelicDataTableKey, Data->ItemIcon, FString(""));
-                return;
-            }
+            InvecntorySlots[TargetIndex]->SetSlotItemInfo(RelicDataTableKey, Data->ItemIcon, FString(""));
         }
-
-        // TODO : 비어있는 슬롯이 없는 경우에 대한 처리
-
     }
 }
