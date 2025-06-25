@@ -61,6 +61,16 @@ AActor* ARSTycoonWaiterCharacter::Drop(FTransform DropTransform)
 	return PickupActor;
 }
 
+void ARSTycoonWaiterCharacter::ResetPickup()
+{
+	if (PickupActor)
+	{
+		PickupActor->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+		PickupActor->Destroy();
+		PickupActor = nullptr;
+	}
+}
+
 void ARSTycoonWaiterCharacter::StopAllAction()
 {
 	Super::StopAllAction();
@@ -75,12 +85,7 @@ void ARSTycoonWaiterCharacter::StopAllAction()
 	AIController->GetBlackboardComponent()->SetValueAsObject(CustomerKey, nullptr);
 	AIController->StopMovement();
 	
-	if (PickupActor)
-	{
-		PickupActor->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
-		PickupActor->Destroy();
-		PickupActor = nullptr;
-	}
+	ResetPickup();
 }
 
 

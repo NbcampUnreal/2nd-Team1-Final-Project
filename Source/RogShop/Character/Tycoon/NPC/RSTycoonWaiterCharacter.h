@@ -20,6 +20,7 @@ public:
 
 	virtual void Pickup(AActor* Actor) override;
 	virtual AActor* Drop(FTransform DropTransform) override;
+	virtual void ResetPickup() override;
 	virtual void StopAllAction() override;
 
 	virtual AActor* GetPickupActor() override { return PickupActor; }
