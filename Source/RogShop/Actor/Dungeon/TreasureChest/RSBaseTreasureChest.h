@@ -5,22 +5,22 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "RSInteractable.h"
-#include "RSGameFlowDisplayActor.generated.h"
+#include "RSBaseTreasureChest.generated.h"
 
 class UBoxComponent;
 
 UCLASS()
-class ROGSHOP_API ARSGameFlowDisplayActor : public AActor, public IRSInteractable
+class ROGSHOP_API ARSBaseTreasureChest : public AActor, public IRSInteractable
 {
 	GENERATED_BODY()
 	
 public:	
-	ARSGameFlowDisplayActor();
+	ARSBaseTreasureChest();
 
 protected:
 	virtual void BeginPlay() override;
 
-// 상호작용
+	// 상호작용
 public:
 	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
 
@@ -33,10 +33,16 @@ public:
 protected:
 	FText InteractName;
 
-// 상호작용시 띄워줄 UI
-private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<UUserWidget> GameFlowDisplayWidgetClass;
+	bool bIsAutoInteract;
+
+// 상호작용에 필요한 변수 및 함수
+protected:
+	UFUNCTION()
+	virtual void OpenChest();
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim")
+	TObjectPtr<UAnimMontage> ChestOpenAnimMontage;
 
 // 컴포넌트
 private:
@@ -44,5 +50,8 @@ private:
 	TObjectPtr<USceneComponent> SceneComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UStaticMeshComponent> StaticMeshComp;	// 상호작용을 위한 콜리전 용도의 컴포넌트
+	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComp;	// 상호작용을 위한 콜리전 용도의 컴포넌트
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UBoxComponent> BoxComp;	// 캐릭터와의 충돌을 위한 콜리전 용도의 컴포넌트
 };

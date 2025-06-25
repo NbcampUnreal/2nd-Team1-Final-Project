@@ -39,37 +39,21 @@ void ARSGameFlowDisplayActor::Interact(ARSDunPlayerCharacter* Interactor)
 		return;
 	}
 
-	// 위젯이 생성된 상태인 경우
-	if (GameFlowDisplayWidgetInstance)
-	{
-		GameFlowDisplayWidgetInstance->AddToViewport();
-
-		FInputModeUIOnly InputMode;
-		PC->SetInputMode(InputMode);
-		PC->SetShowMouseCursor(true);
-		PC->FlushPressedKeys();
-
-		return;
-	}
-
 	// 생성된 위젯이 없는 경우
 	if (GameFlowDisplayWidgetClass)
 	{
-		GameFlowDisplayWidgetInstance = CreateWidget<UUserWidget>(PC, GameFlowDisplayWidgetClass);
-		if (!GameFlowDisplayWidgetInstance)
+		UUserWidget* WidgetInstance = CreateWidget<UUserWidget>(PC, GameFlowDisplayWidgetClass);
+		if (!WidgetInstance)
 		{
 			return;
 		}
 
-		GameFlowDisplayWidgetInstance->AddToViewport();
+		WidgetInstance->AddToViewport();
 
 		FInputModeUIOnly InputMode;
 		PC->SetInputMode(InputMode);
 		PC->SetShowMouseCursor(true);
 		PC->FlushPressedKeys();
-
-		// TODO : 2번째 UI부터 여러 시도 후에도 위젯 생성된게 눈에 안보여서 이렇게 했습니다.
-		GameFlowDisplayWidgetInstance = nullptr;	
 	}
 }
 

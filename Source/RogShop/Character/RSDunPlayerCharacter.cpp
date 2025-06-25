@@ -806,27 +806,43 @@ void ARSDunPlayerCharacter::LoadStatus()
         return;
     }
 
-    URSDungeonStatusSaveGame* StatusLoadGame = Cast<URSDungeonStatusSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->StatusSaveSlotName, 0));
-    if (!StatusLoadGame)
-    {
-        // 저장된 값이 없는 경우 기본값으로 설정
-        // 바인딩된 함수를 호출하기 위한 함수 호출
-        ChangeMaxHP(GetMaxHP());
-        ChangeHP(GetHP());
+    URSDungeonStatusSaveGame* PlayerStatusLoadGame = Cast<URSDungeonStatusSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->StatusSaveSlotName, 0));
+    URSDungeonStatusSaveGame* FoodStatusLoadGame = Cast<URSDungeonStatusSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->FoodStatusSaveSlotName, 0));
 
-        // 최대 체력, 현재 체력, 이동 속도는 부모 클래스에서 기본값을 설정합니다.
-        
-        // 공격력과 공격 속도는 캐릭터에 기본값을 설정합니다.
+    float PlayerMaxHP = 0.f;
+    float PlayerHP = 0.f;
+    float PlayerMoveSpeed = 0.f;
+    float PlayerAttackPower = 0.f;
+    float PlayerAttackSpeed = 0.f;
+
+    if (FoodStatusLoadGame)
+    {
+        PlayerMaxHP += FoodStatusLoadGame->MaxHP;
+        PlayerHP += FoodStatusLoadGame->HP;
+        PlayerMoveSpeed += FoodStatusLoadGame->MoveSpeed;
+        PlayerAttackPower += FoodStatusLoadGame->AttackPower;
+        PlayerAttackSpeed += FoodStatusLoadGame->AttackSpeed;
+    }
+
+    if (!PlayerStatusLoadGame)
+    {
+        // 저장된 값이 없는 경우 타이쿤에서 추가된 스탯을 반영하여 초기화합니다.
+        ChangeMaxHP(PlayerMaxHP + GetMaxHP());
+        ChangeHP(PlayerHP + GetMaxHP());
+        ChangeMoveSpeed(PlayerMoveSpeed + GetMoveSpeed());
+        ChangeAttackPower(PlayerAttackPower + GetAttackPower());
+        ChangeAttackSpeed(PlayerAttackSpeed + GetAttackSpeed());
+
         return;
     }
     
     // 로드
-    ChangeMaxHP(StatusLoadGame->MaxHP);
-    ChangeHP(StatusLoadGame->HP);
-    ChangeMoveSpeed(StatusLoadGame->MoveSpeed);
-    ChangeAttackPower(StatusLoadGame->AttackPower);
-    ChangeAttackSpeed(StatusLoadGame->AttackSpeed);
-    LifeEssence = StatusLoadGame->LifeEssence;
+    ChangeMaxHP(PlayerStatusLoadGame->MaxHP);
+    ChangeHP(PlayerStatusLoadGame->HP);
+    ChangeMoveSpeed(PlayerStatusLoadGame->MoveSpeed);
+    ChangeAttackPower(PlayerStatusLoadGame->AttackPower);
+    ChangeAttackSpeed(PlayerStatusLoadGame->AttackSpeed);
+    LifeEssence = PlayerStatusLoadGame->LifeEssence;
 }
 
 void ARSDunPlayerCharacter::ToggleGodMode()
