@@ -239,4 +239,13 @@ private:
 private:
 	int32 LevelIndex; // 현재 레벨 인덱스
 #pragma endregion
+
+#pragma region SaveData
+public:
+	UFUNCTION()
+	void SaveSpawnInfo();
+
+private:
+	void LoadSpawnInfo();
+#pragma endregion
 };
