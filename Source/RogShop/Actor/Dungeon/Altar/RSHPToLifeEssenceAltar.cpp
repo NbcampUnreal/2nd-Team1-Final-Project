@@ -54,7 +54,7 @@ void ARSHPToLifeEssenceAltar::Interact(ARSDunPlayerCharacter* Interactor)
 	{
 		FTimerHandle SpawnDelayTimerHandle;
 
-		GetWorld()->GetTimerManager().SetTimer(SpawnDelayTimerHandle, FTimerDelegate::CreateLambda([=]()
+		GetWorld()->GetTimerManager().SetTimer(SpawnDelayTimerHandle, FTimerDelegate::CreateLambda([=, this]()
 			{
 				if (SpawnManager)
 				{
