@@ -46,6 +46,16 @@ void ARSLifeEssenceTreasureChest::OpenChest()
 
 	for (int32 i = 0; i < RandQuantity; ++i)
 	{
-		SpawnManager->SpawnGroundLifeEssenceAtTransform(TargetTransform, 1);
+		FTimerHandle SpawnDelayTimerHandle;
+
+		GetWorld()->GetTimerManager().SetTimer(SpawnDelayTimerHandle, FTimerDelegate::CreateLambda([=]()
+		{
+				if (SpawnManager)
+				{
+					SpawnManager->SpawnGroundLifeEssenceAtTransform(TargetTransform, 1);
+				}
+		}),
+		i * 0.05f,
+		false);
 	}
 }
