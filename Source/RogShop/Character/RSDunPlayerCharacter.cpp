@@ -842,7 +842,7 @@ void ARSDunPlayerCharacter::LoadStatus()
     ChangeMoveSpeed(PlayerStatusLoadGame->MoveSpeed);
     ChangeAttackPower(PlayerStatusLoadGame->AttackPower);
     ChangeAttackSpeed(PlayerStatusLoadGame->AttackSpeed);
-    LifeEssence = PlayerStatusLoadGame->LifeEssence;
+    SetLifeEssence(PlayerStatusLoadGame->LifeEssence);
 }
 
 void ARSDunPlayerCharacter::ToggleGodMode()

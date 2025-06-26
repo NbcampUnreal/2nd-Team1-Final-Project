@@ -9,7 +9,7 @@
 
 ARSHPToLifeEssenceAltar::ARSHPToLifeEssenceAltar()
 {
-	InteractName = FText::FromString(TEXT("피의 제단"));
+	InteractName = FText::FromString(TEXT("핏값의 제단"));
 
 	Cost = 10;
 
@@ -50,16 +50,24 @@ void ARSHPToLifeEssenceAltar::Interact(ARSDunPlayerCharacter* Interactor)
 		
 	}
 
-	if (SpawnManager)
+	for (int32 i = 0; i < HPCost; ++i)
 	{
-		for (int32 i = 0; i < HPCost; ++i)
-		{
-			SpawnManager->SpawnGroundLifeEssenceAtTransform(GetActorTransform(), 1);
-		}
+		FTimerHandle SpawnDelayTimerHandle;
 
-		// 비용을 2배로 증가시킨다.
-		Cost *= 2;
+		GetWorld()->GetTimerManager().SetTimer(SpawnDelayTimerHandle, FTimerDelegate::CreateLambda([=, this]()
+			{
+				if (SpawnManager)
+				{
+					SpawnManager->SpawnGroundLifeEssenceAtTransform(GetActorTransform(), 1);
+				}
+
+			}),
+			i * 0.05f,
+			false);
 	}
+
+	// 비용을 2배로 증가시킨다.
+	Cost *= 2;
 
 	// 비용 업데이트
 	URSAltarCostWidget* CostWidget = Cast<URSAltarCostWidget>(GetCostWidgetObject());
