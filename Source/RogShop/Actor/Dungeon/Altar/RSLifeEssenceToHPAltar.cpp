@@ -9,7 +9,7 @@
 
 ARSLifeEssenceToHPAltar::ARSLifeEssenceToHPAltar()
 {
-	InteractName = FText::FromString(TEXT("생명의 제단"));
+	InteractName = FText::FromString(TEXT("식복의 제단"));
 
 	Cost = 10;
 }

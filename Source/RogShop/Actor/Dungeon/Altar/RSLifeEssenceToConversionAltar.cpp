@@ -9,7 +9,7 @@
 
 ARSLifeEssenceToConversionAltar::ARSLifeEssenceToConversionAltar()
 {
-	InteractName = FText::FromString(TEXT("보물의 제단"));
+	InteractName = FText::FromString(TEXT("욕망의 제단"));
 
 	Cost = 25;
 }
