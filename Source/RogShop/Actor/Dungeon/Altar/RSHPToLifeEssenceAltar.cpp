@@ -56,7 +56,7 @@ void ARSHPToLifeEssenceAltar::Interact(ARSDunPlayerCharacter* Interactor)
 
 		GetWorld()->GetTimerManager().SetTimer(SpawnDelayTimerHandle, FTimerDelegate::CreateLambda([=, this]()
 			{
-				if (SpawnManager)
+				if (IsValid(this) && IsValid(SpawnManager))
 				{
 					SpawnManager->SpawnGroundLifeEssenceAtTransform(GetActorTransform(), 1);
 				}

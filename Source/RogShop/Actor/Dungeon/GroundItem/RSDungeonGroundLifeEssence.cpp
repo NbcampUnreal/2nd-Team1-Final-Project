@@ -52,6 +52,16 @@ void ARSDungeonGroundLifeEssence::Tick(float DeltaTime)
 	}
 }
 
+void ARSDungeonGroundLifeEssence::BeginDestroy()
+{
+	Super::BeginDestroy();
+
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(InteractDelayTimer);
+	}
+}
+
 void ARSDungeonGroundLifeEssence::Interact(ARSDunPlayerCharacter* Interactor)
 {
 	// 더이상 상호작용 함수가 호출되지 않도록 한다.
@@ -61,7 +71,7 @@ void ARSDungeonGroundLifeEssence::Interact(ARSDunPlayerCharacter* Interactor)
 
 	GetWorld()->GetTimerManager().SetTimer(InteractDelayTimer, FTimerDelegate::CreateLambda([=, this]()
 	{
-		if (MeshComp && SceneComp)
+		if (IsValid(this) && IsValid(MeshComp) && IsValid(SceneComp))
 		{
 			MeshComp->SetSimulatePhysics(false);
 			MeshComp->SetEnableGravity(false);
@@ -77,7 +87,6 @@ void ARSDungeonGroundLifeEssence::Interact(ARSDunPlayerCharacter* Interactor)
 		}
 		else
 		{
-			GetWorld()->GetTimerManager().ClearTimer(InteractDelayTimer);
 			return;
 		}
 
