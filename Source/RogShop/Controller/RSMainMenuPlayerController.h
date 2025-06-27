@@ -17,8 +17,10 @@ class ROGSHOP_API ARSMainMenuPlayerController : public APlayerController
 public:
 	virtual void BeginPlay() override;
 
-protected:
+private:
+	void LoadSetting();
 
+protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TSubclassOf<class UUserWidget> MainMenuWidgetClass;
 

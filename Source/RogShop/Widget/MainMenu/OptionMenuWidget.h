@@ -25,25 +25,6 @@ protected:
     UFUNCTION()
     void OnApplyButtonClicked();
 
-    UFUNCTION()
-    void OnMasterVolumeChanged(float Value);
-
-    UFUNCTION()
-    void OnBGMVolumeChanged(float Value);
-
-    UFUNCTION()
-    void OnSFXVolumeChanged(float Value);
-
-protected:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound", meta = (AllowPrivateAccess = "true"))
-    USoundClass* SC_Master;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound", meta = (AllowPrivateAccess = "true"))
-    USoundClass* SC_BGM;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound", meta = (AllowPrivateAccess = "true"))
-    USoundClass* SC_SFX;
-
 protected:
     UPROPERTY(meta = (BindWidget))
     UButton* BackButton;
