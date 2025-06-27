@@ -19,6 +19,9 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+protected:
+	virtual void BeginDestroy() override;
+
 // 상호작용
 public:
 	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
