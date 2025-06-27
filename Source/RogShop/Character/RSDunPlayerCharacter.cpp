@@ -809,24 +809,24 @@ void ARSDunPlayerCharacter::LoadStatus()
     URSDungeonStatusSaveGame* PlayerStatusLoadGame = Cast<URSDungeonStatusSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->StatusSaveSlotName, 0));
     URSDungeonStatusSaveGame* FoodStatusLoadGame = Cast<URSDungeonStatusSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->FoodStatusSaveSlotName, 0));
 
-    float PlayerMaxHP = 0.f;
-    float PlayerHP = 0.f;
-    float PlayerMoveSpeed = 0.f;
-    float PlayerAttackPower = 0.f;
-    float PlayerAttackSpeed = 0.f;
-
-    if (FoodStatusLoadGame)
-    {
-        PlayerMaxHP += FoodStatusLoadGame->MaxHP;
-        PlayerHP += FoodStatusLoadGame->HP;
-        PlayerMoveSpeed += FoodStatusLoadGame->MoveSpeed;
-        PlayerAttackPower += FoodStatusLoadGame->AttackPower;
-        PlayerAttackSpeed += FoodStatusLoadGame->AttackSpeed;
-    }
-
+    // 저장된 값이 없는 경우 타이쿤에서 추가된 스탯을 반영하여 초기화합니다.
     if (!PlayerStatusLoadGame)
     {
-        // 저장된 값이 없는 경우 타이쿤에서 추가된 스탯을 반영하여 초기화합니다.
+        float PlayerMaxHP = 0.f;
+        float PlayerHP = 0.f;
+        float PlayerMoveSpeed = 0.f;
+        float PlayerAttackPower = 0.f;
+        float PlayerAttackSpeed = 0.f;
+
+        if (FoodStatusLoadGame)
+        {
+            PlayerMaxHP += FoodStatusLoadGame->MaxHP;
+            PlayerHP += FoodStatusLoadGame->HP;
+            PlayerMoveSpeed += FoodStatusLoadGame->MoveSpeed;
+            PlayerAttackPower += FoodStatusLoadGame->AttackPower;
+            PlayerAttackSpeed += FoodStatusLoadGame->AttackSpeed;
+        }
+
         ChangeMaxHP(PlayerMaxHP + GetMaxHP());
         ChangeHP(PlayerHP + GetMaxHP());
         ChangeMoveSpeed(PlayerMoveSpeed + GetMoveSpeed());

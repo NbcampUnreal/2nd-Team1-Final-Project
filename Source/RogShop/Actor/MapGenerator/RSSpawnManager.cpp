@@ -463,17 +463,6 @@ void URSSpawnManager::ResetUnspawnedRelics()
 void URSSpawnManager::SaveSpawnInfo()
 {
 	// SaveGame 오브젝트 생성
-	URSDungeonStageSaveGame* DungeonStageSaveGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::CreateSaveGameObject(URSDungeonStageSaveGame::StaticClass()));
-	if (!DungeonStageSaveGame)
-	{
-		return;
-	}
-
-	// 세이브 데이터 설정
-	DungeonStageSaveGame->UnspawnedWeapons = UnspawnedWeapons.Array();
-	DungeonStageSaveGame->UnspawnedRelics = UnspawnedWeapons.Array();
-
-	// 저장
 	UGameInstance* CurGameInstance = GetWorld()->GetGameInstance();
 	if (!CurGameInstance)
 	{
@@ -485,6 +474,25 @@ void URSSpawnManager::SaveSpawnInfo()
 	{
 		return;
 	}
+	
+	URSDungeonStageSaveGame* DungeonStageSaveGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->DungeonInfoSaveSlotName, 0));
+	// 저장된 세이브 파일이 없는 경우
+	if (!DungeonStageSaveGame)
+	{
+		// 새로운 세이브 파일 생성
+		DungeonStageSaveGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::CreateSaveGameObject(URSDungeonStageSaveGame::StaticClass()));
+		if (!DungeonStageSaveGame)
+		{
+			return;
+		}
+	}
+
+
+	// 세이브 데이터 설정
+	DungeonStageSaveGame->UnspawnedWeapons = UnspawnedWeapons.Array();
+	DungeonStageSaveGame->UnspawnedRelics = UnspawnedWeapons.Array();
+
+	// 저장
 
 	UGameplayStatics::SaveGameToSlot(DungeonStageSaveGame, SaveGameSubsystem->DungeonInfoSaveSlotName, 0);
 }
