@@ -64,6 +64,12 @@ void ARSTycoonChefCharacter::FindCookingTile()
 	if (CookingTileActors.Num() == 0)
 	{
 		RS_LOG_C("가게에 화구가 없습니다!", FColor::Red);
+
+		FTimerHandle RepeatTimer;
+		GetWorldTimerManager().SetTimer(RepeatTimer, [&]()
+		{
+			FindCookingTile();
+		}, 1, false);
 		return;
 	}
 
@@ -109,6 +115,12 @@ void ARSTycoonChefCharacter::FindCookingTile()
 	if (TargetCookingTile == nullptr)
 	{
 		RS_LOG_C("배치될 화구가 없습니다!", FColor::Red);
+
+		FTimerHandle RepeatTimer;
+		GetWorldTimerManager().SetTimer(RepeatTimer, [&]()
+		{
+			FindCookingTile();
+		}, 1, false);
 		return;
 	}
 
@@ -127,7 +139,6 @@ void ARSTycoonChefCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	FindCookingTile();
-
 	FoodBubbleWidgetComponent->SetVisibility(false);
 }
 

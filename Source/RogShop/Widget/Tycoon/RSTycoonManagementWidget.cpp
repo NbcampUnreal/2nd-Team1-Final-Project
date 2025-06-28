@@ -81,7 +81,7 @@ void URSTycoonManagementWidget::OnClickExpandTile()
 	int32 Height = FMath::RoundToInt(HeightBox->GetValue());
 
 	TileMap->ChangeTileSize(Width, Height, true);
-	GetOwningPlayer<ARSTycoonPlayerController>()->SetCameraLocationToCenter();
+	GetOwningPlayer<ARSTycoonPlayerController>()->SetMainCameraLocationToCenter();
 
 	//드는 돈 다시 갱신하기 위해 추가
 	OnChangeTileSizeBox(0);

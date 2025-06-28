@@ -132,10 +132,12 @@ void ARSTycoonGameModeBase::EndSaleMode()
 
 void ARSTycoonGameModeBase::StartWaitMode()
 {
+	bool bNoAnimation = State == ETycoonGameMode::None ? true : false;
+	
 	State = ETycoonGameMode::Wait;
 
 	ARSTycoonPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
-	PlayerController->StartWaitMode();
+	PlayerController->StartWaitMode(bNoAnimation);
 }
 
 void ARSTycoonGameModeBase::StartManagementMode()

@@ -23,6 +23,7 @@ class URSTycoonSaleResultWidget;
 class URSTycoonWaitWidget;
 class UInputAction;
 class UInputMappingContext;
+class URSTycoonCameraChangeWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeGold, int32, Value);
 
@@ -37,7 +38,7 @@ private:
 #pragma region Mode
 
 public:
-	void StartWaitMode();
+	void StartWaitMode(bool bNoAnimation = false);
 	void StartSaleMode();
 	void EndSaleMode();
 	void StartManagementMode();
@@ -69,7 +70,7 @@ public:
 	bool IsOpenFoodListUI() const { return bIsOpenFoodListUI; }
 
 private:
-	void ChangeMainWidget(UUserWidget* ActiveWidget);
+	void ChangeMainWidget(UUserWidget* ActiveWidget, bool bNoAnimation = false);
 	void SettingWidget();
 
 private:
@@ -101,6 +102,9 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<URSTycoonFoodListWidget> FoodListWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<URSTycoonCameraChangeWidget> CameraChangeWidgetClass;
+
 	UPROPERTY()
 	TObjectPtr<URSTycoonWaitWidget> WaitWidget;
 
@@ -127,6 +131,9 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<URSTycoonFoodListWidget> FoodListWidget;
+	
+	UPROPERTY()
+	TObjectPtr<URSTycoonCameraChangeWidget> CameraChangeWidget;
 
 	bool bIsOpenFoodListUI;
 #pragma endregion
@@ -159,15 +166,11 @@ private:
 #pragma endregion
 
 #pragma region Camera
-
 public:
-	void SetCameraLocationToCenter();
-
+	void SetMainCameraLocationToCenter();
+	
 private:
 	void SettingCamera();
-
-	UFUNCTION(BlueprintCallable)
-	void SetMaxLengthOfMainCamera();
 
 	UFUNCTION()
 	void OnZoom(const FInputActionValue& Value);
@@ -202,11 +205,15 @@ public:
 private:
 	UFUNCTION()
 	void OnRotateTile(const FInputActionValue& Value);
-
+	
+	UFUNCTION()
+	void OnClickTileOrNPC();
+	
 	void SettingChangeTile();
 
 	void EnableSelectTileOutline(FVector CenterLocation);
 	void DisableSelectTileOutline();
+
 
 private:
 	UPROPERTY(EditDefaultsOnly)
@@ -237,10 +244,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-private:
-	UFUNCTION()
-	void OnClickTileOrNPC();
 
 public:
 	FOnChangeGold OnChangeGold;

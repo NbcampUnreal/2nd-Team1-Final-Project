@@ -27,7 +27,7 @@ public:
 private:
 	UFUNCTION()
 	void SetFoodInformation(const FCookFoodData& Data, FName Key);
-	void SortFoodList();
+	void CreateFoodList();
 	
 	UFUNCTION()
 	void OnClickMakeButton();
@@ -65,4 +65,5 @@ protected:
 private:
 	FName NowOpenKey;
 	const FCookFoodData* NowOpenData;
+	TArray<URSTycoonFoodListButtonWidget*> FoodListButtons;
 };

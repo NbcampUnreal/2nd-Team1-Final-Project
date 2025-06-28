@@ -34,11 +34,8 @@ void URSTycoonFoodListWidget::NativeOnInitialized()
 		ButtonWidget->Set(AllFoods[i], AllFoodKeys[i]);
 		ButtonWidget->OnClickFoodListButton.BindUObject(this, &URSTycoonFoodListWidget::SetFoodInformation);
 
-		UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(FoodListScroll->AddChild(ButtonWidget));
-		ScrollBoxSlot->SetPadding(FMargin(0, 0, 0, 2));
+		FoodListButtons.Add(ButtonWidget);
 	}
-
-	SortFoodList();
 
 	MakeButton->OnClicked.AddDynamic(this, &URSTycoonFoodListWidget::OnClickMakeButton);
 }
@@ -47,7 +44,7 @@ void URSTycoonFoodListWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	SortFoodList();
+	CreateFoodList();
 	if (URSTycoonFoodListButtonWidget* FoodListButton = Cast<URSTycoonFoodListButtonWidget>(FoodListScroll->GetChildAt(0)))
 	{
 		SetFoodInformation(*FoodListButton->GetData(), FoodListButton->GetKey());
@@ -107,27 +104,32 @@ void URSTycoonFoodListWidget::SetFoodInformation(const FCookFoodData& Data, FNam
 	DescriptionText->SetText(FText::FromString(Data.Description));
 }
 
-void URSTycoonFoodListWidget::SortFoodList()
+void URSTycoonFoodListWidget::CreateFoodList()
 {
-	// ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
-	// check(Controller)
-	//
-	// TArray<UWidget*> Childs = FoodListScroll->GetAllChildren();
-	// int32 ChangeNum = 0;
-	// for (int32 i = 0; i < Childs.Num(); i++)
-	// {
-	// 	if (URSTycoonFoodListButtonWidget* FoodListButton = Cast<URSTycoonFoodListButtonWidget>(Childs[i]))
-	// 	{
-	// 		if (FoodListButton->GetData()->CanMake(Controller->GetInventoryComponent()->GetItems()))
-	// 		{
-	// 			UWidget* Temp = Childs[ChangeNum];
-	// 			FoodListScroll->ReplaceChildAt(ChangeNum, Childs[i]);
-	// 			FoodListScroll->ReplaceChildAt(i, Temp);
-	//
-	// 			ChangeNum++;
-	// 		}
-	// 	}
-	// }
+	ARSTycoonPlayerController* Controller = GetWorld()->GetFirstPlayerController<ARSTycoonPlayerController>();
+	check(Controller)
+
+	FoodListScroll->ClearChildren();
+
+	TArray<URSTycoonFoodListButtonWidget*> Buttons = FoodListButtons;
+	int32 ChangeNum = 0;
+	for (int32 i = 0; i < Buttons.Num(); i++)
+	{
+		if (Buttons[i]->GetData()->CanMake(Controller->GetInventoryComponent()->GetItems()))
+		{
+			auto Temp = Buttons[i];
+			Buttons.RemoveAt(i);
+			Buttons.Insert(Temp, ChangeNum++);
+		}
+	}
+	
+	for (auto& Button : Buttons)
+	{
+		UPanelSlot* ChildButton = FoodListScroll->AddChild(Button);
+		UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(ChildButton);
+		ScrollBoxSlot->SetPadding(FMargin(0, 0, 0, 2));
+	}
+
 }
 
 void URSTycoonFoodListWidget::OnClickMakeButton()
@@ -205,7 +207,7 @@ void URSTycoonFoodListWidget::OnClickMakeButton()
 	UGameplayStatics::SaveGameToSlot(StatusSave, SlotName, 0);
 	GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->OnSaveRequested.Broadcast();
 
-	SortFoodList();
+	CreateFoodList();
 	if (URSTycoonFoodListButtonWidget* FoodListButton = Cast<URSTycoonFoodListButtonWidget>(FoodListScroll->GetChildAt(0)))
 	{
 		SetFoodInformation(*FoodListButton->GetData(), FoodListButton->GetKey());

@@ -16,6 +16,7 @@ class URSTycoonInventoryComponent;
 UENUM()
 enum class ETycoonGameMode : uint8
 {
+	None,
 	Wait,
 	Sale,
 	EndSale,

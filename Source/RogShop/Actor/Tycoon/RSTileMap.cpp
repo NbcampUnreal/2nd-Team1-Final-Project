@@ -190,7 +190,6 @@ void ARSTileMap::BeginPlay()
 
 	LoadTileMap();
 	CreateTiles();
-	ActiveNPC();
 
 	GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->OnSaveRequested.AddDynamic(this, &ARSTileMap::SaveTileMap);
 }
@@ -275,7 +274,7 @@ void ARSTileMap::CreateTiles()
 	NavVolume->SetActorLocation(GetMapCenter());
 
 	FVector TileSize = DefaultTileType.GetDefaultObject()->GetTileSize();
-	FVector NavMeshSize = FVector(TileSize.X * (Height + 1), TileSize.Y * (Width + 1), 100);
+	FVector NavMeshSize = FVector(TileSize.X * (Height + 1), TileSize.Y * (Width + 1), 20);
 	UBrushComponent* BrushComp = NavVolume->GetBrushComponent();
 
 	BrushComp->SetMobility(EComponentMobility::Type::Movable);
