@@ -21,4 +21,23 @@ public:
 
 private:
 	bool bEnableDebugLog = false;
+
+public:
+	UFUNCTION()
+	void OnMasterVolumeChanged(float Value);
+
+	UFUNCTION()
+	void OnBGMVolumeChanged(float Value);
+
+	UFUNCTION()
+	void OnSFXVolumeChanged(float Value);
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound", meta = (AllowPrivateAccess = "true"))
+	USoundClass* SC_Master;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound", meta = (AllowPrivateAccess = "true"))
+	USoundClass* SC_BGM;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sound", meta = (AllowPrivateAccess = "true"))
+	USoundClass* SC_SFX;
 };
