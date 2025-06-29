@@ -64,7 +64,10 @@ void ARSCookingTile::ResetAll()
 		CookedFood = nullptr;
 	}
 
-	CookingAudioComponent->Stop();
+	if (CookingAudioComponent)
+	{
+		CookingAudioComponent->Stop();
+	}
 }
 
 void ARSCookingTile::OrderToCook()
