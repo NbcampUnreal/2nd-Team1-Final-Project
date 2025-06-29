@@ -15,7 +15,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FText ButtonTitle;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(MultiLine=true))
     FText GuideDescription;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
