@@ -53,3 +53,4 @@ protected:
 	TObjectPtr<UTexture2D> Thumbnail;
 	
 };
+ 
