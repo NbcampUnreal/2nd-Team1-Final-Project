@@ -23,8 +23,10 @@ class ROGSHOP_API ARSDungeonGameModeBase : public AGameModeBase, public IRSSpawn
 public:
 #pragma region 공개 함수
 	ARSDungeonGameModeBase(); // 생성자
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+	virtual void InitGameState() override;
 	virtual void BeginPlay() override; // 게임 시작 시 호출
-	virtual void StartPlay() override;
+
 	UFUNCTION()
 	void OnMapReady(); // 맵이 완전히 로드되었을 때 실행되는 콜백
 	UFUNCTION()

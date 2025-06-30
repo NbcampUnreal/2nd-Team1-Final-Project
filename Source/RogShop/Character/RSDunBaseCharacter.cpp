@@ -16,6 +16,15 @@ ARSDunBaseCharacter::ARSDunBaseCharacter()
 	bIsDead = false;
 }
 
+float ARSDunBaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	const float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	OnCharacterHited.Broadcast(this);
+
+	return Damage;
+}
+
 float ARSDunBaseCharacter::GetMoveSpeed() const
 {
 	return MoveSpeed;

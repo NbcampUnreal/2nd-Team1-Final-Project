@@ -783,7 +783,7 @@ void URSSpawnManager::SpawnBossMonster()
 	BossMonster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundLifeEssenceFromCharacter);
 
 	// 적이 스폰됐음을 알려 필요한 함수 바인딩
-	OnEnemySpawn.Broadcast(BossMonster);
+	OnEnemySpawn.Broadcast(Cast<ARSDunBaseCharacter>(BossMonster));
 }
 
 void URSSpawnManager::SpawnMonstersAtTile(FIntPoint TileCoord) // 특정 타일 좌표에 몬스터 스폰하는 함수
@@ -856,7 +856,7 @@ void URSSpawnManager::SpawnMonstersAtTile(FIntPoint TileCoord) // 특정 타일 
 			Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundLifeEssenceFromCharacter);
 
 			// 적이 스폰됐음을 알려 필요한 함수 바인딩
-			OnEnemySpawn.Broadcast(Monster);
+			OnEnemySpawn.Broadcast(Cast<ARSDunBaseCharacter>(Monster));
 
 			AliveMonstersPerTile.FindOrAdd(TileCoord) += 1;
 			TotalSpawned++;

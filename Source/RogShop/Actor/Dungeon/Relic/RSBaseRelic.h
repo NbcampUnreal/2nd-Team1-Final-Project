@@ -14,7 +14,9 @@ class ROGSHOP_API URSBaseRelic : public UObject
 	GENERATED_BODY()
 	
 public:
+	UFUNCTION()
 	virtual void ApplyEffect(ARSDunPlayerCharacter* OwnerCharacter);
 
+	UFUNCTION()
 	virtual void LoadEffect(ARSDunPlayerCharacter* OwnerCharacter);
 };

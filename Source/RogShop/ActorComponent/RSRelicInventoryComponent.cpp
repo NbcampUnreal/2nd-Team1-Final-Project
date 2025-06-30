@@ -185,6 +185,8 @@ void URSRelicInventoryComponent::LoadRelicData()
 
 			// 유물의 로직을 적용
 			SpawnRelic->LoadEffect(OwnerCharacter);
+
+			RelicObjectList.Add(SpawnRelic);
 		}
 	}
 }
