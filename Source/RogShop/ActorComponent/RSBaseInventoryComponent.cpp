@@ -11,7 +11,6 @@ URSBaseInventoryComponent::URSBaseInventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
-	SetMaxSlot(5);
 }
 
 
@@ -24,16 +23,10 @@ void URSBaseInventoryComponent::BeginPlay()
 
 int32 URSBaseInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 {
-	if (GetFilledSize() >= GetSlotMaxSize())
-	{
-		RS_LOG_C("인벤토리가 가득 찼습니다.", FColor::Red);
-		return -1;
-	}
-
 	if (CheckValidItem(ItemKey))
 	{
 		// 인벤토리 순회
-		size_t EmptySlot = INDEX_NONE;
+		int32 EmptySlot = INDEX_NONE;
 		for (size_t i = 0; i < ItemList.Num(); ++i)
 		{
 			FItemSlot& ItemSlot = ItemList[i];
@@ -113,24 +106,6 @@ int32 URSBaseInventoryComponent::GetQuantity(const FName& ItemKey)
 	}
 
 	return Quantity;
-}
-
-int32 URSBaseInventoryComponent::GetFilledSize() const
-{
-	// 현재 인벤토리에서 아이템이 들어있는 슬롯의 수를 세어 반환합니다.
-	int32 FilledCount = 0;
-
-	for (size_t i = 0; i < ItemList.Num(); ++i)
-	{
-		FItemSlot CurItemSlot = ItemList[i];
-
-		if (CurItemSlot.ItemKey != NAME_None)
-		{
-			++FilledCount;
-		}
-	}
-
-	return FilledCount;
 }
 
 void URSBaseInventoryComponent::SaveItemData()

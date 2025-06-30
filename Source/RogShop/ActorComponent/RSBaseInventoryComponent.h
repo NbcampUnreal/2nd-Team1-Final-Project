@@ -40,7 +40,6 @@ public:
 	int32 GetQuantity(const FName& ItemKey);
 	const TArray<FItemSlot>& GetItems() const { return ItemList; }
 	int32 GetSlotMaxSize() const { return ItemList.Num(); }	//인벤토리 크기
-	int32 GetFilledSize() const; //현재 채워진 인벤토리 크기
 
 protected:
 	bool CheckValidItem(const FName& ItemKey); //유효한 키값인지 검사

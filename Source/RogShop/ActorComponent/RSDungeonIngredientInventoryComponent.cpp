@@ -15,6 +15,11 @@
 #include "GameFramework/GameModeBase.h"
 #include "RSSpawnManagerAccessor.h"
 
+URSDungeonIngredientInventoryComponent::URSDungeonIngredientInventoryComponent()
+{
+	SetMaxSlot(9);
+}
+
 void URSDungeonIngredientInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
