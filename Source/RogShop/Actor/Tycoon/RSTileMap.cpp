@@ -329,28 +329,25 @@ ARSBaseTile* ARSTileMap::CreateTile(const TSubclassOf<ARSBaseTile>& TileClass, i
 void ARSTileMap::CreateWalls(const FVector& Location, int32 Row, int32 Column)
 {
 	//벽, 문 타일이 있다면 설치하지 않음
-	if (TileName2DMap[Row].Tiles[Column] != ARSDoorTile::GetStaticTileKey())
+	//위
+	if (Row == Height - 1)
 	{
-		//위
-		if (Row == Height - 1)
-		{
-			CreateWall(WallClass, Location, 0.f);
-		}
-		//아래
-		if (Row == 0)
-		{
-			CreateWall(WallClass, Location, 180.f);
-		}
-		//왼쪽
-		if (Column == 0)
-		{
-			CreateWall(WallClass, Location, 270.f);
-		}
-		//오른쪽
-		if (Column == Width - 1)
-		{
-			CreateWall(WallClass, Location, 90.f);
-		}
+		CreateWall(WallClass, Location, 0.f);
+	}
+	//아래
+	if (Row == 0)
+	{
+		CreateWall(WallClass, Location, 180.f);
+	}
+	//왼쪽
+	if (Column == 0)
+	{
+		CreateWall(WallClass, Location, 270.f);
+	}
+	//오른쪽
+	if (Column == Width - 1)
+	{
+		CreateWall(WallClass, Location, 90.f);
 	}
 
 	//기둥
