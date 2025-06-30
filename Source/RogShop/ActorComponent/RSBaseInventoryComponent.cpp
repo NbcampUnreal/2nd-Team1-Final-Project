@@ -49,6 +49,9 @@ int32 URSBaseInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 			if (ItemSlot.ItemKey == NAME_None)
 			{
 				EmptySlot = i;
+				ItemList[EmptySlot].ItemKey = ItemKey;
+				ItemList[EmptySlot].Quantity = Amount;
+				return i;
 			}
 		}
 
