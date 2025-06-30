@@ -5,6 +5,7 @@
 #include "RSDunPlayerController.h"
 #include "RSDunPlayerCharacter.h"
 #include "RSPlayerWeaponComponent.h"
+#include "RSRelicInventoryComponent.h"
 #include "RSBaseWeapon.h"
 #include "RSGameInstance.h"
 #include "RSBaseRelic.h"
@@ -109,17 +110,14 @@ bool URSDunItemWidget::BuyItem()
     {
         case EItemType::Relic:
         {
-            FDungeonRelicData* RelicClassData = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>()->RelicDetail->FindRow<FDungeonRelicData>(CurrentRowName, TEXT("Get RelicData"));
-
-            if (RelicClassData && RelicClassData->RelicClass)
+            URSRelicInventoryComponent* RelicInventoryComp = PlayerChar->GetRSRelicInventoryComponent();
+            if (RelicInventoryComp)
             {
-                URSBaseRelic* RelicInstance = NewObject<URSBaseRelic>(GetTransientPackage(), RelicClassData->RelicClass);
-
-                RelicInstance->ApplyEffect(PlayerChar);
+                RelicInventoryComp->ApplyRelic(CurrentRowName);
             }
             else
             {
-                RS_LOG_DEBUG("RelicClassData is Null");
+                RS_LOG_DEBUG("RSRelicInventoryComponent is Null");
                 bIsBuy = false;
             }
 

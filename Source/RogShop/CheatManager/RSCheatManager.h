@@ -36,6 +36,9 @@ public:
 	void SpawnRelic(FName RelicName);
 
 	UFUNCTION(Exec)
+	void SpawnLifeEssence(int32 Quantity);
+
+	UFUNCTION(Exec)
 	void SpawnDunShopNPC();
   
 	UFUNCTION(exec)
