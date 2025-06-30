@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "RSRelicInventoryComponent.generated.h"
 
+class URSBaseRelic;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ROGSHOP_API URSRelicInventoryComponent : public UActorComponent
@@ -38,5 +39,9 @@ public:
 
 private:
 	void LoadRelicData();
+
+private:
+	UPROPERTY()
+	TArray<TObjectPtr<URSBaseRelic>> RelicObjectList;
 
 };

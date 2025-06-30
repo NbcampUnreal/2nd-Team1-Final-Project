@@ -19,13 +19,17 @@ ARSDungeonGameModeBase::ARSDungeonGameModeBase()
 {
     MaxStageCount = 3;
 }
-void ARSDungeonGameModeBase::StartPlay()
+void ARSDungeonGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
-	Super::StartPlay();
-	// 스폰 매니저 생성
-	SpawnManager = NewObject<URSSpawnManager>(this, SpawnManagerClass);
-}
+    Super::InitGame(MapName, Options, ErrorMessage);
 
+    // 스폰 매니저 생성
+    SpawnManager = NewObject<URSSpawnManager>(this, SpawnManagerClass);
+}
+void ARSDungeonGameModeBase::InitGameState()
+{
+    Super::InitGameState();
+}
 
 void ARSDungeonGameModeBase::BeginPlay()// 게임이 시작될 때 호출됨
 {

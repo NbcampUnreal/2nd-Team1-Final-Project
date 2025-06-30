@@ -16,9 +16,9 @@ class ROGSHOP_API URSKillStatusRelic : public URSBaseRelic
 	GENERATED_BODY()
 
 public:
-	virtual void ApplyEffect(ARSDunPlayerCharacter* OwnerCharacter);
+	virtual void ApplyEffect(ARSDunPlayerCharacter* OwnerCharacter) override;
 
-	virtual void LoadEffect(ARSDunPlayerCharacter* OwnerCharacter);
+	virtual void LoadEffect(ARSDunPlayerCharacter* OwnerCharacter) override;
 
 private:
 	// 해당 유물을 획득 했을 때에만 바인딩할 수 있도록 바인딩이 2중으로 이루어져있습니다.
