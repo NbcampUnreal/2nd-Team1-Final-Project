@@ -18,7 +18,7 @@ class ROGSHOP_API URSInventorySlotWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-    virtual void NativeConstruct() override;
+    virtual void NativeOnInitialized() override;
 
 // 현재 슬롯에 대한 아이템 정보
 public:
