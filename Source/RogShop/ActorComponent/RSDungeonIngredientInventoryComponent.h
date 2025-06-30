@@ -14,6 +14,9 @@ class ROGSHOP_API URSDungeonIngredientInventoryComponent : public URSBaseInvento
 {
 	GENERATED_BODY()
 	
+public:
+	URSDungeonIngredientInventoryComponent();
+
 protected:
 	virtual void BeginPlay() override;
 
