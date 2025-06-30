@@ -44,7 +44,7 @@ void ARSLifeEssenceTreasureChest::OpenChest()
 
 	TargetTransform.SetLocation(TargetLocation);
 
-	for (int32 i = 0; i < RandQuantity; ++i)
+	for (int32 i = 0; i <= RandQuantity; ++i)
 	{
 		FTimerHandle SpawnDelayTimerHandle;
 
