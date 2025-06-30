@@ -19,13 +19,15 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-// 데이터 관리
+// 유물 관리
 public:	
-	void AddRelic(FName RelicKey);
+	void ApplyRelic(FName RelicKey);
 
 	const TArray<FName> GetRelicList() const { return RelicList; }
 
 private:
+	void AddRelic(FName RelicKey);
+
 	bool CheckValidRelicKey(const FName& RelicKey);
 
 private:

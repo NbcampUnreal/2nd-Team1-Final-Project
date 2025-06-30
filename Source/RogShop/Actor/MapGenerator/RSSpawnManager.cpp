@@ -265,7 +265,6 @@ AActor* URSSpawnManager::SpawnGroundRelicAtTransform(FName TargetName, FTransfor
 			UStaticMesh* ItemStaticMesh = RelicInfoDataRow->ItemStaticMesh;
 
 			GroundRelic->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
-			GroundRelic->SetRelicClass(RelicClassDataRow->RelicClass);
 
 			RemoveUnspawnedRelic(TargetName);
 

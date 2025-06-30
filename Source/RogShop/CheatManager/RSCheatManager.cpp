@@ -133,6 +133,34 @@ void URSCheatManager::SpawnRelic(FName RelicName)
     }
 }
 
+void URSCheatManager::SpawnLifeEssence(int32 Quantity)
+{
+    UWorld* World = GetWorld();
+    if (!World)
+    {
+        return;
+    }
+
+    IRSSpawnManagerAccessor* SpawnManagerAccessor = World->GetAuthGameMode<IRSSpawnManagerAccessor>();
+    URSSpawnManager* SpawnManager = nullptr;
+    if (SpawnManagerAccessor)
+    {
+        SpawnManager = SpawnManagerAccessor->GetSpawnManager();
+    }
+
+    if (SpawnManager)
+    {
+        FVector PlayerLocation = GetOuterAPlayerController()->GetPawn()->GetActorLocation();
+
+        FTransform TargetTransform;
+        TargetTransform.SetLocation(PlayerLocation);
+        TargetTransform.SetRotation(FQuat::Identity);
+        TargetTransform.SetScale3D(FVector::OneVector);
+
+        SpawnManager->SpawnGroundLifeEssenceAtTransform(TargetTransform, Quantity);
+    }
+}
+
 void URSCheatManager::SpawnDunShopNPC()
 {
     UWorld* World = GetWorld();
