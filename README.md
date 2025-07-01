@@ -1,8 +1,8 @@
 # RogShop
-<img src="https://github.com/user-attachments/assets/f8e7f0c4-aabe-4473-b97f-28e6ecd79881" width="50%" height="10%" />
+<img src="https://github.com/user-attachments/assets/ae635c0a-5fe9-4a1b-be10-bc2f60ef093f" width="50%" height="10%" />
 
 ---
-# 이름 옆 세모를 누르면 세부 역할과 개인 깃허브 링크가 나옵니다!
+## 이름 옆 세모를 누르면 세부 역할과 개인 깃허브 링크가 나옵니다!
 <details>
 <summary><h2>김선국 - 리더, 전체적인 개발 및 총괄</h2></summary>
 
