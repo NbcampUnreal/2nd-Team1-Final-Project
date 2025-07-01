@@ -20,116 +20,6 @@
 # ↑↑↑트레일러 영상은 <br>↑↑↑이미지를 클릭하면 유튜브로 보실 수 있습니다!
 
 ---
-## 이름 옆 세모를 누르면 세부 역할과 개인 깃허브 링크가 나옵니다!
-<details>
-<summary><h2>김선국 - 리더, 전체적인 개발 및 총괄</h2></summary>
-
-- 레벨 흐름
-- 플레이어 캐릭터
-- 유물
-- 무기
-- 인벤토리
-- 게임 내 오브젝트와 상호작용
-- 던전 및 거점
-- 전반적인 UI
-
-
-</details>
-
-<details>
-<summary><h2>김영웅 - 부리더, 타이쿤</h2></summary>
-
-- 타이쿤 게임모드
-- 타이쿤 UI
-- 타이쿤 타일맵 및 타일 시스템
-- 타이쿤 NPC 
-
-</details>
-
-<details>
-<summary><h2>강동인 - 던전 게임모드 및 맵 생성</h2></summary>
-
-- 던전 맵 생성기
-- 스폰 매니저
-- 던전 게임 모드
-- 미니맵
-- 플레이어 발소
-
-</details>
-
-<details>
-<summary><h2>김승길 - 던전 상점 및 가이드</h2></summary>
-
-- 던전 상점 위젯
-- 가이드 위젯
-- 로그 제어 시스템
-- 각종 사운드 연결
-
-</details>
-
-<details>
-<summary><h2>김영빈 - 몬스터 AI</h2></summary>
-
-- AI Controller
-- Behavior Tree
-- 보스 몬스터 공격 패턴 및 이펙트
-- 일반 몬스터 공격 패턴
-
-</details>
-
-<details>
-<summary><h2>박선우 - 아트 기획 및 UI 디자인</h2></summary>
-
-- 던전 및 메뉴 UI
-- 아트 기획
-- UI 디자인
-- 각종 사운드 적용 
-
-</details>
-
-<details>
-<summary><h2>박영민 - 몬스터 전투 및 애니메이션</h2></summary>
-
-- 몬스터 이동, 공격, 피격, 죽음 애니메이션
-- 게임 흐름 설명 UI
-- 몬스터 체력바 UI(디자인 제외)
-- 몬스터 발소리
-- 몬스터 데미지 표시 UI
-- 몬스터 AI와 관련 이펙트는 제외
-- 리드미 전체적인 구조와 내용 작성
-
-</details>
-
-<details>
-<summary><h2>서승우 - 아트/디자인 총괄 및 에셋 제작</h2></summary>
-
-- 아트 기획
-- 에셋 선정
-- 레벨 디자인
-- UI 디자인
-- 이펙트 / 에셋 / 머티리얼 제작 
-
-</details>
-
-<details>
-<summary><h2>송민준 - 기획 및 QA</h2></summary>
-
-- 에셋 선정
-- QA
-- 기획
-
-</details>
-
-<details>
-<summary><h2>이종민 - 기획 및 QA</h2></summary>
-
-- 에셋 선정
-- QA
-- 기획
-
-</details>
-
----
 # 프로젝트 소개
 **던전에서 식재료를 구해 식당을 운영하라!**
 
@@ -147,6 +37,7 @@
 - <h3><a href="#게임-흐름">게임 흐름</a></h3>
 - <h3><a href="#시연-영상">시연 영상</a></h3>
 - <h3><a href="#브로셔-링크">브로셔 링크</a></h3>
+- <h3><a href="#팀원-및-역할">팀원 및 역할</a></h3>
 
 ---
 ## 프로젝트 목표
@@ -154,7 +45,7 @@
 
 ---
 ## 게임 흐름
-![image](https://github.com/user-attachments/assets/37066535-5cfd-426f-a1a6-f183bf294f44)
+![이해를 돕기 위한 게임 흐름 이미지](https://github.com/user-attachments/assets/37066535-5cfd-426f-a1a6-f183bf294f44)
 
 ---
 ## 시연 영상 ↓↓↓이미지를 클릭하면 유튜브로 보실 수 있습니다!
@@ -170,3 +61,132 @@
 
 ### 브로셔 미리보기
 ![브로셔 미리보기](https://github.com/user-attachments/assets/2df59d3c-3fb3-4ae1-af2e-df1e9a17b092)
+
+---
+## 팀원 및 역할
+### 이름 옆 세모를 누르면 세부 역할과 개인 깃허브 링크가 나옵니다!
+<details>
+<summary><h2>김선국 - 리더, 전체적인 개발 및 총괄</h2></summary>
+
+- 레벨 흐름
+- 플레이어 캐릭터
+- 유물
+- 무기
+- 인벤토리
+- 게임 내 오브젝트와 상호작용
+- 던전 및 거점
+- 전반적인 UI
+- ### [김선국님의 GitHub](https://github.com/SeonBab)
+
+</details>
+
+<details>
+<summary><h2>김영웅 - 부리더, 타이쿤</h2></summary>
+
+- 타이쿤 게임모드
+- 타이쿤 UI
+- 타이쿤 타일맵 및 타일 시스템
+- 타이쿤 NPC
+
+- ### [김영웅님의 GitHub](https://github.com/balamwind)
+
+</details>
+
+<details>
+<summary><h2>강동인 - 던전 게임모드 및 맵 생성</h2></summary>
+
+- 던전 맵 생성기
+- 스폰 매니저
+- 던전 게임 모드
+- 미니맵
+- 플레이어 발소
+
+- ### [강동인님의 GitHub](https://github.com/dongin03008)
+
+</details>
+
+<details>
+<summary><h2>김승길 - 던전 상점 및 가이드</h2></summary>
+
+- 던전 상점 위젯
+- 가이드 위젯
+- 로그 제어 시스템
+- 각종 사운드 연결
+
+- ### [김승길님의 GitHub](https://github.com/F1ANK76)
+
+</details>
+
+<details>
+<summary><h2>김영빈 - 몬스터 AI</h2></summary>
+
+- AI Controller
+- Behavior Tree
+- 보스 몬스터 공격 패턴 및 이펙트
+- 일반 몬스터 공격 패턴
+
+- ### [김영빈님의 GitHub](https://github.com/EBSiNoah)
+
+</details>
+
+<details>
+<summary><h2>박선우 - 아트 기획 및 UI 디자인</h2></summary>
+
+- 던전 및 메뉴 UI
+- 아트 기획
+- UI 디자인
+- 각종 사운드 적용
+
+- ### [박선우님의 GitHub](https://github.com/parkthy)
+
+</details>
+
+<details>
+<summary><h2>박영민 - 몬스터 전투 및 애니메이션</h2></summary>
+
+- 몬스터 이동, 공격, 피격, 죽음 애니메이션
+- 게임 흐름 설명 UI
+- 몬스터 체력바 UI(디자인 제외)
+- 몬스터 발소리
+- 몬스터 데미지 표시 UI
+- 몬스터 AI와 관련 이펙트는 제외
+- 리드미 전체적인 구조와 내용 작성
+
+- ### [박영민님의 GitHub](https://github.com/yeong132)
+
+</details>
+
+<details>
+<summary><h2>서승우 - 아트/디자인 총괄 및 에셋 제작</h2></summary>
+
+- 아트 기획
+- 에셋 선정
+- 레벨 디자인
+- UI 디자인
+- 이펙트 / 에셋 / 머티리얼 제작
+
+- ### [서승우님의 GitHub](https://github.com/hallowoo)
+
+</details>
+
+<details>
+<summary><h2>송민준 - 기획 및 QA</h2></summary>
+
+- 에셋 선정
+- QA
+- 기획
+
+- ### [송민준님의 GitHub](https://github.com/ss0ngg)
+
+</details>
+
+<details>
+<summary><h2>이종민 - 기획 및 QA</h2></summary>
+
+- 에셋 선정
+- QA
+- 기획
+
+- ### [이종민님의 GitHub](https://github.com/jmin0922)
+
+</details>
