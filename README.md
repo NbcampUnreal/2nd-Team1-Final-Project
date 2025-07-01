@@ -156,7 +156,9 @@
 
 ---
 ## 시연 영상
-
+<a href="https://www.youtube.com/watch?v=zynmhNI1JBg">
+  <img src="https://github.com/user-attachments/assets/ae635c0a-5fe9-4a1b-be10-bc2f60ef093f" width="600" />
+</a>
 
 ---
 ## 브로셔 링크
