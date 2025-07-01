@@ -157,8 +157,8 @@
 
 ---
 ## 시연 영상 ↓↓↓이미지를 클릭하면 유튜브로 보실 수 있습니다!
-<a href="https://www.youtube.com/watch?v=zynmhNI1JBg">
-  <img src="https://github.com/user-attachments/assets/ae635c0a-5fe9-4a1b-be10-bc2f60ef093f" width="600" />
+<a href="https://www.youtube.com/watch?v=xqjJGslHHrg">
+  <img src="https://github.com/user-attachments/assets/1a94995f-0c78-4a10-9685-c6fe3a20e2d4" width="600" />
 </a>
 
 ---
