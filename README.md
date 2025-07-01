@@ -156,7 +156,7 @@
 ![image](https://github.com/user-attachments/assets/37066535-5cfd-426f-a1a6-f183bf294f44)
 
 ---
-## 시연 영상
+## 시연 영상 ↓↓↓이미지를 클릭하면 유튜브로 보실 수 있습니다!
 <a href="https://www.youtube.com/watch?v=zynmhNI1JBg">
   <img src="https://github.com/user-attachments/assets/ae635c0a-5fe9-4a1b-be10-bc2f60ef093f" width="600" />
 </a>
