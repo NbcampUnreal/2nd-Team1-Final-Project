@@ -137,7 +137,7 @@
 - UI 디자인
 - 각종 사운드 적용
 
-- ### [박선우님의 GitHub](https://github.com/parkthy)
+- ### [박선우님의 GitHub](https://github.com/seonu1126)
 
 </details>
 
