@@ -186,7 +186,13 @@ protected:
 	float MinLengthOfMainCamera = 50.f;
 
 	UPROPERTY(EditDefaultsOnly)
+	float MaxLengthOfMainCamera = 300.f;
+
+	UPROPERTY(EditDefaultsOnly)
 	float MinOrthoWidth;
+
+	UPROPERTY(EditDefaultsOnly)
+	float MaxOrthoWidth;
 
 private:
 	UPROPERTY()

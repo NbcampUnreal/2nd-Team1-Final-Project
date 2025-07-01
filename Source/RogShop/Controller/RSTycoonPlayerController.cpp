@@ -272,10 +272,7 @@ void ARSTycoonPlayerController::OnZoom(const FInputActionValue& Value)
 
 		//탑 카메라
 		float OrthoWidth = TopCamera->GetCameraComponent()->OrthoWidth + OrthoWidthSensitivity * InputAction;
-		if (OrthoWidth < MinOrthoWidth)
-		{
-			OrthoWidth = MinOrthoWidth;
-		}
+		OrthoWidth = FMath::Clamp(OrthoWidth, MinOrthoWidth, MaxOrthoWidth);
 
 		TopCamera->AttachPlayer();
 		TopCamera->GetCameraComponent()->SetOrthoWidth(OrthoWidth);
@@ -284,10 +281,7 @@ void ARSTycoonPlayerController::OnZoom(const FInputActionValue& Value)
 	{
 		//메인 카메라
 		float CameraLength = MainCamera->GetSpringArmComponent()->TargetArmLength + CameraMoveSensitivity * InputAction;
-		if (CameraLength < MinLengthOfMainCamera)
-		{
-			CameraLength = MinLengthOfMainCamera;
-		}
+		CameraLength = FMath::Clamp(CameraLength, MinLengthOfMainCamera, MaxLengthOfMainCamera);
 
 		MainCamera->AttachPlayer();
 		MainCamera->GetSpringArmComponent()->TargetArmLength = CameraLength;
