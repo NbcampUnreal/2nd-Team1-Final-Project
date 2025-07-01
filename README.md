@@ -1,5 +1,19 @@
 # RogShop
-<img src="https://github.com/user-attachments/assets/ae635c0a-5fe9-4a1b-be10-bc2f60ef093f" width="50%" height="10%" />
+
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/ae635c0a-5fe9-4a1b-be10-bc2f60ef093f"
+           width="600">
+    </td>
+    <td>
+      <a href="https://your-download-link.com">
+        <img src="https://github.com/user-attachments/assets/914eba8b-0fef-462b-95e3-34d268e44563"
+             width="200" alt="다운로드 버튼">
+      </a>
+    </td>
+  </tr>
+</table>
 
 ---
 ## 이름 옆 세모를 누르면 세부 역할과 개인 깃허브 링크가 나옵니다!
@@ -124,21 +138,23 @@
 ---
 # 목차
 - <h3><a href="#프로젝트-목표">프로젝트 목표</a></h3>
-- <h3><a href="#기능-및-시연-영상">기능 및 시연 영상</a></h3>
-- <h3><a href="#게임-다운로드">게임 다운로드</a></h3>
+- <h3><a href="#시연-영상">시연 영상</a></h3>
+- <h3><a href="#브로셔-링크">브로셔 링크</a></h3>
 - <h3><a href="#프로젝트-구조">프로젝트 구조</a></h3>
 
 ---
 ## 프로젝트 목표
+타이쿤과 전투 시스템이 결합된 던전 로그라이크 게임을 팀 협업을 통해 구현하는 것을 목표로 하였습니다.
+
+---
+## 시연 영상
 
 
 ---
-## 기능 및 시연 영상
-
-
----
-## 게임 다운로드 
-
+## 브로셔 링크
+### 콘텐츠/기능 소개, 기술적 의사결정, 트러블 슈팅 등이 궁금하시다면 아래 링크를 눌러주세요!
+[브로셔 링크](https://teamsparta.notion.site/2-1-RogShop-2172dc3ef514802d959fe9fe49e66d2b) 👈 Click! <br>
+각 기능에 대해 더 자세한 것은 개인 깃허브/포트폴리오에서 확인하실 수 있습니다.
 
 ---
 ## 프로젝트 구조
