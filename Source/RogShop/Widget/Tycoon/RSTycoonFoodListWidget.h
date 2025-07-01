@@ -65,5 +65,7 @@ protected:
 private:
 	FName NowOpenKey;
 	const FCookFoodData* NowOpenData;
+
+	UPROPERTY()
 	TArray<URSTycoonFoodListButtonWidget*> FoodListButtons;
 };

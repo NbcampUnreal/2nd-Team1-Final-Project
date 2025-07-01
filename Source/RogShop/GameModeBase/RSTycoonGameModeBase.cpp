@@ -225,9 +225,9 @@ void ARSTycoonGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-#if WITH_EDITOR
-	GetGameInstance<URSGameInstance>()->SetDebugLogEnabled(true);
-#endif
+// #if WITH_EDITOR
+// 	GetGameInstance<URSGameInstance>()->SetDebugLogEnabled(true);
+// #endif
 
 	URSSaveGameSubsystem* SaveSubsystem = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
 	SaveSubsystem->OnSaveRequested.AddDynamic(this, &ARSTycoonGameModeBase::SaveGameData);
