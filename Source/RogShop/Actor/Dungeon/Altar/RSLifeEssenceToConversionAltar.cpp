@@ -60,26 +60,32 @@ void ARSLifeEssenceToConversionAltar::Interact(ARSDunPlayerCharacter* Interactor
 
 		bool bChooseWeapon = FMath::RandBool();
 
+		FTransform SpawnTransform = GetActorTransform();
+		FVector SpawnLocation = SpawnTransform.GetLocation();
+		SpawnLocation.X += 100;
+		SpawnLocation.Z += 100;
+		SpawnTransform.SetLocation(SpawnLocation);
+
 		if (bChooseWeapon && UnspawnedWeapons.Num() > 0)
 		{
 			int32 WeaponSpawnIndex = FMath::RandRange(0, UnspawnedWeapons.Num() - 1);
 			FName SpawnName = UnspawnedWeapons[WeaponSpawnIndex];
 
-			SpawnManager->SpawnGroundWeaponAtTransform(SpawnName, GetActorTransform(), true);
+			SpawnManager->SpawnGroundWeaponAtTransform(SpawnName, SpawnTransform, true);
 		}
 		else if (UnspawnedRelics.Num() > 0)
 		{
 			int32 RelicSpawnIndex = FMath::RandRange(0, UnspawnedRelics.Num() - 1);
 			FName SpawnName = UnspawnedRelics[RelicSpawnIndex];
 
-			SpawnManager->SpawnGroundRelicAtTransform(SpawnName, GetActorTransform());
+			SpawnManager->SpawnGroundRelicAtTransform(SpawnName, SpawnTransform);
 		}
 		else if (UnspawnedWeapons.Num() > 0)
 		{
 			int32 WeaponSpawnIndex = FMath::RandRange(0, UnspawnedWeapons.Num() - 1);
 			FName SpawnName = UnspawnedWeapons[WeaponSpawnIndex];
 
-			SpawnManager->SpawnGroundWeaponAtTransform(SpawnName, GetActorTransform(), true);
+			SpawnManager->SpawnGroundWeaponAtTransform(SpawnName, SpawnTransform, true);
 		}
 
 		// 비용을 2배로 증가시킨다.
