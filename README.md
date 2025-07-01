@@ -15,7 +15,7 @@
   </tr>
 </table>
 
-## 트레일러 영상
+## 트레일러 영상 ↓↓이미지를 클릭하면 유튜브 페이지로 넘어갑니다!
 [![트레일러 영상](https://img.youtube.com/vi/zynmhNI1JBg/0.jpg)](https://www.youtube.com/watch?v=zynmhNI1JBg)
 
 ---
