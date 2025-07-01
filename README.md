@@ -17,8 +17,7 @@
   </tr>
 </table>
 
-## 트레일러 영상 ↓↓이미지를 클릭하면 유튜브로 넘어갑니다!
-[![트레일러 영상](https://img.youtube.com/vi/zynmhNI1JBg/0.jpg)](https://www.youtube.com/watch?v=zynmhNI1JBg)
+## 트레일러 영상은 ↑↑↑이미지를 클릭하면 유튜브로 보실 수 있습니다!
 
 ---
 ## 이름 옆 세모를 누르면 세부 역할과 개인 깃허브 링크가 나옵니다!
