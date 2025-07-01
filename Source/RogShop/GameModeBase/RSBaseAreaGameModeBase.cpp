@@ -29,6 +29,9 @@ void ARSBaseAreaGameModeBase::BeginPlay()
         if (SaveGameSubsystem)
         {
             SaveGameSubsystem->OnSaveRequested.AddDynamic(this, &ARSBaseAreaGameModeBase::SaveDungeonInfo);
+
+            // 던전 세이브 파일 제거
+            SaveGameSubsystem->DeleteDungeonSaveFile();
         }
     }
 
