@@ -60,25 +60,48 @@ void UOptionMenuWidget::LoadSettings()
         LoadedData = Cast<UOptionSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->OptionSaveSlotName, 0));
     }
 
+    float Master = 1.f;
+    float BGM = 1.f;
+    float SFX = 1.f;
+    int32 Resolution = 0;
+    int32 WindowMode = 0;
+
     if (LoadedData)
     {
-        if (MasterVolumeSlider)
-            MasterVolumeSlider->SetValue(LoadedData->MasterVolume);
-        if (BGMVolumeSlider)
-            BGMVolumeSlider->SetValue(LoadedData->BGMVolume);
-        if (SFXVolumeSlider)
-            SFXVolumeSlider->SetValue(LoadedData->SFXVolume);
-        if (ResolutionComboBox)
-            ResolutionComboBox->SetSelectedIndex(LoadedData->ResolutionIndex);
-        if (WindowModeComboBox)
-            WindowModeComboBox->SetSelectedIndex(LoadedData->WindowModeIndex);
+        Master = LoadedData->MasterVolume;
+
+        BGM = LoadedData->BGMVolume;
+
+        SFX = LoadedData->SFXVolume;
+
+        Resolution = LoadedData->ResolutionIndex;
+
+        WindowMode = LoadedData->WindowModeIndex;
     }
-    else
+
+    if (MasterVolumeSlider)
     {
-        if (ResolutionComboBox)
-            ResolutionComboBox->SetSelectedIndex(0);
-        if (WindowModeComboBox)
-            WindowModeComboBox->SetSelectedIndex(0);
+        MasterVolumeSlider->SetValue(Master);
+    }
+
+    if (BGMVolumeSlider)
+    {
+        BGMVolumeSlider->SetValue(BGM);
+    }
+
+    if (SFXVolumeSlider)
+    {
+        SFXVolumeSlider->SetValue(SFX);
+    }
+
+    if (ResolutionComboBox)
+    {
+        ResolutionComboBox->SetSelectedIndex(Resolution);
+    }
+
+    if (WindowModeComboBox)
+    {
+        WindowModeComboBox->SetSelectedIndex(WindowMode);
     }
 }
 

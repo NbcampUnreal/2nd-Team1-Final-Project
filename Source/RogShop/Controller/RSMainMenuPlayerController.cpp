@@ -12,6 +12,8 @@ void ARSMainMenuPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+    LoadSetting();
+
 	if (MainMenuWidgetClass)
 	{
 		MainMenuWidget = CreateWidget<UUserWidget>(this, MainMenuWidgetClass);
@@ -32,8 +34,6 @@ void ARSMainMenuPlayerController::BeginPlay()
 
 		}
 	}
-
-    LoadSetting();
 }
 
 void ARSMainMenuPlayerController::LoadSetting()
@@ -48,16 +48,26 @@ void ARSMainMenuPlayerController::LoadSetting()
         }
     }
 
+    float Master = 1.f;
+    float BGM = 1.f;
+    float SFX = 1.f;
+
     if (LoadedData)
     {
-        URSGameInstance* GameInstance = GetGameInstance<URSGameInstance>();
-        if (GameInstance)
-        {
-            GameInstance->OnMasterVolumeChanged(LoadedData->MasterVolume);
+        Master = LoadedData->MasterVolume;
 
-            GameInstance->OnBGMVolumeChanged(LoadedData->BGMVolume);
+        BGM = LoadedData->BGMVolume;
 
-            GameInstance->OnSFXVolumeChanged(LoadedData->SFXVolume);
-        }
+        SFX = LoadedData->SFXVolume;
+    }
+
+    URSGameInstance* GameInstance = GetGameInstance<URSGameInstance>();
+    if (GameInstance)
+    {
+        GameInstance->OnMasterVolumeChanged(Master);
+
+        GameInstance->OnBGMVolumeChanged(BGM);
+
+        GameInstance->OnSFXVolumeChanged(SFX);
     }
 }
