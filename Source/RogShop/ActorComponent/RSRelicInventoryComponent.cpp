@@ -73,6 +73,58 @@ void URSRelicInventoryComponent::AddRelic(FName RelicKey)
 	PC->OnRelicAdded.Broadcast(RelicKey);
 }
 
+void URSRelicInventoryComponent::ApplyRelic(FName RelicKey)
+{
+	ARSDunPlayerCharacter* CurCharacter = GetOwner<ARSDunPlayerCharacter>();
+	if (!CurCharacter)
+	{
+		return;
+	}
+
+	UGameInstance* CurGameInstance = CurCharacter->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	UDataTable* RelicClassDataTable = DataSubsystem->RelicDetail;
+	if (!RelicClassDataTable)
+	{
+		return;
+	}
+
+	FDungeonRelicData* RelicClassData = RelicClassDataTable->FindRow<FDungeonRelicData>(RelicKey, TEXT("Get RelicClassData"));
+	if (!RelicClassData)
+	{
+		return;
+	}
+
+	if (!RelicClassData->RelicClass)
+	{
+		return;
+	}
+
+	FString ObjectString = RelicKey.ToString() + TEXT("Object");
+	FName ObjectName = FName(*ObjectString);
+
+	URSBaseRelic* SpawnRelic = NewObject<URSBaseRelic>(CurCharacter, RelicClassData->RelicClass, ObjectName, EObjectFlags::RF_Transient);
+
+	if (SpawnRelic)
+	{
+		AddRelic(RelicKey);
+
+		SpawnRelic->ApplyEffect(CurCharacter);
+
+		RelicObjectList.Add(SpawnRelic);
+	}
+}
+
 bool URSRelicInventoryComponent::CheckValidRelicKey(const FName& RelicKey)
 {
 	URSDataSubsystem* Data = GetWorld()->GetGameInstance()->GetSubsystem<URSDataSubsystem>();
@@ -185,6 +237,8 @@ void URSRelicInventoryComponent::LoadRelicData()
 
 			// 유물의 로직을 적용
 			SpawnRelic->LoadEffect(OwnerCharacter);
+
+			RelicObjectList.Add(SpawnRelic);
 		}
 	}
 }

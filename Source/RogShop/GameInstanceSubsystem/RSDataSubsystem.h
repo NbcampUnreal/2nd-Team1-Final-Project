@@ -22,6 +22,9 @@ public:
 	TObjectPtr<UDataTable> Food;
 	
 	UPROPERTY()
+	TObjectPtr<UDataTable> FoodDetail;
+	
+	UPROPERTY()
 	TObjectPtr<UDataTable> IngredientInfo;
 
 	UPROPERTY()
@@ -53,4 +56,10 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UDataTable> DungeonLevel;
+
+	UPROPERTY()
+	TObjectPtr<UDataTable> Guide;
+
+	UPROPERTY()
+	TObjectPtr<UDataTable> GameFlowInfo;
 };

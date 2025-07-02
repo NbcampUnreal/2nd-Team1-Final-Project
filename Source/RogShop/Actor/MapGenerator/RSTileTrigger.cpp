@@ -33,7 +33,7 @@ void ARSTileTrigger::InitTileCoord()
 
 void ARSTileTrigger::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 {
-	if (bMonsterSpawned || !OtherActor->ActorHasTag("Player"))
+	if (!OtherActor->ActorHasTag("Player"))
 	{
 		return;
 	}
@@ -59,6 +59,11 @@ void ARSTileTrigger::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 				HUD->UpdateMiniMapPlayerPosition(TileCoord);
 			}
 		}
+	}
+
+	if (bMonsterSpawned)
+	{
+		return;
 	}
 
 	if (TileCoord == FIntPoint(0, 0))

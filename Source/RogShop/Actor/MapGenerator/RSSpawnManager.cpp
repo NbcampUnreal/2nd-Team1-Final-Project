@@ -24,6 +24,10 @@
 #include "RSDungeonGroundRelic.h"
 #include "RSDungeonGroundLifeEssence.h"
 #include "RSTileBlocker.h"
+#include "RSBaseAltar.h"
+#include "RSBaseTreasureChest.h"
+#include "RSDungeonStageSaveGame.h"
+#include "RSSaveGameSubsystem.h"
 
 // 외부에서 전달받은 월드 및 테이블 초기화
 void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, int32 TargetLevelIndex)
@@ -57,6 +61,7 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, i
 		return;
 		break;
 	}
+	BGM = BGMCues[LevelIndex];
 	MonsterDataTable = DataSubsystem->Monster;
 
 	if (!MonsterSpawnGroupDataTable)
@@ -81,6 +86,20 @@ void URSSpawnManager::Initialize(UWorld* InWorld, UGameInstance* GameInstance, i
 
 	TileToTargets = BuildTileToTargets();
 	RegisterAllTileBlockers();
+
+	// 세이브 된 데이터 로드
+	LoadSpawnInfo();
+
+	// 세이브 하도록 바인딩
+	UGameInstance* CurGameInstance = GetWorld()->GetGameInstance();
+	if (CurGameInstance)
+	{
+		URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+		if (SaveGameSubsystem)
+		{
+			SaveGameSubsystem->OnSaveRequested.AddDynamic(this, &URSSpawnManager::SaveSpawnInfo);
+		}
+	}
 }
 
 // NPC 태그가 있는 TargetPoint 중 하나에 상점 NPC 스폰
@@ -117,18 +136,18 @@ void URSSpawnManager::SpawnShopNPCInLevel()
 	RS_LOG_DEBUG("상점 생성 성공");
 }
 
-void URSSpawnManager::SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform, bool AddImpulse)
+AActor* URSSpawnManager::SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform, bool AddImpulse)
 {
 	URSGameInstance* RSGameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
 	if (!RSGameInstance)
 	{
-		return;
+		return nullptr;
 	}
 
 	URSDataSubsystem* DataSubsystem = RSGameInstance->GetSubsystem<URSDataSubsystem>();
 	if (!DataSubsystem)
 	{
-		return;
+		return nullptr;
 	}
 
 	FItemInfoData* WeaponData = DataSubsystem->WeaponInfo->FindRow<FItemInfoData>(TargetName, TEXT("Get ItemInfoData"));
@@ -150,40 +169,46 @@ void URSSpawnManager::SpawnGroundWeaponAtTransform(FName TargetName, FTransform 
 				GroundWeapon->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
 				GroundWeapon->SetWeaponClass(WeaponClassData->WeaponClass);
 
+				RemoveUnspawnedWeapon(TargetName);
+
 				if (AddImpulse)
 				{
 					GroundWeapon->RandImpulse();
 				}
+
+				return GroundWeapon;
 			}
 		}
 	}
+
+	return nullptr;
 }
 
-void URSSpawnManager::SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Amount)
+AActor* URSSpawnManager::SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Quantity)
 {
 	URSGameInstance* RSGameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
 	if (!RSGameInstance)
 	{
-		return;
+		return nullptr;
 	}
 
 	URSDataSubsystem* DataSubsystem = RSGameInstance->GetSubsystem<URSDataSubsystem>();
 	if (!DataSubsystem)
 	{
-		return;
+		return nullptr;
 	}
 
 	UDataTable* IngredientInfoDataTable = DataSubsystem->IngredientInfo;
 	if (!IngredientInfoDataTable)
 	{
 		RS_LOG("재료 데이터테이블 nullptr");
-		return;
+		return nullptr;
 	}
 
 	if (!MonsterDataTable)
 	{
 		RS_LOG("캐싱 된 데이터 테이블이 nullptr");
-		return;
+		return nullptr;
 	}
 
 	FItemInfoData* IngredientInfoDataRow = IngredientInfoDataTable->FindRow<FItemInfoData>(TargetName, TEXT("Get IngredientDetailData"));
@@ -197,31 +222,35 @@ void URSSpawnManager::SpawnGroundIngredientAtTransform(FName TargetName, FTransf
 			UStaticMesh* ItemStaticMesh = IngredientInfoDataRow->ItemStaticMesh;
 
 			DungeonIngredient->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
-			DungeonIngredient->SetQuantity(Amount);
+			DungeonIngredient->SetQuantity(Quantity);
 			DungeonIngredient->RandImpulse();
+
+			return DungeonIngredient;
 		}
 	}
+
+	return nullptr;
 }
 
-void URSSpawnManager::SpawnGroundRelicAtTransform(FName TargetName, FTransform TargetTransform)
+AActor* URSSpawnManager::SpawnGroundRelicAtTransform(FName TargetName, FTransform TargetTransform)
 {
 	UGameInstance* CurGameInstance = GetWorld()->GetGameInstance();
 	if (!CurGameInstance)
 	{
-		return;
+		return nullptr;
 	}
 
 	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
 	if (!DataSubsystem)
 	{
-		return;
+		return nullptr;
 	}
 
 	UDataTable* RelicInfoDataTable = DataSubsystem->RelicInfo;
 	UDataTable* RelicClassDataTable = DataSubsystem->RelicDetail;
 	if (!RelicInfoDataTable || !RelicClassDataTable)
 	{
-		return;
+		return nullptr;
 	}
 
 	FItemInfoData* RelicInfoDataRow = RelicInfoDataTable->FindRow<FItemInfoData>(TargetName, TEXT("Get ItemInfoData"));
@@ -236,9 +265,27 @@ void URSSpawnManager::SpawnGroundRelicAtTransform(FName TargetName, FTransform T
 			UStaticMesh* ItemStaticMesh = RelicInfoDataRow->ItemStaticMesh;
 
 			GroundRelic->InitGroundItemInfo(ItemName, false, TargetName, ItemStaticMesh);
-			GroundRelic->SetRelicClass(RelicClassDataRow->RelicClass);
+
+			RemoveUnspawnedRelic(TargetName);
+
+			return GroundRelic;
 		}
 	}
+
+	return nullptr;
+}
+
+AActor* URSSpawnManager::SpawnGroundLifeEssenceAtTransform(FTransform TargetTransform, int32 Quantity)
+{
+	ARSDungeonGroundLifeEssence* DungeonLifeEssence = GetWorld()->SpawnActor<ARSDungeonGroundLifeEssence>(DungeonGroundLifeEssenceClass, TargetTransform);
+
+	if (DungeonLifeEssence)
+	{
+		DungeonLifeEssence->RandImpulse();
+		DungeonLifeEssence->SetQuantity(Quantity);
+	}
+
+	return DungeonLifeEssence;
 }
 
 void URSSpawnManager::SpawnGroundIngredientFromCharacter(ARSDunBaseCharacter* DiedCharacter)
@@ -340,6 +387,141 @@ void URSSpawnManager::SpawnGroundLifeEssenceFromCharacter(ARSDunBaseCharacter* D
 			DungeonLifeEssence->RandImpulse();
 			DungeonLifeEssence->SetQuantity(LifeEssenceQuantity);
 		}
+	}
+}
+
+TSet<FName> URSSpawnManager::GetUnspawnedWeapons() const
+{
+	return UnspawnedWeapons;
+}
+
+void URSSpawnManager::SetUnspawnedWeapons(TArray<FName> NewUnspawnedWeapons)
+{
+	UnspawnedWeapons = TSet<FName>(NewUnspawnedWeapons);
+}
+
+void URSSpawnManager::RemoveUnspawnedWeapon(FName RemoveTargetName)
+{
+	UnspawnedWeapons.Remove(RemoveTargetName);
+}
+
+void URSSpawnManager::ResetUnspawnedWeapons()
+{
+	if (!GetWorld())
+	{
+		return;
+	}
+
+	URSGameInstance* RSGameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
+	if (!RSGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = RSGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	UnspawnedWeapons = TSet<FName>(DataSubsystem->WeaponInfo->GetRowNames());
+}
+
+TSet<FName> URSSpawnManager::GetUnspawnedRelics() const
+{
+	return UnspawnedRelics;
+}
+
+void URSSpawnManager::SetUnspawnedRelics(TArray<FName> NewUnspawnedRelics)
+{
+	UnspawnedRelics = TSet<FName>(NewUnspawnedRelics);
+}
+
+void URSSpawnManager::RemoveUnspawnedRelic(FName RemoveTargetName)
+{
+	UnspawnedRelics.Remove(RemoveTargetName);
+}
+
+void URSSpawnManager::ResetUnspawnedRelics()
+{
+	URSGameInstance* RSGameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
+	if (!RSGameInstance)
+	{
+		return;
+	}
+
+	URSDataSubsystem* DataSubsystem = RSGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return;
+	}
+
+	UnspawnedRelics = TSet<FName>(DataSubsystem->RelicInfo->GetRowNames());
+}
+
+void URSSpawnManager::SaveSpawnInfo()
+{
+	// SaveGame 오브젝트 생성
+	UGameInstance* CurGameInstance = GetWorld()->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+	if (!SaveGameSubsystem)
+	{
+		return;
+	}
+	
+	URSDungeonStageSaveGame* DungeonStageSaveGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->DungeonInfoSaveSlotName, 0));
+	// 저장된 세이브 파일이 없는 경우
+	if (!DungeonStageSaveGame)
+	{
+		// 새로운 세이브 파일 생성
+		DungeonStageSaveGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::CreateSaveGameObject(URSDungeonStageSaveGame::StaticClass()));
+		if (!DungeonStageSaveGame)
+		{
+			return;
+		}
+	}
+
+
+	// 세이브 데이터 설정
+	DungeonStageSaveGame->UnspawnedWeapons = UnspawnedWeapons.Array();
+	DungeonStageSaveGame->UnspawnedRelics = UnspawnedWeapons.Array();
+
+	// 저장
+
+	UGameplayStatics::SaveGameToSlot(DungeonStageSaveGame, SaveGameSubsystem->DungeonInfoSaveSlotName, 0);
+}
+
+void URSSpawnManager::LoadSpawnInfo()
+{
+	// 저장된 세이브 로드
+	UGameInstance* CurGameInstance = GetWorld()->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return;
+	}
+
+	URSSaveGameSubsystem* SaveGameSubsystem = CurGameInstance->GetSubsystem<URSSaveGameSubsystem>();
+	if (!SaveGameSubsystem)
+	{
+		return;
+	}
+
+	URSDungeonStageSaveGame* DungeonInfoLoadGame = Cast<URSDungeonStageSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->DungeonInfoSaveSlotName, 0));
+	if (DungeonInfoLoadGame)
+	{
+		SetUnspawnedWeapons(DungeonInfoLoadGame->UnspawnedWeapons);
+		SetUnspawnedRelics(DungeonInfoLoadGame->UnspawnedRelics);
+	}
+	// 세이브 파일이 없는 경우
+	else
+	{
+		ResetUnspawnedWeapons();
+		ResetUnspawnedRelics();
 	}
 }
 
@@ -517,7 +699,6 @@ void URSSpawnManager::SpawnDunNextStagePortal() // 다음 스테이지 포탈 �
 {
 	if (!World || !DunNextStagePortalClass)
 	{
-		RS_LOG_DEBUG("다음 스테이지 포탈 생성 실패: World 또는 PortalClass 누락");
 		return;
 	}
 
@@ -600,6 +781,8 @@ void URSSpawnManager::SpawnBossMonster()
 	BossMonster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundIngredientFromCharacter);
 	BossMonster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundLifeEssenceFromCharacter);
 
+	// 적이 스폰됐음을 알려 필요한 함수 바인딩
+	OnEnemySpawn.Broadcast(Cast<ARSDunBaseCharacter>(BossMonster));
 }
 
 void URSSpawnManager::SpawnMonstersAtTile(FIntPoint TileCoord) // 특정 타일 좌표에 몬스터 스폰하는 함수
@@ -670,6 +853,9 @@ void URSSpawnManager::SpawnMonstersAtTile(FIntPoint TileCoord) // 특정 타일 
 			// 사망 시 오브젝트 스폰 함수 바인딩
 			Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundIngredientFromCharacter);
 			Monster->OnCharacterDied.AddDynamic(this, &URSSpawnManager::SpawnGroundLifeEssenceFromCharacter);
+
+			// 적이 스폰됐음을 알려 필요한 함수 바인딩
+			OnEnemySpawn.Broadcast(Cast<ARSDunBaseCharacter>(Monster));
 
 			AliveMonstersPerTile.FindOrAdd(TileCoord) += 1;
 			TotalSpawned++;
@@ -787,3 +973,120 @@ void URSSpawnManager::RegisterAllTileBlockers()
 		}
 	}
 }
+
+void URSSpawnManager::SpawnAltar()
+{
+	if (!World)
+	{
+		RS_LOG_DEBUG("제단 생성 실패");
+		return;
+	}
+
+	TArray<ATargetPoint*> AltarPoints;
+	for (TActorIterator<ATargetPoint> It(World); It; ++It)
+	{
+		if (It->Tags.Contains(FName("Altar")))
+		{
+			AltarPoints.Add(*It);
+		}
+	}
+
+	if (AltarPoints.Num() == 0)
+	{
+		return;
+	}
+
+	TArray<int32> Indices;
+
+
+	if(AltarClasses.Num() <= 0)
+	{
+		return;
+	}
+
+	for (int32 i = 0; i < AltarPoints.Num(); ++i)
+	{
+		Indices.Add(i);
+	}
+
+
+	Algo::RandomShuffle(Indices); // 중복 없이 무작위 순서 결정
+	AltarInstance.SetNum(3); //소환될 제단의 숫자
+
+	for (int32 i = 0; i < AltarClasses.Num(); ++i)
+	{
+		int32 Index = Indices[i];
+		ATargetPoint* ChosenPoint = AltarPoints[Index];
+
+		FTransform SpawnTransform = ChosenPoint->GetActorTransform();
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		AltarInstance[i] = World->SpawnActor<ARSBaseAltar>(AltarClasses[i], SpawnTransform, SpawnParams);
+	}
+
+	RS_LOG_DEBUG("제단 생성 성공");
+}
+
+void URSSpawnManager::SpawnTreasureChest()
+{
+	if (!World)
+	{
+		RS_LOG_DEBUG("보물상자 생성 실패");
+		return;
+	}
+
+	TArray<ATargetPoint*> TreasurePoints;
+	for (TActorIterator<ATargetPoint> It(World); It; ++It)
+	{
+		if (It->Tags.Contains(FName("TreasureChest")))
+		{
+			TreasurePoints.Add(*It);
+		}
+	}
+
+	if (TreasurePoints.Num() == 0)
+	{
+		return;
+	}
+
+	TArray<int32> Indices;
+
+	for (int32 i = 0; i < TreasurePoints.Num(); ++i)
+	{
+		Indices.Add(i);
+	}
+
+	if (TreasureChestClasses.Num() <= 0)
+	{
+		return;
+	}
+
+	Algo::RandomShuffle(Indices); // 중복 없이 무작위 순서 결정
+	TreasureChestInstance.SetNum(3); //소환될 보물상자의 숫자
+
+	for (int32 i = 0; i < TreasureChestClasses.Num(); ++i)
+	{
+		int32 Index = Indices[i];
+		ATargetPoint* ChosenPoint = TreasurePoints[Index];
+
+		FTransform SpawnTransform = ChosenPoint->GetActorTransform();
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		TreasureChestInstance[i] = World->SpawnActor<ARSBaseTreasureChest>(TreasureChestClasses[i], SpawnTransform, SpawnParams);
+	}
+
+	RS_LOG_DEBUG("보물상자 생성 성공");
+}
+void URSSpawnManager::PlayBGMSound() 
+{
+	UGameplayStatics::PlaySoundAtLocation(
+		this,
+		BGM,
+		FVector::ZeroVector
+	);
+}
+ 

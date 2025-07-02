@@ -52,6 +52,16 @@ void ARSDungeonGroundLifeEssence::Tick(float DeltaTime)
 	}
 }
 
+void ARSDungeonGroundLifeEssence::BeginDestroy()
+{
+	Super::BeginDestroy();
+
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(InteractDelayTimer);
+	}
+}
+
 void ARSDungeonGroundLifeEssence::Interact(ARSDunPlayerCharacter* Interactor)
 {
 	// 더이상 상호작용 함수가 호출되지 않도록 한다.
@@ -61,23 +71,33 @@ void ARSDungeonGroundLifeEssence::Interact(ARSDunPlayerCharacter* Interactor)
 
 	GetWorld()->GetTimerManager().SetTimer(InteractDelayTimer, FTimerDelegate::CreateLambda([=, this]()
 	{
-		MeshComp->SetSimulatePhysics(false);
-		MeshComp->SetEnableGravity(false);
+		if (IsValid(this) && IsValid(MeshComp) && IsValid(SceneComp))
+		{
+			MeshComp->SetSimulatePhysics(false);
+			MeshComp->SetEnableGravity(false);
 
-		MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+			// 루트 컴포넌트를 메시 위치로 이동 및 루트 컴포넌트에 다시 부착후 메시 컴포넌트의 위치 및 회전 초기화
+			SceneComp->SetWorldLocationAndRotation(MeshComp->GetComponentLocation(), MeshComp->GetComponentRotation());
+
+			MeshComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+			MeshComp->SetRelativeLocation(FVector::ZeroVector);
+			MeshComp->SetRelativeRotation(FRotator::ZeroRotator);
+		}
+		else
+		{
+			return;
+		}
 
 		// 틱 활성화
 		SetActorTickEnabled(true);
 
-		// 루트 컴포넌트를 메시 위치로 이동 및 루트 컴포넌트에 다시 부착후 메시 컴포넌트의 위치 및 회전 초기화
-		SceneComp->SetWorldLocationAndRotation(MeshComp->GetComponentLocation(), MeshComp->GetComponentRotation());
-
-		MeshComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-		MeshComp->SetRelativeLocation(FVector::ZeroVector);
-		MeshComp->SetRelativeRotation(FRotator::ZeroRotator);
-
 		// 타겟 액터 저장
-		TargetActor = Interactor;
+		if (Interactor)
+		{
+			TargetActor = Interactor;
+		}
 	}),
 		InteractDelayTime,
 		false);

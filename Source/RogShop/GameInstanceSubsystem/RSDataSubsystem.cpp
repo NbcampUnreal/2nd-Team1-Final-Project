@@ -12,6 +12,7 @@ void URSDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	const URSDataSubsystemSettings* DataSettings = GetDefault<URSDataSubsystemSettings>();
 	Food = DataSettings->FoodDataTable.LoadSynchronous();
+	FoodDetail = DataSettings->FoodDetailDataTable.LoadSynchronous();
 	IngredientInfo = DataSettings->IngredientDataTable.LoadSynchronous();
 	IngredientDetail = DataSettings->IngredientDetailDataTable.LoadSynchronous();
 	WeaponInfo = DataSettings->WeaponDataTable.LoadSynchronous();
@@ -23,8 +24,11 @@ void URSDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	CaveMonsterSpawnGroup = DataSettings->CaveMonsterSpawnGroupDataTable.LoadSynchronous();
 	Monster = DataSettings->MonsterDataTable.LoadSynchronous();
 	DungeonLevel = DataSettings->DungeonLevelDataTable.LoadSynchronous();
+	Guide = DataSettings->GuideDataTable.LoadSynchronous();
+	GameFlowInfo = DataSettings->GameFlowInfoDataTable.LoadSynchronous();
 
 	check(Food)
+	check(FoodDetail)
 	check(IngredientInfo)
 	check(IngredientDetail)
 	check(WeaponInfo)
@@ -36,4 +40,6 @@ void URSDataSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	check(CaveMonsterSpawnGroup)
 	check(Monster)
 	check(DungeonLevel)
+	check(Guide)
+	check(GameFlowInfo)
 }

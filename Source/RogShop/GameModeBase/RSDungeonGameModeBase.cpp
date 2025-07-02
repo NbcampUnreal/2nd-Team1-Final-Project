@@ -19,7 +19,17 @@ ARSDungeonGameModeBase::ARSDungeonGameModeBase()
 {
     MaxStageCount = 3;
 }
+void ARSDungeonGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+    Super::InitGame(MapName, Options, ErrorMessage);
 
+    // 스폰 매니저 생성
+    SpawnManager = NewObject<URSSpawnManager>(this, SpawnManagerClass);
+}
+void ARSDungeonGameModeBase::InitGameState()
+{
+    Super::InitGameState();
+}
 
 void ARSDungeonGameModeBase::BeginPlay()// 게임이 시작될 때 호출됨
 {
@@ -166,17 +176,19 @@ void ARSDungeonGameModeBase::LoadDungeonInfo()
         LevelIndex = DungeonInfoLoadGame->LevelIndex;
         Seed = DungeonInfoLoadGame->Seed;
     }
-
-    // 시드 값이 설정되어있지 않은 경우 랜덤한 시드를 설정한다.
-    if (Seed == 0)
+    // 세이브 파일이 없는 경우
+    else
     {
-        InitRandSeed();
+        // 랜덤한 시드를 설정한다.
+        if (Seed == 0)
+        {
+            InitRandSeed();
+        }
     }
 }
 
 void ARSDungeonGameModeBase::OnMapReady()// 맵 로딩이 완료되었을 때 호출되는 함수
 {
-    RS_LOG_DEBUG("맵 로딩 완료, 캐릭터 생성 시작");
     
     TWeakObjectPtr<ARSDungeonGameModeBase> WeakThis(this);
 
@@ -189,14 +201,15 @@ void ARSDungeonGameModeBase::OnMapReady()// 맵 로딩이 완료되었을 때 �
         
         ARSDungeonGameModeBase* GameMode = WeakThis.Get();
         
-        if (!GameMode->SpawnManager)
+        if (GameMode->SpawnManager)
         {
-            RS_LOG_DEBUG("스폰 매니저 생성");
-            GameMode->SpawnManager = NewObject<URSSpawnManager>(GameMode, GameMode->SpawnManagerClass);
-            GameMode->SpawnManager->Initialize(GameMode->GetWorld(), GameMode->GetGameInstance(), GameMode->LevelIndex);
+            GameMode->SpawnManager->Initialize(GameMode->GetWorld(), GameMode->GetGameInstance(),GameMode->LevelIndex);
         
             GameMode->SpawnManager->SpawnPlayerAtStartPoint();
             GameMode->SpawnManager->SpawnShopNPCInLevel();
+            GameMode->SpawnManager->SpawnAltar();
+            GameMode->SpawnManager->SpawnTreasureChest();
+            GameMode->SpawnManager->PlayBGMSound();
             GameMode->SpawnManager->SetBossTileCoord(GameMode->MapGeneratorInstance->BossWorldLocation);
         
             GameMode->OnGameReady.Broadcast();

@@ -43,7 +43,27 @@ UBoxComponent* ARSBaseWeapon::GetBoxComp() const
 
 TSubclassOf<UAnimInstance> ARSBaseWeapon::GetWeaponAnimInstnace() const
 {
-	return WeaponAnimInstnace;
+	UGameInstance* CurGameInstance = GetWorld()->GetGameInstance();
+	if (!CurGameInstance)
+	{
+		return nullptr;
+	}
+
+	URSDataSubsystem* DataSubsystem = CurGameInstance->GetSubsystem<URSDataSubsystem>();
+	if (!DataSubsystem)
+	{
+		return nullptr;
+	}
+
+	UDataTable* WeaponDetailDataTable = DataSubsystem->WeaponDetail;
+	if (!WeaponDetailDataTable)
+	{
+		return nullptr;
+	}
+
+	FDungeonWeaponData* WeaponData = WeaponDetailDataTable->FindRow<FDungeonWeaponData>(DataTableKey, TEXT("Get WeaponData"));
+
+	return WeaponData->WeaponAnimInstnace;
 }
 
 UAnimMontage* ARSBaseWeapon::GetNormalAttackMontage(int32 Index) const
@@ -128,6 +148,11 @@ float ARSBaseWeapon::GetStrongAttackMontageDamage(int32 MontageIndex) const
 	}
 
 	return 0.0f;
+}
+
+FName ARSBaseWeapon::GetAttachSocketName() const
+{
+	return AttachSocket;
 }
 
 void ARSBaseWeapon::StartTrail()

@@ -30,8 +30,6 @@ void ARSDunPlayerController::BeginPlay()
     AddMapping();
 
     InitializeRSDunMainWidget();
-
-    BindCharacterDelegates();
 }
 
 void ARSDunPlayerController::AddMapping()
@@ -141,15 +139,6 @@ void ARSDunPlayerController::HideInteractWidget()
     if (RSDunMainHUDWidget)
     {
         RSDunMainHUDWidget->HideInteractWidget();
-    }
-}
-
-void ARSDunPlayerController::BindCharacterDelegates()
-{
-    ARSDunPlayerCharacter* CurPawn = GetPawn<ARSDunPlayerCharacter>();
-    if (CurPawn)
-    {
-        CurPawn->OnCharacterDied.AddDynamic(this, &ARSDunPlayerController::ShowPlayerDeathWidget);
     }
 }
 

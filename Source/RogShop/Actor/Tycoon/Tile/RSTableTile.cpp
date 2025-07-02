@@ -24,7 +24,7 @@ void ARSTableTile::Interact(ACharacter* InteractCharacter)
 	if (InteractIndex != INDEX_NONE)
 	{
 		//주문을 받음
-		Order(SittingCustomers[InteractIndex]);
+		Order(SittingCustomers[InteractIndex].Get());
 	}
 	else if (InteractCharacter->Implements<URSCanPickup>())
 	{
@@ -181,7 +181,7 @@ void ARSTableTile::Serving(ACharacter* InteractCharacter)
 		}
 	}
 
-	ARSTycoonCustomerCharacter* OrderedCustomer = SittingCustomers[ServingCustomerIndex];
+	ARSTycoonCustomerCharacter* OrderedCustomer = SittingCustomers[ServingCustomerIndex].Get();
 	if (OrderedCustomer)
 	{
 		RS_LOG("음식을 전달했습니다");

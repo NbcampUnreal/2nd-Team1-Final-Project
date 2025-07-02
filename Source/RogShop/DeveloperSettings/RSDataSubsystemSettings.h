@@ -19,6 +19,9 @@ public:
 	TSoftObjectPtr<UDataTable> FoodDataTable;
 	
 	UPROPERTY(Config, EditAnywhere)
+	TSoftObjectPtr<UDataTable> FoodDetailDataTable;
+	
+	UPROPERTY(Config, EditAnywhere)
 	TSoftObjectPtr<UDataTable> IngredientDataTable;
 
 	UPROPERTY(Config, EditAnywhere)
@@ -50,4 +53,10 @@ public:
 
 	UPROPERTY(Config, EditAnywhere)
 	TSoftObjectPtr<UDataTable> DungeonLevelDataTable;
+
+	UPROPERTY(Config, EditAnywhere)
+	TSoftObjectPtr<UDataTable> GuideDataTable;
+
+	UPROPERTY(Config, EditAnywhere)
+	TSoftObjectPtr<UDataTable> GameFlowInfoDataTable;
 };

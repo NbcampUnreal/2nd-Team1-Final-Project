@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CharacterStatus.h"
 #include "Engine/DataTable.h" // 헤더 추가
 #include "CookFoodData.generated.h"
 
@@ -13,7 +14,8 @@ enum class EIngredientType : uint8
 {
 	Etc,
 	Meat,
-	Vegetable
+	Vegetable,
+	Special
 };
 
 USTRUCT(BlueprintType)
@@ -52,8 +54,17 @@ struct ROGSHOP_API FIngredientDetailData : public FTableRowBase
 	GENERATED_BODY()
 
 public:
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EIngredientType Category;
+};
 
+
+USTRUCT(BlueprintType)
+struct ROGSHOP_API FCookFoodDetailData : public FTableRowBase
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<ECharacterStatus, int32> PlusStatus;
 };

@@ -42,14 +42,22 @@ void URSDunShopWidget::NativeConstruct()
     Super::NativeConstruct();
 
     SetMouseMode(true);
+
+    // 상점을 열 때도 보유 재화값 갱신
+    ARSDunPlayerCharacter* PlayerChar = Cast<ARSDunPlayerCharacter>(GetOwningPlayerPawn());
+
+    if (PlayerChar)
+    {
+        UpdateLifeEssence(PlayerChar->GetLifeEssence());
+    }
 }
 
 void URSDunShopWidget::UpdateLifeEssence(int NewLifeEssence)
 {
     if (LifeEssenceText)
     {
-        FString LifeEssenceString = FString::Printf(TEXT("%d"), NewLifeEssence); // 정수 형태로 변환
-        LifeEssenceText->SetText(FText::FromString(LifeEssenceString));
+        FText DisplayText = FText::AsNumber(NewLifeEssence);
+        LifeEssenceText->SetText(DisplayText);
     }
 }
 

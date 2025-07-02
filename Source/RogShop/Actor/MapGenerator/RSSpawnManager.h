@@ -23,6 +23,11 @@ class ARSDungeonGroundWeapon;
 class ARSDungeonGroundIngredient;
 class ARSDungeonGroundRelic;
 class ARSDungeonGroundLifeEssence;
+class ARSBaseAltar;
+class ARSBaseTreasureChest;
+class USoundBase;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemySpawn, ARSDunBaseCharacter*, SpawnCharacter);
 
 /**
  * URSSpawnManager
@@ -66,6 +71,13 @@ private:
 	
 	TSet<FIntPoint> SpawnedTiles; // 타일별로 몬스터가 한 번이라도 스폰됐는지	
 	TMap<FIntPoint, bool> ClearedTiles; // 타일별로 클리어(= 몬스터 전멸) 여부
+#pragma endregion
+
+#pragma region Delegate
+public:
+	// 적(몬스터, 보스)가 스폰될 때 바인딩될 함수를 연결하는 델리게이트
+	UPROPERTY(BlueprintAssignable)
+	FOnEnemySpawn OnEnemySpawn;
 #pragma endregion
 
 #pragma region Wall
@@ -115,24 +127,56 @@ public:
 	// 상점 NPC를 스폰
 	void SpawnShopNPCInLevel();
 
+	// 제단 생성
+	void SpawnAltar();
+
+	// 보물상자 생성
+	void SpawnTreasureChest();
+
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ARSDunLifeEssenceShop> DunLifeEssenceShopClass; // 생명의 정수 상점 클래스
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<ARSDunLifeEssenceShop> DunLifeEssenceShopInstance; // 인스턴스
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
+	TArray<TSubclassOf<ARSBaseAltar>> AltarClasses; //제단 클래스
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
+	TArray<TObjectPtr<ARSBaseAltar>> AltarInstance; //제단 인스턴스
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
+	TArray<TSubclassOf<ARSBaseTreasureChest>> TreasureChestClasses; // 보물상자 클래스
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
+	TArray<TObjectPtr<ARSBaseTreasureChest>> TreasureChestInstance; // 보물상자 인스턴스
+#pragma endregion
+
+#pragma region BGM
+public:
+	void PlayBGMSound();
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Audio", meta = (AllowPrivateAccess = "true"))
+	TArray<TObjectPtr<USoundBase>> BGMCues;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USoundBase> BGM;
 #pragma endregion
 
 #pragma region GroundItem
 public:
 	UFUNCTION()
-	void SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform, bool AddImpulse);
+	AActor* SpawnGroundWeaponAtTransform(FName TargetName, FTransform TargetTransform, bool AddImpulse);
 
 	UFUNCTION()
-	void SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Amount);
+	AActor* SpawnGroundIngredientAtTransform(FName TargetName, FTransform TargetTransform, int32 Quantity);
 
 	UFUNCTION()
-	void SpawnGroundRelicAtTransform(FName TargetName, FTransform TargetTransform);
+	AActor* SpawnGroundRelicAtTransform(FName TargetName, FTransform TargetTransform);
+
+	UFUNCTION()
+	AActor* SpawnGroundLifeEssenceAtTransform(FTransform TargetTransform, int32 Quantity);
 
 private:
 	UFUNCTION()
@@ -153,7 +197,32 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ARSDungeonGroundLifeEssence> DungeonGroundLifeEssenceClass; // 아이템으로 드랍되는 생명의 정수 클래스
+#pragma endregion
 
+#pragma region Unspawned
+public:
+	TSet<FName> GetUnspawnedWeapons() const;
+
+	void SetUnspawnedWeapons(TArray<FName> NewUnspawnedWeapons);
+
+	void RemoveUnspawnedWeapon(FName RemoveTargetName);
+
+	void ResetUnspawnedWeapons();
+
+	TSet<FName> GetUnspawnedRelics() const;
+
+	void SetUnspawnedRelics(TArray<FName> NewUnspawnedRelics);
+
+	void RemoveUnspawnedRelic(FName RemoveTargetName);
+
+	void ResetUnspawnedRelics();
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
+	TSet<FName> UnspawnedWeapons;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Object", meta = (AllowPrivateAccess = "true"))
+	TSet<FName> UnspawnedRelics;
 #pragma endregion
 
 #pragma region DataTableCaching
@@ -169,5 +238,14 @@ private:
 #pragma region StageClear
 private:
 	int32 LevelIndex; // 현재 레벨 인덱스
+#pragma endregion
+
+#pragma region SaveData
+public:
+	UFUNCTION()
+	void SaveSpawnInfo();
+
+private:
+	void LoadSpawnInfo();
 #pragma endregion
 };

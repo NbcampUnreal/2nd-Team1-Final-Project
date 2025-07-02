@@ -10,6 +10,7 @@ void URSMonsterHPBarWidget::NativeConstruct()
 	TargetPercent = 1.0f;
 	CurrentPercent = 1.0f;
 	InterpSpeed = 5.0f;
+	
 }
 
 void URSMonsterHPBarWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)

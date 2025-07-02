@@ -76,7 +76,7 @@ void ARSDunNextStagePortal::Interact(ARSDunPlayerCharacter* Interactor)
 			// 보스 잡은 횟수 + 1개의 슬롯을 적용한다.
 			int32 LevelIndex = DungeonGameMode->GetLevelIndex();
 
-			SendIngredientWidgetInstance->CreateSendIngredientSlots(LevelIndex + 1);
+			SendIngredientWidgetInstance->CreateSendIngredientSlots((LevelIndex + 1) * 2);
 		}
 
 		SendIngredientWidgetInstance->CreatePlayerIngredientSlots(IngredientItems);

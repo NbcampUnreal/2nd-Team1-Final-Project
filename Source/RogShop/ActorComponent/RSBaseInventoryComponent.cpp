@@ -11,7 +11,6 @@ URSBaseInventoryComponent::URSBaseInventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
-	SetMaxSlot(5);
 }
 
 
@@ -24,15 +23,10 @@ void URSBaseInventoryComponent::BeginPlay()
 
 int32 URSBaseInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 {
-	if (GetFilledSize() >= GetSlotMaxSize())
-	{
-		RS_LOG_C("인벤토리가 가득 찼습니다.", FColor::Red);
-		return -1;
-	}
-
 	if (CheckValidItem(ItemKey))
 	{
 		// 인벤토리 순회
+		int32 EmptySlot = INDEX_NONE;
 		for (size_t i = 0; i < ItemList.Num(); ++i)
 		{
 			FItemSlot& ItemSlot = ItemList[i];
@@ -47,13 +41,21 @@ int32 URSBaseInventoryComponent::AddItem(FName ItemKey, int32 Amount)
 			// 인벤토리에 해당 슬롯이 비어있는 경우 아이템 추가			
 			if (ItemSlot.ItemKey == NAME_None)
 			{
-				ItemSlot.ItemKey = ItemKey;
-				ItemSlot.Quantity = Amount;
+				EmptySlot = i;
+				ItemList[EmptySlot].ItemKey = ItemKey;
+				ItemList[EmptySlot].Quantity = Amount;
 				return i;
 			}
 		}
+
+		if (EmptySlot != INDEX_NONE)
+		{
+			ItemList[EmptySlot].ItemKey = ItemKey;
+			ItemList[EmptySlot].Quantity = Amount;
+			return EmptySlot;
+		}
 	}
-	
+
 	RS_LOG_C("아이템을 추가하지 못했습니다.", FColor::Red);
 	return -1;
 }
@@ -85,7 +87,7 @@ int32 URSBaseInventoryComponent::RemoveItem(FName ItemKey, int32 Amount)
 			}
 		}
 	}
-	
+
 	RS_LOG_C("아이템을 삭제하지 못했습니다.", FColor::Red);
 	return -1;
 }
@@ -104,24 +106,6 @@ int32 URSBaseInventoryComponent::GetQuantity(const FName& ItemKey)
 	}
 
 	return Quantity;
-}
-
-int32 URSBaseInventoryComponent::GetFilledSize() const
-{
-	// 현재 인벤토리에서 아이템이 들어있는 슬롯의 수를 세어 반환합니다.
-	int32 FilledCount = 0;
-
-	for (size_t i = 0; i < ItemList.Num(); ++i)
-	{
-		FItemSlot CurItemSlot = ItemList[i];
-
-		if (CurItemSlot.ItemKey != NAME_None)
-		{
-			++FilledCount;
-		}
-	}
-
-	return FilledCount;
 }
 
 void URSBaseInventoryComponent::SaveItemData()

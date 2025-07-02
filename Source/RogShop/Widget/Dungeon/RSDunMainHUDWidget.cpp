@@ -135,7 +135,6 @@ void URSDunMainHUDWidget::HandlePlayerInventoryWidget()
 
     if (PC)
     {
-        // 이 창을 끄는건 Exit 버튼으로 해서 이 부분은 현재 실행 안 됨, 방어 코드
         if (PlayerInventoryWidget->IsVisible())
         {
             PlayerInventoryWidget->SetVisibility(ESlateVisibility::Hidden);
@@ -144,8 +143,10 @@ void URSDunMainHUDWidget::HandlePlayerInventoryWidget()
             PC->SetInputMode(InputMode);
             PC->bShowMouseCursor = false;
             PC->FlushPressedKeys();
+
+            // 상호작용 UI가 나타나도록 합니다.
+            ShowInteractWidget();
         }
-        // 현재는 위젯을 켜기만 해서 이 부분만 계속 실행
         else
         {
             PlayerInventoryWidget->SetVisibility(ESlateVisibility::Visible);
@@ -154,6 +155,9 @@ void URSDunMainHUDWidget::HandlePlayerInventoryWidget()
             PC->SetInputMode(InputMode);
             PC->bShowMouseCursor = true;
             PC->FlushPressedKeys();
+
+            // 상호작용 UI를 숨깁니다.
+            HideInteractWidget();
         }
     }
 }

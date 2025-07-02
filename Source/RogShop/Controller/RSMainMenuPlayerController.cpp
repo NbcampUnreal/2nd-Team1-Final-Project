@@ -3,10 +3,16 @@
 
 #include "RSMainMenuPlayerController.h"
 #include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
+#include "Option/OptionSaveGame.h"
+#include "RSSaveGameSubsystem.h"
+#include "RSGameInstance.h"
 
 void ARSMainMenuPlayerController::BeginPlay() 
 {
 	Super::BeginPlay();
+
+    LoadSetting();
 
 	if (MainMenuWidgetClass)
 	{
@@ -19,13 +25,49 @@ void ARSMainMenuPlayerController::BeginPlay()
 
 			FInputModeUIOnly InputMode;
 
-			//UI À§Á¬¿¡ Æ÷Ä¿½º
+			//UI ìœ„ì ¯ì— í¬ì»¤ìŠ¤
 			InputMode.SetWidgetToFocus(MainMenuWidget->TakeWidget());
 			
-			//¸¶¿ì½º ÀÚÀ¯·Ó°Ô
+			//ë§ˆìš°ìŠ¤ ìžìœ ë¡­ê²Œ
 			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 			SetInputMode(InputMode);
 
 		}
 	}
+}
+
+void ARSMainMenuPlayerController::LoadSetting()
+{
+    UOptionSaveGame* LoadedData = nullptr;
+    URSSaveGameSubsystem* SaveGameSubsystem = GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>();
+    if (SaveGameSubsystem)
+    {
+        if (UGameplayStatics::DoesSaveGameExist(SaveGameSubsystem->OptionSaveSlotName, 0))
+        {
+            LoadedData = Cast<UOptionSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->OptionSaveSlotName, 0));
+        }
+    }
+
+    float Master = 1.f;
+    float BGM = 1.f;
+    float SFX = 1.f;
+
+    if (LoadedData)
+    {
+        Master = LoadedData->MasterVolume;
+
+        BGM = LoadedData->BGMVolume;
+
+        SFX = LoadedData->SFXVolume;
+    }
+
+    URSGameInstance* GameInstance = GetGameInstance<URSGameInstance>();
+    if (GameInstance)
+    {
+        GameInstance->OnMasterVolumeChanged(Master);
+
+        GameInstance->OnBGMVolumeChanged(BGM);
+
+        GameInstance->OnSFXVolumeChanged(SFX);
+    }
 }

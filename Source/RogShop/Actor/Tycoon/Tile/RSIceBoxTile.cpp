@@ -5,6 +5,7 @@
 
 #include "RSTycoonInventoryComponent.h"
 #include "RSTycoonPlayerController.h"
+#include "Kismet/GameplayStatics.h"
 #include "Tycoon/RSTycoonPlayerCharacter.h"
 
 const int32 ARSIceBoxTile::AddInventorySlot = 5;
@@ -29,10 +30,14 @@ void ARSIceBoxTile::Interact(ACharacter* InteractCharacter)
 
 	if (PlayerController->GetInventoryComponent()->IsOpen())
 	{
+		check(CloseSound)
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), CloseSound, GetActorLocation(), GetActorRotation());
 		PlayerController->GetInventoryComponent()->Close();
 	}
 	else
 	{
+		check(OpenSound)
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), OpenSound, GetActorLocation(), GetActorRotation());
 		PlayerController->GetInventoryComponent()->Open();
 	}
 }

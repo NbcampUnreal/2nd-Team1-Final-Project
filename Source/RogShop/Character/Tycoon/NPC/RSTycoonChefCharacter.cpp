@@ -64,6 +64,12 @@ void ARSTycoonChefCharacter::FindCookingTile()
 	if (CookingTileActors.Num() == 0)
 	{
 		RS_LOG_C("가게에 화구가 없습니다!", FColor::Red);
+
+		FTimerHandle RepeatTimer;
+		GetWorldTimerManager().SetTimer(RepeatTimer, [&]()
+		{
+			FindCookingTile();
+		}, 1, false);
 		return;
 	}
 
@@ -109,6 +115,12 @@ void ARSTycoonChefCharacter::FindCookingTile()
 	if (TargetCookingTile == nullptr)
 	{
 		RS_LOG_C("배치될 화구가 없습니다!", FColor::Red);
+
+		FTimerHandle RepeatTimer;
+		GetWorldTimerManager().SetTimer(RepeatTimer, [&]()
+		{
+			FindCookingTile();
+		}, 1, false);
 		return;
 	}
 
@@ -127,7 +139,6 @@ void ARSTycoonChefCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	FindCookingTile();
-
 	FoodBubbleWidgetComponent->SetVisibility(false);
 }
 
@@ -166,16 +177,6 @@ void ARSTycoonChefCharacter::TryCook()
 		FoodBubble->SetImage(GameMode->GetOrderToCook().FoodKey);
 
 		PlacedCookingTile->Interact(this);
-
-		check(CookingSound)
-		if (CookingAudioComponent)
-		{
-			CookingAudioComponent->Play();
-		}
-		else
-		{
-			CookingAudioComponent = UGameplayStatics::SpawnSoundAttached(CookingSound, RootComponent);
-		}
 	}
 }
 
@@ -185,13 +186,5 @@ void ARSTycoonChefCharacter::CheckFinish()
 	{
 		bCooking = false;
 		FoodBubbleWidgetComponent->SetVisibility(false);
-
-		if (CookingAudioComponent && CookingAudioComponent->IsPlaying())
-		{
-			CookingAudioComponent->Stop();
-		}
-
-		check(CookingFinishSound)
-		UGameplayStatics::SpawnSoundAtLocation(this, CookingFinishSound, GetActorLocation());
 	}
 }

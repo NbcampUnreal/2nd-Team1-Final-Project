@@ -2,11 +2,11 @@
 #include "Components/Button.h"
 #include "Components/ComboBoxString.h"
 #include "Components/Slider.h"
-#include "Sound/SoundClass.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameUserSettings.h"
 #include "Option/OptionSaveGame.h"
 #include "RSSaveGameSubsystem.h"
+#include "RSGameInstance.h"
 
 void UOptionMenuWidget::NativeConstruct()
 {
@@ -18,14 +18,19 @@ void UOptionMenuWidget::NativeConstruct()
     if (ApplyButton)
         ApplyButton->OnClicked.AddDynamic(this, &UOptionMenuWidget::OnApplyButtonClicked);
 
-    if (MasterVolumeSlider)
-        MasterVolumeSlider->OnValueChanged.AddDynamic(this, &UOptionMenuWidget::OnMasterVolumeChanged);
+    URSGameInstance* GameInstance = GetWorld()->GetGameInstance<URSGameInstance>();
+    if (GameInstance)
+    {
+        if (MasterVolumeSlider)
+            MasterVolumeSlider->OnValueChanged.AddDynamic(GameInstance, &URSGameInstance::OnMasterVolumeChanged);
 
-    if (BGMVolumeSlider)
-        BGMVolumeSlider->OnValueChanged.AddDynamic(this, &UOptionMenuWidget::OnBGMVolumeChanged);
+        if (BGMVolumeSlider)
+            BGMVolumeSlider->OnValueChanged.AddDynamic(GameInstance, &URSGameInstance::OnBGMVolumeChanged);
 
-    if (SFXVolumeSlider)
-        SFXVolumeSlider->OnValueChanged.AddDynamic(this, &UOptionMenuWidget::OnSFXVolumeChanged);
+        if (SFXVolumeSlider)
+            SFXVolumeSlider->OnValueChanged.AddDynamic(GameInstance, &URSGameInstance::OnSFXVolumeChanged);
+    }
+
 
     if (ResolutionComboBox)
     {
@@ -55,25 +60,48 @@ void UOptionMenuWidget::LoadSettings()
         LoadedData = Cast<UOptionSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSubsystem->OptionSaveSlotName, 0));
     }
 
+    float Master = 1.f;
+    float BGM = 1.f;
+    float SFX = 1.f;
+    int32 Resolution = 0;
+    int32 WindowMode = 0;
+
     if (LoadedData)
     {
-        if (MasterVolumeSlider)
-            MasterVolumeSlider->SetValue(LoadedData->MasterVolume);
-        if (BGMVolumeSlider)
-            BGMVolumeSlider->SetValue(LoadedData->BGMVolume);
-        if (SFXVolumeSlider)
-            SFXVolumeSlider->SetValue(LoadedData->SFXVolume);
-        if (ResolutionComboBox)
-            ResolutionComboBox->SetSelectedIndex(LoadedData->ResolutionIndex);
-        if (WindowModeComboBox)
-            WindowModeComboBox->SetSelectedIndex(LoadedData->WindowModeIndex);
+        Master = LoadedData->MasterVolume;
+
+        BGM = LoadedData->BGMVolume;
+
+        SFX = LoadedData->SFXVolume;
+
+        Resolution = LoadedData->ResolutionIndex;
+
+        WindowMode = LoadedData->WindowModeIndex;
     }
-    else
+
+    if (MasterVolumeSlider)
     {
-        if (ResolutionComboBox)
-            ResolutionComboBox->SetSelectedIndex(0);
-        if (WindowModeComboBox)
-            WindowModeComboBox->SetSelectedIndex(0);
+        MasterVolumeSlider->SetValue(Master);
+    }
+
+    if (BGMVolumeSlider)
+    {
+        BGMVolumeSlider->SetValue(BGM);
+    }
+
+    if (SFXVolumeSlider)
+    {
+        SFXVolumeSlider->SetValue(SFX);
+    }
+
+    if (ResolutionComboBox)
+    {
+        ResolutionComboBox->SetSelectedIndex(Resolution);
+    }
+
+    if (WindowModeComboBox)
+    {
+        WindowModeComboBox->SetSelectedIndex(WindowMode);
     }
 }
 
@@ -139,28 +167,4 @@ void UOptionMenuWidget::OnApplyButtonClicked()
 void UOptionMenuWidget::OnBackButtonClicked()
 {
     RemoveFromParent();
-}
-
-void UOptionMenuWidget::OnMasterVolumeChanged(float Value)
-{
-    if (SC_Master)
-    {
-        SC_Master->Properties.Volume = Value;
-    }
-}
-
-void UOptionMenuWidget::OnBGMVolumeChanged(float Value)
-{
-    if (SC_BGM)
-    {
-        SC_BGM->Properties.Volume = Value;
-    }
-}
-
-void UOptionMenuWidget::OnSFXVolumeChanged(float Value)
-{
-    if (SC_SFX)
-    {
-        SC_SFX->Properties.Volume = Value;
-    }
 }

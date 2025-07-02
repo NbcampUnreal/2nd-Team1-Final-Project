@@ -3,7 +3,6 @@
 
 #include "RSTycoonPlayerController.h"
 
-#include "CanvasItem.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "RSIngredientInventoryWidget.h"
@@ -11,7 +10,6 @@
 #include "RSTycoonInventoryComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
-#include "GameFramework/HUD.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "RogShop/UtilDefine.h"
@@ -28,6 +26,9 @@
 #include "Tycoon/NPC/RSTycoonNPC.h"
 #include "RSPlayerFloatingDamageWidget.h"
 #include "RogShop/Actor/Tycoon/Tile/RSIceBoxTile.h"
+#include "RogShop/Widget/Tycoon/RSTycoonCameraChangeWidget.h"
+#include "RogShop/Widget/Tycoon/RSTycoonFoodListWidget.h"
+#include "Tycoon/RSTycoonPlayerCharacter.h"
 
 #pragma region Mode
 ARSTycoonPlayerController::ARSTycoonPlayerController()
@@ -35,14 +36,11 @@ ARSTycoonPlayerController::ARSTycoonPlayerController()
 	InventoryComponent = CreateDefaultSubobject<URSTycoonInventoryComponent>(TEXT("Inventory"));
 }
 
-void ARSTycoonPlayerController::StartWaitMode()
+void ARSTycoonPlayerController::StartWaitMode(bool bNoAnimation)
 {
 	FInputModeGameAndUI InputMode;
 	SetInputMode(InputMode);
-	ChangeMainWidget(WaitWidget);
-
-	SetViewTargetWithBlend(MainCamera, 1.f);
-	SetCameraLocationToCenter();
+	ChangeMainWidget(WaitWidget, bNoAnimation);
 
 	DisableSelectTileOutline();
 
@@ -75,6 +73,10 @@ void ARSTycoonPlayerController::EndSaleMode()
 	ChangeMainWidget(SaleResultWidget);
 
 	SaleWidget->RemoveAllOrderSlots();
+
+	ARSTycoonPlayerCharacter* PlayerCharacter = Cast<ARSTycoonPlayerCharacter>(GetCharacter());
+	PlayerCharacter->ResetPickup();
+	PlayerCharacter->SetCooking(false);
 }
 
 void ARSTycoonPlayerController::StartManagementMode()
@@ -82,9 +84,6 @@ void ARSTycoonPlayerController::StartManagementMode()
 	FInputModeGameAndUI InputMode;
 	SetInputMode(InputMode);
 	ChangeMainWidget(ManagementWidget);
-
-	SetViewTargetWithBlend(TopCamera, 1.f);
-	SetCameraLocationToCenter();
 }
 
 void ARSTycoonPlayerController::SetSaleEnable(bool Value)
@@ -141,14 +140,48 @@ void ARSTycoonPlayerController::FinishOrderSlot(FFoodOrder Order)
 	SaleWidget->StopOrderSlotAnimation(Order);
 }
 
-void ARSTycoonPlayerController::ChangeMainWidget(UUserWidget* ActiveWidget)
+void ARSTycoonPlayerController::OpenFoodListWidget()
 {
-	WaitWidget->RemoveFromParent();
-	SaleWidget->RemoveFromParent();
-	SaleResultWidget->RemoveFromParent();
-	ManagementWidget->RemoveFromParent();
+	bIsOpenFoodListUI = true;
+	FoodListWidget->AddToViewport();
+}
 
-	ActiveWidget->AddToViewport();
+void ARSTycoonPlayerController::CloseFoodListWidget()
+{
+	bIsOpenFoodListUI = false;
+	FoodListWidget->RemoveFromParent();
+}
+
+void ARSTycoonPlayerController::ChangeMainWidget(UUserWidget* ActiveWidget, bool bNoAnimation)
+{
+	auto Lamda = [&, ActiveWidget]()
+	{
+		WaitWidget->RemoveFromParent();
+		SaleWidget->RemoveFromParent();
+		SaleResultWidget->RemoveFromParent();
+		ManagementWidget->RemoveFromParent();
+
+		ActiveWidget->AddToViewport();
+
+		if (ActiveWidget == ManagementWidget)
+		{
+			SetViewTarget(TopCamera);
+			TopCamera->SetLocationToCenter();
+		}
+		else if (ActiveWidget == WaitWidget || ActiveWidget == SaleWidget)
+		{
+			SetViewTarget(MainCamera);
+		}
+	};
+
+	if (bNoAnimation)
+	{
+		Lamda();
+	}
+	else
+	{
+		CameraChangeWidget->Active(Lamda);
+	}
 }
 
 void ARSTycoonPlayerController::SettingWidget()
@@ -169,6 +202,9 @@ void ARSTycoonPlayerController::SettingWidget()
 	EventViewWidget = CreateWidget<URSTycoonEventViewWidget>(this, EventViewWidgetClass.Get());
 	EventViewWidget->AddToViewport();
 	EventViewWidget->SetVisibility(ESlateVisibility::Hidden);
+
+	FoodListWidget = CreateWidget<URSTycoonFoodListWidget>(this, FoodListWidgetClass.Get());
+	CameraChangeWidget = CreateWidget<URSTycoonCameraChangeWidget>(this, CameraChangeWidgetClass.Get());
 }
 #pragma endregion
 
@@ -203,10 +239,9 @@ void ARSTycoonPlayerController::SettingInput()
 #pragma endregion
 
 #pragma region Camera
-void ARSTycoonPlayerController::SetCameraLocationToCenter()
+void ARSTycoonPlayerController::SetMainCameraLocationToCenter()
 {
 	MainCamera->SetLocationToCenter();
-	TopCamera->SetLocationToCenter();
 }
 
 void ARSTycoonPlayerController::SettingCamera()
@@ -222,75 +257,8 @@ void ARSTycoonPlayerController::SettingCamera()
 	TopCamera = Cast<ARSTycoonCamera>(TycoonCameras[1 - MainCameraIndex]);
 
 	SetViewTarget(MainCamera);
-	SetCameraLocationToCenter();
-
-	//SetViewTarget으로 뷰를 설정하면 이론상 다음 프레임에 행렬이 변경되어야 하는데 실제로 NextTick에 실행해보면
-	//갱신되지 않아 이상한데에 찍혀 물리적인 딜레이를 주었다.
-	// FTimerHandle TimerHandle;
-	// GetWorldTimerManager().SetTimer(TimerHandle, [&]()
-	// {
-	// 	SetMaxLengthOfMainCamera();
-	// }, 0.05f, false);
+	MainCamera->SetLocationToCenter();
 }
-
-void ARSTycoonPlayerController::SetMaxLengthOfMainCamera()
-{
-	/*
-	ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
-	check(TileMap)
-
-	FVector Center = TileMap->GetMapCenter();
-	FVector HalfSize = TileMap->GetMapSize() * 0.5f;
-
-	TArray<FVector> Vertices;
-	Vertices.SetNum(4);
-	Vertices[0] = FVector(Center.X + HalfSize.X, Center.Y - HalfSize.Y, Center.Z);
-	Vertices[1] = FVector(Center.X + HalfSize.X, Center.Y + HalfSize.Y, Center.Z);
-	Vertices[2] = FVector(Center.X - HalfSize.X, Center.Y - HalfSize.Y, Center.Z);
-	Vertices[3] = FVector(Center.X - HalfSize.X, Center.Y + HalfSize.Y, Center.Z);
-
-	//반복문 이전 세팅
-	bool bAllVertexInScreen;
-	MainCamera->GetSpringArmComponent()->TargetArmLength = 0;
-	MainCamera->GetSpringArmComponent()->MarkRenderTransformDirty();
-	MainCamera->GetSpringArmComponent()->UpdateComponentToWorld();
-
-	int32 ScreenW, ScreenH;
-	GetViewportSize(ScreenW, ScreenH);
-	RS_LOG_F("Screen : %d %d", ScreenW, ScreenH)
-
-	do
-	{
-		MainCamera->GetSpringArmComponent()->TargetArmLength += CameraMoveSensitivity;
-		MainCamera->GetSpringArmComponent()->MarkRenderTransformDirty();
-		MainCamera->GetSpringArmComponent()->UpdateComponentToWorld();
-
-		UpdateCameraManager(0.0f);
-		
-		bAllVertexInScreen = true;
-		FVector2D ScreenPosition;
-		for (FVector Vertex : Vertices)
-		{
-			ProjectWorldLocationToScreen(Vertex, ScreenPosition);
-
-			//디버그용
-			RS_LOG_F_C("%f %f", FColor::Orange, ScreenPosition.X, ScreenPosition.Y);
-			FVector WorldLo, WorldFront;
-			DeprojectScreenPositionToWorld(ScreenPosition.X, ScreenPosition.Y, WorldLo, WorldFront);
-			DrawDebugSphere(GetWorld(), WorldLo, 2, 30, FColor::Orange, false, 10);
-			
-			if (ScreenPosition.X < 0 || ScreenPosition.X > ScreenW ||
-				ScreenPosition.Y < 0 || ScreenPosition.Y > ScreenH)
-			{
-				bAllVertexInScreen = false;
-			}
-		}
-	} while (!bAllVertexInScreen);
-
-	MaxCameraLengthOfMainCamera = MainCamera->GetSpringArmComponent()->TargetArmLength;
-	*/
-}
-
 
 void ARSTycoonPlayerController::OnZoom(const FInputActionValue& Value)
 {
@@ -304,22 +272,7 @@ void ARSTycoonPlayerController::OnZoom(const FInputActionValue& Value)
 
 		//탑 카메라
 		float OrthoWidth = TopCamera->GetCameraComponent()->OrthoWidth + OrthoWidthSensitivity * InputAction;
-
-		//최댓값 설정에 너무 많은 시간을 뺏김. 제거
-		// if (OrthoWidth >= MaxTopCameraOrthoWidth)
-		// {
-		// 	OrthoWidth = MaxTopCameraOrthoWidth;
-		// 	TopCamera->SetLocationToCenter();
-		// }
-		// else
-		// {
-		//		TopCamera->AttachPlayer();
-		// }
-
-		if (OrthoWidth < MinOrthoWidth)
-		{
-			OrthoWidth = MinOrthoWidth;
-		}
+		OrthoWidth = FMath::Clamp(OrthoWidth, MinOrthoWidth, MaxOrthoWidth);
 
 		TopCamera->AttachPlayer();
 		TopCamera->GetCameraComponent()->SetOrthoWidth(OrthoWidth);
@@ -328,22 +281,7 @@ void ARSTycoonPlayerController::OnZoom(const FInputActionValue& Value)
 	{
 		//메인 카메라
 		float CameraLength = MainCamera->GetSpringArmComponent()->TargetArmLength + CameraMoveSensitivity * InputAction;
-
-		//최댓값 설정에 너무 많은 시간을 뺏김. 제거
-		// if (PerspectiveFov >= MaxCameraLengthOfMainCamera)
-		// {
-		// 	PerspectiveFov = MaxCameraLengthOfMainCamera;
-		// 	MainCamera->SetLocationToCenter();
-		// }
-		// else
-		// {
-		// 	MainCamera->AttachPlayer();
-		// }
-
-		if (CameraLength < MinLengthOfMainCamera)
-		{
-			CameraLength = MinLengthOfMainCamera;
-		}
+		CameraLength = FMath::Clamp(CameraLength, MinLengthOfMainCamera, MaxLengthOfMainCamera);
 
 		MainCamera->AttachPlayer();
 		MainCamera->GetSpringArmComponent()->TargetArmLength = CameraLength;
@@ -370,6 +308,75 @@ void ARSTycoonPlayerController::OnRotateTile(const FInputActionValue& Value)
 	Yaw += 90 * Sign;
 
 	TileMap->RotateTile(SelectTileIndex, Yaw);
+	CheckLimitsOfSale();
+}
+
+void ARSTycoonPlayerController::OnClickTileOrNPC()
+{
+	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
+	check(GameMode)
+
+	if (GameMode->GetState() != ETycoonGameMode::Management)
+	{
+		return;
+	}
+
+	if (NPCInfoWidget->IsInViewport())
+	{
+		NPCInfoWidget->RemoveFromParent();
+	}
+
+	FHitResult HitResult;
+	if (GetHitResultUnderCursor(ECC_WorldDynamic, true, HitResult))
+	{
+		//디버그
+		RS_DRAW_DEBUG_SPHERE(GetWorld(), HitResult.Location, 40, 20, FColor::Blue, false, 5, 0, 1.0f);
+
+		AActor* HitActor = HitResult.GetActor();
+		if (ARSBaseTile* Tile = Cast<ARSBaseTile>(HitActor))
+		{
+			ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
+			check(TileMap)
+
+			auto& Tiles = TileMap->GetTiles();
+			for (int i = 0; i < Tiles.Num(); i++)
+			{
+				if (Tiles[i] == Tile)
+				{
+					SelectTileIndex = i;
+					break;
+				}
+			}
+
+			RS_LOG_F("%s 타일이 선택됬습니다", *HitActor->GetName());
+			ManagementWidget->OpenBuyTileLayout();
+
+			EnableSelectTileOutline(Tile->GetActorLocation());
+		}
+		else if (ARSTycoonNPC* NPC = Cast<ARSTycoonNPC>(HitActor))
+		{
+			RS_LOG_F("%s NPC가 선택됬습니다", *HitActor->GetName());
+
+			DisableSelectTileOutline();
+
+			NPCInfoWidget->SetNPC(NPC);
+			NPCInfoWidget->AddToViewport();
+
+			FVector2D MousePosition;
+			GetMousePosition(MousePosition.X, MousePosition.Y);
+
+			NPCInfoWidget->SetPositionInViewport(MousePosition);
+		}
+		else
+		{
+			DisableSelectTileOutline();
+		}
+	}
+	//타일을 한번 선택한 후 어딜 누르든 타일 선택이 취소됨
+	else
+	{
+		DisableSelectTileOutline();
+	}
 }
 
 void ARSTycoonPlayerController::SettingChangeTile()
@@ -450,70 +457,6 @@ void ARSTycoonPlayerController::BeginPlay()
 	SettingCamera();
 	SettingWidget();
 	SettingChangeTile();
-}
-
-void ARSTycoonPlayerController::OnClickTileOrNPC()
-{
-	ARSTycoonGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ARSTycoonGameModeBase>();
-	check(GameMode)
-
-	if (GameMode->GetState() != ETycoonGameMode::Management)
-	{
-		return;
-	}
-
-	if (NPCInfoWidget->IsInViewport())
-	{
-		NPCInfoWidget->RemoveFromParent();
-	}
-
-	FHitResult HitResult;
-	if (GetHitResultUnderCursor(ECC_WorldDynamic, true, HitResult))
-	{
-		//디버그
-		RS_DRAW_DEBUG_SPHERE(GetWorld(), HitResult.Location, 40, 20, FColor::Blue, false, 5, 0, 1.0f);
-
-		AActor* HitActor = HitResult.GetActor();
-		if (ARSBaseTile* Tile = Cast<ARSBaseTile>(HitActor))
-		{
-			ARSTileMap* TileMap = Cast<ARSTileMap>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTileMap::StaticClass()));
-			check(TileMap)
-
-			auto& Tiles = TileMap->GetTiles();
-			for (int i = 0; i < Tiles.Num(); i++)
-			{
-				if (Tiles[i] == Tile)
-				{
-					SelectTileIndex = i;
-					break;
-				}
-			}
-
-			RS_LOG_F("%s 타일이 선택됬습니다", *HitActor->GetName());
-			ManagementWidget->OpenBuyTileLayout();
-
-			EnableSelectTileOutline(Tile->GetActorLocation());
-		}
-		else if (ARSTycoonNPC* NPC = Cast<ARSTycoonNPC>(HitActor))
-		{
-			RS_LOG_F("%s NPC가 선택됬습니다", *HitActor->GetName());
-
-			DisableSelectTileOutline();
-
-			NPCInfoWidget->SetNPC(NPC);
-			NPCInfoWidget->AddToViewport();
-
-			FVector2D MousePosition;
-			GetMousePosition(MousePosition.X, MousePosition.Y);
-
-			NPCInfoWidget->SetPositionInViewport(MousePosition);
-		}
-	}
-	//타일을 한번 선택한 후 어딜 누르든 타일 선택이 취소됨
-	else
-	{
-		DisableSelectTileOutline();
-	}
 }
 
 void ARSTycoonPlayerController::FloatingGold(int32 Amount, FVector WorldLocation)

@@ -55,9 +55,6 @@ public:
 		
 private:
 	// 애니메이션들을 캐싱한다.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<UAnimInstance> WeaponAnimInstnace; // 무기의 기본 이동 애님 인스턴스
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anim", meta = (AllowPrivateAccess = "true"))
 	TArray<FWeaponAttackData> NormalAttackDatas; // 무기의 기본 공격 몽타주
 
@@ -74,6 +71,15 @@ public:
 	float GetNormalAttackMontageDamage(int32 MontageIndex) const;
 
 	float GetStrongAttackMontageDamage(int32 MontageIndex) const;
+
+// 부착할 소켓
+public:
+	FName GetAttachSocketName() const;
+
+private:
+	// 부착할 소켓 이름
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttachSocket", meta = (AllowPrivateAccess = "true"))
+	FName AttachSocket;
 
 // 나이아가라
 public:

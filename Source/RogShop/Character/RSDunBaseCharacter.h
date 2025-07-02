@@ -7,6 +7,8 @@
 #include "RSDunBaseCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterDied, ARSDunBaseCharacter*, DiedCharacter);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterHited, ARSDunBaseCharacter*, HitedCharacter);
+
 
 UCLASS()
 class ROGSHOP_API ARSDunBaseCharacter : public ACharacter
@@ -16,10 +18,15 @@ class ROGSHOP_API ARSDunBaseCharacter : public ACharacter
 public:
 	ARSDunBaseCharacter();
 
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 // 델리게이트
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnCharacterDied OnCharacterDied;	// 죽었을 때 호출
+
+	UPROPERTY(BlueprintAssignable)
+	FOnCharacterHited OnCharacterHited;	// 피해를 받았을 때 호출
 
 // 스탯 관련
 public:

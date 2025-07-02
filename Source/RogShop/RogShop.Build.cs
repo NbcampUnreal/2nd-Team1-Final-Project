@@ -30,6 +30,9 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "Actor", "MapGenerator"),
             Path.Combine(ModuleDirectory, "Actor", "Dungeon", "GroundItem"),
             Path.Combine(ModuleDirectory, "Actor", "Dungeon", "Relic"),
+            Path.Combine(ModuleDirectory, "Actor", "Dungeon", "Altar"),
+            Path.Combine(ModuleDirectory, "Actor", "Dungeon", "TreasureChest"),
+            Path.Combine(ModuleDirectory, "Actor", "BaseArea"),
             Path.Combine(ModuleDirectory, "Interface"),
             Path.Combine(ModuleDirectory, "DataTable"),
             Path.Combine(ModuleDirectory, "Object", "Relic"),
@@ -39,6 +42,7 @@ public class RogShop : ModuleRules
             Path.Combine(ModuleDirectory, "SaveGame", "Tycoon"),
             Path.Combine(ModuleDirectory, "SaveGame", "Option"),
             Path.Combine(ModuleDirectory, "Struct"),
+            Path.Combine(ModuleDirectory, "Enum"),
             Path.Combine(ModuleDirectory, "DeveloperSettings"),
         });
 

@@ -7,9 +7,9 @@
 #include "Components/Image.h"
 #include "Components/Button.h"
 
-void URSInventorySlotWidget::NativeConstruct()
+void URSInventorySlotWidget::NativeOnInitialized()
 {
-    Super::NativeConstruct();
+    Super::NativeOnInitialized();
 
     if (SlotButton)
     {

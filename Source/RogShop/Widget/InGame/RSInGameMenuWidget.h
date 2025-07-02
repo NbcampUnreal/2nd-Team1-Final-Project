@@ -7,6 +7,7 @@
 #include "RSInGameMenuWidget.generated.h"
 
 class UButton;
+class URSGuideWidget;
 
 UCLASS()
 class ROGSHOP_API URSInGameMenuWidget : public UUserWidget
@@ -16,7 +17,17 @@ class ROGSHOP_API URSInGameMenuWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
+public:
+	UFUNCTION()
+	void VsibleInGameMenu();
+
+	UFUNCTION()
+	void HideInGameMenu();
+
 private:
+	UFUNCTION()
+	void OnGuideButtonClicked();
+
 	UFUNCTION()
 	void OnMainMenuButtonClicked();
 
@@ -24,10 +35,13 @@ private:
 	void OnBaseAreaButtonClicked();
 
 	UFUNCTION()
-	void OnCloseButtonClicked ();
+	void OnCloseButtonClicked();
 
-// UI
+// 버튼
 private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
+	TObjectPtr<UButton> GuideButton;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
 	TObjectPtr<UButton> MainMenuButton;
 
@@ -36,4 +50,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (BindWidget, AllowPrivateAccess = "true"))
 	TObjectPtr<UButton> CloseButton;
+
+// 가이드 UI
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> GuideWidgetClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<URSGuideWidget> GuideWidgetInstance;
 };

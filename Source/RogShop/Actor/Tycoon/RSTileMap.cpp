@@ -51,9 +51,10 @@ void ARSTileMap::ChangeTileSize(int32 NewWidth, int32 NewHeight, bool bUseGold)
 	if (bUseGold)
 	{
 		ARSTycoonPlayerController* PlayerController =
-			Cast<ARSTycoonPlayerController>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSTycoonPlayerController::StaticClass()));
+			Cast<ARSTycoonPlayerController>(
+				UGameplayStatics::GetActorOfClass(GetWorld(), ARSTycoonPlayerController::StaticClass()));
 		check(PlayerController)
-		
+
 		int32 Price = GetNeedPrice(NewWidth, NewHeight);
 		if (PlayerController->GetGold() < Price)
 		{
@@ -63,7 +64,7 @@ void ARSTileMap::ChangeTileSize(int32 NewWidth, int32 NewHeight, bool bUseGold)
 
 		PlayerController->AddGold(-Price);
 	}
-	
+
 	Width = NewWidth;
 	Height = NewHeight;
 
@@ -189,7 +190,6 @@ void ARSTileMap::BeginPlay()
 
 	LoadTileMap();
 	CreateTiles();
-	ActiveNPC();
 
 	GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->OnSaveRequested.AddDynamic(this, &ARSTileMap::SaveTileMap);
 }
@@ -274,7 +274,7 @@ void ARSTileMap::CreateTiles()
 	NavVolume->SetActorLocation(GetMapCenter());
 
 	FVector TileSize = DefaultTileType.GetDefaultObject()->GetTileSize();
-	FVector NavMeshSize = FVector(TileSize.X * (Height + 1), TileSize.Y * (Width + 1), 100);
+	FVector NavMeshSize = FVector(TileSize.X * (Height + 1), TileSize.Y * (Width + 1), 20);
 	UBrushComponent* BrushComp = NavVolume->GetBrushComponent();
 
 	BrushComp->SetMobility(EComponentMobility::Type::Movable);
@@ -329,28 +329,25 @@ ARSBaseTile* ARSTileMap::CreateTile(const TSubclassOf<ARSBaseTile>& TileClass, i
 void ARSTileMap::CreateWalls(const FVector& Location, int32 Row, int32 Column)
 {
 	//벽, 문 타일이 있다면 설치하지 않음
-	if (TileName2DMap[Row].Tiles[Column] != ARSDoorTile::GetStaticTileKey())
+	//위
+	if (Row == Height - 1)
 	{
-		//위
-		if (Row == Height - 1)
-		{
-			CreateWall(WallClass, Location, 0.f);
-		}
-		//아래
-		if (Row == 0)
-		{
-			CreateWall(WallClass, Location, 180.f);
-		}
-		//왼쪽
-		if (Column == 0)
-		{
-			CreateWall(WallClass, Location, 270.f);
-		}
-		//오른쪽
-		if (Column == Width - 1)
-		{
-			CreateWall(WallClass, Location, 90.f);
-		}
+		CreateWall(WallClass, Location, 0.f);
+	}
+	//아래
+	if (Row == 0)
+	{
+		CreateWall(WallClass, Location, 180.f);
+	}
+	//왼쪽
+	if (Column == 0)
+	{
+		CreateWall(WallClass, Location, 270.f);
+	}
+	//오른쪽
+	if (Column == Width - 1)
+	{
+		CreateWall(WallClass, Location, 90.f);
 	}
 
 	//기둥
@@ -406,7 +403,8 @@ void ARSTileMap::DeleteTileData()
 {
 	RS_LOG_C("저장 데이터 삭제", FColor::Orange);
 
-	FString SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
+	// FString SlotName = GetWorld()->GetGameInstance()->GetSubsystem<URSSaveGameSubsystem>()->TycoonTileMapSaveSlot;
+	FString SlotName = TEXT("TileMapSaveSlot");;
 	UGameplayStatics::DeleteGameInSlot(SlotName, 0);
 }
 
