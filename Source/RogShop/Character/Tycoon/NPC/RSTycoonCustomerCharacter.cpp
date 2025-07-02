@@ -68,10 +68,10 @@ void ARSTycoonCustomerCharacter::StopAllAction()
 {
 	Super::StopAllAction();
 
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+	
 	State = ETycoonCustomerState::Move;
 	SitTableTile = nullptr;
-
-	GetWorldTimerManager().ClearAllTimersForObject(this);
 }
 
 void ARSTycoonCustomerCharacter::BeginPlay()
@@ -124,9 +124,11 @@ void ARSTycoonCustomerCharacter::Leave()
 
 	float PlayTime = PlayAnimMontage(StandMontage);
 	FTimerHandle StandTimer;
-	GetWorldTimerManager().SetTimer(StandTimer, [&]()
-	{
-		ARSDoorTile* DoorTile = Cast<ARSDoorTile>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSDoorTile::StaticClass()));
-		MoveToTarget(DoorTile->GetSpawnPoint(), DoorTile);
-	}, PlayTime, false);
+	GetWorldTimerManager().SetTimer(StandTimer, this, &ARSTycoonCustomerCharacter::MoveToDoor, PlayTime, false);
+}
+
+void ARSTycoonCustomerCharacter::MoveToDoor()
+{
+	ARSDoorTile* DoorTile = Cast<ARSDoorTile>(UGameplayStatics::GetActorOfClass(GetWorld(), ARSDoorTile::StaticClass()));
+	MoveToTarget(DoorTile->GetSpawnPoint(), DoorTile);
 }

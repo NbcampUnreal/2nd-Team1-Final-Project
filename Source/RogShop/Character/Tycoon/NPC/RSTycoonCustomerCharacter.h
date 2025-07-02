@@ -51,6 +51,9 @@ protected:
 private:
 	void Leave();
 	
+	UFUNCTION()
+	void MoveToDoor();
+	
 public:
 	FName WantFoodKey;
 
