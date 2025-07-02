@@ -43,7 +43,7 @@ void ARSTableTile::ResetAll()
 
 	for (auto& FoodActor : FoodActors)
 	{
-		if (FoodActor->IsValidLowLevel())
+		if (FoodActor.IsValid())
 		{
 			FoodActor->Destroy();
 			FoodActor = nullptr;

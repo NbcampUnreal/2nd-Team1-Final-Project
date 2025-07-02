@@ -164,13 +164,14 @@ void ARSTileMap::SaveTileMap()
 
 FVector ARSTileMap::GetMapCenter()
 {
-	FVector Size = GetMapSize();
 	FVector Center = GetActorLocation();
-	FVector HalfTileSize = DefaultTileType.GetDefaultObject()->GetTileSize() * 0.5f;
+	///왼쪽 아래가 기준일 경우
+	// FVector Size = GetMapSize();
+	// FVector HalfTileSize = DefaultTileType.GetDefaultObject()->GetTileSize() * 0.5f;
 
 	//Center에서 타일의 중심이 생성되기 때문에 위치를 보정해줘야함
-	Center.Y += Size.Y * 0.5f - HalfTileSize.Y;
-	Center.X += Size.X * 0.5f - HalfTileSize.X;
+	// Center.Y += Size.Y * 0.5f - HalfTileSize.Y;
+	// Center.X += Size.X * 0.5f - HalfTileSize.X;
 
 	return Center;
 }
@@ -313,7 +314,13 @@ ARSBaseTile* ARSTileMap::CreateTile(const TSubclassOf<ARSBaseTile>& TileClass, i
 #endif
 
 	FVector TileSize = DefaultTileType.GetDefaultObject()->GetTileSize();
+
+	//중앙 정렬
 	FVector Location = GetActorLocation();
+	FVector MapSize = GetMapSize();
+	Location.X = Location.X - MapSize.X * 0.5f + TileSize.X * 0.5f;
+	Location.Y = Location.Y - MapSize.Y * 0.5f + TileSize.Y * 0.5f;
+	
 	Location.X += TileSize.X * Row;
 	Location.Y += TileSize.Y * Column;
 
@@ -429,7 +436,7 @@ FVector ARSTileMap::GetRandomLocationInMap()
 	FVector HalfTileSize = DefaultTileType->GetDefaultObject<ARSBaseTile>()->GetTileSize() * 0.5f;
 	FVector MapSize = GetMapSize();
 	FVector RandomLocation = FVector(FMath::FRand()) * MapSize;
-	FVector SpawnLocation = GetActorLocation() + RandomLocation - HalfTileSize;
+	FVector SpawnLocation = GetActorLocation() - MapSize * 0.5f  + RandomLocation;
 	SpawnLocation.Z = GetActorLocation().Z + 100;
 
 	return SpawnLocation;

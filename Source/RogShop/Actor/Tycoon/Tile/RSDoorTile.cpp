@@ -26,7 +26,12 @@ ARSTycoonCustomerCharacter* ARSDoorTile::SpawnCustomer(const FName& FoodKey, ARS
 	Customer->WantFoodKey = FoodKey;
 
 	int32 Index = TargetTable->GetCanSitingLocationIndex();
-	Customer->MoveToTarget(TargetTable->GetSitTransform(Index).GetLocation(), TargetTable);	
+	if (Index == INDEX_NONE)
+	{
+		verify("Sit Location Index Is None")
+	}
+
+	Customer->MoveToTarget(TargetTable->GetSitTransform(Index).GetLocation(), TargetTable);
 
 	return Customer;
 }
