@@ -9,7 +9,7 @@
       </a>
     </td>
     <td>
-      <a href="https://your-download-link.com">
+      <a href="https://drive.google.com/file/d/1j5m93WEwPretgy8io5T_n-XIz-M0K8jw/view?usp=sharing">
         <img src="https://github.com/user-attachments/assets/914eba8b-0fef-462b-95e3-34d268e44563"
              width="200" alt="다운로드 버튼">
       </a>
