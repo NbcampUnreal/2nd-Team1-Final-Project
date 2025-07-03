@@ -50,7 +50,8 @@
 ![이해를 돕기 위한 게임 흐름 이미지](https://github.com/user-attachments/assets/37066535-5cfd-426f-a1a6-f183bf294f44)
 
 ---
-## 시연 영상 ↓↓↓이미지를 클릭하면 유튜브로 보실 수 있습니다!
+## 시연 영상 
+### ↓↓↓이미지를 클릭하면 유튜브로 보실 수 있습니다!
 <a href="https://www.youtube.com/watch?v=xqjJGslHHrg">
   <img src="https://github.com/user-attachments/assets/1a94995f-0c78-4a10-9685-c6fe3a20e2d4" width="600" />
 </a>
