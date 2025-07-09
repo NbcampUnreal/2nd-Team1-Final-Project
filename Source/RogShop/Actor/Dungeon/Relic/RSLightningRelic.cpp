@@ -60,7 +60,7 @@ void URSLightningRelic::EnemyHitEffect(ARSDunBaseCharacter* TargetCharacter)
 
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), EffectNiagara, SpawnLocation, SpawnRotation, Scale, true, true);
 
-		FVector TraceStart = TargetCharacter->GetActorUpVector() * TargetCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+		FVector TraceStart = TargetCharacter->GetActorLocation() + TargetCharacter->GetActorUpVector() * TargetCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 		FVector TraceEnd = TargetCharacter->GetActorUpVector();
 
 		TArray<FHitResult> HitResults;

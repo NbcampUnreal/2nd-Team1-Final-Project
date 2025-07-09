@@ -71,6 +71,7 @@ ARSDunPlayerCharacter::ARSDunPlayerCharacter()
     // 상호작용
     InteractActor = nullptr;
     InteractRadius = 200.f;
+    InteractAngle = 45.f;
 
     // AI퍼셉션 자극 소스
     AIPerceptionStimuliSourceComp = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("AIPerceptionStimuliSource"));
@@ -626,7 +627,7 @@ void ARSDunPlayerCharacter::InteractTrace()
         FVector Forward = GetActorForwardVector();
 
         // 전방 내에 있는 액터와 가장 가까이 있는 액터를 병행해서 계산한다.
-        AActor* ClosestInFront = nullptr;
+        AActor* ClosestInFrontActor = nullptr;
         float ClosestInFrontDist = TNumericLimits<float>::Max();
 
         AActor* ClosestActor = nullptr;
@@ -652,7 +653,7 @@ void ARSDunPlayerCharacter::InteractTrace()
             // 전방 내 혀용 각도 안에 있으며, 현재까지 가장 가까운 액터일 경우
             if (Angle <= InteractAngle && Distance < ClosestInFrontDist)
             {
-                ClosestInFront = Target;
+                ClosestInFrontActor = Target;
                 ClosestInFrontDist = Distance;
             }
 
@@ -665,10 +666,10 @@ void ARSDunPlayerCharacter::InteractTrace()
         }
 
         // 전방 또는 전체 액터 중 유효한 액터가 있는 경우
-        if (ClosestInFront || ClosestActor)
+        if (ClosestInFrontActor || ClosestActor)
         {
             // 전방을 우선으로 사용한다.
-            AActor* TargetActor = (ClosestInFront != nullptr) ? ClosestInFront : ClosestActor;
+            AActor* TargetActor = (ClosestInFrontActor != nullptr) ? ClosestInFrontActor : ClosestActor;
 
             // 대상 액터가 상호작용 인터페이스를 구현했는지 확인하고 구현했다면 저장한다.
             if (TargetActor && TargetActor->GetClass()->ImplementsInterface(URSInteractable::StaticClass()))

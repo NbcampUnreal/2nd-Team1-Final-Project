@@ -489,7 +489,7 @@ void URSSpawnManager::SaveSpawnInfo()
 
 	// 세이브 데이터 설정
 	DungeonStageSaveGame->UnspawnedWeapons = UnspawnedWeapons.Array();
-	DungeonStageSaveGame->UnspawnedRelics = UnspawnedWeapons.Array();
+	DungeonStageSaveGame->UnspawnedRelics = UnspawnedRelics.Array();
 
 	// 저장
 

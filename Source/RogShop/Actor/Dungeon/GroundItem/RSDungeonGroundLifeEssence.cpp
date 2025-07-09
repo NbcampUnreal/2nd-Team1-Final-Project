@@ -71,7 +71,12 @@ void ARSDungeonGroundLifeEssence::Interact(ARSDunPlayerCharacter* Interactor)
 
 	GetWorld()->GetTimerManager().SetTimer(InteractDelayTimer, FTimerDelegate::CreateLambda([=, this]()
 	{
-		if (IsValid(this) && IsValid(MeshComp) && IsValid(SceneComp))
+		if (!IsValid(this) || IsPendingKillEnabled())
+		{
+			return;
+		}
+
+		if (IsValid(MeshComp) && IsValid(SceneComp))
 		{
 			MeshComp->SetSimulatePhysics(false);
 			MeshComp->SetEnableGravity(false);
