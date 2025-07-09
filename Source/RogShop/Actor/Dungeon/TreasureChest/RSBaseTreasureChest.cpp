@@ -61,6 +61,11 @@ UAnimMontage* ARSBaseTreasureChest::GetInteractAnimMontage() const
 	return nullptr;
 }
 
+int32 ARSBaseTreasureChest::GetWeight() const
+{
+	return 0;
+}
+
 void ARSBaseTreasureChest::OpenChest()
 {
 

@@ -31,4 +31,6 @@ public:
 	virtual bool GetIsAutoInteract() const = 0;
 
 	virtual UAnimMontage* GetInteractAnimMontage() const = 0;
+
+	virtual int32 GetWeight() const = 0;
 };

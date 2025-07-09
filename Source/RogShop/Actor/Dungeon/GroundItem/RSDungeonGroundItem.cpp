@@ -55,6 +55,11 @@ UAnimMontage* ARSDungeonGroundItem::GetInteractAnimMontage() const
 	return InteractAnimMontage;
 }
 
+int32 ARSDungeonGroundItem::GetWeight() const
+{
+	return 0;
+}
+
 void ARSDungeonGroundItem::InitGroundItemInfo(FText NewInteractName, bool NewbIsAutoInteract, FName NewDataTableKey, UStaticMesh* NewMesh)
 {
 	InteractName = NewInteractName;

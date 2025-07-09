@@ -60,3 +60,8 @@ UAnimMontage* ARSDunBossRoomPortal::GetInteractAnimMontage() const
 	return nullptr;
 }
 
+int32 ARSDunBossRoomPortal::GetWeight() const
+{
+	return 0;
+}
+

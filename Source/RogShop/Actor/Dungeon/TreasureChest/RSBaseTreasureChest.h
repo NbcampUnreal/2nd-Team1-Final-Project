@@ -30,6 +30,8 @@ public:
 
 	virtual UAnimMontage* GetInteractAnimMontage() const override;
 
+	virtual int32 GetWeight() const override;
+
 protected:
 	FText InteractName;
 

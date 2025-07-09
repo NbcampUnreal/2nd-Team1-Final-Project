@@ -53,6 +53,11 @@ UAnimMontage* ARSBaseAltar::GetInteractAnimMontage() const
 	return nullptr;
 }
 
+int32 ARSBaseAltar::GetWeight() const
+{
+	return 0;
+}
+
 UUserWidget* ARSBaseAltar::GetCostWidgetObject()
 {
 	if (CostWidgetComp)

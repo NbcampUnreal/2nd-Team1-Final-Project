@@ -29,6 +29,11 @@ void ARSDungeonGroundIngredient::Interact(ARSDunPlayerCharacter* Interactor)
 	}
 }
 
+int32 ARSDungeonGroundIngredient::GetWeight() const
+{
+	return 5;
+}
+
 void ARSDungeonGroundIngredient::SetQuantity(int32 NewQuantity)
 {
 	Quantity = NewQuantity;

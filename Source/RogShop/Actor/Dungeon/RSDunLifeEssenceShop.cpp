@@ -78,6 +78,11 @@ UAnimMontage* ARSDunLifeEssenceShop::GetInteractAnimMontage() const
 	return nullptr;
 }
 
+int32 ARSDunLifeEssenceShop::GetWeight() const
+{
+	return 0;
+}
+
 void ARSDunLifeEssenceShop::PlayMontage()
 {
 	if (!SkeletalAnim.IsEmpty())

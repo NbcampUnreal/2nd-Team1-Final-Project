@@ -21,6 +21,8 @@ public:
 public:
 	virtual void Interact(ARSDunPlayerCharacter* Interactor) override;
 
+	virtual int32 GetWeight() const override;
+
 public:
 	void SetQuantity(int32 NewQuantity);
 

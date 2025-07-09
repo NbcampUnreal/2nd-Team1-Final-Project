@@ -78,3 +78,8 @@ UAnimMontage* ARSInteractableLevelTravel::GetInteractAnimMontage() const
 {
 	return nullptr;
 }
+
+int32 ARSInteractableLevelTravel::GetWeight() const
+{
+	return 0;
+}

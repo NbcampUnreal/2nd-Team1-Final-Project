@@ -71,7 +71,7 @@ void ARSDungeonGroundLifeEssence::Interact(ARSDunPlayerCharacter* Interactor)
 
 	GetWorld()->GetTimerManager().SetTimer(InteractDelayTimer, FTimerDelegate::CreateLambda([=, this]()
 	{
-		if (!IsValid(this) || IsPendingKillEnabled())
+		if (!IsValid(this) || IsActorBeingDestroyed())
 		{
 			return;
 		}

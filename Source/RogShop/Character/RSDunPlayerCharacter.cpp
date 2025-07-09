@@ -633,6 +633,8 @@ void ARSDunPlayerCharacter::InteractTrace()
         AActor* ClosestActor = nullptr;
         float CosestActorDistance = TNumericLimits<float>::Max();
 
+        AActor* HighWeightActor = nullptr;
+
         for (const FOverlapResult& Result : OutOverlaps)
         {
             AActor* Target = Result.GetActor();
@@ -640,6 +642,44 @@ void ARSDunPlayerCharacter::InteractTrace()
             {
                 continue;
             }
+
+            IRSInteractable* TargetInteractable = Cast<IRSInteractable>(Target);
+
+            // 바로 상호작용 해야하는 경우
+            if (TargetInteractable->GetIsAutoInteract() == true)
+            {
+                TargetInteractable->Interact(this);
+                continue;
+            }
+
+            // 가중치를 비교하여 현재 탐색된 대상보다 낮은 경우 스킵
+            if (HighWeightActor)
+            {
+                IRSInteractable* HighWeightInteractable = Cast<IRSInteractable>(HighWeightActor);
+
+                if (!TargetInteractable || !HighWeightInteractable)
+                {
+                    continue;
+                }
+
+                int32 TargetWeight = TargetInteractable->GetWeight();
+                int32 HighWeight = HighWeightInteractable->GetWeight();
+
+                if (HighWeight < TargetWeight)
+                {
+                    ClosestInFrontActor = nullptr;
+                    ClosestInFrontDist = 0.f;
+
+                    ClosestActor = nullptr;
+                    CosestActorDistance = 0.f;
+                }
+                else if (HighWeight > TargetWeight)
+                {
+                    continue;
+                }
+            }
+
+            HighWeightActor = Target;
 
             // 대상 액터까지의 벡터 및 거리 계산
             FVector ToTarget = Target->GetActorLocation() - Center;
@@ -671,7 +711,7 @@ void ARSDunPlayerCharacter::InteractTrace()
             // 전방을 우선으로 사용한다.
             AActor* TargetActor = (ClosestInFrontActor != nullptr) ? ClosestInFrontActor : ClosestActor;
 
-            // 대상 액터가 상호작용 인터페이스를 구현했는지 확인하고 구현했다면 저장한다.
+            // 대상 액터가 상호작용 인터페이스를 구현했는지 확인한다.
             if (TargetActor && TargetActor->GetClass()->ImplementsInterface(URSInteractable::StaticClass()))
             {
                 IRSInteractable* Interactable = Cast<IRSInteractable>(TargetActor);
@@ -679,20 +719,12 @@ void ARSDunPlayerCharacter::InteractTrace()
                 {
                     InteractActor = TargetActor;
 
-                    // 바로 상호작용 해야하는 경우
-                    if (Interactable->GetIsAutoInteract() == true)
-                    {
-                        Interactable->Interact(this);
-                    }
                     // 유저가 직접 상호작용 해야하는 경우
-                    else
+                    ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
+                    if (PC)
                     {
-                        ARSDunPlayerController* PC = Cast<ARSDunPlayerController>(GetController());
-                        if (PC)
-                        {
-                            PC->ShowInteractWidget();
-                            PC->OnInteractableFound.Broadcast(Interactable->GetInteractName());
-                        }
+                        PC->ShowInteractWidget();
+                        PC->OnInteractableFound.Broadcast(Interactable->GetInteractName());
                     }
 
                     RS_DRAW_DEBUG_SPHERE(GetWorld(), Center, InteractRadius, 32, FColor::Green, false, 0.f, 0, 1.0f);

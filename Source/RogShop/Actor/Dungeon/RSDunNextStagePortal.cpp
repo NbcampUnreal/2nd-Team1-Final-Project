@@ -103,3 +103,8 @@ UAnimMontage* ARSDunNextStagePortal::GetInteractAnimMontage() const
 {
 	return nullptr;
 }
+
+int32 ARSDunNextStagePortal::GetWeight() const
+{
+	return 0;
+}

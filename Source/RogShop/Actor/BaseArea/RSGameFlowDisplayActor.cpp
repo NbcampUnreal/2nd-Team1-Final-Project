@@ -72,4 +72,9 @@ UAnimMontage* ARSGameFlowDisplayActor::GetInteractAnimMontage() const
 	return nullptr;
 }
 
+int32 ARSGameFlowDisplayActor::GetWeight() const
+{
+	return 0;
+}
+
 
